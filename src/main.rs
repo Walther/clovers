@@ -7,8 +7,9 @@ fn main() -> ImageResult<()> {
     draw()
 }
 
-// Handy alias for internal use
-type Vec3 = Vector3<f32>;
+// Handy aliases for internal use
+type Float = f32;
+type Vec3 = Vector3<Float>;
 
 struct Ray {
     origin: Vec3,
@@ -20,29 +21,57 @@ impl Ray {
         Ray { origin, direction }
     }
 
-    fn point_at_parameter(&self, t: f32) -> Vec3 {
+    fn point_at_parameter(&self, t: Float) -> Vec3 {
         self.origin + t * self.direction
     }
 
     fn color(&self) -> Rgb<u8> {
+        // Chapter 4: sphere and background
+        let color: Vec3;
+        let sphere = Sphere::new(Vector3::new(0.0, 0.0, -1.0), 0.5);
         let unit_direction: Unit<Vec3> = Unit::new_normalize(self.direction);
-        // magic hardcoded values from tutorial
-        let t = 0.5 * (unit_direction.y + 1.0);
-        let magic_vec: Vec3 =
-            (1.0 - t) * Vector3::new(1.0, 1.0, 1.0) + t * Vector3::new(0.5, 0.7, 1.0);
+
+        if sphere.hit(&self) {
+            // Sphere, red
+            color = Vec3::new(1.0, 0.0, 0.0);
+        } else {
+            // Background, blue-white gradient. Magic from tutorial.
+            let t = 0.5 * (unit_direction.y + 1.0);
+            color = (1.0 - t) * Vector3::new(1.0, 1.0, 1.0) + t * Vector3::new(0.5, 0.7, 1.0);
+        }
 
         // Integer-i-fy
-        let r = (255.99 * magic_vec.x).floor() as u8;
-        let g = (255.99 * magic_vec.y).floor() as u8;
-        let b = (255.99 * magic_vec.z).floor() as u8;
+        let r = (255.99 * color.x).floor() as u8;
+        let g = (255.99 * color.y).floor() as u8;
+        let b = (255.99 * color.z).floor() as u8;
         Rgb([r, g, b])
+    }
+}
+
+struct Sphere {
+    center: Vec3,
+    radius: Float,
+}
+
+impl Sphere {
+    fn new(center: Vec3, radius: Float) -> Sphere {
+        Sphere { center, radius }
+    }
+
+    fn hit(&self, ray: &Ray) -> bool {
+        let oc = ray.origin - self.center;
+        let a = ray.direction.dot(&ray.direction);
+        let b = 2.0 * oc.dot(&ray.direction);
+        let c = oc.dot(&oc) - self.radius * self.radius;
+        let discriminant = b * b - 4.0 * a * c;
+        discriminant > 0.0
     }
 }
 
 fn draw() -> ImageResult<()> {
     // Let's start dirty & hardcoded
-    let width = 200;
-    let height = 100;
+    let width = 2000;
+    let height = 1000;
     let upper_left_corner: Vec3 = Vec3::new(-2.0, 1.0, -1.0);
     let horizontal: Vec3 = Vec3::new(4.0, 0.0, 0.0);
     let vertical: Vec3 = Vec3::new(0.0, -2.0, 0.0);
@@ -51,8 +80,8 @@ fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(width, height);
 
     for (x, y, pixel) in img.enumerate_pixels_mut() {
-        let u: f32 = x as f32 / width as f32;
-        let v: f32 = y as f32 / height as f32;
+        let u: Float = x as Float / width as Float;
+        let v: Float = y as Float / height as Float;
         let ray = Ray::new(origin, upper_left_corner + u * horizontal + v * vertical);
         let color = ray.color();
 
