@@ -87,12 +87,12 @@ fn color_to_rgb(color: Vec3) -> Rgb<u8> {
 /// The main drawing function, returns an `ImageResult`.
 fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
-    let camera_position: Vec3 = Vec3::new(3.0, 3.0, 2.0);
+    let camera_position: Vec3 = Vec3::new(10.0, 2.0, 3.0);
     let camera_target: Vec3 = Vec3::new(0.0, 0.0, -1.0);
     let camera_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
-    let fov: Float = 20.0;
+    let fov: Float = 25.0;
     let aspect_ratio: Float = WIDTH as Float / HEIGHT as Float;
-    let aperture: Float = 2.0;
+    let aperture: Float = 0.02;
     let focus_distance: Float = (camera_position - camera_target).norm();
     let camera = Camera::new(
         camera_position,
@@ -104,40 +104,72 @@ fn draw() -> ImageResult<()> {
         focus_distance,
     );
 
-    let sphere1 = Sphere::new(
-        Vec3::new(0.0, 0.0, -1.0),
-        0.5,
-        Arc::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.5))),
-    );
-    let sphere2 = Sphere::new(
-        Vec3::new(0.0, -100.5, -1.0),
-        100.0,
-        Arc::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0))),
-    );
-    let sphere3 = Sphere::new(
-        Vec3::new(1.0, 0.0, -1.0),
-        0.5,
-        Arc::new(Metal::new(Vec3::new(0.8, 0.6, 0.2))),
-    );
-    let sphere4 = Sphere::new(
-        Vec3::new(-1.0, 0.0, -1.0),
-        0.5,
-        Arc::new(Dielectric::new(1.5)),
-    );
-    let sphere5 = Sphere::new(
-        Vec3::new(-1.0, 0.0, -1.0),
-        -0.45,
-        Arc::new(Dielectric::new(1.5)),
-    );
-    let world: HitableList = HitableList {
-        hitables: vec![
-            Box::new(sphere1),
-            Box::new(sphere2),
-            Box::new(sphere3),
-            Box::new(sphere4),
-            Box::new(sphere5),
-        ],
+    // Chapter 12: Where next
+    // Random Scene from the book
+    let mut world: HitableList = HitableList {
+        hitables: Vec::with_capacity(500),
     };
+    world.hitables.push(Box::new(Sphere::new(
+        Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Arc::new(Lambertian::new(Vec3::new(0.5, 0.5, 0.5))),
+    )));
+    let mut rng = rand::thread_rng();
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat: Float = rng.gen();
+            let center: Vec3 = Vec3::new(
+                a as Float + 0.9 * rng.gen::<Float>(),
+                0.2 as f32,
+                b as Float + 0.9 * rng.gen::<Float>(),
+            );
+            if (center - Vec3::new(4.0, 0.2, 0.0)).norm() > 0.9 {
+                if choose_mat < 0.8 {
+                    world.hitables.push(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Arc::new(Lambertian::new(Vec3::new(
+                            rng.gen::<Float>() * rng.gen::<Float>(),
+                            rng.gen::<Float>() * rng.gen::<Float>(),
+                            rng.gen::<Float>() * rng.gen::<Float>(),
+                        ))),
+                    )));
+                } else if choose_mat < 0.95 {
+                    world.hitables.push(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Arc::new(Metal::new(Vec3::new(
+                            0.5 * (1.0 + rng.gen::<Float>()),
+                            0.5 * (1.0 + rng.gen::<Float>()),
+                            0.5 * (1.0 + rng.gen::<Float>()),
+                        ))),
+                    )));
+                } else {
+                    world.hitables.push(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Arc::new(Dielectric::new(1.5)),
+                    )));
+                }
+            }
+        }
+    }
+    world.hitables.push(Box::new(Sphere::new(
+        Vec3::new(0.0, 1.0, 0.0),
+        1.0,
+        Arc::new(Dielectric::new(1.5)),
+    )));
+    world.hitables.push(Box::new(Sphere::new(
+        Vec3::new(-4.0, 1.0, 0.0),
+        1.0,
+        Arc::new(Lambertian::new(Vec3::new(0.4, 0.2, 0.1))),
+    )));
+    world.hitables.push(Box::new(Sphere::new(
+        Vec3::new(4.0, 1.0, 0.0),
+        1.0,
+        Arc::new(Metal::new(Vec3::new(0.7, 0.6, 0.5))),
+    )));
+    // End scene
 
     img.enumerate_pixels_mut()
         .par_bridge()
