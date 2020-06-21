@@ -17,7 +17,7 @@ use ray::Ray;
 mod camera;
 use camera::Camera;
 mod material;
-use material::{Lambertian, Material, Metal};
+use material::{Dielectric, Lambertian, Material, Metal};
 
 const SHADOW_SMOOTHING: Float = 0.001;
 const GAMMA: Float = 2.0;
@@ -91,7 +91,7 @@ fn draw() -> ImageResult<()> {
     let sphere1 = Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
         0.5,
-        Arc::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3))),
+        Arc::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.5))),
     );
     let sphere2 = Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
@@ -106,7 +106,12 @@ fn draw() -> ImageResult<()> {
     let sphere4 = Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),
         0.5,
-        Arc::new(Metal::new(Vec3::new(0.8, 0.8, 0.8))),
+        Arc::new(Dielectric::new(1.5)),
+    );
+    let sphere5 = Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        -0.45,
+        Arc::new(Dielectric::new(1.5)),
     );
     let world: HitableList = HitableList {
         hitables: vec![
@@ -114,6 +119,7 @@ fn draw() -> ImageResult<()> {
             Box::new(sphere2),
             Box::new(sphere3),
             Box::new(sphere4),
+            Box::new(sphere5),
         ],
     };
 
