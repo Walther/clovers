@@ -1,3 +1,5 @@
+#![deny(clippy::all)]
+
 use rayon::prelude::*;
 
 use rand::prelude::*;
@@ -21,10 +23,10 @@ use material::{Dielectric, Lambertian, Material, Metal};
 
 const SHADOW_SMOOTHING: Float = 0.001;
 const GAMMA: Float = 2.0;
-const WIDTH: u32 = 1200;
+const WIDTH: u32 = 1000;
 const HEIGHT: u32 = 600;
-const ANTIALIAS_SAMPLES: u32 = 100;
-const MAX_DEPTH: u32 = 50;
+const ANTIALIAS_SAMPLES: u32 = 10;
+const MAX_DEPTH: u32 = 10;
 
 fn main() -> ImageResult<()> {
     println!("clovers - ray tracing in rust <3");
@@ -54,25 +56,28 @@ pub fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
 fn colorize(ray: &Ray, world: &dyn Hitable, depth: u32, rng: ThreadRng) -> Vec3 {
     let color: Vec3;
 
-    if let Some(hit_record) = world.hit(&ray, SHADOW_SMOOTHING, Float::MAX) {
-        // Hit an object, scatter and colorize the new ray
-        if depth < MAX_DEPTH {
-            if let Some((scattered, attenuation)) =
-                hit_record.material.scatter(&ray, &hit_record, rng)
-            {
-                color = attenuation.component_mul(&colorize(&scattered, world, depth + 1, rng));
-                return color;
+    match world.hit(&ray, SHADOW_SMOOTHING, Float::MAX) {
+        Some(hit_record) => {
+            // Hit an object, scatter and colorize the new ray
+            if depth < MAX_DEPTH {
+                if let Some((scattered, attenuation)) =
+                    hit_record.material.scatter(&ray, &hit_record, rng)
+                {
+                    color = attenuation.component_mul(&colorize(&scattered, world, depth + 1, rng));
+                    return color;
+                }
             }
+            // Ray absorbed, no color
+            color = Vec3::new(0.0, 0.0, 0.0);
+            color
         }
-        // Ray absorbed, no color
-        color = Vec3::new(0.0, 0.0, 0.0);
-        return color;
-    } else {
-        // Background, blue-white gradient. Magic from tutorial.
-        let unit_direction: Vec3 = ray.direction.normalize();
-        let t = 0.5 * (unit_direction.y + 1.0);
-        color = (1.0 - t) * Vector3::new(1.0, 1.0, 1.0) + t * Vector3::new(0.5, 0.7, 1.0);
-        return color;
+        None => {
+            // Background, blue-white gradient. Magic from tutorial.
+            let unit_direction: Vec3 = ray.direction.normalize();
+            let t = 0.5 * (unit_direction.y + 1.0);
+            color = (1.0 - t) * Vector3::new(1.0, 1.0, 1.0) + t * Vector3::new(0.5, 0.7, 1.0);
+            color
+        }
     }
 }
 

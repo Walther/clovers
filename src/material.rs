@@ -70,7 +70,7 @@ fn refract(vector: Vec3, normal: Vec3, ni_over_nt: Float) -> Option<Vec3> {
 fn schlick(cosine: Float, refractive_index: Float) -> Float {
   let r0 = (1.0 - refractive_index) / (1.0 + refractive_index);
   let r0 = r0 * r0;
-  return r0 + (1.0 - r0) * ((1.0 - cosine).powf(5.0));
+  r0 + (1.0 - r0) * ((1.0 - cosine).powf(5.0))
 }
 
 #[derive(Clone)]

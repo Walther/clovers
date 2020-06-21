@@ -27,6 +27,6 @@ impl Hitable for HitableList {
         hit_record = Some(record);
       }
     }
-    return hit_record;
+    hit_record
   }
 }
