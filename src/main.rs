@@ -87,12 +87,22 @@ fn color_to_rgb(color: Vec3) -> Rgb<u8> {
 /// The main drawing function, returns an `ImageResult`.
 fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
-    let camera_position: Vec3 = Vec3::new(-2.0, 2.0, 1.0);
-    let camera_targt: Vec3 = Vec3::new(0.0, 0.0, -1.0);
+    let camera_position: Vec3 = Vec3::new(3.0, 3.0, 2.0);
+    let camera_target: Vec3 = Vec3::new(0.0, 0.0, -1.0);
     let camera_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
-    let fov: Float = 90.0;
+    let fov: Float = 20.0;
     let aspect_ratio: Float = WIDTH as Float / HEIGHT as Float;
-    let camera = Camera::new(camera_position, camera_targt, camera_up, fov, aspect_ratio);
+    let aperture: Float = 2.0;
+    let focus_distance: Float = (camera_position - camera_target).norm();
+    let camera = Camera::new(
+        camera_position,
+        camera_target,
+        camera_up,
+        fov,
+        aspect_ratio,
+        aperture,
+        focus_distance,
+    );
 
     let sphere1 = Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
@@ -142,7 +152,7 @@ fn draw() -> ImageResult<()> {
             for _sample in 0..ANTIALIAS_SAMPLES {
                 u = (x as Float + rng.gen::<Float>()) / WIDTH as Float;
                 v = (y as Float + rng.gen::<Float>()) / HEIGHT as Float;
-                ray = camera.get_ray(u, v);
+                ray = camera.get_ray(u, v, rng);
                 color += colorize(&ray, &world, 0, rng);
             }
             color /= ANTIALIAS_SAMPLES as Float;
