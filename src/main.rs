@@ -60,13 +60,7 @@ fn colorize(ray: &Ray, world: &dyn Hitable, depth: u32, rng: ThreadRng) -> Vec3 
             if let Some((scattered, attenuation)) =
                 hit_record.material.scatter(&ray, &hit_record, rng)
             {
-                // TODO: clean up this mess
-                let temp_color: Vec3 = colorize(&scattered, world, depth + 1, rng);
-                color = Vec3::new(
-                    attenuation.x * temp_color.x,
-                    attenuation.y * temp_color.y,
-                    attenuation.z * temp_color.z,
-                );
+                color = attenuation.component_mul(&colorize(&scattered, world, depth + 1, rng));
                 return color;
             }
         }
