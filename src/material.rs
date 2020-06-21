@@ -1,5 +1,16 @@
-use crate::{random_in_unit_sphere, Float, HitRecord, Ray, ThreadRng, Vec3};
+use crate::{Float, HitRecord, Ray, ThreadRng, Vec3};
 use rand::prelude::*;
+
+// Internal helper
+pub fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
+  let mut position: Vec3;
+  loop {
+    position = 2.0 * Vec3::new(rng.gen(), rng.gen(), rng.gen()) - Vec3::new(1.0, 1.0, 1.0);
+    if position.magnitude_squared() >= 1.0 {
+      return position;
+    }
+  }
+}
 
 pub trait Material: Sync + Send {
   /// Returns `None`, if the ray gets absorbed.

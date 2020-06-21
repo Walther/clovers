@@ -10,6 +10,8 @@ use nalgebra::Vector3;
 
 use std::{sync::Arc, time::Instant};
 
+use chrono::Utc;
+
 mod sphere;
 use sphere::Sphere;
 mod hitable;
@@ -25,8 +27,8 @@ const SHADOW_SMOOTHING: Float = 0.001;
 const GAMMA: Float = 2.0;
 const WIDTH: u32 = 1000;
 const HEIGHT: u32 = 600;
-const ANTIALIAS_SAMPLES: u32 = 10;
-const MAX_DEPTH: u32 = 10;
+const ANTIALIAS_SAMPLES: u32 = 100;
+const MAX_DEPTH: u32 = 50;
 
 fn main() -> ImageResult<()> {
     println!("clovers - ray tracing in rust <3");
@@ -40,17 +42,6 @@ fn main() -> ImageResult<()> {
 // Handy aliases for internal use
 type Float = f32;
 type Vec3 = Vector3<Float>;
-
-// Internal helper
-pub fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
-    let mut position: Vec3;
-    loop {
-        position = 2.0 * Vec3::new(rng.gen(), rng.gen(), rng.gen()) - Vec3::new(1.0, 1.0, 1.0);
-        if position.magnitude_squared() >= 1.0 {
-            return position;
-        }
-    }
-}
 
 /// The main coloring function
 fn colorize(ray: &Ray, world: &dyn Hitable, depth: u32, rng: ThreadRng) -> Vec3 {
@@ -206,5 +197,8 @@ fn draw() -> ImageResult<()> {
     // Graphics assume origin at bottom left corner of the screen
     // Our buffer writes pixels from top left corner. Simple fix, just flip it!
     image::imageops::flip_vertical_in_place(&mut img);
-    img.save("renders/image.png")
+    // Timestamp & write
+    let timestamp = Utc::now().timestamp();
+    println!("{}", timestamp);
+    img.save(format!("renders/{}.png", timestamp))
 }
