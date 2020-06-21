@@ -87,7 +87,13 @@ fn color_to_rgb(color: Vec3) -> Rgb<u8> {
 /// The main drawing function, returns an `ImageResult`.
 fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
-    let camera = Camera::default();
+    let camera_position: Vec3 = Vec3::new(-2.0, 2.0, 1.0);
+    let camera_targt: Vec3 = Vec3::new(0.0, 0.0, -1.0);
+    let camera_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
+    let fov: Float = 90.0;
+    let aspect_ratio: Float = WIDTH as Float / HEIGHT as Float;
+    let camera = Camera::new(camera_position, camera_targt, camera_up, fov, aspect_ratio);
+
     let sphere1 = Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
         0.5,
@@ -150,5 +156,8 @@ fn draw() -> ImageResult<()> {
             *pixel = color_to_rgb(color);
         });
 
+    // Graphics assume origin at bottom left corner of the screen
+    // Our buffer writes pixels from top left corner. Simple fix, just flip it!
+    image::imageops::flip_vertical_in_place(&mut img);
     img.save("renders/image.png")
 }
