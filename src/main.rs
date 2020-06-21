@@ -1,6 +1,13 @@
 use image::{ImageBuffer, ImageResult, Rgb, RgbImage};
 
-use nalgebra::{Unit, Vector3};
+use nalgebra::Vector3;
+
+mod sphere;
+use sphere::Sphere;
+mod hitable;
+use hitable::{HitRecord, Hitable, HitableList};
+mod ray;
+use ray::Ray;
 
 fn main() -> ImageResult<()> {
     println!("clovers - ray tracing in rust <3");
@@ -10,90 +17,6 @@ fn main() -> ImageResult<()> {
 // Handy aliases for internal use
 type Float = f32;
 type Vec3 = Vector3<Float>;
-
-struct Ray {
-    origin: Vec3,
-    direction: Vec3,
-}
-
-impl Ray {
-    fn new(origin: Vec3, direction: Vec3) -> Ray {
-        Ray { origin, direction }
-    }
-
-    fn point_at_parameter(&self, t: Float) -> Vec3 {
-        self.origin + t * self.direction
-    }
-}
-
-struct HitRecord {
-    distance: Float,
-    position: Vec3,
-    normal: Vec3,
-}
-
-trait Hitable {
-    fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord>;
-}
-
-/// Helper struct for storing multiple `Hitable` objects. This list has a `Hitable` implementation too, returning the closest possible hit
-struct HitableList {
-    hitables: Vec<Box<dyn Hitable>>,
-}
-
-impl Hitable for HitableList {
-    fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord> {
-        let mut hit_record: Option<HitRecord> = None;
-        let mut closest = distance_max;
-        for hitable in self.hitables.iter() {
-            if let Some(record) = hitable.hit(&ray, distance_min, closest) {
-                closest = record.distance;
-                hit_record = Some(record);
-            }
-        }
-        return hit_record;
-    }
-}
-
-struct Sphere {
-    center: Vec3,
-    radius: Float,
-}
-
-impl Hitable for Sphere {
-    fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord> {
-        let oc = ray.origin - self.center;
-        let a = ray.direction.dot(&ray.direction);
-        let b = oc.dot(&ray.direction);
-        let c = oc.dot(&oc) - self.radius * self.radius;
-        let discriminant = b * b - a * c;
-        if discriminant > 0.0 {
-            // First possible root
-            let distance = (-b - discriminant.sqrt()) / a;
-            if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.point_at_parameter(distance);
-                let normal = (position - self.center) / self.radius;
-                return Some(HitRecord {
-                    distance,
-                    position,
-                    normal,
-                });
-            }
-            // Second possible root
-            let distance = (-b + discriminant.sqrt()) / a;
-            if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.point_at_parameter(distance);
-                let normal = (position - self.center) / self.radius;
-                return Some(HitRecord {
-                    distance,
-                    position,
-                    normal,
-                });
-            }
-        }
-        None
-    }
-}
 
 /// The main coloring function
 fn color(ray: &Ray, world: &dyn Hitable) -> Rgb<u8> {
@@ -133,14 +56,8 @@ fn draw() -> ImageResult<()> {
 
     let mut img: RgbImage = ImageBuffer::new(width, height);
 
-    let sphere1 = Sphere {
-        center: Vec3::new(0.0, 0.0, -1.0),
-        radius: 0.5,
-    };
-    let sphere2 = Sphere {
-        center: Vec3::new(0.0, -100.5, -1.0),
-        radius: 100.0,
-    };
+    let sphere1 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5);
+    let sphere2 = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0);
     let world: HitableList = HitableList {
         hitables: vec![Box::new(sphere1), Box::new(sphere2)],
     };
