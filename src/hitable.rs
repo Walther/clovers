@@ -6,7 +6,7 @@ pub struct HitRecord {
   pub normal: Vec3,
 }
 
-pub trait Hitable {
+pub trait Hitable: Sync {
   fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord>;
 }
 

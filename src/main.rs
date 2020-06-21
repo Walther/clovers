@@ -1,3 +1,5 @@
+use rayon::prelude::*;
+
 use image::{ImageBuffer, ImageResult, Rgb, RgbImage};
 
 use nalgebra::Vector3;
@@ -8,10 +10,15 @@ mod hitable;
 use hitable::{HitRecord, Hitable, HitableList};
 mod ray;
 use ray::Ray;
+use std::time::Instant;
 
 fn main() -> ImageResult<()> {
     println!("clovers - ray tracing in rust <3");
-    draw()
+    let start = Instant::now();
+    draw()?;
+    let duration = Instant::now() - start;
+    println!("rendered in {} ms", duration.as_millis());
+    Ok(())
 }
 
 // Handy aliases for internal use
@@ -62,6 +69,7 @@ fn draw() -> ImageResult<()> {
         hitables: vec![Box::new(sphere1), Box::new(sphere2)],
     };
 
+    // sequential
     for (x, y, pixel) in img.enumerate_pixels_mut() {
         let u: Float = x as Float / width as Float;
         let v: Float = y as Float / height as Float;
@@ -69,6 +77,18 @@ fn draw() -> ImageResult<()> {
         let color = color(&ray, &world);
         *pixel = color;
     }
+
+    // rayon parallelized
+    // TODO: why is this slower?
+    // img.enumerate_pixels_mut()
+    //     .par_bridge()
+    //     .for_each(|(x, y, pixel)| {
+    //         let u: Float = x as Float / width as Float;
+    //         let v: Float = y as Float / height as Float;
+    //         let ray = Ray::new(origin, upper_left_corner + u * horizontal + v * vertical);
+    //         let color = color(&ray, &world);
+    //         *pixel = color;
+    //     });
 
     img.save("renders/image.png")
 }
