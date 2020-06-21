@@ -1,6 +1,6 @@
 use crate::{random_in_unit_sphere, HitRecord, Ray, ThreadRng, Vec3};
 
-pub trait Material: Sync {
+pub trait Material: Sync + Send {
   /// Returns `None`, if the ray gets absorbed.
   /// Returns `Some(scattered, attenuation)`, if the ray gets scattered
   fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Vec3)>;
@@ -12,7 +12,7 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-  fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Vec3)> {
+  fn scatter(&self, _ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Vec3)> {
     let target = hit_record.position + hit_record.normal + random_in_unit_sphere(rng);
     let scattered: Ray = Ray::new(hit_record.position, target - hit_record.position);
     let attenuation: Vec3 = self.albedo;
@@ -36,11 +36,15 @@ fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
 }
 
 impl Material for Metal {
-  fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Vec3)> {
+  fn scatter(&self, ray: &Ray, hit_record: &HitRecord, _rng: ThreadRng) -> Option<(Ray, Vec3)> {
     let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
     let scattered: Ray = Ray::new(hit_record.position, reflected);
     let attenuation: Vec3 = self.albedo;
-    Some((scattered, attenuation))
+    if scattered.direction.dot(&hit_record.normal) > 0.0 {
+      Some((scattered, attenuation))
+    } else {
+      None
+    }
   }
 }
 

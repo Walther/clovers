@@ -60,7 +60,13 @@ fn colorize(ray: &Ray, world: &dyn Hitable, depth: u32, rng: ThreadRng) -> Vec3 
             if let Some((scattered, attenuation)) =
                 hit_record.material.scatter(&ray, &hit_record, rng)
             {
-                color = attenuation.cross(&colorize(&scattered, world, depth + 1, rng));
+                // TODO: clean up this mess
+                let temp_color: Vec3 = colorize(&scattered, world, depth + 1, rng);
+                color = Vec3::new(
+                    attenuation.x * temp_color.x,
+                    attenuation.y * temp_color.y,
+                    attenuation.z * temp_color.z,
+                );
                 return color;
             }
         }
@@ -106,7 +112,7 @@ fn draw() -> ImageResult<()> {
     let sphere4 = Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),
         0.5,
-        Arc::new(Metal::new(Vec3::new(0.8, 0.8, 0.0))),
+        Arc::new(Metal::new(Vec3::new(0.8, 0.8, 0.8))),
     );
     let world: HitableList = HitableList {
         hitables: vec![

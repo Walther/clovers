@@ -8,7 +8,7 @@ pub struct HitRecord {
   pub material: Arc<dyn Material>,
 }
 
-pub trait Hitable: Sync {
+pub trait Hitable: Sync + Send {
   fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord>;
 }
 

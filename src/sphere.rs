@@ -26,7 +26,7 @@ impl Hitable for Sphere {
     let discriminant = b * b - a * c;
     if discriminant > 0.0 {
       // First possible root
-      let distance = (-b - discriminant.sqrt()) / a;
+      let distance = (-b - (b * b - a * c).sqrt()) / a;
       if distance < distance_max && distance > distance_min {
         let position: Vec3 = ray.point_at_parameter(distance);
         let normal = (position - self.center) / self.radius;
@@ -34,11 +34,11 @@ impl Hitable for Sphere {
           distance,
           position,
           normal,
-          material: self.material,
+          material: Arc::clone(&self.material),
         });
       }
       // Second possible root
-      let distance = (-b + discriminant.sqrt()) / a;
+      let distance = (-b + (b * b - a * c).sqrt()) / a;
       if distance < distance_max && distance > distance_min {
         let position: Vec3 = ray.point_at_parameter(distance);
         let normal = (position - self.center) / self.radius;
@@ -46,7 +46,7 @@ impl Hitable for Sphere {
           distance,
           position,
           normal,
-          material: self.material,
+          material: Arc::clone(&self.material),
         });
       }
     }
