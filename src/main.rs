@@ -17,6 +17,12 @@ use ray::Ray;
 mod camera;
 use camera::Camera;
 
+const SHADOW_SMOOTHING: Float = 0.001;
+const GAMMA: Float = 2.0;
+const WIDTH: u32 = 1200;
+const HEIGHT: u32 = 600;
+const ANTIALIAS_SAMPLES: u32 = 100;
+
 fn main() -> ImageResult<()> {
     println!("clovers - ray tracing in rust <3");
     let start = Instant::now();
@@ -31,16 +37,28 @@ type Float = f32;
 type Vec3 = Vector3<Float>;
 
 /// The main coloring function
-fn colorize(ray: &Ray, world: &dyn Hitable) -> Vec3 {
+fn colorize(ray: &Ray, world: &dyn Hitable, rng: ThreadRng) -> Vec3 {
+    // Internal helper
+    fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
+        let mut position: Vec3;
+        loop {
+            position = 2.0 * Vec3::new(rng.gen(), rng.gen(), rng.gen()) - Vec3::new(1.0, 1.0, 1.0);
+            if position.magnitude_squared() >= 1.0 {
+                return position;
+            }
+        }
+    }
+
     let color: Vec3;
 
-    if let Some(hit_record) = world.hit(&ray, 0.0, Float::MAX) {
+    if let Some(hit_record) = world.hit(&ray, SHADOW_SMOOTHING, Float::MAX) {
         // Hit an object, colorize based on surface normals
-        color = 0.5
-            * Vec3::new(
-                hit_record.normal.x + 1.0,
-                hit_record.normal.y + 1.0,
-                hit_record.normal.z + 1.0,
+        let target = hit_record.position + hit_record.normal + random_in_unit_sphere(rng);
+        return 0.5
+            * colorize(
+                &Ray::new(hit_record.position, target - hit_record.position),
+                world,
+                rng,
             );
     } else {
         // Background, blue-white gradient. Magic from tutorial.
@@ -62,11 +80,7 @@ fn color_to_rgb(color: Vec3) -> Rgb<u8> {
 
 /// The main drawing function, returns an `ImageResult`.
 fn draw() -> ImageResult<()> {
-    // Let's start dirty & hardcoded
-    let width = 1200;
-    let height = 600;
-    let antialias_samples = 100;
-    let mut img: RgbImage = ImageBuffer::new(width, height);
+    let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
     let camera = Camera::default();
     let sphere1 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5);
     let sphere2 = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0);
@@ -82,13 +96,21 @@ fn draw() -> ImageResult<()> {
             let mut u: Float;
             let mut v: Float;
             let mut ray: Ray;
-            for _sample in 0..antialias_samples {
-                u = (x as Float + rng.gen::<Float>()) / width as Float;
-                v = (y as Float + rng.gen::<Float>()) / height as Float;
+
+            // Multisampling for antialiasing
+            for _sample in 0..ANTIALIAS_SAMPLES {
+                u = (x as Float + rng.gen::<Float>()) / WIDTH as Float;
+                v = (y as Float + rng.gen::<Float>()) / HEIGHT as Float;
                 ray = camera.get_ray(u, v);
-                color += colorize(&ray, &world);
+                color += colorize(&ray, &world, rng);
             }
-            color /= antialias_samples as Float;
+            color /= ANTIALIAS_SAMPLES as Float;
+
+            // Gamma correction
+            let gamma_correction = 1.0 / GAMMA;
+            color.x = color.x.powf(gamma_correction);
+            color.y = color.y.powf(gamma_correction);
+            color.z = color.z.powf(gamma_correction);
 
             *pixel = color_to_rgb(color);
         });
