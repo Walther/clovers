@@ -6,7 +6,7 @@ use image::{ImageBuffer, ImageResult, Rgb, RgbImage};
 
 use nalgebra::Vector3;
 
-use std::time::Instant;
+use std::{sync::Arc, time::Instant};
 
 mod sphere;
 use sphere::Sphere;
@@ -16,12 +16,15 @@ mod ray;
 use ray::Ray;
 mod camera;
 use camera::Camera;
+mod material;
+use material::{Lambertian, Material, Metal};
 
 const SHADOW_SMOOTHING: Float = 0.001;
 const GAMMA: Float = 2.0;
 const WIDTH: u32 = 1200;
 const HEIGHT: u32 = 600;
 const ANTIALIAS_SAMPLES: u32 = 100;
+const MAX_DEPTH: u32 = 50;
 
 fn main() -> ImageResult<()> {
     println!("clovers - ray tracing in rust <3");
@@ -36,38 +39,41 @@ fn main() -> ImageResult<()> {
 type Float = f32;
 type Vec3 = Vector3<Float>;
 
-/// The main coloring function
-fn colorize(ray: &Ray, world: &dyn Hitable, rng: ThreadRng) -> Vec3 {
-    // Internal helper
-    fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
-        let mut position: Vec3;
-        loop {
-            position = 2.0 * Vec3::new(rng.gen(), rng.gen(), rng.gen()) - Vec3::new(1.0, 1.0, 1.0);
-            if position.magnitude_squared() >= 1.0 {
-                return position;
-            }
+// Internal helper
+pub fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
+    let mut position: Vec3;
+    loop {
+        position = 2.0 * Vec3::new(rng.gen(), rng.gen(), rng.gen()) - Vec3::new(1.0, 1.0, 1.0);
+        if position.magnitude_squared() >= 1.0 {
+            return position;
         }
     }
+}
 
+/// The main coloring function
+fn colorize(ray: &Ray, world: &dyn Hitable, depth: u32, rng: ThreadRng) -> Vec3 {
     let color: Vec3;
 
     if let Some(hit_record) = world.hit(&ray, SHADOW_SMOOTHING, Float::MAX) {
-        // Hit an object, colorize based on surface normals
-        let target = hit_record.position + hit_record.normal + random_in_unit_sphere(rng);
-        return 0.5
-            * colorize(
-                &Ray::new(hit_record.position, target - hit_record.position),
-                world,
-                rng,
-            );
+        // Hit an object, scatter and colorize the new ray
+        if depth < MAX_DEPTH {
+            if let Some((scattered, attenuation)) =
+                hit_record.material.scatter(&ray, &hit_record, rng)
+            {
+                color = attenuation.cross(&colorize(&scattered, world, depth + 1, rng));
+                return color;
+            }
+        }
+        // Ray absorbed, no color
+        color = Vec3::new(0.0, 0.0, 0.0);
+        return color;
     } else {
         // Background, blue-white gradient. Magic from tutorial.
         let unit_direction: Vec3 = ray.direction.normalize();
         let t = 0.5 * (unit_direction.y + 1.0);
         color = (1.0 - t) * Vector3::new(1.0, 1.0, 1.0) + t * Vector3::new(0.5, 0.7, 1.0);
+        return color;
     }
-
-    color
 }
 
 fn color_to_rgb(color: Vec3) -> Rgb<u8> {
@@ -82,10 +88,33 @@ fn color_to_rgb(color: Vec3) -> Rgb<u8> {
 fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
     let camera = Camera::default();
-    let sphere1 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5);
-    let sphere2 = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0);
+    let sphere1 = Sphere::new(
+        Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        Arc::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3))),
+    );
+    let sphere2 = Sphere::new(
+        Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        Arc::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0))),
+    );
+    let sphere3 = Sphere::new(
+        Vec3::new(1.0, 0.0, -1.0),
+        0.5,
+        Arc::new(Metal::new(Vec3::new(0.8, 0.6, 0.2))),
+    );
+    let sphere4 = Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        0.5,
+        Arc::new(Metal::new(Vec3::new(0.8, 0.8, 0.0))),
+    );
     let world: HitableList = HitableList {
-        hitables: vec![Box::new(sphere1), Box::new(sphere2)],
+        hitables: vec![
+            Box::new(sphere1),
+            Box::new(sphere2),
+            Box::new(sphere3),
+            Box::new(sphere4),
+        ],
     };
 
     img.enumerate_pixels_mut()
@@ -102,7 +131,7 @@ fn draw() -> ImageResult<()> {
                 u = (x as Float + rng.gen::<Float>()) / WIDTH as Float;
                 v = (y as Float + rng.gen::<Float>()) / HEIGHT as Float;
                 ray = camera.get_ray(u, v);
-                color += colorize(&ray, &world, rng);
+                color += colorize(&ray, &world, 0, rng);
             }
             color /= ANTIALIAS_SAMPLES as Float;
 

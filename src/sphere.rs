@@ -1,13 +1,19 @@
-use crate::{Float, HitRecord, Hitable, Ray, Vec3};
+use crate::{Float, HitRecord, Hitable, Material, Ray, Vec3};
+use std::sync::Arc;
 
 pub struct Sphere {
   center: Vec3,
   radius: Float,
+  material: Arc<dyn Material>,
 }
 
 impl Sphere {
-  pub fn new(center: Vec3, radius: Float) -> Self {
-    Sphere { center, radius }
+  pub fn new(center: Vec3, radius: Float, material: Arc<dyn Material>) -> Self {
+    Sphere {
+      center,
+      radius,
+      material,
+    }
   }
 }
 
@@ -28,6 +34,7 @@ impl Hitable for Sphere {
           distance,
           position,
           normal,
+          material: self.material,
         });
       }
       // Second possible root
@@ -39,6 +46,7 @@ impl Hitable for Sphere {
           distance,
           position,
           normal,
+          material: self.material,
         });
       }
     }
