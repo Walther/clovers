@@ -4,13 +4,16 @@ use image::{ImageBuffer, ImageResult, Rgb, RgbImage};
 
 use nalgebra::Vector3;
 
+use std::time::Instant;
+
 mod sphere;
 use sphere::Sphere;
 mod hitable;
 use hitable::{HitRecord, Hitable, HitableList};
 mod ray;
 use ray::Ray;
-use std::time::Instant;
+mod camera;
+use camera::Camera;
 
 fn main() -> ImageResult<()> {
     println!("clovers - ray tracing in rust <3");
@@ -56,12 +59,9 @@ fn draw() -> ImageResult<()> {
     // Let's start dirty & hardcoded
     let width = 2000;
     let height = 1000;
-    let upper_left_corner: Vec3 = Vec3::new(-2.0, 1.0, -1.0);
-    let horizontal: Vec3 = Vec3::new(4.0, 0.0, 0.0);
-    let vertical: Vec3 = Vec3::new(0.0, -2.0, 0.0);
-    let origin: Vec3 = Vec3::new(0.0, 0.0, 0.0);
 
     let mut img: RgbImage = ImageBuffer::new(width, height);
+    let camera = Camera::default();
 
     let sphere1 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5);
     let sphere2 = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0);
@@ -73,7 +73,7 @@ fn draw() -> ImageResult<()> {
     for (x, y, pixel) in img.enumerate_pixels_mut() {
         let u: Float = x as Float / width as Float;
         let v: Float = y as Float / height as Float;
-        let ray = Ray::new(origin, upper_left_corner + u * horizontal + v * vertical);
+        let ray = camera.get_ray(u, v);
         let color = color(&ray, &world);
         *pixel = color;
     }
