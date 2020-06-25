@@ -29,8 +29,8 @@ use scenes::{metal_spheres, random_scene};
 
 const SHADOW_SMOOTHING: Float = 0.001;
 const GAMMA: Float = 2.0;
-const WIDTH: u32 = 1000;
-const HEIGHT: u32 = 600;
+const WIDTH: u32 = 1920;
+const HEIGHT: u32 = 1080;
 const ANTIALIAS_SAMPLES: u32 = 100;
 const MAX_DEPTH: u32 = 50;
 
