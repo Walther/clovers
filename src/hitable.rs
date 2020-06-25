@@ -133,7 +133,7 @@ pub struct BVHNode {
 }
 
 impl BVHNode {
-    fn from_list(
+    pub fn from_list(
         objects: HitableList,
         time_0: Float,
         time_1: Float,
@@ -259,10 +259,9 @@ fn box_compare(a: &dyn Hitable, b: &dyn Hitable, axis: usize) -> Ordering {
     } else {
         if box_a.unwrap().min[axis] < box_b.unwrap().min[axis] {
             Ordering::Less
-        } else if box_a.unwrap().min[axis] > box_b.unwrap().min[axis] {
-            Ordering::Greater
         } else {
-            panic!("Floating point comparison error at box_compare");
+            // Default to greater, even if equal
+            Ordering::Greater
         }
     }
 }
