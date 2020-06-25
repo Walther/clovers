@@ -19,7 +19,7 @@ pub fn scene(mut rng: ThreadRng) -> HitableList {
         1000.0,
         Arc::new(ground_material),
     );
-    world.hitables.push(Box::new(ground_sphere));
+    world.hitables.push(Arc::new(ground_sphere));
 
     for a in -11..11 {
         for b in -11..11 {
@@ -36,7 +36,7 @@ pub fn scene(mut rng: ThreadRng) -> HitableList {
                     let albedo = Color::random(rng);
                     let sphere_material = Lambertian::new(albedo);
                     let center2 = center + Vec3::new(0.0, rng.gen_range(0.0, 0.5), 0.0);
-                    world.hitables.push(Box::new(MovingSphere::new(
+                    world.hitables.push(Arc::new(MovingSphere::new(
                         center,
                         center2,
                         0.0,
@@ -49,7 +49,7 @@ pub fn scene(mut rng: ThreadRng) -> HitableList {
                     let albedo = Color::random(rng);
                     let fuzz = rng.gen_range(0.0, 0.5);
                     let sphere_material = Metal::new(albedo, fuzz);
-                    world.hitables.push(Box::new(Sphere::new(
+                    world.hitables.push(Arc::new(Sphere::new(
                         center,
                         0.2,
                         Arc::new(sphere_material),
@@ -57,7 +57,7 @@ pub fn scene(mut rng: ThreadRng) -> HitableList {
                 } else {
                     // glass
                     let sphere_material = Dielectric::new(1.5);
-                    world.hitables.push(Box::new(Sphere::new(
+                    world.hitables.push(Arc::new(Sphere::new(
                         center,
                         0.2,
                         Arc::new(sphere_material),
@@ -68,21 +68,21 @@ pub fn scene(mut rng: ThreadRng) -> HitableList {
     }
 
     let material1 = Dielectric::new(1.5);
-    world.hitables.push(Box::new(Sphere::new(
+    world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, 1.0, 0.0),
         1.0,
         Arc::new(material1),
     )));
 
     let material2 = Lambertian::new(Color::new(0.4, 0.2, 0.1));
-    world.hitables.push(Box::new(Sphere::new(
+    world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
         Arc::new(material2),
     )));
 
     let material3 = Metal::new(Color::new(0.7, 0.6, 0.5), 0.0);
-    world.hitables.push(Box::new(Sphere::new(
+    world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(4.0, 1.0, 0.0),
         1.0,
         Arc::new(material3),
