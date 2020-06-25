@@ -11,6 +11,7 @@ pub struct HitRecord {
 pub trait Hitable: Sync + Send {
     /// The main function for checking whether an object is hit by a ray. If an object is hit, returns Some(HitRecord)
     fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord>;
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB>;
 }
 
 /// Helper struct for storing multiple `Hitable` objects. This list has a `Hitable` implementation too, returning the closest possible hit
@@ -30,6 +31,40 @@ impl Hitable for HitableList {
         }
         hit_record
     }
+
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+        if self.hitables.is_empty() {
+            return None;
+        }
+
+        let mut output_box: Option<AABB> = None;
+
+        for object in self.hitables.iter() {
+            // Check if the object has a box
+            match object.bounding_box(t0, t1) {
+                // No box found, early return.
+                // Having even one unbounded object in a list makes the entire list unbounded
+                None => return None,
+                // Box found
+                Some(bounding) =>
+                // Do we have an output_box already saved?
+                {
+                    match output_box {
+                        // If we do, expand it & recurse
+                        Some(old_box) => {
+                            output_box = Some(AABB::surrounding_box(old_box, bounding));
+                        }
+                        // Otherwise, set output box to be the newly-found box
+                        None => {
+                            output_box = Some(bounding);
+                        }
+                    }
+                }
+            }
+        }
+
+        return output_box;
+    }
 }
 
 impl HitableList {
@@ -42,4 +77,50 @@ impl HitableList {
     //     pub fn add(&self, object: dyn Hitable) {
     //         self.hitables.push(Box::new(object));
     //     }
+}
+
+#[derive(Clone, Copy)]
+pub struct AABB {
+    min: Vec3,
+    max: Vec3,
+}
+
+impl AABB {
+    pub fn new(min: Vec3, max: Vec3) -> AABB {
+        AABB { min, max }
+    }
+
+    /// "An Optimized AABB Hit Method" https://raytracing.github.io/books/RayTracingTheNextWeek.html
+    pub fn hit(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
+        for a in 0..3 {
+            let invd = 1.0 / ray.direction[a];
+            let mut t0 = (self.min[a] - ray.origin[a]) * invd;
+            let mut t1 = (self.max[a] - ray.origin[a]) * invd;
+            if invd < 0.0 {
+                std::mem::swap(&mut t0, &mut t1);
+            }
+            tmin = if t0 > tmin { t0 } else { tmin };
+            tmax = if t1 < tmax { t1 } else { tmax };
+            if tmax <= tmin {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
+        let small: Vec3 = Vec3::new(
+            (box0.min.x).min(box1.min.x),
+            (box0.min.y).min(box1.min.y),
+            (box0.min.z).min(box1.min.z),
+        );
+
+        let big: Vec3 = Vec3::new(
+            (box0.max.x).max(box1.max.x),
+            (box0.max.y).max(box1.max.y),
+            (box0.max.z).max(box1.max.z),
+        );
+
+        AABB::new(small, big)
+    }
 }

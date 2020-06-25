@@ -1,4 +1,4 @@
-use crate::{Float, HitRecord, Hitable, Material, Ray, Vec3};
+use crate::{hitable::AABB, Float, HitRecord, Hitable, Material, Ray, Vec3};
 use std::sync::Arc;
 
 pub struct MovingSphere {
@@ -69,5 +69,19 @@ impl Hitable for MovingSphere {
             }
         }
         None
+    }
+
+    // TODO: might need to return Option<T> ?
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+        let box0: AABB = AABB::new(
+            self.center(t0) - Vec3::new(self.radius, self.radius, self.radius),
+            self.center(t0) + Vec3::new(self.radius, self.radius, self.radius),
+        );
+        let box1: AABB = AABB::new(
+            self.center(t1) - Vec3::new(self.radius, self.radius, self.radius),
+            self.center(t1) + Vec3::new(self.radius, self.radius, self.radius),
+        );
+
+        Some(AABB::surrounding_box(box0, box1))
     }
 }
