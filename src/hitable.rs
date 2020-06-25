@@ -124,3 +124,47 @@ impl AABB {
         AABB::new(small, big)
     }
 }
+
+pub struct BVHNode {
+    left: Arc<dyn Hitable>,
+    right: Arc<dyn Hitable>,
+    bounding_box: AABB,
+}
+
+impl Hitable for BVHNode {
+    fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord> {
+        match self.bounding_box.hit(ray, distance_min, distance_max) {
+            false => None,
+            true => {
+                let hit_left = self.left.hit(ray, distance_min, distance_max);
+                let hit_right = self.right.hit(ray, distance_min, distance_max);
+
+                match &hit_left {
+                    Some(left) => {
+                        match &hit_right {
+                            // Both hit
+                            Some(right) => {
+                                if left.distance < right.distance {
+                                    return hit_left;
+                                } else {
+                                    return hit_right;
+                                }
+                            }
+                            // Left hit
+                            None => return hit_left,
+                        }
+                    }
+                    None => match &hit_right {
+                        // Right hit
+                        Some(_right) => return hit_right,
+                        // Neither hit
+                        None => return None,
+                    },
+                }
+            }
+        }
+    }
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+        Some(self.bounding_box)
+    }
+}
