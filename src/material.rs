@@ -1,4 +1,4 @@
-use crate::{Float, HitRecord, Ray, ThreadRng, Vec3};
+use crate::{color::Color, Float, HitRecord, Ray, ThreadRng, Vec3};
 use rand::prelude::*;
 
 // Internal helper
@@ -15,32 +15,32 @@ pub fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
 pub trait Material: Sync + Send {
     /// Returns `None`, if the ray gets absorbed.
     /// Returns `Some(scattered, attenuation)`, if the ray gets scattered
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Vec3)>;
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)>;
 }
 
 #[derive(Clone)]
 pub struct Lambertian {
-    albedo: Vec3,
+    albedo: Color,
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Vec3)> {
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)> {
         let target = hit_record.position + hit_record.normal + random_in_unit_sphere(rng);
         let scattered: Ray = Ray::new(hit_record.position, target - hit_record.position, ray.time);
-        let attenuation: Vec3 = self.albedo;
+        let attenuation: Color = self.albedo;
         Some((scattered, attenuation))
     }
 }
 
 impl Lambertian {
-    pub fn new(albedo: Vec3) -> Self {
+    pub fn new(albedo: Color) -> Self {
         Lambertian { albedo }
     }
 }
 
 #[derive(Clone)]
 pub struct Metal {
-    albedo: Vec3,
+    albedo: Color,
 }
 
 fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
@@ -48,10 +48,10 @@ fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, _rng: ThreadRng) -> Option<(Ray, Vec3)> {
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, _rng: ThreadRng) -> Option<(Ray, Color)> {
         let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
         let scattered: Ray = Ray::new(hit_record.position, reflected, ray.time);
-        let attenuation: Vec3 = self.albedo;
+        let attenuation: Color = self.albedo;
         if scattered.direction.dot(&hit_record.normal) > 0.0 {
             Some((scattered, attenuation))
         } else {
@@ -61,7 +61,7 @@ impl Material for Metal {
 }
 
 impl Metal {
-    pub fn new(albedo: Vec3) -> Self {
+    pub fn new(albedo: Color) -> Self {
         Metal { albedo }
     }
 }
@@ -95,8 +95,8 @@ impl Material for Dielectric {
         ray: &Ray,
         hit_record: &HitRecord,
         mut rng: ThreadRng,
-    ) -> Option<(Ray, Vec3)> {
-        let attenuation: Vec3 = Vec3::new(1.0, 1.0, 1.0); // Glass does not attenuate
+    ) -> Option<(Ray, Color)> {
+        let attenuation: Color = Color::new(1.0, 1.0, 1.0); // Glass does not attenuate
         let ni_over_nt: Float;
         let reflect_probability: Float;
         let cosine: Float;

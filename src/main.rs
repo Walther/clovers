@@ -4,7 +4,7 @@ use rayon::prelude::*;
 
 use rand::prelude::*;
 
-use image::{ImageBuffer, ImageResult, Rgb, RgbImage};
+use image::{ImageBuffer, ImageResult, RgbImage};
 
 use nalgebra::Vector3;
 
@@ -23,6 +23,7 @@ mod color;
 mod material;
 use material::Material;
 mod random_scene;
+use color::Color;
 use hitable::{HitRecord, Hitable, HitableList};
 use random_scene::random_scene;
 
@@ -47,8 +48,8 @@ type Float = f32;
 type Vec3 = Vector3<Float>;
 
 /// The main coloring function
-fn colorize(ray: &Ray, world: &dyn Hitable, depth: u32, rng: ThreadRng) -> Vec3 {
-    let color: Vec3;
+fn colorize(ray: &Ray, world: &dyn Hitable, depth: u32, rng: ThreadRng) -> Color {
+    let color: Color;
 
     match world.hit(&ray, SHADOW_SMOOTHING, Float::MAX) {
         Some(hit_record) => {
@@ -62,25 +63,17 @@ fn colorize(ray: &Ray, world: &dyn Hitable, depth: u32, rng: ThreadRng) -> Vec3 
                 }
             }
             // Ray absorbed, no color
-            color = Vec3::new(0.0, 0.0, 0.0);
-            color
+            Color::new(0.0, 0.0, 0.0)
         }
         None => {
             // Background, blue-white gradient. Magic from tutorial.
             let unit_direction: Vec3 = ray.direction.normalize();
-            let t = 0.5 * (unit_direction.y + 1.0);
-            color = (1.0 - t) * Vector3::new(1.0, 1.0, 1.0) + t * Vector3::new(0.5, 0.7, 1.0);
+            let t: Float = 0.5 * (unit_direction.y + 1.0);
+            color = ((1.0 - t) as Float) * Color::new(1.0, 1.0, 1.0)
+                + (t as Float) * Color::new(0.5, 0.7, 1.0);
             color
         }
     }
-}
-
-fn color_to_rgb(color: Vec3) -> Rgb<u8> {
-    // Integer-i-fy
-    let r = (255.99 * color.x).floor() as u8;
-    let g = (255.99 * color.y).floor() as u8;
-    let b = (255.99 * color.z).floor() as u8;
-    Rgb([r, g, b])
 }
 
 /// The main drawing function, returns an `ImageResult`.
@@ -112,7 +105,7 @@ fn draw() -> ImageResult<()> {
         .par_bridge()
         .for_each(|(x, y, pixel)| {
             let mut rng = rand::thread_rng();
-            let mut color: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+            let mut color: Color = Color::new(0.0, 0.0, 0.0);
             let mut u: Float;
             let mut v: Float;
             let mut ray: Ray;
@@ -126,13 +119,8 @@ fn draw() -> ImageResult<()> {
             }
             color /= ANTIALIAS_SAMPLES as Float;
 
-            // Gamma correction
-            let gamma_correction = 1.0 / GAMMA;
-            color.x = color.x.powf(gamma_correction);
-            color.y = color.y.powf(gamma_correction);
-            color.z = color.z.powf(gamma_correction);
-
-            *pixel = color_to_rgb(color);
+            color = color.gamma_correction(GAMMA);
+            *pixel = color.to_rgb_u8();
         });
 
     // Graphics assume origin at bottom left corner of the screen

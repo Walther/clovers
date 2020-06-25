@@ -12,7 +12,7 @@ use std::sync::Arc;
 pub fn random_scene(mut rng: ThreadRng) -> HitableList {
     let mut world: HitableList = HitableList::new();
 
-    let ground_material = Lambertian::new(Vec3::new(0.5, 0.5, 0.5));
+    let ground_material = Lambertian::new(Color::new(0.5, 0.5, 0.5));
     let ground_sphere = Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
