@@ -1,8 +1,8 @@
 use crate::{color::Color, Float, HitRecord, Ray, ThreadRng, Vec3, PI};
 use rand::prelude::*;
 
-// Internal helper. The original lambertian reflection with flaws
-fn _random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
+// Internal helper. Originally used for lambertian reflection with flaws
+fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
     let mut position: Vec3;
     loop {
         position = 2.0 * Vec3::new(rng.gen(), rng.gen(), rng.gen()) - Vec3::new(1.0, 1.0, 1.0);
@@ -12,7 +12,7 @@ fn _random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
     }
 }
 
-// Internal helper. The more correct "True Lambertian" reflection
+// Internal helper. Use this for the more correct "True Lambertian" reflection
 fn random_unit_vector(mut rng: ThreadRng) -> Vec3 {
     let a: Float = rng.gen_range(0.0, 2.0 * PI);
     let z: Float = rng.gen_range(-1.0, 1.0);
@@ -49,6 +49,7 @@ impl Lambertian {
 #[derive(Clone)]
 pub struct Metal {
     albedo: Color,
+    fuzz: Float,
 }
 
 fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
@@ -56,9 +57,13 @@ fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, _rng: ThreadRng) -> Option<(Ray, Color)> {
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)> {
         let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
-        let scattered: Ray = Ray::new(hit_record.position, reflected, ray.time);
+        let scattered: Ray = Ray::new(
+            hit_record.position,
+            reflected + self.fuzz * random_in_unit_sphere(rng),
+            ray.time,
+        );
         let attenuation: Color = self.albedo;
         if scattered.direction.dot(&hit_record.normal) > 0.0 {
             Some((scattered, attenuation))
@@ -69,8 +74,11 @@ impl Material for Metal {
 }
 
 impl Metal {
-    pub fn new(albedo: Color) -> Self {
-        Metal { albedo }
+    pub fn new(albedo: Color, fuzz: Float) -> Self {
+        Metal {
+            albedo,
+            fuzz: fuzz.min(1.0),
+        }
     }
 }
 

@@ -1,15 +1,16 @@
 use crate::{
+    camera::Camera,
     color::Color,
     hitable::HitableList,
     material::{Dielectric, Lambertian, Metal},
     moving_sphere::MovingSphere,
     sphere::Sphere,
-    Float, Vec3,
+    Float, Vec3, HEIGHT, WIDTH,
 };
 use rand::prelude::*;
 use std::sync::Arc;
 
-pub fn random_scene(mut rng: ThreadRng) -> HitableList {
+pub fn scene(mut rng: ThreadRng) -> HitableList {
     let mut world: HitableList = HitableList::new();
 
     let ground_material = Lambertian::new(Color::new(0.5, 0.5, 0.5));
@@ -33,7 +34,7 @@ pub fn random_scene(mut rng: ThreadRng) -> HitableList {
                 if choose_mat < 0.8 {
                     // diffuse
                     let albedo = Color::random(rng);
-                    let sphere_material = Lambertian::new(albedo.into());
+                    let sphere_material = Lambertian::new(albedo);
                     let center2 = center + Vec3::new(0.0, rng.gen_range(0.0, 0.5), 0.0);
                     world.hitables.push(Box::new(MovingSphere::new(
                         center,
@@ -46,7 +47,8 @@ pub fn random_scene(mut rng: ThreadRng) -> HitableList {
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = Color::random(rng);
-                    let sphere_material = Metal::new(albedo.into());
+                    let fuzz = rng.gen_range(0.0, 0.5);
+                    let sphere_material = Metal::new(albedo, fuzz);
                     world.hitables.push(Box::new(Sphere::new(
                         center,
                         0.2,
@@ -72,14 +74,14 @@ pub fn random_scene(mut rng: ThreadRng) -> HitableList {
         Arc::new(material1),
     )));
 
-    let material2 = Lambertian::new(Color::new(0.4, 0.2, 0.1).into());
+    let material2 = Lambertian::new(Color::new(0.4, 0.2, 0.1));
     world.hitables.push(Box::new(Sphere::new(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
         Arc::new(material2),
     )));
 
-    let material3 = Metal::new(Color::new(0.7, 0.6, 0.5).into());
+    let material3 = Metal::new(Color::new(0.7, 0.6, 0.5), 0.0);
     world.hitables.push(Box::new(Sphere::new(
         Vec3::new(4.0, 1.0, 0.0),
         1.0,
@@ -87,4 +89,27 @@ pub fn random_scene(mut rng: ThreadRng) -> HitableList {
     )));
 
     return world;
+}
+
+pub fn camera() -> Camera {
+    let camera_position: Vec3 = Vec3::new(13.0, 2.0, 3.0);
+    let camera_target: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+    let camera_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
+    let fov: Float = 25.0;
+    let aspect_ratio: Float = WIDTH as Float / HEIGHT as Float;
+    let aperture: Float = 0.0;
+    let focus_distance: Float = 10.0;
+    let camera = Camera::new(
+        camera_position,
+        camera_target,
+        camera_up,
+        fov,
+        aspect_ratio,
+        aperture,
+        focus_distance,
+        0.0,
+        1.0,
+    );
+
+    camera
 }

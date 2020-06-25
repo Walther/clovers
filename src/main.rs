@@ -22,10 +22,10 @@ use camera::Camera;
 mod color;
 mod material;
 use material::Material;
-mod random_scene;
+mod scenes;
 use color::Color;
 use hitable::{HitRecord, Hitable, HitableList};
-use random_scene::random_scene;
+use scenes::{metal_spheres, random_scene};
 
 const SHADOW_SMOOTHING: Float = 0.001;
 const GAMMA: Float = 2.0;
@@ -80,27 +80,11 @@ fn colorize(ray: &Ray, world: &dyn Hitable, depth: u32, rng: ThreadRng) -> Color
 /// The main drawing function, returns an `ImageResult`.
 fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
-    let camera_position: Vec3 = Vec3::new(13.0, 2.0, 3.0);
-    let camera_target: Vec3 = Vec3::new(0.0, 0.0, 0.0);
-    let camera_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
-    let fov: Float = 25.0;
-    let aspect_ratio: Float = WIDTH as Float / HEIGHT as Float;
-    let aperture: Float = 0.0;
-    let focus_distance: Float = 10.0;
-    let camera = Camera::new(
-        camera_position,
-        camera_target,
-        camera_up,
-        fov,
-        aspect_ratio,
-        aperture,
-        focus_distance,
-        0.0,
-        1.0,
-    );
 
     let rng = rand::thread_rng();
-    let world: HitableList = random_scene(rng);
+    // let world: HitableList = random_scene::scene(rng);
+    let world: HitableList = metal_spheres::scene(rng);
+    let camera: Camera = metal_spheres::camera();
 
     img.enumerate_pixels_mut()
         .par_bridge()
