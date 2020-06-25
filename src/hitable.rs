@@ -173,7 +173,7 @@ impl BVHNode {
                 }
             } else {
                 // Otherwise, recurse
-                objects.sort_by(|&a, &b| comparator(&*a, &*b));
+                objects.sort_by(|a, b| comparator(&**a, &**b));
 
                 // Split the vector; divide and conquer
                 let mid = object_span / 2;
