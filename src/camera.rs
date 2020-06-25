@@ -1,4 +1,4 @@
-use crate::{Float, Ray, Vec3};
+use crate::{Float, Ray, Vec3, PI};
 use rand::prelude::*;
 
 fn random_in_unit_disk(rng: &mut ThreadRng) -> Vec3 {
@@ -38,8 +38,8 @@ impl Camera {
         time_0: Float,
         time_1: Float,
     ) -> Self {
-        let lens_radius = aperture / 2.0;
-        let theta: Float = vertical_fov * std::f32::consts::PI / 180.0; // TODO: make this a Float too, for global precision
+        let lens_radius: Float = aperture / 2.0;
+        let theta: Float = vertical_fov * PI / 180.0;
         let half_height: Float = (theta / 2.0).tan();
         let half_width: Float = aspect_ratio * half_height;
         let origin: Vec3 = look_from;

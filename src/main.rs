@@ -45,6 +45,7 @@ fn main() -> ImageResult<()> {
 
 // Handy aliases for internal use
 type Float = f32;
+pub const PI: Float = std::f32::consts::PI as Float;
 type Vec3 = Vector3<Float>;
 
 /// The main coloring function

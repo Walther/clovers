@@ -1,8 +1,8 @@
-use crate::{color::Color, Float, HitRecord, Ray, ThreadRng, Vec3};
+use crate::{color::Color, Float, HitRecord, Ray, ThreadRng, Vec3, PI};
 use rand::prelude::*;
 
-// Internal helper
-pub fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
+// Internal helper. The original lambertian reflection with flaws
+fn _random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
     let mut position: Vec3;
     loop {
         position = 2.0 * Vec3::new(rng.gen(), rng.gen(), rng.gen()) - Vec3::new(1.0, 1.0, 1.0);
@@ -10,6 +10,14 @@ pub fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
             return position;
         }
     }
+}
+
+// Internal helper. The more correct "True Lambertian" reflection
+fn random_unit_vector(mut rng: ThreadRng) -> Vec3 {
+    let a: Float = rng.gen_range(0.0, 2.0 * PI);
+    let z: Float = rng.gen_range(-1.0, 1.0);
+    let r: Float = (1.0 - z * z).sqrt();
+    return Vec3::new(r * a.cos(), r * a.sin(), z);
 }
 
 pub trait Material: Sync + Send {
@@ -25,7 +33,7 @@ pub struct Lambertian {
 
 impl Material for Lambertian {
     fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)> {
-        let target = hit_record.position + hit_record.normal + random_in_unit_sphere(rng);
+        let target = hit_record.position + hit_record.normal + random_unit_vector(rng);
         let scattered: Ray = Ray::new(hit_record.position, target - hit_record.position, ray.time);
         let attenuation: Color = self.albedo;
         Some((scattered, attenuation))
