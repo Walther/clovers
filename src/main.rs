@@ -26,11 +26,12 @@ mod scenes;
 use color::Color;
 use hitable::{BVHNode, HitRecord, Hitable, HitableList};
 use scenes::{metal_spheres, random_scene};
+mod texture;
 
 const SHADOW_SMOOTHING: Float = 0.001;
 const GAMMA: Float = 2.0;
-const WIDTH: u32 = 1920;
-const HEIGHT: u32 = 1080;
+const WIDTH: u32 = 1000;
+const HEIGHT: u32 = 600;
 const ANTIALIAS_SAMPLES: u32 = 100;
 const MAX_DEPTH: u32 = 50;
 

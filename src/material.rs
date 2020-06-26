@@ -1,5 +1,6 @@
-use crate::{color::Color, Float, HitRecord, Ray, ThreadRng, Vec3, PI};
+use crate::{color::Color, texture::Texture, Float, HitRecord, Ray, ThreadRng, Vec3, PI};
 use rand::prelude::*;
+use std::sync::Arc;
 
 // Internal helper. Originally used for lambertian reflection with flaws
 fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
@@ -28,27 +29,31 @@ pub trait Material: Sync + Send {
 
 #[derive(Clone)]
 pub struct Lambertian {
-    albedo: Color,
+    albedo: Arc<dyn Texture>,
 }
 
 impl Material for Lambertian {
     fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)> {
         let target = hit_record.position + hit_record.normal + random_unit_vector(rng);
         let scattered: Ray = Ray::new(hit_record.position, target - hit_record.position, ray.time);
-        let attenuation: Color = self.albedo;
+        let attenuation: Color = self
+            .albedo
+            .color(hit_record.u, hit_record.v, hit_record.position);
         Some((scattered, attenuation))
     }
 }
 
 impl Lambertian {
-    pub fn new(albedo: Color) -> Self {
-        Lambertian { albedo }
+    pub fn new(albedo: Arc<dyn Texture>) -> Self {
+        Lambertian {
+            albedo: Arc::clone(&albedo),
+        }
     }
 }
 
 #[derive(Clone)]
 pub struct Metal {
-    albedo: Color,
+    albedo: Arc<dyn Texture>,
     fuzz: Float,
 }
 
@@ -64,7 +69,9 @@ impl Material for Metal {
             reflected + self.fuzz * random_in_unit_sphere(rng),
             ray.time,
         );
-        let attenuation: Color = self.albedo;
+        let attenuation: Color = self
+            .albedo
+            .color(hit_record.u, hit_record.v, hit_record.position);
         if scattered.direction.dot(&hit_record.normal) > 0.0 {
             Some((scattered, attenuation))
         } else {
@@ -74,9 +81,9 @@ impl Material for Metal {
 }
 
 impl Metal {
-    pub fn new(albedo: Color, fuzz: Float) -> Self {
+    pub fn new(albedo: Arc<dyn Texture>, fuzz: Float) -> Self {
         Metal {
-            albedo,
+            albedo: Arc::clone(&albedo),
             fuzz: fuzz.min(1.0),
         }
     }

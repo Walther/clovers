@@ -3,9 +3,17 @@ use rand::prelude::*;
 use std::{cmp::Ordering, sync::Arc};
 
 pub struct HitRecord {
+    /// Distance from the ray origin to the hitpoint
     pub distance: Float,
+    /// 3D coordinate of the hitpoint
     pub position: Vec3,
+    /// Surface normal from the hitpoint
     pub normal: Vec3,
+    /// U surface coordinate of the hitpoint
+    pub u: Float,
+    /// V surface coordinate of the hitpoint
+    pub v: Float,
+    /// Reference to the material at the hitpoint
     pub material: Arc<dyn Material>,
 }
 

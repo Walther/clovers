@@ -5,6 +5,7 @@ use crate::{
     material::{Dielectric, Lambertian, Metal},
     moving_sphere::MovingSphere,
     sphere::Sphere,
+    texture::SolidColor,
     Float, Vec3, HEIGHT, WIDTH,
 };
 use rand::prelude::*;
@@ -13,7 +14,9 @@ use std::sync::Arc;
 pub fn scene(mut rng: ThreadRng) -> HitableList {
     let mut world: HitableList = HitableList::new();
 
-    let ground_material = Lambertian::new(Color::new(0.5, 0.5, 0.5));
+    let ground_color = Color::new(0.5, 0.5, 0.5);
+    let ground_texture = SolidColor::new(ground_color);
+    let ground_material = Lambertian::new(Arc::new(ground_texture));
     let ground_sphere = Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -33,8 +36,9 @@ pub fn scene(mut rng: ThreadRng) -> HitableList {
             if (center - Vec3::new(4.0, 0.2, 0.0)).norm() > 0.9 {
                 if choose_mat < 0.8 {
                     // diffuse
-                    let albedo = Color::random(rng);
-                    let sphere_material = Lambertian::new(albedo);
+                    let color = Color::random(rng);
+                    let texture = Arc::new(SolidColor::new(color));
+                    let sphere_material = Lambertian::new(texture);
                     let center2 = center + Vec3::new(0.0, rng.gen_range(0.0, 0.5), 0.0);
                     world.hitables.push(Arc::new(MovingSphere::new(
                         center,
@@ -46,9 +50,10 @@ pub fn scene(mut rng: ThreadRng) -> HitableList {
                     )));
                 } else if choose_mat < 0.95 {
                     // metal
-                    let albedo = Color::random(rng);
+                    let color = Color::random(rng);
+                    let texture = Arc::new(SolidColor::new(color));
                     let fuzz = rng.gen_range(0.0, 0.5);
-                    let sphere_material = Metal::new(albedo, fuzz);
+                    let sphere_material = Metal::new(texture, fuzz);
                     world.hitables.push(Arc::new(Sphere::new(
                         center,
                         0.2,
@@ -74,14 +79,14 @@ pub fn scene(mut rng: ThreadRng) -> HitableList {
         Arc::new(material1),
     )));
 
-    let material2 = Lambertian::new(Color::new(0.4, 0.2, 0.1));
+    let material2 = Lambertian::new(Arc::new(SolidColor::new(Color::new(0.4, 0.2, 0.1))));
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
         Arc::new(material2),
     )));
 
-    let material3 = Metal::new(Color::new(0.7, 0.6, 0.5), 0.0);
+    let material3 = Metal::new(Arc::new(SolidColor::new(Color::new(0.7, 0.6, 0.5))), 0.0);
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(4.0, 1.0, 0.0),
         1.0,
