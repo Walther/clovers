@@ -5,7 +5,7 @@ use crate::{
     material::{Dielectric, Lambertian, Metal},
     moving_sphere::MovingSphere,
     sphere::Sphere,
-    texture::SolidColor,
+    texture::{Checkered, SolidColor},
     Float, Vec3, HEIGHT, WIDTH,
 };
 use rand::prelude::*;
@@ -14,8 +14,9 @@ use std::sync::Arc;
 pub fn scene(mut rng: ThreadRng) -> HitableList {
     let mut world: HitableList = HitableList::new();
 
-    let ground_color = Color::new(0.5, 0.5, 0.5);
-    let ground_texture = SolidColor::new(ground_color);
+    let ground_color1 = Arc::new(SolidColor::new(Color::new(0.2, 0.3, 0.1)));
+    let ground_color2 = Arc::new(SolidColor::new(Color::new(0.9, 0.9, 0.9)));
+    let ground_texture = Checkered::new(ground_color1, ground_color2, 10.0);
     let ground_material = Lambertian::new(Arc::new(ground_texture));
     let ground_sphere = Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
