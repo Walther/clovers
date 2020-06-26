@@ -37,8 +37,8 @@ impl MovingSphere {
     // Returns the U,V surface coordinates of a hitpoint
     pub fn get_uv(&self, hit_position: Vec3, time: Float) -> (Float, Float) {
         let translated: Vec3 = (hit_position - self.center(time)) / self.radius;
-        let phi: Float = hit_position.z.atan2(hit_position.x);
-        let theta: Float = hit_position.y.asin();
+        let phi: Float = translated.z.atan2(translated.x);
+        let theta: Float = translated.y.asin();
         let u: Float = 1.0 - (phi + PI) / (2.0 * PI);
         let v: Float = (theta + PI / 2.0) / PI;
         (u, v)
