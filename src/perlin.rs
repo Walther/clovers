@@ -70,7 +70,7 @@ impl Perlin {
         let u: Float = point.x - point.x.floor();
         let v: Float = point.y - point.y.floor();
         let w: Float = point.z - point.z.floor();
-        // He: Floatrmitian cubic smoothing
+        // Hermitian cubic smoothing
         let u: Float = u * u * (3.0 - 2.0 * u);
         let v: Float = v * v * (3.0 - 2.0 * v);
         let w: Float = w * w * (3.0 - 2.0 * w);
