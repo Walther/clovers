@@ -29,6 +29,24 @@ fn permute(point_count: usize, p: &mut Vec<usize>, mut rng: ThreadRng) {
     }
 }
 
+fn trilinear_interp(c: [[[Float; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Float {
+    let mut accum: Float = 0.0;
+    for i in 0..2 {
+        for j in 0..2 {
+            for k in 0..2 {
+                let i_f = i as Float;
+                let j_f = j as Float;
+                let k_f = k as Float;
+                accum += (i_f * u + (1.0 - i_f) * (1.0 - u))
+                    * (j_f * v + (1.0 - j_f) * (1.0 - v))
+                    * (k_f * w + (1.0 - k_f) * (1.0 - w))
+                    * c[i][j][k];
+            }
+        }
+    }
+    return accum;
+}
+
 impl Perlin {
     pub fn new(point_count: usize, mut rng: ThreadRng) -> Self {
         let mut random_float: Vec<Float> = Vec::with_capacity(point_count);
@@ -49,15 +67,25 @@ impl Perlin {
     }
 
     pub fn noise(&self, point: Vec3) -> Float {
-        // Why are these unused in the tutorial?
         let u = point.x - point.x.floor();
         let v = point.y - point.y.floor();
         let w = point.z - point.z.floor();
 
-        let i = (4.0 * point.x) as usize & 255;
-        let j = (4.0 * point.y) as usize & 255;
-        let k = (4.0 * point.z) as usize & 255;
+        let i: usize = point.x.floor() as usize;
+        let j: usize = point.y.floor() as usize;
+        let k: usize = point.z.floor() as usize;
 
-        return self.random_float[self.perm_x[i] ^ self.perm_y[j] ^ self.perm_z[k]];
+        let mut c: [[[Float; 2]; 2]; 2] = [[[0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0]]];
+
+        for di in 0..2 {
+            for dj in 0..2 {
+                for dk in 0..2 {
+                    c[di][dj][dk] = self.random_float[self.perm_x[(i + di) & 255]
+                        ^ self.perm_y[(j + dj) & 255]
+                        ^ self.perm_z[(k + dk) & 255]];
+                }
+            }
+        }
+        return trilinear_interp(c, u, v, w);
     }
 }
