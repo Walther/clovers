@@ -63,8 +63,13 @@ pub struct NoiseTexture {
 }
 
 impl Texture for NoiseTexture {
+    // TODO: investigate why this does not swirl as well as the example marble in tutorial
     fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
-        return Color::new(1.0, 1.0, 1.0) * self.noise.noise(self.scale * position);
+        let depth = 7;
+        return Color::new(1.0, 1.0, 1.0)
+            * 0.5
+            * (1.0
+                + (self.scale * position.z + 10.0 * self.noise.turbulence(position, depth)).sin());
     }
 }
 

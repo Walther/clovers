@@ -2,7 +2,7 @@ use crate::{Float, Vec3};
 use rand::prelude::*;
 
 pub struct Perlin {
-    random_float: Vec<Float>,
+    random_vectors: Vec<Vec3>,
     perm_x: Vec<usize>,
     perm_y: Vec<usize>,
     perm_z: Vec<usize>,
@@ -29,18 +29,23 @@ fn permute(point_count: usize, p: &mut Vec<usize>, mut rng: ThreadRng) {
     }
 }
 
-fn trilinear_interp(c: [[[Float; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Float {
+fn perlin_interp(c: [[[Vec3; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Float {
+    let uu: Float = u * u * (3.0 - 2.0 * u);
+    let vv: Float = v * v * (3.0 - 2.0 * v);
+    let ww: Float = w * w * (3.0 - 2.0 * w);
     let mut accum: Float = 0.0;
+
     for i in 0..2 {
         for j in 0..2 {
             for k in 0..2 {
                 let i_f = i as Float;
                 let j_f = j as Float;
                 let k_f = k as Float;
-                accum += (i_f * u + (1.0 - i_f) * (1.0 - u))
-                    * (j_f * v + (1.0 - j_f) * (1.0 - v))
-                    * (k_f * w + (1.0 - k_f) * (1.0 - w))
-                    * c[i][j][k];
+                let weight_v: Vec3 = Vec3::new(u - i_f, v - j_f, w - k_f);
+                accum += (i_f * uu + (1.0 - i_f) * (1.0 - uu))
+                    * (j_f * vv + (1.0 - j_f) * (1.0 - vv))
+                    * (k_f * ww + (1.0 - k_f) * (1.0 - ww))
+                    * c[i][j][k].dot(&weight_v);
             }
         }
     }
@@ -49,9 +54,9 @@ fn trilinear_interp(c: [[[Float; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Fl
 
 impl Perlin {
     pub fn new(point_count: usize, mut rng: ThreadRng) -> Self {
-        let mut random_float: Vec<Float> = Vec::with_capacity(point_count);
+        let mut random_vectors: Vec<Vec3> = Vec::with_capacity(point_count);
         for i in 0..point_count {
-            random_float.push(rng.gen::<Float>());
+            random_vectors.push(rng.gen::<Vec3>());
         }
 
         let perm_x = perlin_generate_perm(point_count, rng);
@@ -59,7 +64,7 @@ impl Perlin {
         let perm_z = perlin_generate_perm(point_count, rng);
 
         Perlin {
-            random_float,
+            random_vectors,
             perm_x,
             perm_y,
             perm_z,
@@ -79,17 +84,40 @@ impl Perlin {
         let j: usize = point.y.floor() as usize;
         let k: usize = point.z.floor() as usize;
 
-        let mut c: [[[Float; 2]; 2]; 2] = [[[0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0]]];
+        let mut c: [[[Vec3; 2]; 2]; 2] = [
+            [
+                [Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0)],
+                [Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0)],
+            ],
+            [
+                [Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0)],
+                [Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0)],
+            ],
+        ];
 
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
-                    c[di][dj][dk] = self.random_float[self.perm_x[(i + di) & 255]
+                    c[di][dj][dk] = self.random_vectors[self.perm_x[(i + di) & 255]
                         ^ self.perm_y[(j + dj) & 255]
                         ^ self.perm_z[(k + dk) & 255]];
                 }
             }
         }
-        return trilinear_interp(c, u, v, w);
+        return perlin_interp(c, u, v, w);
+    }
+
+    pub fn turbulence(&self, position: Vec3, depth: usize) -> Float {
+        let mut accum: Float = 0.0;
+        let mut temp_p: Vec3 = position;
+        let mut weight: Float = 1.0;
+
+        for _i in 0..depth {
+            accum += weight * self.noise(temp_p);
+            weight *= 0.5;
+            temp_p *= 2.0;
+        }
+
+        return accum.abs();
     }
 }
