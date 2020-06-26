@@ -119,10 +119,3 @@ pub fn camera() -> Camera {
 
     camera
 }
-
-pub fn bvh_scene(mut rng: ThreadRng) -> BVHNode {
-    let scene = scene(rng);
-    let bvh_node = BVHNode::from_list(scene, 0.0, 1.0, rng);
-
-    bvh_node
-}

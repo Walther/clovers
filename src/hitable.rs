@@ -86,6 +86,11 @@ impl HitableList {
     //     pub fn add(&self, object: dyn Hitable) {
     //         self.hitables.push(Box::new(object));
     //     }
+
+    pub fn into_bvh(self, time_0: Float, time_1: Float, mut rng: ThreadRng) -> BVHNode {
+        let bvh_node = BVHNode::from_list(self, time_0, time_1, rng);
+        bvh_node
+    }
 }
 
 #[derive(Clone, Copy)]

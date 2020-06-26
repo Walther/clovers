@@ -25,7 +25,7 @@ use material::Material;
 mod scenes;
 use color::Color;
 use hitable::{BVHNode, HitRecord, Hitable, HitableList};
-use scenes::{metal_spheres, random_scene};
+use scenes::{metal_spheres, random_scene, two_spheres};
 mod texture;
 
 const SHADOW_SMOOTHING: Float = 0.001;
@@ -83,11 +83,9 @@ fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
 
     let rng = rand::thread_rng();
-    // let world: HitableList = random_scene::scene(rng);
-    let world: BVHNode = random_scene::bvh_scene(rng);
-    let camera: Camera = random_scene::camera();
-    // let world: HitableList = metal_spheres::scene(rng);
-    // let camera: Camera = metal_spheres::camera();
+    let world: HitableList = two_spheres::scene(rng);
+    let world: BVHNode = world.into_bvh(0.0, 1.0, rng);
+    let camera: Camera = two_spheres::camera();
 
     img.enumerate_pixels_mut()
         .par_bridge()
