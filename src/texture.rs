@@ -1,4 +1,4 @@
-use crate::{color::Color, Float, Vec3};
+use crate::{color::Color, perlin::Perlin, Float, Vec3};
 use std::sync::Arc;
 
 pub trait Texture: Sync + Send {
@@ -54,5 +54,21 @@ impl Texture for Checkered {
         } else {
             return self.even.color(u, v, position);
         }
+    }
+}
+
+pub struct NoiseTexture {
+    noise: Perlin,
+}
+
+impl Texture for NoiseTexture {
+    fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
+        return Color::new(1.0, 1.0, 1.0) * self.noise.noise(position);
+    }
+}
+
+impl NoiseTexture {
+    pub fn new(noise: Perlin) -> NoiseTexture {
+        NoiseTexture { noise }
     }
 }
