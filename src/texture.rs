@@ -59,16 +59,17 @@ impl Texture for Checkered {
 
 pub struct NoiseTexture {
     noise: Perlin,
+    scale: Float,
 }
 
 impl Texture for NoiseTexture {
     fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
-        return Color::new(1.0, 1.0, 1.0) * self.noise.noise(position);
+        return Color::new(1.0, 1.0, 1.0) * self.noise.noise(self.scale * position);
     }
 }
 
 impl NoiseTexture {
-    pub fn new(noise: Perlin) -> NoiseTexture {
-        NoiseTexture { noise }
+    pub fn new(noise: Perlin, scale: Float) -> NoiseTexture {
+        NoiseTexture { noise, scale }
     }
 }
