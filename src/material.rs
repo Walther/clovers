@@ -39,12 +39,20 @@ pub struct Lambertian {
 
 impl Material for Lambertian {
     fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)> {
-        let target = hit_record.position + hit_record.normal + random_unit_vector(rng);
-        let scattered: Ray = Ray::new(hit_record.position, target - hit_record.position, ray.time);
-        let attenuation: Color = self
+        let scatter_direction: Vec3 = hit_record.normal + random_unit_vector(rng);
+        let scattered = Ray::new(hit_record.position, scatter_direction, ray.time);
+        let attenuation = self
             .albedo
             .color(hit_record.u, hit_record.v, hit_record.position);
         Some((scattered, attenuation))
+
+        // old backup
+        //     let target = hit_record.position + hit_record.normal + random_unit_vector(rng);
+        //     let scattered: Ray = Ray::new(hit_record.position, target - hit_record.position, ray.time);
+        //     let attenuation: Color = self
+        //         .albedo
+        //         .color(hit_record.u, hit_record.v, hit_record.position);
+        //     Some((scattered, attenuation))
     }
 }
 
