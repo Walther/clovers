@@ -36,7 +36,8 @@ mod perlin;
 mod rect;
 mod texture;
 
-const SMOOTHING_EPSILON: Float = 0.0000001;
+const SHADOW_EPSILON: Float = 0.001;
+const RECT_EPSILON: Float = 0.0001;
 const GAMMA: Float = 2.0;
 const WIDTH: u32 = 1000;
 const HEIGHT: u32 = 600;
@@ -73,7 +74,7 @@ fn colorize(
     }
 
     // Here, smoothing is used to avoid "shadow acne"
-    match world.hit(&ray, SMOOTHING_EPSILON, Float::MAX) {
+    match world.hit(&ray, SHADOW_EPSILON, Float::MAX) {
         // Hit an object
         Some(hit_record) => {
             let emitted: Color =

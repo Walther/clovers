@@ -1,7 +1,7 @@
 use crate::{
     hitable::{HitRecord, Hitable, AABB},
     material::Material,
-    Float, Vec3, SMOOTHING_EPSILON,
+    Float, Vec3, RECT_EPSILON,
 };
 use std::sync::Arc;
 
@@ -71,8 +71,8 @@ impl Hitable for XYRect {
     fn bounding_box(&self, _t0: crate::Float, _t1: crate::Float) -> Option<crate::hitable::AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
-            Vec3::new(self.x0, self.y0, self.k - SMOOTHING_EPSILON),
-            Vec3::new(self.x1, self.y1, self.k + SMOOTHING_EPSILON),
+            Vec3::new(self.x0, self.y0, self.k - RECT_EPSILON),
+            Vec3::new(self.x1, self.y1, self.k + RECT_EPSILON),
         );
         Some(output_box)
     }
@@ -144,8 +144,8 @@ impl Hitable for XZRect {
     fn bounding_box(&self, _t0: crate::Float, _t1: crate::Float) -> Option<crate::hitable::AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
-            Vec3::new(self.x0, self.k - SMOOTHING_EPSILON, self.z0),
-            Vec3::new(self.x1, self.k + SMOOTHING_EPSILON, self.z1),
+            Vec3::new(self.x0, self.k - RECT_EPSILON, self.z0),
+            Vec3::new(self.x1, self.k + RECT_EPSILON, self.z1),
         );
         Some(output_box)
     }
@@ -217,8 +217,8 @@ impl Hitable for YZRect {
     fn bounding_box(&self, _t0: crate::Float, _t1: crate::Float) -> Option<crate::hitable::AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
-            Vec3::new(self.k - SMOOTHING_EPSILON, self.y0, self.z0),
-            Vec3::new(self.k + SMOOTHING_EPSILON, self.y1, self.z1),
+            Vec3::new(self.k - RECT_EPSILON, self.y0, self.z0),
+            Vec3::new(self.k + RECT_EPSILON, self.y1, self.z1),
         );
         Some(output_box)
     }
