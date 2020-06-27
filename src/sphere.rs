@@ -1,7 +1,4 @@
-use crate::{
-    hitable::{face_normal, AABB},
-    Float, HitRecord, Hitable, Material, Ray, Vec3, PI,
-};
+use crate::{hitable::AABB, Float, HitRecord, Hitable, Material, Ray, Vec3, PI};
 use std::sync::Arc;
 
 pub struct Sphere {
@@ -32,50 +29,55 @@ impl Sphere {
 
 impl Hitable for Sphere {
     fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord> {
-        let oc = ray.origin - self.center;
-        let a = ray.direction.dot(&ray.direction);
-        let b = oc.dot(&ray.direction);
-        let c = oc.dot(&oc) - self.radius * self.radius;
-        let discriminant = b * b - a * c;
+        let oc: Vec3 = ray.origin - self.center;
+        let a: Float = ray.direction.norm_squared();
+        let half_b: Float = oc.dot(&ray.direction);
+        let c: Float = oc.norm_squared() - self.radius * self.radius;
+        let discriminant = half_b * half_b - a * c;
         if discriminant > 0.0 {
+            let root: Float = discriminant.sqrt();
+            let distance: Float = (-half_b - root) / a;
+
             // First possible root
-            let distance = (-b - discriminant.sqrt()) / a;
             if distance < distance_max && distance > distance_min {
                 let position: Vec3 = ray.point_at_parameter(distance);
-                let normal = (position - self.center) / self.radius;
-                let normal = face_normal(ray, normal);
+                let outward_normal = (position - self.center) / self.radius;
                 let (u, v) = self.get_uv(position, ray.time);
-                return Some(HitRecord {
+                let mut record = HitRecord {
                     distance,
                     position,
-                    normal,
+                    normal: outward_normal,
                     u,
                     v,
                     material: Arc::clone(&self.material),
-                });
+                    front_face: false, // TODO: fix having to declare it before calling face_normal
+                };
+                record.set_face_normal(ray, outward_normal);
+                return Some(record);
             }
             // Second possible root
-            let distance = (-b + discriminant.sqrt()) / a;
             if distance < distance_max && distance > distance_min {
                 let position: Vec3 = ray.point_at_parameter(distance);
-                let normal = (position - self.center) / self.radius;
-                let normal = face_normal(ray, normal);
+                let outward_normal = (position - self.center) / self.radius;
                 let (u, v) = self.get_uv(position, ray.time);
-                return Some(HitRecord {
+                let mut record = HitRecord {
                     distance,
                     position,
-                    normal,
+                    normal: outward_normal,
                     u,
                     v,
                     material: Arc::clone(&self.material),
-                });
+                    front_face: false, // TODO: fix having to declare it before calling face_normal
+                };
+                record.set_face_normal(ray, outward_normal);
+                return Some(record);
             }
         }
         None
     }
 
     // TODO: might need to return Option<T> ?
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         let output_box = AABB::new(
             self.center - Vec3::new(self.radius, self.radius, self.radius),
             self.center + Vec3::new(self.radius, self.radius, self.radius),

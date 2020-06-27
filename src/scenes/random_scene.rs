@@ -1,7 +1,8 @@
+use super::Scene;
 use crate::{
     camera::Camera,
     color::Color,
-    hitable::{BVHNode, HitableList},
+    hitable::HitableList,
     material::{Dielectric, Lambertian, Metal},
     moving_sphere::MovingSphere,
     sphere::Sphere,
@@ -11,7 +12,9 @@ use crate::{
 use rand::prelude::*;
 use std::sync::Arc;
 
-pub fn scene(mut rng: ThreadRng) -> HitableList {
+pub fn load(mut rng: ThreadRng) -> Scene {
+    let time_0: Float = 0.0;
+    let time_1: Float = 1.0;
     let mut world: HitableList = HitableList::new();
 
     let ground_color1 = Arc::new(SolidColor::new(Color::new(0.2, 0.3, 0.1)));
@@ -44,8 +47,8 @@ pub fn scene(mut rng: ThreadRng) -> HitableList {
                     world.hitables.push(Arc::new(MovingSphere::new(
                         center,
                         center2,
-                        0.0,
-                        1.0,
+                        time_0,
+                        time_1,
                         0.2,
                         Arc::new(sphere_material),
                     )));
@@ -94,10 +97,6 @@ pub fn scene(mut rng: ThreadRng) -> HitableList {
         Arc::new(material3),
     )));
 
-    return world;
-}
-
-pub fn camera() -> Camera {
     let camera_position: Vec3 = Vec3::new(13.0, 2.0, 3.0);
     let camera_target: Vec3 = Vec3::new(0.0, 0.0, 0.0);
     let camera_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
@@ -113,9 +112,11 @@ pub fn camera() -> Camera {
         aspect_ratio,
         aperture,
         focus_distance,
-        0.0,
-        1.0,
+        time_0,
+        time_1,
     );
 
-    camera
+    let background: Color = Color::new(0.7, 0.7, 0.7); // TODO: gradient from first book
+
+    Scene::new(world, camera, time_0, time_1, background, rng)
 }

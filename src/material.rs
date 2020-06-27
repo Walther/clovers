@@ -94,16 +94,11 @@ impl Metal {
     }
 }
 
-fn refract(vector: Vec3, normal: Vec3, ni_over_nt: Float) -> Option<Vec3> {
-    let uv: Vec3 = vector.normalize();
-    let dt: Float = uv.dot(&normal);
-    let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
-    if discriminant > 0.0 {
-        let refracted: Vec3 = ni_over_nt * (uv - normal * dt) - normal * discriminant.sqrt();
-        Some(refracted)
-    } else {
-        None
-    }
+fn refract(uv: Vec3, normal: Vec3, etai_over_etat: Float) -> Vec3 {
+    let cos_theta: Float = -uv.dot(&normal);
+    let r_out_parallel: Vec3 = etai_over_etat * (uv + cos_theta * normal);
+    let r_out_perp: Vec3 = -(1.0 - r_out_parallel.norm_squared()).sqrt() * normal;
+    return r_out_parallel + r_out_perp;
 }
 
 fn schlick(cosine: Float, refractive_index: Float) -> Float {
@@ -125,37 +120,29 @@ impl Material for Dielectric {
         mut rng: ThreadRng,
     ) -> Option<(Ray, Color)> {
         let attenuation: Color = Color::new(1.0, 1.0, 1.0); // Glass does not attenuate
-        let ni_over_nt: Float;
-        let reflect_probability: Float;
-        let cosine: Float;
-        let outward_normal: Vec3;
         let scattered: Ray;
-        let mut refracted: Vec3 = Vec3::new(0.0, 0.0, 0.0); // TODO: fix this, shouldn't be zero. see below
-        let reflected: Vec3 = reflect(ray.direction, hit_record.normal);
+        let etai_over_etat: Float = match hit_record.front_face {
+            true => 1.0 / self.refractive_index,
+            false => self.refractive_index,
+        };
 
-        // TODO: understand and annotate this mess of if-else clauses
-        // TODO: cleanup
-        if ray.direction.dot(&hit_record.normal) > 0.0 {
-            outward_normal = -hit_record.normal;
-            ni_over_nt = self.refractive_index;
-            cosine = self.refractive_index * ray.direction.dot(&hit_record.normal)
-                / ray.direction.norm();
+        let unit_direction: Vec3 = ray.direction.normalize();
+        let cos_theta: Float = (-unit_direction.dot(&hit_record.normal)).min(1.0);
+        let sin_theta: Float = (1.0 - cos_theta * cos_theta).sqrt();
+        if etai_over_etat * sin_theta > 1.0 {
+            let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
+            scattered = Ray::new(hit_record.position, reflected, ray.time)
         } else {
-            outward_normal = hit_record.normal;
-            ni_over_nt = 1.0 / self.refractive_index;
-            cosine = -(ray.direction.dot(&hit_record.normal)) / ray.direction.norm();
+            let reflect_probability: Float = schlick(cos_theta, etai_over_etat);
+            if rng.gen::<Float>() < reflect_probability {
+                let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
+                scattered = Ray::new(hit_record.position, reflected, ray.time);
+            } else {
+                let refracted: Vec3 = refract(unit_direction, hit_record.normal, etai_over_etat);
+                scattered = Ray::new(hit_record.position, refracted, ray.time);
+            }
         }
-        if let Some(new_refracted) = refract(ray.direction, outward_normal, ni_over_nt) {
-            refracted = new_refracted;
-            reflect_probability = schlick(cosine, self.refractive_index);
-        } else {
-            reflect_probability = 1.0;
-        }
-        if rng.gen::<Float>() < reflect_probability {
-            scattered = Ray::new(hit_record.position, reflected, ray.time);
-        } else {
-            scattered = Ray::new(hit_record.position, refracted, ray.time); // TODO: fix this. should be refracted. see above
-        }
+
         Some((scattered, attenuation))
     }
 }
@@ -171,7 +158,12 @@ pub struct DiffuseLight {
 }
 
 impl Material for DiffuseLight {
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)> {
+    fn scatter(
+        &self,
+        _ray: &Ray,
+        _hit_record: &HitRecord,
+        _rng: ThreadRng,
+    ) -> Option<(Ray, Color)> {
         None
     }
     fn emitted(&self, u: Float, v: Float, position: Vec3) -> Color {

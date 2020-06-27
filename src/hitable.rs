@@ -15,15 +15,19 @@ pub struct HitRecord {
     pub v: Float,
     /// Reference to the material at the hitpoint
     pub material: Arc<dyn Material>,
+    /// Is the hitpoint at the front of the surface
+    pub front_face: bool,
 }
 
-// Helper function for getting normals pointing at the correct direction
-pub fn face_normal(ray: &Ray, outward_normal: Vec3) -> Vec3 {
-    let front_face = ray.direction.dot(&outward_normal) < 0.0;
-    if front_face {
-        return outward_normal;
-    } else {
-        return -outward_normal;
+impl HitRecord {
+    // Helper function for getting normals pointing at the correct direction
+    pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
+        self.front_face = ray.direction.dot(&outward_normal) < 0.0;
+        if self.front_face {
+            self.normal = outward_normal;
+        } else {
+            self.normal = -outward_normal;
+        }
     }
 }
 
@@ -97,7 +101,7 @@ impl HitableList {
     //         self.hitables.push(Box::new(object));
     //     }
 
-    pub fn into_bvh(self, time_0: Float, time_1: Float, mut rng: ThreadRng) -> BVHNode {
+    pub fn into_bvh(self, time_0: Float, time_1: Float, rng: ThreadRng) -> BVHNode {
         let bvh_node = BVHNode::from_list(self, time_0, time_1, rng);
         bvh_node
     }
@@ -268,7 +272,7 @@ impl Hitable for BVHNode {
             }
         }
     }
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
         Some(self.bounding_box)
     }
 }
@@ -299,4 +303,36 @@ fn box_y_compare(a: &dyn Hitable, b: &dyn Hitable) -> Ordering {
 
 fn box_z_compare(a: &dyn Hitable, b: &dyn Hitable) -> Ordering {
     box_compare(a, b, 2)
+}
+
+pub struct FlipFace {
+    hitable: Arc<dyn Hitable>,
+}
+
+impl Hitable for FlipFace {
+    fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord> {
+        match self.hitable.hit(ray, distance_min, distance_max) {
+            Some(hit) => Some(HitRecord {
+                distance: hit.distance,
+                position: hit.position,
+                normal: hit.position,
+                u: hit.u,
+                v: hit.v,
+                material: hit.material,
+                front_face: !hit.front_face,
+            }),
+            None => None,
+        }
+    }
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+        self.hitable.bounding_box(t0, t1)
+    }
+}
+
+impl FlipFace {
+    pub fn new(hitable: Arc<dyn Hitable>) -> Self {
+        FlipFace {
+            hitable: Arc::clone(&hitable),
+        }
+    }
 }

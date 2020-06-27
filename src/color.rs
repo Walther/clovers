@@ -5,9 +5,9 @@ use std::ops::{Add, AddAssign, DivAssign, Mul, MulAssign};
 
 #[derive(Clone, Copy)]
 pub struct Color {
-    r: Float,
-    g: Float,
-    b: Float,
+    pub r: Float,
+    pub g: Float,
+    pub b: Float,
 }
 
 impl Color {

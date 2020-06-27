@@ -1,7 +1,14 @@
 use super::Scene;
 use crate::{
-    camera::Camera, color::Color, hitable::HitableList, material::Lambertian, perlin::Perlin,
-    sphere::Sphere, texture::NoiseTexture, Float, Vec3, HEIGHT, WIDTH,
+    camera::Camera,
+    color::Color,
+    hitable::HitableList,
+    material::{DiffuseLight, Lambertian, Material},
+    perlin::Perlin,
+    rect::XYRect,
+    sphere::Sphere,
+    texture::{NoiseTexture, SolidColor},
+    Float, Vec3, HEIGHT, WIDTH,
 };
 use rand::prelude::*;
 use std::sync::Arc;
@@ -9,7 +16,6 @@ use std::sync::Arc;
 pub fn load(rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
-
     let mut world: HitableList = HitableList::new();
 
     let perlin = Perlin::new(256, rng);
@@ -26,8 +32,25 @@ pub fn load(rng: ThreadRng) -> Scene {
         Arc::new(Lambertian::new(Arc::new(NoiseTexture::new(perlin2, 4.0)))),
     )));
 
-    let camera_position: Vec3 = Vec3::new(13.0, 2.0, 3.0);
-    let camera_target: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+    let difflight: Arc<dyn Material> = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(
+        Color::new(4.0, 4.0, 4.0),
+    ))));
+    world.hitables.push(Arc::new(Sphere::new(
+        Vec3::new(0.0, 7.0, 0.0),
+        2.0,
+        Arc::clone(&difflight),
+    )));
+    world.hitables.push(Arc::new(XYRect::new(
+        3.0,
+        5.0,
+        1.0,
+        3.0,
+        -2.0,
+        Arc::clone(&difflight),
+    )));
+
+    let camera_position: Vec3 = Vec3::new(20.0, 5.0, 2.0);
+    let camera_target: Vec3 = Vec3::new(0.0, 2.0, 0.0);
     let camera_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
     let fov: Float = 20.0;
     let aspect_ratio: Float = WIDTH as Float / HEIGHT as Float;
@@ -45,7 +68,7 @@ pub fn load(rng: ThreadRng) -> Scene {
         time_1,
     );
 
-    let background: Color = Color::new(0.7, 0.7, 0.7); // TODO: gradient from first book
+    let background: Color = Color::new(0.0, 0.0, 0.0); // Black background = only lit by the light, no ambient
 
     Scene::new(world, camera, time_0, time_1, background, rng)
 }

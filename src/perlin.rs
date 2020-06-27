@@ -1,6 +1,8 @@
 use crate::{Float, Vec3};
 use rand::prelude::*;
 
+// TODO: This might be currently oddly broken and resulting in overflowy surfaces
+
 pub struct Perlin {
     random_vectors: Vec<Vec3>,
     perm_x: Vec<usize>,
@@ -55,7 +57,7 @@ fn perlin_interp(c: [[[Vec3; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Float 
 impl Perlin {
     pub fn new(point_count: usize, mut rng: ThreadRng) -> Self {
         let mut random_vectors: Vec<Vec3> = Vec::with_capacity(point_count);
-        for i in 0..point_count {
+        for _i in 0..point_count {
             random_vectors.push(rng.gen::<Vec3>());
         }
 

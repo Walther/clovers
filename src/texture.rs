@@ -57,6 +57,7 @@ impl Texture for Checkered {
     }
 }
 
+// TODO: This might be currently oddly broken and resulting in overflowy surfaces
 pub struct NoiseTexture {
     noise: Perlin,
     scale: Float,
@@ -64,7 +65,7 @@ pub struct NoiseTexture {
 
 impl Texture for NoiseTexture {
     // TODO: investigate why this does not swirl as well as the example marble in tutorial
-    fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
+    fn color(&self, _u: Float, _v: Float, position: Vec3) -> Color {
         let depth = 7;
         return Color::new(1.0, 1.0, 1.0)
             * 0.5

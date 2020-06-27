@@ -1,4 +1,6 @@
 #![deny(clippy::all)]
+// A lot of loader functions etc, suppresses some warning noise
+#![allow(dead_code)]
 
 use rayon::prelude::*;
 
@@ -24,14 +26,17 @@ mod material;
 use material::Material;
 mod scenes;
 use color::Color;
-use hitable::{face_normal, BVHNode, HitRecord, Hitable, HitableList};
-use scenes::{metal_spheres, random_scene, simple_light, two_perlin_spheres, two_spheres};
+use hitable::{BVHNode, HitRecord, Hitable};
+#[allow(unused)] // Scene imports, only using one at a time
+use scenes::{
+    cornell, glass_spheres, metal_spheres, random_scene, simple_light_lambertian,
+    simple_light_perlin, two_perlin_spheres, two_spheres,
+};
 mod perlin;
+mod rect;
 mod texture;
-use perlin::Perlin;
-mod xy_rect;
 
-const SMOOTHING_EPSILON: Float = 0.00001;
+const SMOOTHING_EPSILON: Float = 0.0000001;
 const GAMMA: Float = 2.0;
 const WIDTH: u32 = 1000;
 const HEIGHT: u32 = 600;
@@ -48,8 +53,8 @@ fn main() -> ImageResult<()> {
 }
 
 // Handy aliases for internal use
-type Float = f32;
-pub const PI: Float = std::f32::consts::PI as Float;
+type Float = f64;
+pub const PI: Float = std::f64::consts::PI as Float;
 type Vec3 = Vector3<Float>;
 
 /// The main coloring function
@@ -69,31 +74,38 @@ fn colorize(
 
     // Here, smoothing is used to avoid "shadow acne"
     match world.hit(&ray, SMOOTHING_EPSILON, Float::MAX) {
+        // Hit an object
         Some(hit_record) => {
-            // Hit an object
             let emitted: Color =
                 hit_record
                     .material
                     .emitted(hit_record.u, hit_record.v, hit_record.position);
-            // scatter and colorize the new ray
-            if let Some((scattered, attenuation)) =
-                hit_record.material.scatter(&ray, &hit_record, rng)
-            {
-                color = attenuation.component_mul(&colorize(
-                    &scattered,
-                    background_color,
-                    world,
-                    depth + 1,
-                    rng,
-                ));
-                return color + emitted;
-            } else {
-                // no scatter, emit only
-                return emitted;
+            // Try to scatter and colorize the new ray
+            match hit_record.material.scatter(&ray, &hit_record, rng) {
+                // Got a scatter and attenuation
+                Some((scattered, attenuation)) => {
+                    color = emitted
+                        + attenuation.component_mul(
+                            // Recurse
+                            &colorize(&scattered, background_color, world, depth + 1, rng),
+                        );
+
+                    // TODO: consider whether you want to clamp here. Pros: avoids overflow. Cons: seems to affect a bunch of things, including lightness, saturation etc...
+                    // let color = Color::new(color.r.min(1.0), color.g.min(1.0), color.b.min(1.0));
+                    // let color = Color::new(color.r.max(0.0), color.g.max(0.0), color.b.max(0.0));
+
+                    return color;
+                }
+                // No scatter, emit only
+                None => {
+                    return emitted;
+                }
             }
         }
+        // Did not hit anything, return the background_color
         None => {
-            // Did not hit anything, return the background_color
+            // DEBUG
+            // return Color::new(0.3, 0.0, 0.0);
             return background_color;
         }
     }
@@ -104,10 +116,10 @@ fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
 
     let rng = rand::thread_rng();
-    let world: HitableList = simple_light::scene(rng);
-    let world: BVHNode = world.into_bvh(0.0, 1.0, rng);
-    let camera: Camera = simple_light::camera();
-    let background_color: Color = Color::new(0.0, 0.0, 0.0);
+    let scene = cornell::load(rng);
+    let world: BVHNode = scene.world;
+    let camera: Camera = scene.camera;
+    let background_color: Color = scene.background;
 
     img.enumerate_pixels_mut()
         .par_bridge()
