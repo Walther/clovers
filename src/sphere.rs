@@ -1,4 +1,7 @@
-use crate::{hitable::AABB, Float, HitRecord, Hitable, Material, Ray, Vec3, PI};
+use crate::{
+    hitable::{face_normal, AABB},
+    Float, HitRecord, Hitable, Material, Ray, Vec3, PI,
+};
 use std::sync::Arc;
 
 pub struct Sphere {
@@ -40,6 +43,7 @@ impl Hitable for Sphere {
             if distance < distance_max && distance > distance_min {
                 let position: Vec3 = ray.point_at_parameter(distance);
                 let normal = (position - self.center) / self.radius;
+                let normal = face_normal(ray, normal);
                 let (u, v) = self.get_uv(position, ray.time);
                 return Some(HitRecord {
                     distance,
@@ -55,6 +59,7 @@ impl Hitable for Sphere {
             if distance < distance_max && distance > distance_min {
                 let position: Vec3 = ray.point_at_parameter(distance);
                 let normal = (position - self.center) / self.radius;
+                let normal = face_normal(ray, normal);
                 let (u, v) = self.get_uv(position, ray.time);
                 return Some(HitRecord {
                     distance,

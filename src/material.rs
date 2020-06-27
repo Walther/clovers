@@ -25,6 +25,11 @@ pub trait Material: Sync + Send {
     /// Returns `None`, if the ray gets absorbed.
     /// Returns `Some(scattered, attenuation)`, if the ray gets scattered
     fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)>;
+
+    /// Returns the amount of light the material emits. By default, materials do not emit light, returning black.
+    fn emitted(&self, _u: Float, _v: Float, _position: Vec3) -> Color {
+        Color::new(0.0, 0.0, 0.0)
+    }
 }
 
 #[derive(Clone)]
@@ -158,5 +163,27 @@ impl Material for Dielectric {
 impl Dielectric {
     pub fn new(refractive_index: Float) -> Self {
         Dielectric { refractive_index }
+    }
+}
+
+pub struct DiffuseLight {
+    emit: Arc<dyn Texture>,
+}
+
+impl Material for DiffuseLight {
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)> {
+        None
+    }
+    fn emitted(&self, u: Float, v: Float, position: Vec3) -> Color {
+        self.emit.color(u, v, position)
+    }
+}
+
+// TODO: figure out why this sometimes returns odd black reflections
+impl DiffuseLight {
+    pub fn new(emission: Arc<dyn Texture>) -> Self {
+        DiffuseLight {
+            emit: Arc::clone(&emission),
+        }
     }
 }

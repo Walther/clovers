@@ -17,6 +17,16 @@ pub struct HitRecord {
     pub material: Arc<dyn Material>,
 }
 
+// Helper function for getting normals pointing at the correct direction
+pub fn face_normal(ray: &Ray, outward_normal: Vec3) -> Vec3 {
+    let front_face = ray.direction.dot(&outward_normal) < 0.0;
+    if front_face {
+        return outward_normal;
+    } else {
+        return -outward_normal;
+    }
+}
+
 pub trait Hitable: Sync + Send {
     /// The main function for checking whether an object is hit by a ray. If an object is hit, returns Some(HitRecord)
     fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord>;
