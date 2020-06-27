@@ -304,35 +304,3 @@ fn box_y_compare(a: &dyn Hitable, b: &dyn Hitable) -> Ordering {
 fn box_z_compare(a: &dyn Hitable, b: &dyn Hitable) -> Ordering {
     box_compare(a, b, 2)
 }
-
-pub struct FlipFace {
-    hitable: Arc<dyn Hitable>,
-}
-
-impl Hitable for FlipFace {
-    fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord> {
-        match self.hitable.hit(ray, distance_min, distance_max) {
-            Some(hit) => Some(HitRecord {
-                distance: hit.distance,
-                position: hit.position,
-                normal: hit.position,
-                u: hit.u,
-                v: hit.v,
-                material: hit.material,
-                front_face: !hit.front_face,
-            }),
-            None => None,
-        }
-    }
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
-        self.hitable.bounding_box(t0, t1)
-    }
-}
-
-impl FlipFace {
-    pub fn new(hitable: Arc<dyn Hitable>) -> Self {
-        FlipFace {
-            hitable: Arc::clone(&hitable),
-        }
-    }
-}

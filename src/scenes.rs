@@ -7,7 +7,6 @@ use crate::{
 use rand::prelude::*;
 
 pub mod cornell;
-pub mod cornell_flips;
 pub mod glass_spheres;
 pub mod metal_spheres;
 pub mod random_scene;

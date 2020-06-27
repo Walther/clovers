@@ -29,7 +29,7 @@ use color::Color;
 use hitable::{BVHNode, HitRecord, Hitable};
 #[allow(unused)] // Scene imports, only using one at a time
 use scenes::{
-    cornell, cornell_flips, glass_spheres, metal_spheres, random_scene, simple_light_lambertian,
+    cornell, glass_spheres, metal_spheres, random_scene, simple_light_lambertian,
     simple_light_perlin, two_perlin_spheres, two_spheres,
 };
 mod perlin;
