@@ -58,9 +58,7 @@ impl Material for Lambertian {
 
 impl Lambertian {
     pub fn new(albedo: Arc<dyn Texture>) -> Self {
-        Lambertian {
-            albedo: Arc::clone(&albedo),
-        }
+        Lambertian { albedo }
     }
 }
 
@@ -96,7 +94,7 @@ impl Material for Metal {
 impl Metal {
     pub fn new(albedo: Arc<dyn Texture>, fuzz: Float) -> Self {
         Metal {
-            albedo: Arc::clone(&albedo),
+            albedo: albedo,
             fuzz: fuzz.min(1.0),
         }
     }
@@ -182,8 +180,6 @@ impl Material for DiffuseLight {
 // TODO: figure out why this sometimes returns odd black reflections
 impl DiffuseLight {
     pub fn new(emission: Arc<dyn Texture>) -> Self {
-        DiffuseLight {
-            emit: Arc::clone(&emission),
-        }
+        DiffuseLight { emit: emission }
     }
 }

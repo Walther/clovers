@@ -31,7 +31,7 @@ impl XYRect {
             y0,
             y1,
             k,
-            material: Arc::clone(&material),
+            material: material,
         }
     }
 }
@@ -104,7 +104,7 @@ impl XZRect {
             z0,
             z1,
             k,
-            material: Arc::clone(&material),
+            material: material,
         }
     }
 }
@@ -177,7 +177,7 @@ impl YZRect {
             z0,
             z1,
             k,
-            material: Arc::clone(&material),
+            material: material,
         }
     }
 }
