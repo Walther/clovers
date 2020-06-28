@@ -3,6 +3,7 @@ use crate::{
     ray::Ray,
     Float, Vec3,
 };
+use rand::prelude::*;
 use std::sync::Arc;
 
 pub struct RotateY {
@@ -80,6 +81,7 @@ impl Hitable for RotateY {
         ray: &crate::ray::Ray,
         distance_min: Float,
         distance_max: Float,
+        rng: ThreadRng,
     ) -> Option<HitRecord> {
         let mut origin: Vec3 = ray.origin;
         let mut direction: Vec3 = ray.direction;
@@ -92,7 +94,7 @@ impl Hitable for RotateY {
 
         let rotated_r: Ray = Ray::new(origin, direction, ray.time);
 
-        match self.object.hit(&rotated_r, distance_min, distance_max) {
+        match self.object.hit(&rotated_r, distance_min, distance_max, rng) {
             // Did not hit rotated object, return None
             None => return None,
             // Hit the rotated object

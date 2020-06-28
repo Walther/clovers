@@ -177,9 +177,29 @@ impl Material for DiffuseLight {
     }
 }
 
-// TODO: figure out why this sometimes returns odd black reflections
 impl DiffuseLight {
     pub fn new(emission: Arc<dyn Texture>) -> Self {
         DiffuseLight { emit: emission }
+    }
+}
+
+pub struct Isotropic {
+    albedo: Arc<dyn Texture>,
+}
+
+impl Isotropic {
+    pub fn new(emission: Arc<dyn Texture>) -> Self {
+        Isotropic { albedo: emission }
+    }
+}
+
+impl Material for Isotropic {
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)> {
+        let scattered: Ray = Ray::new(hit_record.position, random_in_unit_sphere(rng), ray.time);
+        let attenuation: Color = self
+            .albedo
+            .color(hit_record.u, hit_record.v, hit_record.position);
+
+        Some((scattered, attenuation))
     }
 }

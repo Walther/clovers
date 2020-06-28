@@ -1,9 +1,11 @@
 use crate::{
     hitable::{HitRecord, Hitable, HitableList, AABB},
     material::Material,
+    ray::Ray,
     rect::{XYRect, XZRect, YZRect},
-    Vec3,
+    Float, Vec3,
 };
+use rand::prelude::*;
 use std::sync::Arc;
 
 // Avoid keyword clash
@@ -80,11 +82,12 @@ impl Boxy {
 impl Hitable for Boxy {
     fn hit(
         &self,
-        ray: &crate::ray::Ray,
-        distance_min: crate::Float,
-        distance_max: crate::Float,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        rng: ThreadRng,
     ) -> Option<HitRecord> {
-        self.sides.hit(ray, distance_min, distance_max)
+        self.sides.hit(ray, distance_min, distance_max, rng)
     }
     fn bounding_box(&self, _t0: crate::Float, _t1: crate::Float) -> Option<AABB> {
         Some(AABB::new(self.corner_0, self.corner_1))

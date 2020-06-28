@@ -1,4 +1,5 @@
 use crate::{hitable::AABB, Float, HitRecord, Hitable, Material, Ray, Vec3, PI};
+use rand::prelude::*;
 use std::sync::Arc;
 
 pub struct Sphere {
@@ -28,7 +29,13 @@ impl Sphere {
 }
 
 impl Hitable for Sphere {
-    fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord> {
+    fn hit(
+        &self,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        _rng: ThreadRng,
+    ) -> Option<HitRecord> {
         let oc: Vec3 = ray.origin - self.center;
         let a: Float = ray.direction.norm_squared();
         let half_b: Float = oc.dot(&ray.direction);

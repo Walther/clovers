@@ -8,6 +8,8 @@ use rand::prelude::*;
 
 pub mod cornell;
 pub mod cornell_with_boxes;
+pub mod cornell_with_smoke;
+pub mod final_scene;
 pub mod glass_spheres;
 pub mod metal_spheres;
 pub mod random_scene;

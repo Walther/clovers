@@ -26,11 +26,6 @@ use material::Material;
 mod scenes;
 use color::Color;
 use hitable::{BVHNode, HitRecord, Hitable};
-#[allow(unused)] // Scene imports, only using one at a time
-use scenes::{
-    cornell, cornell_with_boxes, glass_spheres, metal_spheres, random_scene,
-    simple_light_lambertian, simple_light_perlin, two_perlin_spheres, two_spheres,
-};
 mod perlin;
 mod rect;
 mod texture;
@@ -42,8 +37,8 @@ type Vec3 = Vector3<Float>;
 const SHADOW_EPSILON: Float = 0.001;
 const RECT_EPSILON: Float = 0.0001;
 const GAMMA: Float = 2.0;
-const WIDTH: u32 = 1000;
-const HEIGHT: u32 = 600;
+const WIDTH: u32 = 1920;
+const HEIGHT: u32 = 1080;
 const SAMPLES: u32 = 500;
 const MAX_DEPTH: u32 = 50;
 
@@ -72,7 +67,7 @@ fn colorize(
     }
 
     // Here, smoothing is used to avoid "shadow acne"
-    match world.hit(&ray, SHADOW_EPSILON, Float::MAX) {
+    match world.hit(&ray, SHADOW_EPSILON, Float::MAX, rng) {
         // Hit an object
         Some(hit_record) => {
             let emitted: Color =
@@ -115,7 +110,7 @@ fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
 
     let rng = rand::thread_rng();
-    let scene = cornell_with_boxes::load(rng);
+    let scene = scenes::final_scene::load(rng);
     let world: BVHNode = scene.world;
     let camera: Camera = scene.camera;
     let background_color: Color = scene.background;

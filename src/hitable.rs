@@ -33,7 +33,13 @@ impl HitRecord {
 
 pub trait Hitable: Sync + Send {
     /// The main function for checking whether an object is hit by a ray. If an object is hit, returns Some(HitRecord)
-    fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord>;
+    fn hit(
+        &self,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        rng: ThreadRng,
+    ) -> Option<HitRecord>;
     fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB>;
 }
 
@@ -43,11 +49,17 @@ pub struct HitableList {
 }
 
 impl Hitable for HitableList {
-    fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord> {
+    fn hit(
+        &self,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        rng: ThreadRng,
+    ) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest = distance_max;
         for hitable in self.hitables.iter() {
-            if let Some(record) = hitable.hit(&ray, distance_min, closest) {
+            if let Some(record) = hitable.hit(&ray, distance_min, closest, rng) {
                 closest = record.distance;
                 hit_record = Some(record);
             }
@@ -240,12 +252,18 @@ impl BVHNode {
 }
 
 impl Hitable for BVHNode {
-    fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord> {
+    fn hit(
+        &self,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        rng: ThreadRng,
+    ) -> Option<HitRecord> {
         match self.bounding_box.hit(ray, distance_min, distance_max) {
             false => None,
             true => {
-                let hit_left = self.left.hit(ray, distance_min, distance_max);
-                let hit_right = self.right.hit(ray, distance_min, distance_max);
+                let hit_left = self.left.hit(ray, distance_min, distance_max, rng);
+                let hit_right = self.right.hit(ray, distance_min, distance_max, rng);
 
                 match &hit_left {
                     Some(left) => {

@@ -1,8 +1,10 @@
 use crate::{
     hitable::{HitRecord, Hitable, AABB},
     material::Material,
+    ray::Ray,
     Float, Vec3, RECT_EPSILON,
 };
+use rand::prelude::ThreadRng;
 use std::sync::Arc;
 
 // XY
@@ -39,9 +41,10 @@ impl XYRect {
 impl Hitable for XYRect {
     fn hit(
         &self,
-        ray: &crate::ray::Ray,
-        distance_min: crate::Float,
-        distance_max: crate::Float,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        _rng: ThreadRng,
     ) -> Option<HitRecord> {
         let t = (self.k - ray.origin.z) / ray.direction.z;
         if t < distance_min || t > distance_max {
@@ -112,9 +115,10 @@ impl XZRect {
 impl Hitable for XZRect {
     fn hit(
         &self,
-        ray: &crate::ray::Ray,
-        distance_min: crate::Float,
-        distance_max: crate::Float,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        _rng: ThreadRng,
     ) -> Option<HitRecord> {
         let t = (self.k - ray.origin.y) / ray.direction.y;
         if t < distance_min || t > distance_max {
@@ -185,9 +189,10 @@ impl YZRect {
 impl Hitable for YZRect {
     fn hit(
         &self,
-        ray: &crate::ray::Ray,
-        distance_min: crate::Float,
-        distance_max: crate::Float,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        _rng: ThreadRng,
     ) -> Option<HitRecord> {
         let t = (self.k - ray.origin.x) / ray.direction.x;
         if t < distance_min || t > distance_max {

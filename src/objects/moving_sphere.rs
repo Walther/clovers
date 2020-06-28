@@ -1,4 +1,5 @@
 use crate::{hitable::AABB, Float, HitRecord, Hitable, Material, Ray, Vec3, PI};
+use rand::prelude::*;
 use std::sync::Arc;
 
 pub struct MovingSphere {
@@ -46,7 +47,13 @@ impl MovingSphere {
 }
 
 impl Hitable for MovingSphere {
-    fn hit(&self, ray: &Ray, distance_min: Float, distance_max: Float) -> Option<HitRecord> {
+    fn hit(
+        &self,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        _rng: ThreadRng,
+    ) -> Option<HitRecord> {
         let oc = ray.origin - self.center(ray.time);
         let a: Float = ray.direction.norm_squared();
         let half_b: Float = oc.dot(&ray.direction);
