@@ -127,7 +127,7 @@ impl Hitable for RotateY {
             }
         }
     }
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         self.bounding_box
     }
 }
