@@ -21,14 +21,13 @@ use ray::Ray;
 mod camera;
 use camera::Camera;
 mod color;
-mod material;
-use material::Material;
+mod materials;
 mod scenes;
 use color::Color;
 use hitable::{BVHNode, HitRecord, Hitable};
 mod perlin;
 mod rect;
-mod texture;
+mod textures;
 
 // Handy aliases for internal use
 type Float = f64;

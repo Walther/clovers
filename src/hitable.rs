@@ -1,4 +1,4 @@
-use crate::{Float, Material, Ray, Vec3};
+use crate::{materials::Material, Float, Ray, Vec3};
 use rand::prelude::*;
 use std::{cmp::Ordering, sync::Arc};
 

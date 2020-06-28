@@ -1,8 +1,8 @@
 use crate::{
     hitable::{HitRecord, Hitable},
-    material::{Isotropic, Material},
+    materials::{isotropic::Isotropic, Material},
     ray::Ray,
-    texture::Texture,
+    textures::Texture,
     Float, Vec3,
 };
 use rand::prelude::*;

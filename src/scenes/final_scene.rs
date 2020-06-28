@@ -3,14 +3,17 @@ use crate::{
     camera::Camera,
     color::Color,
     hitable::{Hitable, HitableList},
-    material::{Dielectric, DiffuseLight, Lambertian, Material, Metal},
+    materials::{
+        dielectric::Dielectric, diffuse_light::DiffuseLight, lambertian::Lambertian, metal::Metal,
+        Material,
+    },
     objects::{
         boxy::Boxy, constant_medium::ConstantMedium, moving_sphere::MovingSphere, rotate::RotateY,
         sphere::Sphere, translate::Translate,
     },
     perlin::Perlin,
-    rect::XZRect,
-    texture::{NoiseTexture, SolidColor, Texture},
+    rect::{XYRect, XZRect, YZRect},
+    textures::{noise_texture::NoiseTexture, solid_color::SolidColor, Texture},
     Float, Vec3, HEIGHT, WIDTH,
 };
 use rand::prelude::*;

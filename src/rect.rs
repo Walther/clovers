@@ -1,6 +1,6 @@
 use crate::{
     hitable::{HitRecord, Hitable, AABB},
-    material::Material,
+    materials::Material,
     ray::Ray,
     Float, Vec3, RECT_EPSILON,
 };
