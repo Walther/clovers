@@ -4,8 +4,8 @@ use crate::{
     color::Color,
     hitable::HitableList,
     material::{Dielectric, Lambertian, Metal},
-    moving_sphere::MovingSphere,
-    sphere::Sphere,
+    objects::moving_sphere::MovingSphere,
+    objects::sphere::Sphere,
     texture::{Checkered, SolidColor},
     Float, Vec3, HEIGHT, WIDTH,
 };

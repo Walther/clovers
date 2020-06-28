@@ -4,8 +4,8 @@ use crate::{
     color::Color,
     hitable::HitableList,
     material::{DiffuseLight, Lambertian, Material},
+    objects::sphere::Sphere,
     rect::XYRect,
-    sphere::Sphere,
     texture::{SolidColor, Texture},
     Float, Vec3, HEIGHT, WIDTH,
 };

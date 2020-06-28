@@ -15,9 +15,8 @@ use std::time::Instant;
 use chrono::Utc;
 
 mod hitable;
-mod moving_sphere;
+mod objects;
 mod ray;
-mod sphere;
 use ray::Ray;
 mod camera;
 use camera::Camera;
@@ -29,13 +28,17 @@ use color::Color;
 use hitable::{BVHNode, HitRecord, Hitable};
 #[allow(unused)] // Scene imports, only using one at a time
 use scenes::{
-    cornell, glass_spheres, metal_spheres, random_scene, simple_light_lambertian,
-    simple_light_perlin, two_perlin_spheres, two_spheres,
+    cornell, cornell_with_boxes, glass_spheres, metal_spheres, random_scene,
+    simple_light_lambertian, simple_light_perlin, two_perlin_spheres, two_spheres,
 };
 mod perlin;
 mod rect;
 mod texture;
 
+// Handy aliases for internal use
+type Float = f64;
+pub const PI: Float = std::f64::consts::PI as Float;
+type Vec3 = Vector3<Float>;
 const SHADOW_EPSILON: Float = 0.001;
 const RECT_EPSILON: Float = 0.0001;
 const GAMMA: Float = 2.0;
@@ -52,11 +55,6 @@ fn main() -> ImageResult<()> {
     println!("rendered in {} ms", duration.as_millis());
     Ok(())
 }
-
-// Handy aliases for internal use
-type Float = f64;
-pub const PI: Float = std::f64::consts::PI as Float;
-type Vec3 = Vector3<Float>;
 
 /// The main coloring function
 fn colorize(
@@ -117,7 +115,7 @@ fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
 
     let rng = rand::thread_rng();
-    let scene = cornell::load(rng);
+    let scene = cornell_with_boxes::load(rng);
     let world: BVHNode = scene.world;
     let camera: Camera = scene.camera;
     let background_color: Color = scene.background;

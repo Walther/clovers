@@ -4,7 +4,7 @@ use crate::{
     color::Color,
     hitable::HitableList,
     material::{Lambertian, Metal},
-    sphere::Sphere,
+    objects::sphere::Sphere,
     texture::SolidColor,
     Float, Vec3, HEIGHT, WIDTH,
 };

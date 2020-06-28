@@ -4,9 +4,9 @@ use crate::{
     color::Color,
     hitable::HitableList,
     material::{DiffuseLight, Lambertian, Material},
+    objects::sphere::Sphere,
     perlin::Perlin,
     rect::XYRect,
-    sphere::Sphere,
     texture::{NoiseTexture, SolidColor},
     Float, Vec3, HEIGHT, WIDTH,
 };

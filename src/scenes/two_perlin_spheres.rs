@@ -1,7 +1,7 @@
 use super::Scene;
 use crate::{
-    camera::Camera, color::Color, hitable::HitableList, material::Lambertian, perlin::Perlin,
-    sphere::Sphere, texture::NoiseTexture, Float, Vec3, HEIGHT, WIDTH,
+    camera::Camera, color::Color, hitable::HitableList, material::Lambertian,
+    objects::sphere::Sphere, perlin::Perlin, texture::NoiseTexture, Float, Vec3, HEIGHT, WIDTH,
 };
 use rand::prelude::*;
 use std::sync::Arc;
