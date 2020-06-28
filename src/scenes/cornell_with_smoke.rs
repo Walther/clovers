@@ -3,15 +3,14 @@ use crate::{
     camera::Camera,
     color::Color,
     hitable::HitableList,
-    materials::{diffuse_light::DiffuseLight, lambertian::Lambertian, Material},
-    objects::{boxy::Boxy, constant_medium::ConstantMedium, rotate::RotateY, translate::Translate},
+    materials::{DiffuseLight, Lambertian, Material},
+    objects::{Boxy, ConstantMedium, RotateY, Translate},
     rect::{XYRect, XZRect, YZRect},
-    textures::solid_color::SolidColor,
+    textures::SolidColor,
     Float, Vec3, HEIGHT, WIDTH,
 };
 use rand::prelude::*;
 use std::sync::Arc;
-
 pub fn load(rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;

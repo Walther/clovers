@@ -3,9 +3,9 @@ use crate::{
     camera::Camera,
     color::Color,
     hitable::HitableList,
-    materials::lambertian::Lambertian,
-    objects::sphere::Sphere,
-    textures::{checkered::Checkered, solid_color::SolidColor, Texture},
+    materials::Lambertian,
+    objects::Sphere,
+    textures::{Checkered, SolidColor, Texture},
     Float, Vec3, HEIGHT, WIDTH,
 };
 use rand::prelude::*;

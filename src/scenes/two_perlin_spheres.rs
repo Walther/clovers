@@ -1,20 +1,11 @@
 use super::Scene;
 use crate::{
-    camera::Camera,
-    color::Color,
-    hitable::HitableList,
-    materials::{lambertian::Lambertian, metal::Metal, Material},
-    objects::{
-        boxy::Boxy, constant_medium::ConstantMedium, moving_sphere::MovingSphere, rotate::RotateY,
-        sphere::Sphere, translate::Translate,
-    },
-    perlin::Perlin,
-    rect::{XYRect, XZRect, YZRect},
-    textures::{noise_texture::NoiseTexture, solid_color::SolidColor, Texture},
-    Float, Vec3, HEIGHT, WIDTH,
+    camera::Camera, color::Color, hitable::HitableList, materials::Lambertian, objects::Sphere,
+    perlin::Perlin, textures::NoiseTexture, Float, Vec3, HEIGHT, WIDTH,
 };
 use rand::prelude::*;
 use std::sync::Arc;
+
 pub fn load(rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;

@@ -2,18 +2,12 @@ use super::Scene;
 use crate::{
     camera::Camera,
     color::Color,
-    hitable::{Hitable, HitableList},
-    materials::{
-        dielectric::Dielectric, diffuse_light::DiffuseLight, lambertian::Lambertian, metal::Metal,
-        Material,
-    },
-    objects::{
-        boxy::Boxy, constant_medium::ConstantMedium, moving_sphere::MovingSphere, rotate::RotateY,
-        sphere::Sphere, translate::Translate,
-    },
+    hitable::HitableList,
+    materials::{DiffuseLight, Lambertian, Material},
+    objects::Sphere,
     perlin::Perlin,
-    rect::{XYRect, XZRect, YZRect},
-    textures::{noise_texture::NoiseTexture, solid_color::SolidColor, Texture},
+    rect::XYRect,
+    textures::{NoiseTexture, SolidColor},
     Float, Vec3, HEIGHT, WIDTH,
 };
 use rand::prelude::*;
