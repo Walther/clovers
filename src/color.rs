@@ -3,7 +3,7 @@ use image::Rgb;
 use rand::prelude::*;
 use std::ops::{Add, AddAssign, DivAssign, Mul, MulAssign};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Color {
     pub r: Float,
     pub g: Float,
@@ -43,10 +43,28 @@ impl Color {
     }
 
     pub fn to_rgb_u8(&self) -> Rgb<u8> {
+        // TODO: might be possible to optimize
+        let mut r = self.r;
+        let mut g = self.g;
+        let mut b = self.b;
+        // Fix NaN to zero & remove negatives
+        if r.is_nan() || r < 0.0 {
+            r = 0.0;
+        };
+        if g.is_nan() || g < 0.0 {
+            g = 0.0;
+        };
+        if b.is_nan() || b < 0.0 {
+            b = 0.0;
+        };
+        // Fix too large numbers
+        r = r.min(1.0);
+        g = g.min(1.0);
+        b = b.min(1.0);
         // Integer-i-fy
-        let r = (255.99 * self.r).floor() as u8;
-        let g = (255.99 * self.g).floor() as u8;
-        let b = (255.99 * self.b).floor() as u8;
+        let r = (255.99 * r).floor() as u8;
+        let g = (255.99 * g).floor() as u8;
+        let b = (255.99 * b).floor() as u8;
         Rgb([r, g, b])
     }
 }
