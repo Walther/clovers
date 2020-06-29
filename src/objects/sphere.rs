@@ -48,9 +48,9 @@ impl Hitable for Sphere {
         let discriminant = half_b * half_b - a * c;
         if discriminant > 0.0 {
             let root: Float = discriminant.sqrt();
-            let distance: Float = (-half_b - root) / a;
 
             // First possible root
+            let distance: Float = (-half_b - root) / a;
             if distance < distance_max && distance > distance_min {
                 let position: Vec3 = ray.point_at_parameter(distance);
                 let outward_normal = (position - self.center) / self.radius;
@@ -68,6 +68,7 @@ impl Hitable for Sphere {
                 return Some(record);
             }
             // Second possible root
+            let distance: Float = (-half_b + root) / a;
             if distance < distance_max && distance > distance_min {
                 let position: Vec3 = ray.point_at_parameter(distance);
                 let outward_normal = (position - self.center) / self.radius;
@@ -88,7 +89,6 @@ impl Hitable for Sphere {
         None
     }
 
-    // TODO: might need to return Option<T> ?
     fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         let output_box = AABB::new(
             self.center - Vec3::new(self.radius, self.radius, self.radius),
