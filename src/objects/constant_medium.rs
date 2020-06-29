@@ -3,7 +3,7 @@ use crate::{
     materials::{isotropic::Isotropic, Material},
     ray::Ray,
     textures::Texture,
-    Float, Vec3,
+    Float, Vec3, CONSTANT_MEDIUM_EPSILON,
 };
 use rand::prelude::*;
 use std::sync::Arc;
@@ -43,10 +43,12 @@ impl Hitable for ConstantMedium {
             None => return None,
         };
 
-        rec2 = match self
-            .boundary
-            .hit(ray, rec1.distance + 0.0001, Float::INFINITY, rng)
-        {
+        rec2 = match self.boundary.hit(
+            ray,
+            rec1.distance + CONSTANT_MEDIUM_EPSILON,
+            Float::INFINITY,
+            rng,
+        ) {
             Some(record) => record,
             None => return None,
         };
@@ -81,8 +83,8 @@ impl Hitable for ConstantMedium {
         let front_face: bool = true; // tutorial says: also arbitrary
         let material: Arc<dyn Material> = Arc::clone(&self.phase_function);
 
-        let u: Float = 0.0; // TODO: should this be something sensible?
-        let v: Float = 0.0; // TODO: should this be something sensible?
+        let u: Float = 0.5; // TODO: should this be something sensible?
+        let v: Float = 0.5; // TODO: should this be something sensible?
 
         Some(HitRecord {
             distance,
@@ -98,23 +100,3 @@ impl Hitable for ConstantMedium {
         self.boundary.bounding_box(t0, t1)
     }
 }
-
-// class constant_medium : public hittable {
-//   public:
-//       constant_medium(shared_ptr<hittable> b, double d, shared_ptr<texture> a)
-//           : boundary(b), neg_inv_density(-1/d)
-//       {
-//           phase_function = make_shared<isotropic>(a);
-//       }
-
-//       virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const;
-
-//       virtual bool bounding_box(double t0, double t1, aabb& output_box) const {
-//           return boundary->bounding_box(t0, t1, output_box);
-//       }
-
-//   public:
-//       shared_ptr<hittable> boundary;
-//       shared_ptr<material> phase_function;
-//       double neg_inv_density;
-// };

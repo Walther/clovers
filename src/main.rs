@@ -35,9 +35,10 @@ pub const PI: Float = std::f64::consts::PI as Float;
 type Vec3 = Vector3<Float>;
 const SHADOW_EPSILON: Float = 0.001;
 const RECT_EPSILON: Float = 0.0001;
+const CONSTANT_MEDIUM_EPSILON: Float = 0.0001;
 const GAMMA: Float = 2.0;
-const WIDTH: u32 = 1920;
-const HEIGHT: u32 = 1080;
+const WIDTH: u32 = 512;
+const HEIGHT: u32 = 512;
 const SAMPLES: u32 = 500;
 const MAX_DEPTH: u32 = 50;
 
@@ -109,7 +110,7 @@ fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
 
     let rng = rand::thread_rng();
-    let scene = scenes::final_scene::load(rng);
+    let scene = scenes::cornell_with_subsurface_sphere::load(rng);
     let world: BVHNode = scene.world;
     let camera: Camera = scene.camera;
     let background_color: Color = scene.background;
