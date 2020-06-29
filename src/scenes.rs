@@ -9,6 +9,7 @@ use rand::prelude::*;
 pub mod cornell;
 pub mod cornell_with_boxes;
 pub mod cornell_with_smoke;
+pub mod cornell_with_sphere;
 pub mod cornell_with_subsurface_sphere;
 pub mod final_scene;
 pub mod glass_spheres;

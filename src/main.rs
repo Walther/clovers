@@ -110,7 +110,7 @@ fn draw() -> ImageResult<()> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
 
     let rng = rand::thread_rng();
-    let scene = scenes::cornell_with_subsurface_sphere::load(rng);
+    let scene = scenes::cornell_with_sphere::load(rng);
     let world: BVHNode = scene.world;
     let camera: Camera = scene.camera;
     let background_color: Color = scene.background;
