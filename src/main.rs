@@ -37,17 +37,28 @@ const SHADOW_EPSILON: Float = 0.001;
 const RECT_EPSILON: Float = 0.0001;
 const CONSTANT_MEDIUM_EPSILON: Float = 0.0001;
 const GAMMA: Float = 2.0;
-const WIDTH: u32 = 512;
-const HEIGHT: u32 = 512;
-const SAMPLES: u32 = 500;
+const WIDTH: u32 = 1024;
+const HEIGHT: u32 = 1024;
+const SAMPLES: u32 = 100;
 const MAX_DEPTH: u32 = 50;
+const GUESS_RAYS_PER_MS: u32 = 200_000; // totally unscientific, reasonable approximation on my home machine
 
 fn main() -> ImageResult<()> {
     println!("clovers - ray tracing in rust <3");
+    let rays: u64 = WIDTH as u64 * HEIGHT as u64 * SAMPLES as u64 * MAX_DEPTH as u64;
+    println!("tracing approximately {} rays", rays);
+    println!(
+        "guessing render time: {} ms",
+        rays / GUESS_RAYS_PER_MS as u64
+    );
     let start = Instant::now();
-    draw()?;
+    let img = draw()?;
     let duration = Instant::now() - start;
-    println!("rendered in {} ms", duration.as_millis());
+    println!("finished render in {} ms", duration.as_millis());
+    // Timestamp & write
+    let timestamp = Utc::now().timestamp();
+    println!("output saved: renders/{}.png", timestamp);
+    img.save(format!("renders/{}.png", timestamp))?;
     Ok(())
 }
 
@@ -106,7 +117,7 @@ fn colorize(
 }
 
 /// The main drawing function, returns an `ImageResult`.
-fn draw() -> ImageResult<()> {
+fn draw() -> ImageResult<ImageBuffer<image::Rgb<u8>, std::vec::Vec<u8>>> {
     let mut img: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
 
     let rng = rand::thread_rng();
@@ -140,8 +151,5 @@ fn draw() -> ImageResult<()> {
     // Graphics assume origin at bottom left corner of the screen
     // Our buffer writes pixels from top left corner. Simple fix, just flip it!
     image::imageops::flip_vertical_in_place(&mut img);
-    // Timestamp & write
-    let timestamp = Utc::now().timestamp();
-    println!("{}", timestamp);
-    img.save(format!("renders/{}.png", timestamp))
+    Ok(img)
 }
