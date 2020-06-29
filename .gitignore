@@ -11,3 +11,4 @@ Cargo.lock
 
 # Renders created by the program
 /renders/*
+!/renders/.gitignore
