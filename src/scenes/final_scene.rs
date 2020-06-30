@@ -4,12 +4,12 @@ use crate::{
     color::Color,
     hitable::{Hitable, HitableList},
     materials::{Dielectric, DiffuseLight, Lambertian, Material, Metal},
+    objects::XZRect,
     objects::{
         boxy::Boxy, constant_medium::ConstantMedium, moving_sphere::MovingSphere, rotate::RotateY,
         sphere::Sphere, translate::Translate,
     },
     perlin::Perlin,
-    rect::XZRect,
     textures::{NoiseTexture, SolidColor, Texture},
     Float, Vec3, HEIGHT, WIDTH,
 };

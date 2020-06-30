@@ -1,8 +1,8 @@
+use super::{XYRect, XZRect, YZRect};
 use crate::{
     hitable::{HitRecord, Hitable, HitableList, AABB},
     materials::Material,
     ray::Ray,
-    rect::{XYRect, XZRect, YZRect},
     Float, Vec3,
 };
 use rand::prelude::*;

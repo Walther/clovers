@@ -5,7 +5,7 @@ use crate::{
     hitable::HitableList,
     materials::{DiffuseLight, Lambertian, Material},
     objects::Sphere,
-    rect::XYRect,
+    objects::XYRect,
     textures::{SolidColor, Texture},
     Float, Vec3, HEIGHT, WIDTH,
 };

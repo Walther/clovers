@@ -26,7 +26,6 @@ mod scenes;
 use color::Color;
 use hitable::{BVHNode, HitRecord, Hitable};
 mod perlin;
-mod rect;
 mod textures;
 
 // Handy aliases for internal use
