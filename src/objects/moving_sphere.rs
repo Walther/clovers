@@ -80,6 +80,7 @@ impl Hitable for MovingSphere {
                 return Some(record);
             }
             // Second possible root
+            let distance: Float = (-half_b + root) / a;
             if distance < distance_max && distance > distance_min {
                 let position: Vec3 = ray.point_at_parameter(distance);
                 let outward_normal = (position - self.center(ray.time)) / self.radius;
