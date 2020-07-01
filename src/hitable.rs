@@ -2,7 +2,7 @@ use crate::{materials::Material, Float, Ray, Vec3};
 use rand::prelude::*;
 use std::{cmp::Ordering, sync::Arc};
 
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     /// Distance from the ray origin to the hitpoint
     pub distance: Float,
     /// 3D coordinate of the hitpoint
@@ -14,12 +14,12 @@ pub struct HitRecord {
     /// V surface coordinate of the hitpoint
     pub v: Float,
     /// Reference to the material at the hitpoint
-    pub material: Arc<dyn Material>,
+    pub material: &'a dyn Material,
     /// Is the hitpoint at the front of the surface
     pub front_face: bool,
 }
 
-impl HitRecord {
+impl<'a> HitRecord<'a> {
     // Helper function for getting normals pointing at the correct direction
     pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
         self.front_face = ray.direction.dot(&outward_normal) < 0.0;

@@ -63,7 +63,7 @@ impl Hitable for XYRect {
             distance: t,
             position,
             normal: outward_normal,
-            material: Arc::clone(&self.material),
+            material: &*self.material,
             u,
             v,
             front_face: false, // TODO: fix having to declare it before calling face_normal
@@ -137,7 +137,7 @@ impl Hitable for XZRect {
             distance: t,
             position,
             normal: outward_normal,
-            material: Arc::clone(&self.material),
+            material: &*self.material,
             u,
             v,
             front_face: false, // TODO: fix having to declare it before calling face_normal
@@ -211,7 +211,7 @@ impl Hitable for YZRect {
             distance: t,
             position,
             normal: outward_normal,
-            material: Arc::clone(&self.material),
+            material: &*self.material,
             u,
             v,
             front_face: false, // TODO: fix having to declare it before calling face_normal

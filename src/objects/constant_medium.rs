@@ -81,7 +81,6 @@ impl Hitable for ConstantMedium {
 
         let normal: Vec3 = Vec3::new(1.0, 0.0, 0.0); // tutorial says: arbitrary
         let front_face: bool = true; // tutorial says: also arbitrary
-        let material: Arc<dyn Material> = Arc::clone(&self.phase_function);
 
         let u: Float = 0.5; // TODO: should this be something sensible?
         let v: Float = 0.5; // TODO: should this be something sensible?
@@ -92,7 +91,7 @@ impl Hitable for ConstantMedium {
             normal,
             u,
             v,
-            material,
+            material: &*self.phase_function,
             front_face,
         })
     }
