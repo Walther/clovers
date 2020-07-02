@@ -22,7 +22,7 @@ pub fn draw() -> ImageResult<ImageBuffer<image::Rgb<u8>, std::vec::Vec<u8>>> {
     let bar = ProgressBar::new(pixels);
     bar.set_draw_delta(pixels / 1000);
     bar.set_style(ProgressStyle::default_bar().template(
-        "Elapsed: {elapsed_precise}\nPixels:  {wide_bar} {pos}/{len}\nETA:     {eta_precise}",
+        "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
     ));
 
     img.enumerate_pixels_mut()
