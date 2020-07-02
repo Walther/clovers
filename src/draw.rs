@@ -3,6 +3,7 @@ use crate::{
     GAMMA, HEIGHT, SAMPLES, WIDTH,
 };
 use image::{ImageBuffer, ImageResult, RgbImage};
+use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
 use rayon::prelude::*;
 
@@ -15,6 +16,14 @@ pub fn draw() -> ImageResult<ImageBuffer<image::Rgb<u8>, std::vec::Vec<u8>>> {
     let world: BVHNode = scene.world;
     let camera: Camera = scene.camera;
     let background_color: Color = scene.background;
+
+    // Progress bar
+    let pixels = (WIDTH * HEIGHT) as u64;
+    let bar = ProgressBar::new(pixels);
+    bar.set_draw_delta(pixels / 1000);
+    bar.set_style(ProgressStyle::default_bar().template(
+        "Elapsed: {elapsed_precise}\nPixels:  {wide_bar} {pos}/{len}\nETA:     {eta_precise}",
+    ));
 
     img.enumerate_pixels_mut()
         .par_bridge()
@@ -36,6 +45,8 @@ pub fn draw() -> ImageResult<ImageBuffer<image::Rgb<u8>, std::vec::Vec<u8>>> {
 
             color = color.gamma_correction(GAMMA);
             *pixel = color.to_rgb_u8();
+
+            bar.inc(1);
         });
 
     // Graphics assume origin at bottom left corner of the screen

@@ -34,11 +34,10 @@ const SHADOW_EPSILON: Float = 0.001;
 const RECT_EPSILON: Float = 0.0001;
 const CONSTANT_MEDIUM_EPSILON: Float = 0.0001;
 const GAMMA: Float = 2.0;
-const WIDTH: u32 = 1024;
-const HEIGHT: u32 = 1024;
+const WIDTH: u32 = 4096;
+const HEIGHT: u32 = 4096;
 const SAMPLES: u32 = 100;
 const MAX_DEPTH: u32 = 50;
-const GUESS_RAYS_PER_MS: u32 = 400_000; // totally unscientific, reasonable approximation on my home machine
 
 fn main() -> ImageResult<()> {
     println!("clovers - ray tracing in rust <3");
@@ -48,14 +47,15 @@ fn main() -> ImageResult<()> {
     println!("max depth: {}", MAX_DEPTH);
     let rays: u64 = WIDTH as u64 * HEIGHT as u64 * SAMPLES as u64 * MAX_DEPTH as u64;
     println!("tracing approximately {} rays", rays);
-    println!(
-        "guessing render time: {}",
-        format_duration(Duration::from_millis(rays / GUESS_RAYS_PER_MS as u64))
-    );
+    println!(""); // Empty line before progress bar
+
     let start = Instant::now();
-    let img = draw()?;
+    let img = draw()?; // Note: live progress bar printed within draw
     let duration = Instant::now() - start;
+
+    println!(""); // Empty line after progress bar
     println!("finished render in {}", format_duration(duration));
+
     // Timestamp & write
     let timestamp = Utc::now().timestamp();
     println!("output saved: renders/{}.png", timestamp);
