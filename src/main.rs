@@ -40,13 +40,13 @@ const SAMPLES: u32 = 100;
 const MAX_DEPTH: u32 = 50;
 
 fn main() -> ImageResult<()> {
-    println!("clovers - ray tracing in rust <3");
-    println!("width: {}", WIDTH);
-    println!("height: {}", HEIGHT);
-    println!("samples: {}", SAMPLES);
-    println!("max depth: {}", MAX_DEPTH);
+    println!("clovers 🍀    ray tracing in rust 🦀");
+    println!("width:        {}", WIDTH);
+    println!("height:       {}", HEIGHT);
+    println!("samples:      {}", SAMPLES);
+    println!("max depth:    {}", MAX_DEPTH);
     let rays: u64 = WIDTH as u64 * HEIGHT as u64 * SAMPLES as u64 * MAX_DEPTH as u64;
-    println!("tracing approximately {} rays", rays);
+    println!("aprrox. rays: {}", rays);
     println!(""); // Empty line before progress bar
 
     let start = Instant::now();
