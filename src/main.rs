@@ -10,9 +10,9 @@ use image::{ImageBuffer, ImageResult, RgbImage};
 
 use nalgebra::Vector3;
 
-use std::time::Instant;
-
 use chrono::Utc;
+use humantime::format_duration;
+use std::time::{Duration, Instant};
 
 mod hitable;
 mod objects;
@@ -44,16 +44,20 @@ const GUESS_RAYS_PER_MS: u32 = 400_000; // totally unscientific, reasonable appr
 
 fn main() -> ImageResult<()> {
     println!("clovers - ray tracing in rust <3");
+    println!("width: {}", WIDTH);
+    println!("height: {}", HEIGHT);
+    println!("samples: {}", SAMPLES);
+    println!("max depth: {}", MAX_DEPTH);
     let rays: u64 = WIDTH as u64 * HEIGHT as u64 * SAMPLES as u64 * MAX_DEPTH as u64;
     println!("tracing approximately {} rays", rays);
     println!(
-        "guessing render time: {} ms",
-        rays / GUESS_RAYS_PER_MS as u64
+        "guessing render time: {}",
+        format_duration(Duration::from_millis(rays / GUESS_RAYS_PER_MS as u64))
     );
     let start = Instant::now();
     let img = draw()?;
     let duration = Instant::now() - start;
-    println!("finished render in {} ms", duration.as_millis());
+    println!("finished render in {}", format_duration(duration));
     // Timestamp & write
     let timestamp = Utc::now().timestamp();
     println!("output saved: renders/{}.png", timestamp);
