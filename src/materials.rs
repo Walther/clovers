@@ -1,4 +1,4 @@
-use crate::{color::Color, Float, HitRecord, Ray, ThreadRng, Vec3, PI};
+use crate::{color::Color, hitable::HitRecord, Float, Ray, ThreadRng, Vec3, PI};
 use rand::prelude::*;
 pub mod dielectric;
 pub mod diffuse_light;

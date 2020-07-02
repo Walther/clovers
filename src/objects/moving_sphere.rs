@@ -1,4 +1,9 @@
-use crate::{hitable::AABB, materials::Material, Float, HitRecord, Hitable, Ray, Vec3, PI};
+use crate::{
+    hitable::AABB,
+    hitable::{HitRecord, Hitable},
+    materials::Material,
+    Float, Ray, Vec3, PI,
+};
 use rand::prelude::*;
 use std::sync::Arc;
 
