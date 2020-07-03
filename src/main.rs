@@ -34,10 +34,10 @@ const SHADOW_EPSILON: Float = 0.001;
 const RECT_EPSILON: Float = 0.0001;
 const CONSTANT_MEDIUM_EPSILON: Float = 0.0001;
 const GAMMA: Float = 2.0;
-const WIDTH: u32 = 4096;
-const HEIGHT: u32 = 4096;
+const WIDTH: u32 = 2048;
+const HEIGHT: u32 = 2048;
 const SAMPLES: u32 = 100;
-const MAX_DEPTH: u32 = 50;
+const MAX_DEPTH: u32 = 100;
 
 fn main() -> ImageResult<()> {
     println!("clovers 🍀    ray tracing in rust 🦀");
