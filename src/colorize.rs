@@ -1,4 +1,4 @@
-use crate::{color::Color, hitable::Hitable, ray::Ray, Float, MAX_DEPTH, SHADOW_EPSILON};
+use crate::{color::Color, hitable::Hitable, ray::Ray, Float, SHADOW_EPSILON};
 use rand::prelude::ThreadRng;
 
 /// The main coloring function
@@ -7,11 +7,12 @@ pub fn colorize(
     background_color: Color,
     world: &dyn Hitable,
     depth: u32,
+    max_depth: u32,
     rng: ThreadRng,
 ) -> Color {
     let color: Color;
 
-    if depth > MAX_DEPTH {
+    if depth > max_depth {
         // Ray bounce limit reached, return background_color
         return background_color;
     }
@@ -31,7 +32,14 @@ pub fn colorize(
                     color = emitted
                         + attenuation.component_mul(
                             // Recurse
-                            &colorize(&scattered, background_color, world, depth + 1, rng),
+                            &colorize(
+                                &scattered,
+                                background_color,
+                                world,
+                                depth + 1,
+                                max_depth,
+                                rng,
+                            ),
                         );
 
                     return color;

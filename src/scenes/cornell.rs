@@ -6,11 +6,11 @@ use crate::{
     materials::{DiffuseLight, Lambertian, Material},
     objects::{XYRect, XZRect, YZRect},
     textures::SolidColor,
-    Float, Vec3, HEIGHT, WIDTH,
+    Float, Vec3,
 };
 use rand::prelude::*;
 use std::sync::Arc;
-pub fn load(rng: ThreadRng) -> Scene {
+pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
     let mut world: HitableList = HitableList::new();
@@ -75,7 +75,8 @@ pub fn load(rng: ThreadRng) -> Scene {
     let camera_target: Vec3 = Vec3::new(278.0, 278.0, 0.0);
     let camera_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
     let fov: Float = 40.0;
-    let aspect_ratio: Float = WIDTH as Float / HEIGHT as Float;
+    let aspect_ratio: Float = width as Float / height as Float;
+
     let aperture: Float = 0.0;
     let focus_distance: Float = 10.0;
     let camera = Camera::new(

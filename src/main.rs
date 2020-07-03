@@ -12,6 +12,8 @@ use chrono::Utc;
 use humantime::format_duration;
 use std::time::{Duration, Instant};
 
+use clap::Clap;
+
 mod hitable;
 mod objects;
 mod ray;
@@ -33,24 +35,49 @@ type Vec3 = Vector3<Float>;
 const SHADOW_EPSILON: Float = 0.001;
 const RECT_EPSILON: Float = 0.0001;
 const CONSTANT_MEDIUM_EPSILON: Float = 0.0001;
-const GAMMA: Float = 2.0;
-const WIDTH: u32 = 2048;
-const HEIGHT: u32 = 2048;
-const SAMPLES: u32 = 100;
-const MAX_DEPTH: u32 = 100;
+
+// Configure CLI parameters
+#[derive(Clap)]
+#[clap(version = "0.1.0", author = "Walther")]
+struct Opts {
+    /// Width of the image in pixels
+    #[clap(short, long, default_value = "2048")]
+    width: u32,
+    /// Height of the image in pixels
+    #[clap(short, long, default_value = "2048")]
+    height: u32,
+    /// Number of samples to generate per each pixel
+    #[clap(short, long, default_value = "100")]
+    samples: u32,
+    /// Maximum evaluated bounce depth for each ray
+    #[clap(short, long, default_value = "100")]
+    max_depth: u32,
+    /// Gamma correction value
+    #[clap(short, long, default_value = "2.0")]
+    gamma: Float,
+}
 
 fn main() -> ImageResult<()> {
+    let opts: Opts = Opts::parse();
+
     println!("clovers 🍀    ray tracing in rust 🦀");
-    println!("width:        {}", WIDTH);
-    println!("height:       {}", HEIGHT);
-    println!("samples:      {}", SAMPLES);
-    println!("max depth:    {}", MAX_DEPTH);
-    let rays: u64 = WIDTH as u64 * HEIGHT as u64 * SAMPLES as u64 * MAX_DEPTH as u64;
+    println!("width:        {}", opts.width);
+    println!("height:       {}", opts.height);
+    println!("samples:      {}", opts.samples);
+    println!("max depth:    {}", opts.max_depth);
+    let rays: u64 =
+        opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
     println!("aprrox. rays: {}", rays);
     println!(""); // Empty line before progress bar
 
     let start = Instant::now();
-    let img = draw()?; // Note: live progress bar printed within draw
+    let img = draw(
+        opts.width,
+        opts.height,
+        opts.samples,
+        opts.max_depth,
+        opts.gamma,
+    )?; // Note: live progress bar printed within draw
     let duration = Instant::now() - start;
 
     println!(""); // Empty line after progress bar
