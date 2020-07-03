@@ -67,7 +67,7 @@ fn main() -> ImageResult<()> {
     println!("max depth:    {}", opts.max_depth);
     let rays: u64 =
         opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
-    println!("aprrox. rays: {}", rays);
+    println!("approx. rays: {}", rays);
     println!(""); // Empty line before progress bar
 
     let start = Instant::now();
