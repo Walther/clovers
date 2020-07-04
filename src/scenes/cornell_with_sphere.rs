@@ -34,7 +34,7 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     };
     let light = Material::DiffuseLight {
         emit: Texture::SolidColor {
-            color: Color::new(15.0, 15.0, 15.0),
+            color: Color::new(7.0, 7.0, 7.0),
         },
     };
 
@@ -45,7 +45,7 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
         .hitables
         .push(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
     world.hitables.push(Arc::new(XZRect::new(
-        213.0, 343.0, 227.0, 332.0, 554.0, light,
+        113.0, 443.0, 127.0, 432.0, 554.0, light,
     )));
     world
         .hitables
