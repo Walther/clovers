@@ -17,26 +17,10 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let mut world: HitableList = HitableList::new();
 
     // Cornell box
-    let red = Material::Lambertian {
-        albedo: Texture::SolidColor {
-            color: Color::new(0.65, 0.05, 0.05),
-        },
-    };
-    let white = Material::Lambertian {
-        albedo: Texture::SolidColor {
-            color: Color::new(0.73, 0.73, 0.73),
-        },
-    };
-    let green = Material::Lambertian {
-        albedo: Texture::SolidColor {
-            color: Color::new(0.12, 0.45, 0.15),
-        },
-    };
-    let light = Material::DiffuseLight {
-        emit: Texture::SolidColor {
-            color: Color::new(7.0, 7.0, 7.0),
-        },
-    };
+    let red = Lambertian::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
+    let white = Lambertian::new(SolidColor::new(Color::new(0.73, 0.73, 0.73)));
+    let green = Lambertian::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
+    let light = DiffuseLight::new(SolidColor::new(Color::new(7.0, 7.0, 7.0)));
 
     world
         .hitables
@@ -61,18 +45,14 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let sphere: Arc<dyn Hitable> = Arc::new(Sphere::new(
         Vec3::new(278.0, 278.0, 278.0),
         120.0,
-        Material::Dielectric {
-            refractive_index: 1.5,
-        },
+        Dielectric::new(1.5),
     ));
     world.hitables.push(Arc::clone(&sphere));
     // blue subsurface reflection
     let sphere2: Arc<dyn Hitable> = Arc::new(ConstantMedium::new(
         Arc::clone(&sphere),
         0.2,
-        Texture::SolidColor {
-            color: Color::new(0.2, 0.4, 0.9),
-        },
+        SolidColor::new(Color::new(0.2, 0.4, 0.9)),
     ));
     world.hitables.push(sphere2);
 

@@ -1,13 +1,14 @@
 use super::Material;
 use crate::{color::Color, hitable::HitRecord, ray::Ray, textures::Texture, Float, Vec3};
 use rand::prelude::ThreadRng;
+#[derive(Copy, Clone)]
 pub struct DiffuseLight {
     emit: Texture,
 }
 
 impl DiffuseLight {
     pub fn scatter(
-        emit: &Texture,
+        self,
         _ray: &Ray,
         _hit_record: &HitRecord,
         _rng: ThreadRng,
@@ -15,11 +16,11 @@ impl DiffuseLight {
         None
     }
 
-    pub fn emit(emit: Texture, u: Float, v: Float, position: Vec3) -> Color {
-        emit.color(u, v, position)
+    pub fn emit(self, u: Float, v: Float, position: Vec3) -> Color {
+        self.emit.color(u, v, position)
     }
 
-    pub fn new(emission: Texture) -> Self {
-        DiffuseLight { emit: emission }
+    pub fn new(emission: Texture) -> Material {
+        Material::DiffuseLight(DiffuseLight { emit: emission })
     }
 }

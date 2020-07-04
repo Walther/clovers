@@ -7,11 +7,11 @@ pub struct SolidColor {
 }
 
 impl SolidColor {
-    pub fn new(color: Color) -> SolidColor {
-        SolidColor { color }
+    pub fn new(color: Color) -> Texture {
+        Texture::SolidColor(SolidColor { color })
     }
 
-    pub fn color(color: Color, _u: Float, _v: Float, _position: Vec3) -> Color {
-        color
+    pub fn color(self, _u: Float, _v: Float, _position: Vec3) -> Color {
+        self.color
     }
 }

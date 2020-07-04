@@ -1,39 +1,33 @@
 use super::{SolidColor, Texture};
 use crate::{color::Color, Float, Vec3};
 
+#[derive(Copy, Clone)]
 pub struct Checkered {
     // TODO: get recursive textures back, maybe?
-    even: SolidColor,
-    odd: SolidColor,
+    even: Color,
+    odd: Color,
     density: Float,
 }
 
 impl Checkered {
-    pub fn new(color1: SolidColor, color2: SolidColor, density: Float) -> Checkered {
-        Checkered {
+    pub fn new(color1: Color, color2: Color, density: Float) -> Texture {
+        Texture::Checkered(Checkered {
             even: color1,
             odd: color2,
             density,
-        }
+        })
     }
 
-    pub fn color(
-        even: SolidColor,
-        odd: SolidColor,
-        density: Float,
-        u: Float,
-        v: Float,
-        position: Vec3,
-    ) -> Color {
-        let sines = (density * position.x).sin()
-            * (density * position.y).sin()
-            * (density * position.z).sin();
+    pub fn color(self, u: Float, v: Float, position: Vec3) -> Color {
+        let sines = (self.density * position.x).sin()
+            * (self.density * position.y).sin()
+            * (self.density * position.z).sin();
         if sines < 0.0 {
             // return odd.color(u, v, position); TODO:
-            return odd.color;
+            return self.odd;
         } else {
             // return even.color(u, v, position); TODO:
-            return even.color;
+            return self.even;
         }
     }
 }

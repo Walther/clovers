@@ -14,11 +14,11 @@ pub use metal::*;
 
 #[derive(Copy, Clone)]
 pub enum Material {
-    Dielectric { refractive_index: Float },
-    Lambertian { albedo: Texture },
-    DiffuseLight { emit: Texture },
-    Metal { albedo: Texture, fuzz: Float },
-    Isotropic { albedo: Texture },
+    Dielectric(Dielectric),
+    Lambertian(Lambertian),
+    DiffuseLight(DiffuseLight),
+    Metal(Metal),
+    Isotropic(Isotropic),
 }
 
 impl Material {
@@ -28,20 +28,18 @@ impl Material {
         hit_record: &HitRecord,
         rng: ThreadRng,
     ) -> Option<(Ray, Color)> {
-        match self {
-            Material::Dielectric { refractive_index } => {
-                Dielectric::scatter(refractive_index, ray, hit_record, rng)
-            }
-            Material::Lambertian { albedo } => Lambertian::scatter(albedo, ray, hit_record, rng),
-            Material::DiffuseLight { emit } => DiffuseLight::scatter(emit, ray, hit_record, rng),
-            Material::Metal { albedo, fuzz } => Metal::scatter(albedo, fuzz, ray, hit_record, rng),
-            Material::Isotropic { albedo } => Isotropic::scatter(albedo, ray, hit_record, rng),
+        match *self {
+            Material::Dielectric(d) => Dielectric::scatter(d, ray, hit_record, rng),
+            Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),
+            Material::DiffuseLight(d) => DiffuseLight::scatter(d, ray, hit_record, rng),
+            Material::Metal(m) => Metal::scatter(m, ray, hit_record, rng),
+            Material::Isotropic(i) => Isotropic::scatter(i, ray, hit_record, rng),
         }
     }
     /// Returns the amount of light the material emits. By default, materials do not emit light, returning black.
     pub fn emit(&self, u: Float, v: Float, position: Vec3) -> Color {
-        match self {
-            Material::DiffuseLight { emit } => DiffuseLight::emit(*emit, u, v, position),
+        match *self {
+            Material::DiffuseLight(d) => DiffuseLight::emit(d, u, v, position),
             _ => Color::new(0.0, 0.0, 0.0),
         }
     }

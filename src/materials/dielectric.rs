@@ -2,14 +2,14 @@ use super::{reflect, refract, schlick, Material};
 use crate::{color::Color, hitable::HitRecord, ray::Ray, Float, Vec3};
 use rand::prelude::*;
 
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct Dielectric {
     refractive_index: Float,
 }
 
 impl Dielectric {
     pub fn scatter(
-        refractive_index: &Float,
+        self,
         ray: &Ray,
         hit_record: &HitRecord,
         mut rng: ThreadRng,
@@ -17,8 +17,8 @@ impl Dielectric {
         let attenuation: Color = Color::new(1.0, 1.0, 1.0); // Glass does not attenuate
         let scattered: Ray;
         let etai_over_etat: Float = match hit_record.front_face {
-            true => 1.0 / refractive_index,
-            false => *refractive_index,
+            true => 1.0 / self.refractive_index,
+            false => self.refractive_index,
         };
 
         let unit_direction: Vec3 = ray.direction.normalize();
@@ -41,7 +41,7 @@ impl Dielectric {
         Some((scattered, attenuation))
     }
 
-    pub fn new(refractive_index: Float) -> Self {
-        Dielectric { refractive_index }
+    pub fn new(refractive_index: Float) -> Material {
+        Material::Dielectric(Dielectric { refractive_index })
     }
 }

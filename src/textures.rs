@@ -14,31 +14,15 @@ use crate::{color::Color, Float, Vec3};
 
 #[derive(Copy, Clone)]
 pub enum Texture {
-    Checkered {
-        // TODO: get recursive textures back, maybe?
-        even: SolidColor,
-        odd: SolidColor,
-        density: Float,
-    },
-    // NoiseTexture {
-    //     noise: Perlin,
-    //     scale: Float,
-    // },
-    SolidColor {
-        color: Color,
-    },
+    Checkered(Checkered),
+    SolidColor(SolidColor),
 }
 
 impl Texture {
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match *self {
-            Texture::Checkered { even, odd, density } => {
-                Checkered::color(even, odd, density, u, v, position)
-            }
-            // Texture::NoiseTexture { noise, scale } => {
-            //     NoiseTexture::color(noise, scale, u, v, position)
-            // }
-            Texture::SolidColor { color } => SolidColor::color(color, u, v, position),
+            Texture::Checkered(c) => Checkered::color(c, u, v, position),
+            Texture::SolidColor(s) => SolidColor::color(s, u, v, position),
         }
     }
 }

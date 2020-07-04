@@ -16,25 +16,18 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_1: Float = 1.0;
     let mut world: HitableList = HitableList::new();
 
-    let checker: Texture = Texture::Checkered {
-        even: SolidColor {
-            color: Color::new(0.2, 0.3, 0.1),
-        },
-        odd: SolidColor {
-            color: Color::new(0.9, 0.9, 0.9),
-        },
-        density: 10.0,
-    };
+    let checker: Texture =
+        Checkered::new(Color::new(0.2, 0.3, 0.1), Color::new(0.9, 0.9, 0.9), 10.0);
 
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, -10.0, 0.0),
         10.0,
-        Material::Lambertian { albedo: checker },
+        Lambertian::new(checker),
     )));
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, 10.0, 0.0),
         10.0,
-        Material::Lambertian { albedo: checker },
+        Lambertian::new(checker),
     )));
 
     let camera_position: Vec3 = Vec3::new(13.0, 2.0, 3.0);

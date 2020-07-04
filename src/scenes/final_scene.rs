@@ -23,11 +23,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
 
     // Ground: lots of boxes
     let mut boxes1: HitableList = HitableList::new();
-    let ground: Material = Material::Lambertian {
-        albedo: Texture::SolidColor {
-            color: Color::new(0.48, 0.83, 0.53),
-        },
-    };
+    let ground: Material = Lambertian::new(SolidColor::new(Color::new(0.48, 0.83, 0.53)));
 
     let boxes_per_side = 20;
     for i in 0..boxes_per_side {
@@ -54,22 +50,14 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
         .hitables
         .push(Arc::new(boxes1.into_bvh(time_0, time_1, rng)));
 
-    let light = Material::DiffuseLight {
-        emit: Texture::SolidColor {
-            color: Color::new(7.0, 7.0, 7.0),
-        },
-    };
+    let light = DiffuseLight::new(SolidColor::new(Color::new(7.0, 7.0, 7.0)));
     world.hitables.push(Arc::new(XZRect::new(
         123.0, 423.0, 147.0, 412.0, 554.0, light,
     )));
 
     let center1 = Vec3::new(400.0, 400.0, 200.0);
     let center2 = center1 + Vec3::new(30.0, 0.0, 0.0);
-    let moving_sphere_material = Material::Lambertian {
-        albedo: Texture::SolidColor {
-            color: Color::new(0.7, 0.3, 0.1),
-        },
-    };
+    let moving_sphere_material = Lambertian::new(SolidColor::new(Color::new(0.7, 0.3, 0.1)));
     world.hitables.push(Arc::new(MovingSphere::new(
         center1,
         center2,
@@ -83,63 +71,42 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(260.0, 150.0, 45.0),
         50.0,
-        Material::Dielectric {
-            refractive_index: 1.5,
-        },
+        Dielectric::new(1.5),
     )));
 
     // half-matte metal sphere
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, 150.0, 145.0),
         50.0,
-        Material::Metal {
-            albedo: Texture::SolidColor {
-                color: Color::new(0.8, 0.8, 0.9),
-            },
-            fuzz: 10.0,
-        },
+        Metal::new(SolidColor::new(Color::new(0.8, 0.8, 0.9)), 10.0),
     )));
 
     // blue glass sphere
     let boundary: Arc<dyn Hitable> = Arc::new(Sphere::new(
         Vec3::new(360.0, 150.0, 145.0),
         70.0,
-        Material::Dielectric {
-            refractive_index: 1.5,
-        },
+        Dielectric::new(1.5),
     ));
     world.hitables.push(Arc::clone(&boundary));
     world.hitables.push(Arc::new(ConstantMedium::new(
         Arc::clone(&boundary),
         0.2,
-        Texture::SolidColor {
-            color: Color::new(0.2, 0.4, 0.9),
-        },
+        SolidColor::new(Color::new(0.2, 0.4, 0.9)),
     )));
     // overall boundary sphere, big and misty inside
-    let boundary2 = Sphere::new(
-        Vec3::new(0.0, 0.0, 0.0),
-        5000.0,
-        Material::Dielectric {
-            refractive_index: 1.5,
-        },
-    );
+    let boundary2 = Sphere::new(Vec3::new(0.0, 0.0, 0.0), 5000.0, Dielectric::new(1.5));
 
     // // noise / marble sphere TODO:
     // let pertext: Texture = Arc::new(NoiseTexture::new(Perlin::new(256, rng), 2.0));
     // world.hitables.push(Arc::new(Sphere::new(
     //     Vec3::new(220.0, 280.0, 300.0),
     //     80.0,
-    //     Material::Lambertian { albedo: pertext },
+    //     Lambertian::new( pertext )
     // )));
 
     // Sphere-rasterized pseudo-box
     let mut boxes2: HitableList = HitableList::new();
-    let white = Material::Lambertian {
-        albedo: Texture::SolidColor {
-            color: Color::new(0.73, 0.73, 0.73),
-        },
-    };
+    let white = Lambertian::new(SolidColor::new(Color::new(0.73, 0.73, 0.73)));
     let num_spheres = 1000;
     for _j in 0..num_spheres {
         boxes2.hitables.push(Arc::new(Sphere::new(

@@ -17,26 +17,10 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let mut world: HitableList = HitableList::new();
 
     // Cornell box
-    let red = Material::Lambertian {
-        albedo: Texture::SolidColor {
-            color: Color::new(0.65, 0.05, 0.05),
-        },
-    };
-    let white = Material::Lambertian {
-        albedo: Texture::SolidColor {
-            color: Color::new(0.73, 0.73, 0.73),
-        },
-    };
-    let green = Material::Lambertian {
-        albedo: Texture::SolidColor {
-            color: Color::new(0.12, 0.45, 0.15),
-        },
-    };
-    let light = Material::DiffuseLight {
-        emit: Texture::SolidColor {
-            color: Color::new(7.0, 7.0, 7.0),
-        },
-    };
+    let red = Lambertian::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
+    let white = Lambertian::new(SolidColor::new(Color::new(0.73, 0.73, 0.73)));
+    let green = Lambertian::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
+    let light = DiffuseLight::new(SolidColor::new(Color::new(7.0, 7.0, 7.0)));
 
     world
         .hitables
@@ -79,16 +63,12 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let box1 = ConstantMedium::new(
         Arc::new(box1),
         0.01,
-        Texture::SolidColor {
-            color: Color::new(0.0, 0.0, 0.0),
-        },
+        SolidColor::new(Color::new(0.0, 0.0, 0.0)),
     );
     let box2 = ConstantMedium::new(
         Arc::new(box2),
         0.01,
-        Texture::SolidColor {
-            color: Color::new(1.0, 1.0, 1.0),
-        },
+        SolidColor::new(Color::new(1.0, 1.0, 1.0)),
     );
 
     world.hitables.push(Arc::new(box1));
