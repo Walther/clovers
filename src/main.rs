@@ -10,6 +10,7 @@ use nalgebra::Vector3;
 
 use chrono::Utc;
 use humantime::format_duration;
+
 use std::{error::Error, time::Instant};
 
 use clap::Clap;
