@@ -10,7 +10,7 @@ use nalgebra::Vector3;
 
 use chrono::Utc;
 use humantime::format_duration;
-use std::time::{Instant};
+use std::time::Instant;
 
 use clap::Clap;
 
@@ -25,7 +25,7 @@ mod draw;
 mod materials;
 mod scenes;
 use draw::draw;
-// mod perlin;
+mod perlin;
 mod textures;
 
 // Handy aliases for internal use

@@ -7,6 +7,7 @@ pub use checkered::*;
 pub use solid_color::*;
 
 use crate::{color::Color, Float, Vec3};
+use noise_texture::NoiseTexture;
 
 // pub trait Texture: Sync + Send {
 //     fn color(&self, u: Float, v: Float, position: Vec3) -> Color;
@@ -16,6 +17,7 @@ use crate::{color::Color, Float, Vec3};
 pub enum Texture {
     Checkered(Checkered),
     SolidColor(SolidColor),
+    NoiseTexture(NoiseTexture),
 }
 
 impl Texture {
@@ -23,6 +25,7 @@ impl Texture {
         match *self {
             Texture::Checkered(c) => Checkered::color(c, u, v, position),
             Texture::SolidColor(s) => SolidColor::color(s, u, v, position),
+            Texture::NoiseTexture(n) => NoiseTexture::color(n, u, v, position),
         }
     }
 }

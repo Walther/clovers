@@ -9,8 +9,9 @@ use crate::{
         boxy::Boxy, constant_medium::ConstantMedium, moving_sphere::MovingSphere, rotate::RotateY,
         sphere::Sphere, translate::Translate,
     },
+    perlin::Perlin,
     // perlin::Perlin,
-    textures::SolidColor,
+    textures::{noise_texture::NoiseTexture, SolidColor},
     Float,
     Vec3,
 };
@@ -101,13 +102,13 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
         SolidColor::new(Color::new(1.0, 1.0, 1.0)),
     )));
 
-    // // noise / marble sphere TODO:
-    // let pertext: Texture = Arc::new(NoiseTexture::new(Perlin::new(256, rng), 2.0));
-    // world.hitables.push(Arc::new(Sphere::new(
-    //     Vec3::new(220.0, 280.0, 300.0),
-    //     80.0,
-    //     Lambertian::new( pertext )
-    // )));
+    // noise / marble sphere
+    let pertext = NoiseTexture::new(Perlin::new(rng), 2.0);
+    world.hitables.push(Arc::new(Sphere::new(
+        Vec3::new(220.0, 280.0, 300.0),
+        80.0,
+        Lambertian::new(pertext),
+    )));
 
     // Sphere-rasterized pseudo-box
     let mut boxes2: HitableList = HitableList::new();

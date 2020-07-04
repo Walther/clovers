@@ -3,29 +3,29 @@ use rand::prelude::*;
 
 // TODO: This might be currently oddly broken and resulting in overflowy surfaces
 
-// TODO: ponder whether this is worth the trouble
-#[derive(Copy)]
+// TODO: number of points hardcoded to 256 now
+#[derive(Copy, Clone)]
 pub struct Perlin {
-    random_vectors: Vec<Vec3>,
-    perm_x: Vec<usize>,
-    perm_y: Vec<usize>,
-    perm_z: Vec<usize>,
+    random_vectors: [Vec3; 256],
+    perm_x: [usize; 256],
+    perm_y: [usize; 256],
+    perm_z: [usize; 256],
 }
 
-fn perlin_generate_perm(point_count: usize, rng: ThreadRng) -> Vec<usize> {
-    let mut perm: Vec<usize> = Vec::with_capacity(point_count);
+fn perlin_generate_perm(rng: ThreadRng) -> [usize; 256] {
+    let mut perm: [usize; 256] = [0; 256];
 
-    for i in 0..point_count {
-        perm.push(i);
+    for i in 0..256 {
+        perm[i] = i;
     }
-    permute(point_count, &mut perm, rng);
+    permute(&mut perm, rng);
 
     return perm;
 }
 
-fn permute(point_count: usize, p: &mut Vec<usize>, mut rng: ThreadRng) {
+fn permute(p: &mut [usize; 256], mut rng: ThreadRng) {
     // For some reason the tutorial wants the reverse loop
-    for i in (1..point_count).rev() {
+    for i in (1..256).rev() {
         let target: usize = rng.gen_range(0, i);
         let tmp: usize = p[i];
         p[i] = p[target];
@@ -57,15 +57,15 @@ fn perlin_interp(c: [[[Vec3; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Float 
 }
 
 impl Perlin {
-    pub fn new(point_count: usize, mut rng: ThreadRng) -> Self {
-        let mut random_vectors: Vec<Vec3> = Vec::with_capacity(point_count);
-        for _i in 0..point_count {
-            random_vectors.push(rng.gen::<Vec3>());
+    pub fn new(mut rng: ThreadRng) -> Self {
+        let mut random_vectors: [Vec3; 256] = [Vec3::new(0.0, 0.0, 0.0); 256];
+        for i in 0..256 {
+            random_vectors[i] = rng.gen::<Vec3>();
         }
 
-        let perm_x = perlin_generate_perm(point_count, rng);
-        let perm_y = perlin_generate_perm(point_count, rng);
-        let perm_z = perlin_generate_perm(point_count, rng);
+        let perm_x = perlin_generate_perm(rng);
+        let perm_y = perlin_generate_perm(rng);
+        let perm_z = perlin_generate_perm(rng);
 
         Perlin {
             random_vectors,
