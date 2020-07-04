@@ -1,9 +1,7 @@
 use crate::{
-    camera::Camera,
     color::Color,
     colorize::colorize,
-    hitable::{BVHNode, Hitable},
-    ray::Ray,
+    hitable::Hitable,
     scenes::{self, Scene},
     Float,
 };

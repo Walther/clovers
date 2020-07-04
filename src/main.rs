@@ -4,8 +4,6 @@
 
 use rand::prelude::*;
 
-
-
 use nalgebra::Vector3;
 
 use chrono::Utc;
