@@ -1,8 +1,9 @@
 use super::{random_unit_vector, Material};
 use crate::{color::Color, hitable::HitRecord, ray::Ray, textures::Texture, Vec3};
 use rand::prelude::ThreadRng;
+use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct Lambertian {
     albedo: Texture,
 }

@@ -1,8 +1,9 @@
 use super::{reflect, refract, schlick, Material};
 use crate::{color::Color, hitable::HitRecord, ray::Ray, Float, Vec3};
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct Dielectric {
     refractive_index: Float,
 }
