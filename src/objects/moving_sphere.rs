@@ -13,7 +13,7 @@ pub struct MovingSphere {
     time_0: Float,
     time_1: Float,
     radius: Float,
-    material: Arc<dyn Material>,
+    material: Material,
 }
 
 impl MovingSphere {
@@ -23,7 +23,7 @@ impl MovingSphere {
         time_0: Float,
         time_1: Float,
         radius: Float,
-        material: Arc<dyn Material>,
+        material: Material,
     ) -> Self {
         MovingSphere {
             center_0,
@@ -78,7 +78,7 @@ impl Hitable for MovingSphere {
                     normal: outward_normal,
                     u,
                     v,
-                    material: &*self.material,
+                    material: &self.material,
                     front_face: false, // TODO: fix having to declare it before calling face_normal
                 };
                 record.set_face_normal(ray, outward_normal);
@@ -96,7 +96,7 @@ impl Hitable for MovingSphere {
                     normal: outward_normal,
                     u,
                     v,
-                    material: &*self.material,
+                    material: &self.material,
                     front_face: false, // TODO: fix having to declare it before calling face_normal
                 };
                 record.set_face_normal(ray, outward_normal);

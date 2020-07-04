@@ -1,4 +1,4 @@
-use crate::{color::Color, hitable::HitRecord, Float, Ray, ThreadRng, Vec3, PI};
+use crate::{color::Color, hitable::HitRecord, textures::Texture, Float, Ray, ThreadRng, Vec3, PI};
 use rand::prelude::*;
 pub mod dielectric;
 pub mod diffuse_light;
@@ -11,15 +11,40 @@ pub use diffuse_light::*;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
+use std::sync::Arc;
 
-pub trait Material: Sync + Send {
-    /// Returns `None`, if the ray gets absorbed.
-    /// Returns `Some(scattered, attenuation)`, if the ray gets scattered
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)>;
+#[derive(Copy, Clone)]
+pub enum Material {
+    Dielectric { refractive_index: Float },
+    Lambertian { albedo: Texture },
+    DiffuseLight { emit: Texture },
+    Metal { albedo: Texture, fuzz: Float },
+    Isotropic { albedo: Texture },
+}
 
+impl Material {
+    pub fn scatter(
+        &self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        rng: ThreadRng,
+    ) -> Option<(Ray, Color)> {
+        match self {
+            Material::Dielectric { refractive_index } => {
+                Dielectric::scatter(refractive_index, ray, hit_record, rng)
+            }
+            Material::Lambertian { albedo } => Lambertian::scatter(albedo, ray, hit_record, rng),
+            Material::DiffuseLight { emit } => DiffuseLight::scatter(emit, ray, hit_record, rng),
+            Material::Metal { albedo, fuzz } => Metal::scatter(albedo, fuzz, ray, hit_record, rng),
+            Material::Isotropic { albedo } => Isotropic::scatter(albedo, ray, hit_record, rng),
+        }
+    }
     /// Returns the amount of light the material emits. By default, materials do not emit light, returning black.
-    fn emitted(&self, _u: Float, _v: Float, _position: Vec3) -> Color {
-        Color::new(0.0, 0.0, 0.0)
+    pub fn emit(&self, u: Float, v: Float, position: Vec3) -> Color {
+        match self {
+            Material::DiffuseLight { emit } => DiffuseLight::emit(*emit, u, v, position),
+            _ => Color::new(0.0, 0.0, 0.0),
+        }
     }
 }
 

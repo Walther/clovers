@@ -7,9 +7,9 @@ pub struct Dielectric {
     refractive_index: Float,
 }
 
-impl Material for Dielectric {
-    fn scatter(
-        &self,
+impl Dielectric {
+    pub fn scatter(
+        refractive_index: &Float,
         ray: &Ray,
         hit_record: &HitRecord,
         mut rng: ThreadRng,
@@ -17,8 +17,8 @@ impl Material for Dielectric {
         let attenuation: Color = Color::new(1.0, 1.0, 1.0); // Glass does not attenuate
         let scattered: Ray;
         let etai_over_etat: Float = match hit_record.front_face {
-            true => 1.0 / self.refractive_index,
-            false => self.refractive_index,
+            true => 1.0 / refractive_index,
+            false => *refractive_index,
         };
 
         let unit_direction: Vec3 = ray.direction.normalize();
@@ -40,9 +40,7 @@ impl Material for Dielectric {
 
         Some((scattered, attenuation))
     }
-}
 
-impl Dielectric {
     pub fn new(refractive_index: Float) -> Self {
         Dielectric { refractive_index }
     }

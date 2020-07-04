@@ -10,15 +10,15 @@ use std::sync::Arc;
 
 pub struct ConstantMedium {
     boundary: Arc<dyn Hitable>,
-    phase_function: Arc<dyn Material>,
+    phase_function: Material,
     neg_inv_density: Float,
 }
 
 impl ConstantMedium {
-    pub fn new(boundary: Arc<dyn Hitable>, density: Float, texture: Arc<dyn Texture>) -> Self {
+    pub fn new(boundary: Arc<dyn Hitable>, density: Float, texture: Texture) -> Self {
         ConstantMedium {
             boundary,
-            phase_function: Arc::new(Isotropic::new(texture)),
+            phase_function: Isotropic::new(texture),
             neg_inv_density: -1.0 / density,
         }
     }
@@ -91,7 +91,7 @@ impl Hitable for ConstantMedium {
             normal,
             u,
             v,
-            material: &*self.phase_function,
+            material: &self.phase_function,
             front_face,
         })
     }

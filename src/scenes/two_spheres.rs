@@ -16,7 +16,7 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_1: Float = 1.0;
     let mut world: HitableList = HitableList::new();
 
-    let checker: Arc<dyn Texture> = Arc::new(Checkered::new(
+    let checker: Texture = Arc::new(Checkered::new(
         Arc::new(SolidColor::new(Color::new(0.2, 0.3, 0.1))),
         Arc::new(SolidColor::new(Color::new(0.9, 0.9, 0.9))),
         10.0,

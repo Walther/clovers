@@ -31,9 +31,9 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
         Arc::new(Lambertian::new(Arc::new(NoiseTexture::new(perlin2, 4.0)))),
     )));
 
-    let difflight: Arc<dyn Material> = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(
-        Color::new(4.0, 4.0, 4.0),
-    ))));
+    let difflight: Material = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(Color::new(
+        4.0, 4.0, 4.0,
+    )))));
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, 7.0, 0.0),
         2.0,

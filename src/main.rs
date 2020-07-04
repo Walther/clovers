@@ -25,7 +25,7 @@ mod draw;
 mod materials;
 mod scenes;
 use draw::draw;
-mod perlin;
+// mod perlin;
 mod textures;
 
 // Handy aliases for internal use

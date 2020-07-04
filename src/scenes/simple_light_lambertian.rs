@@ -17,8 +17,8 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_1: Float = 1.0;
     let mut world: HitableList = HitableList::new();
 
-    let texture: Arc<dyn Texture> = Arc::new(SolidColor::new(Color::new(0.3, 0.2, 0.1)));
-    let texture2: Arc<dyn Texture> = Arc::new(SolidColor::new(Color::new(0.1, 0.2, 0.3)));
+    let texture: Texture = Arc::new(SolidColor::new(Color::new(0.3, 0.2, 0.1)));
+    let texture2: Texture = Arc::new(SolidColor::new(Color::new(0.1, 0.2, 0.3)));
 
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
@@ -31,9 +31,9 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
         Arc::new(Lambertian::new(texture2)),
     )));
 
-    let difflight: Arc<dyn Material> = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(
-        Color::new(4.0, 4.0, 4.0),
-    ))));
+    let difflight: Material = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(Color::new(
+        4.0, 4.0, 4.0,
+    )))));
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, 7.0, 0.0),
         2.0,

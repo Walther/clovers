@@ -3,6 +3,8 @@ use rand::prelude::*;
 
 // TODO: This might be currently oddly broken and resulting in overflowy surfaces
 
+// TODO: ponder whether this is worth the trouble
+#[derive(Copy)]
 pub struct Perlin {
     random_vectors: Vec<Vec3>,
     perm_x: Vec<usize>,
