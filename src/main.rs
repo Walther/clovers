@@ -22,11 +22,15 @@ mod camera;
 mod color;
 mod colorize;
 mod draw;
+mod draw_gui;
 mod materials;
 mod scenes;
-use draw::{draw, draw_window};
+use draw::draw;
 mod perlin;
 mod textures;
+
+#[cfg(feature = "gui")]
+use draw_gui::draw_gui;
 
 // Handy aliases for internal use
 type Float = f32;
@@ -74,8 +78,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!(""); // Empty line before progress bar
 
     if opts.gui {
-        let _result = draw_window(opts.width, opts.height, opts.samples);
-        return Ok(());
+        if cfg!(feature = "gui") {
+            #[cfg(feature = "gui")]
+            let _result = draw_gui(opts.width, opts.height, opts.samples);
+            return Ok(());
+        } else {
+            println!("clovers not built with feature 'gui' enabled");
+            return Ok(());
+        }
     }
 
     // png writing version

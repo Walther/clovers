@@ -4,7 +4,9 @@ version = "0.1.0"
 authors = ["Walther <veeti.haapsamo@gmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+gui = ["pixels", "winit", "winit_input_helper"]
 
 [dependencies]
 image = "0.23.5"
@@ -15,6 +17,7 @@ chrono = "0.4.11"
 humantime = "2.0.1"
 indicatif = { version = "0.15.0", features = ["rayon"] }
 clap = "3.0.0-beta.1"
-pixels = "0.0.4"
-winit = "0.22.2"
-winit_input_helper = "0.7.0"
+
+pixels = {version = "0.0.4", optional=true }
+winit = {version = "0.22.2", optional=true }
+winit_input_helper = { version="0.7.0", optional=true }
