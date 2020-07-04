@@ -1,19 +1,22 @@
 use super::{random_in_unit_sphere, Material};
 use crate::{color::Color, hitable::HitRecord, ray::Ray, textures::Texture};
 use rand::prelude::ThreadRng;
-use std::sync::Arc;
+#[derive(Copy, Clone)]
 pub struct Isotropic {
-    albedo: Arc<dyn Texture>,
+    albedo: Texture,
 }
 
 impl Isotropic {
-    pub fn new(emission: Arc<dyn Texture>) -> Self {
-        Isotropic { albedo: emission }
+    pub fn new(emission: Texture) -> Material {
+        Material::Isotropic(Isotropic { albedo: emission })
     }
-}
 
-impl Material for Isotropic {
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)> {
+    pub fn scatter(
+        self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        rng: ThreadRng,
+    ) -> Option<(Ray, Color)> {
         let scattered: Ray = Ray::new(hit_record.position, random_in_unit_sphere(rng), ray.time);
         let attenuation: Color = self
             .albedo

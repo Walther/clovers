@@ -1,15 +1,20 @@
 use super::{random_in_unit_sphere, reflect, Material};
 use crate::{color::Color, hitable::HitRecord, ray::Ray, textures::Texture, Float, Vec3};
 use rand::prelude::ThreadRng;
-use std::sync::Arc;
-#[derive(Clone)]
+
+#[derive(Copy, Clone)]
 pub struct Metal {
-    albedo: Arc<dyn Texture>,
+    albedo: Texture,
     fuzz: Float,
 }
 
-impl Material for Metal {
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)> {
+impl Metal {
+    pub fn scatter(
+        self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        rng: ThreadRng,
+    ) -> Option<(Ray, Color)> {
         let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
         let scattered: Ray = Ray::new(
             hit_record.position,
@@ -25,13 +30,11 @@ impl Material for Metal {
             None
         }
     }
-}
 
-impl Metal {
-    pub fn new(albedo: Arc<dyn Texture>, fuzz: Float) -> Self {
-        Metal {
+    pub fn new(albedo: Texture, fuzz: Float) -> Material {
+        Material::Metal(Metal {
             albedo: albedo,
             fuzz: fuzz.min(1.0),
-        }
+        })
     }
 }

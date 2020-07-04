@@ -5,16 +5,15 @@ use crate::{
     Float, Vec3, PI,
 };
 use rand::prelude::*;
-use std::sync::Arc;
 
 pub struct Sphere {
     center: Vec3,
     radius: Float,
-    material: Arc<dyn Material>,
+    material: Material,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: Float, material: Arc<dyn Material>) -> Self {
+    pub fn new(center: Vec3, radius: Float, material: Material) -> Self {
         Sphere {
             center,
             radius,
@@ -61,7 +60,7 @@ impl Hitable for Sphere {
                     normal: outward_normal,
                     u,
                     v,
-                    material: &*self.material,
+                    material: &self.material,
                     front_face: false, // TODO: fix having to declare it before calling face_normal
                 };
                 record.set_face_normal(ray, outward_normal);
@@ -79,7 +78,7 @@ impl Hitable for Sphere {
                     normal: outward_normal,
                     u,
                     v,
-                    material: &*self.material,
+                    material: &self.material,
                     front_face: false, // TODO: fix having to declare it before calling face_normal
                 };
                 record.set_face_normal(ray, outward_normal);

@@ -3,7 +3,7 @@ use crate::{
     camera::Camera,
     color::Color,
     hitable::HitableList,
-    materials::{DiffuseLight, Lambertian, Material},
+    materials::{DiffuseLight, Lambertian},
     objects::{Boxy, ConstantMedium, RotateY, Translate},
     objects::{XYRect, XZRect, YZRect},
     textures::SolidColor,
@@ -17,69 +17,36 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let mut world: HitableList = HitableList::new();
 
     // Cornell box
+    let red = Lambertian::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
+    let white = Lambertian::new(SolidColor::new(Color::new(0.73, 0.73, 0.73)));
+    let green = Lambertian::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
+    let light = DiffuseLight::new(SolidColor::new(Color::new(7.0, 7.0, 7.0)));
 
-    let red = Lambertian::new(Arc::new(SolidColor::new(Color::new(0.65, 0.05, 0.05))));
-    let white: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::new(SolidColor::new(
-        Color::new(0.73, 0.73, 0.73),
-    ))));
-    let green = Lambertian::new(Arc::new(SolidColor::new(Color::new(0.12, 0.45, 0.15))));
-    let light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(7.0, 7.0, 7.0))));
-
-    world.hitables.push(Arc::new(YZRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        555.0,
-        Arc::new(green),
-    )));
-    world.hitables.push(Arc::new(YZRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        0.0,
-        Arc::new(red),
-    )));
+    world
+        .hitables
+        .push(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
+    world
+        .hitables
+        .push(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
     world.hitables.push(Arc::new(XZRect::new(
-        113.0,
-        443.0,
-        127.0,
-        432.0,
-        554.0,
-        Arc::new(light),
+        113.0, 443.0, 127.0, 432.0, 554.0, light,
     )));
-    world.hitables.push(Arc::new(XZRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        0.0,
-        Arc::clone(&white),
-    )));
-    world.hitables.push(Arc::new(XZRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        555.0,
-        Arc::clone(&white),
-    )));
-    world.hitables.push(Arc::new(XYRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        555.0,
-        Arc::clone(&white),
-    )));
+    world
+        .hitables
+        .push(Arc::new(XZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white)));
+    world
+        .hitables
+        .push(Arc::new(XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
+    world
+        .hitables
+        .push(Arc::new(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
 
     // Boxes
 
     let box1 = Arc::new(Boxy::new(
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(165.0, 330.0, 165.0),
-        Arc::clone(&white),
+        white,
     ));
     let box1 = RotateY::new(box1, 15.0);
     let box1 = Translate::new(Arc::new(box1), Vec3::new(265.0, 0.0, 295.0));
@@ -87,7 +54,7 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let box2 = Arc::new(Boxy::new(
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(165.0, 165.0, 165.0),
-        Arc::clone(&white),
+        white,
     ));
     let box2 = RotateY::new(box2, -18.0);
     let box2 = Translate::new(Arc::new(box2), Vec3::new(130.0, 0.0, 65.0));
@@ -96,12 +63,12 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let box1 = ConstantMedium::new(
         Arc::new(box1),
         0.01,
-        Arc::new(SolidColor::new(Color::new(0.0, 0.0, 0.0))),
+        SolidColor::new(Color::new(0.0, 0.0, 0.0)),
     );
     let box2 = ConstantMedium::new(
         Arc::new(box2),
         0.01,
-        Arc::new(SolidColor::new(Color::new(1.0, 1.0, 1.0))),
+        SolidColor::new(Color::new(1.0, 1.0, 1.0)),
     );
 
     world.hitables.push(Arc::new(box1));

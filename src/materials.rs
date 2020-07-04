@@ -12,14 +12,36 @@ pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
 
-pub trait Material: Sync + Send {
-    /// Returns `None`, if the ray gets absorbed.
-    /// Returns `Some(scattered, attenuation)`, if the ray gets scattered
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<(Ray, Color)>;
+#[derive(Copy, Clone)]
+pub enum Material {
+    Dielectric(Dielectric),
+    Lambertian(Lambertian),
+    DiffuseLight(DiffuseLight),
+    Metal(Metal),
+    Isotropic(Isotropic),
+}
 
+impl Material {
+    pub fn scatter(
+        &self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        rng: ThreadRng,
+    ) -> Option<(Ray, Color)> {
+        match *self {
+            Material::Dielectric(d) => Dielectric::scatter(d, ray, hit_record, rng),
+            Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),
+            Material::DiffuseLight(d) => DiffuseLight::scatter(d, ray, hit_record, rng),
+            Material::Metal(m) => Metal::scatter(m, ray, hit_record, rng),
+            Material::Isotropic(i) => Isotropic::scatter(i, ray, hit_record, rng),
+        }
+    }
     /// Returns the amount of light the material emits. By default, materials do not emit light, returning black.
-    fn emitted(&self, _u: Float, _v: Float, _position: Vec3) -> Color {
-        Color::new(0.0, 0.0, 0.0)
+    pub fn emit(&self, u: Float, v: Float, position: Vec3) -> Color {
+        match *self {
+            Material::DiffuseLight(d) => DiffuseLight::emit(d, u, v, position),
+            _ => Color::new(0.0, 0.0, 0.0),
+        }
     }
 }
 

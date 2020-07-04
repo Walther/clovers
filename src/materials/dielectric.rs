@@ -2,14 +2,14 @@ use super::{reflect, refract, schlick, Material};
 use crate::{color::Color, hitable::HitRecord, ray::Ray, Float, Vec3};
 use rand::prelude::*;
 
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct Dielectric {
     refractive_index: Float,
 }
 
-impl Material for Dielectric {
-    fn scatter(
-        &self,
+impl Dielectric {
+    pub fn scatter(
+        self,
         ray: &Ray,
         hit_record: &HitRecord,
         mut rng: ThreadRng,
@@ -40,10 +40,8 @@ impl Material for Dielectric {
 
         Some((scattered, attenuation))
     }
-}
 
-impl Dielectric {
-    pub fn new(refractive_index: Float) -> Self {
-        Dielectric { refractive_index }
+    pub fn new(refractive_index: Float) -> Material {
+        Material::Dielectric(Dielectric { refractive_index })
     }
 }

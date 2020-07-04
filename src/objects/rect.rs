@@ -5,7 +5,6 @@ use crate::{
     Float, Vec3, RECT_EPSILON,
 };
 use rand::prelude::ThreadRng;
-use std::sync::Arc;
 
 // XY
 
@@ -15,18 +14,11 @@ pub struct XYRect {
     y0: Float,
     y1: Float,
     k: Float,
-    material: Arc<dyn Material>,
+    material: Material,
 }
 
 impl XYRect {
-    pub fn new(
-        x0: Float,
-        x1: Float,
-        y0: Float,
-        y1: Float,
-        k: Float,
-        material: Arc<dyn Material>,
-    ) -> XYRect {
+    pub fn new(x0: Float, x1: Float, y0: Float, y1: Float, k: Float, material: Material) -> XYRect {
         XYRect {
             x0,
             x1,
@@ -63,7 +55,7 @@ impl Hitable for XYRect {
             distance: t,
             position,
             normal: outward_normal,
-            material: &*self.material,
+            material: &self.material,
             u,
             v,
             front_face: false, // TODO: fix having to declare it before calling face_normal
@@ -89,18 +81,11 @@ pub struct XZRect {
     z0: Float,
     z1: Float,
     k: Float,
-    material: Arc<dyn Material>,
+    material: Material,
 }
 
 impl XZRect {
-    pub fn new(
-        x0: Float,
-        x1: Float,
-        z0: Float,
-        z1: Float,
-        k: Float,
-        material: Arc<dyn Material>,
-    ) -> XZRect {
+    pub fn new(x0: Float, x1: Float, z0: Float, z1: Float, k: Float, material: Material) -> XZRect {
         XZRect {
             x0,
             x1,
@@ -137,7 +122,7 @@ impl Hitable for XZRect {
             distance: t,
             position,
             normal: outward_normal,
-            material: &*self.material,
+            material: &self.material,
             u,
             v,
             front_face: false, // TODO: fix having to declare it before calling face_normal
@@ -163,18 +148,11 @@ pub struct YZRect {
     z0: Float,
     z1: Float,
     k: Float,
-    material: Arc<dyn Material>,
+    material: Material,
 }
 
 impl YZRect {
-    pub fn new(
-        y0: Float,
-        y1: Float,
-        z0: Float,
-        z1: Float,
-        k: Float,
-        material: Arc<dyn Material>,
-    ) -> YZRect {
+    pub fn new(y0: Float, y1: Float, z0: Float, z1: Float, k: Float, material: Material) -> YZRect {
         YZRect {
             y0,
             y1,
@@ -211,7 +189,7 @@ impl Hitable for YZRect {
             distance: t,
             position,
             normal: outward_normal,
-            material: &*self.material,
+            material: &self.material,
             u,
             v,
             front_face: false, // TODO: fix having to declare it before calling face_normal

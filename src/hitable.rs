@@ -14,7 +14,7 @@ pub struct HitRecord<'a> {
     /// V surface coordinate of the hitpoint
     pub v: Float,
     /// Reference to the material at the hitpoint
-    pub material: &'a dyn Material,
+    pub material: &'a Material,
     /// Is the hitpoint at the front of the surface
     pub front_face: bool,
 }

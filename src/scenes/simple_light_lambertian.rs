@@ -17,36 +17,29 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_1: Float = 1.0;
     let mut world: HitableList = HitableList::new();
 
-    let texture: Arc<dyn Texture> = Arc::new(SolidColor::new(Color::new(0.3, 0.2, 0.1)));
-    let texture2: Arc<dyn Texture> = Arc::new(SolidColor::new(Color::new(0.1, 0.2, 0.3)));
+    let texture: Texture = SolidColor::new(Color::new(0.3, 0.2, 0.1));
+    let texture2: Texture = SolidColor::new(Color::new(0.1, 0.2, 0.3));
 
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
-        Arc::new(Lambertian::new(texture)),
+        Lambertian::new(texture),
     )));
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, 2.0, 0.0),
         2.0,
-        Arc::new(Lambertian::new(texture2)),
+        Lambertian::new(texture2),
     )));
 
-    let difflight: Arc<dyn Material> = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(
-        Color::new(4.0, 4.0, 4.0),
-    ))));
+    let difflight: Material = DiffuseLight::new(SolidColor::new(Color::new(4.0, 4.0, 4.0)));
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, 7.0, 0.0),
         2.0,
-        Arc::clone(&difflight),
+        difflight,
     )));
-    world.hitables.push(Arc::new(XYRect::new(
-        3.0,
-        5.0,
-        1.0,
-        3.0,
-        -2.0,
-        Arc::clone(&difflight),
-    )));
+    world
+        .hitables
+        .push(Arc::new(XYRect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight)));
 
     let camera_position: Vec3 = Vec3::new(20.0, 5.0, 2.0);
     let camera_target: Vec3 = Vec3::new(0.0, 2.0, 0.0);

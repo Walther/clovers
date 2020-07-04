@@ -19,34 +19,24 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
         0.5,
-        Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(
-            0.7, 0.3, 0.3,
-        ))))),
+        Lambertian::new(SolidColor::new(Color::new(0.7, 0.3, 0.3))),
     )));
 
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
         100.0,
-        Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(
-            0.8, 0.8, 0.0,
-        ))))),
+        Lambertian::new(SolidColor::new(Color::new(0.8, 0.8, 0.0))),
     )));
 
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Arc::new(Metal::new(
-            Arc::new(SolidColor::new(Color::new(0.8, 0.6, 0.2))),
-            0.3,
-        )),
+        Metal::new(SolidColor::new(Color::new(0.8, 0.6, 0.2)), 0.3),
     )));
     world.hitables.push(Arc::new(Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),
         0.5,
-        Arc::new(Metal::new(
-            Arc::new(SolidColor::new(Color::new(0.8, 0.8, 0.8))),
-            1.0,
-        )),
+        Metal::new(SolidColor::new(Color::new(0.8, 0.8, 0.8)), 1.0),
     )));
 
     let camera_position: Vec3 = Vec3::new(0.0, 0.0, 5.0);

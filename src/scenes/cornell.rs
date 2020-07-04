@@ -3,7 +3,7 @@ use crate::{
     camera::Camera,
     color::Color,
     hitable::HitableList,
-    materials::{DiffuseLight, Lambertian, Material},
+    materials::{DiffuseLight, Lambertian},
     objects::{XYRect, XZRect, YZRect},
     textures::SolidColor,
     Float, Vec3,
@@ -15,61 +15,30 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_1: Float = 1.0;
     let mut world: HitableList = HitableList::new();
 
-    let red = Lambertian::new(Arc::new(SolidColor::new(Color::new(0.65, 0.05, 0.05))));
-    let white: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::new(SolidColor::new(
-        Color::new(0.73, 0.73, 0.73),
-    ))));
-    let green = Lambertian::new(Arc::new(SolidColor::new(Color::new(0.12, 0.45, 0.15))));
-    let light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(15.0, 15.0, 15.0))));
+    // Cornell box
+    let red = Lambertian::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
+    let white = Lambertian::new(SolidColor::new(Color::new(0.73, 0.73, 0.73)));
+    let green = Lambertian::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
+    let light = DiffuseLight::new(SolidColor::new(Color::new(7.0, 7.0, 7.0)));
 
-    world.hitables.push(Arc::new(YZRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        555.0,
-        Arc::new(green),
-    )));
-    world.hitables.push(Arc::new(YZRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        0.0,
-        Arc::new(red),
-    )));
+    world
+        .hitables
+        .push(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
+    world
+        .hitables
+        .push(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
     world.hitables.push(Arc::new(XZRect::new(
-        213.0,
-        343.0,
-        227.0,
-        332.0,
-        554.0,
-        Arc::new(light),
+        113.0, 443.0, 127.0, 432.0, 554.0, light,
     )));
-    world.hitables.push(Arc::new(XZRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        0.0,
-        Arc::clone(&white),
-    )));
-    world.hitables.push(Arc::new(XZRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        555.0,
-        Arc::clone(&white),
-    )));
-    world.hitables.push(Arc::new(XYRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        555.0,
-        Arc::clone(&white),
-    )));
+    world
+        .hitables
+        .push(Arc::new(XZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white)));
+    world
+        .hitables
+        .push(Arc::new(XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
+    world
+        .hitables
+        .push(Arc::new(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
 
     let camera_position: Vec3 = Vec3::new(278.0, 278.0, -800.0);
     let camera_target: Vec3 = Vec3::new(278.0, 278.0, 0.0);

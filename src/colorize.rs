@@ -24,7 +24,7 @@ pub fn colorize(
             let emitted: Color =
                 hit_record
                     .material
-                    .emitted(hit_record.u, hit_record.v, hit_record.position);
+                    .emit(hit_record.u, hit_record.v, hit_record.position);
             // Try to scatter and colorize the new ray
             match hit_record.material.scatter(&ray, &hit_record, rng) {
                 // Got a scatter and attenuation

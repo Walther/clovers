@@ -12,7 +12,7 @@ use crate::{
 use rand::prelude::*;
 use std::sync::Arc;
 
-pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
+pub fn load<'a>(width: u32, height: u32, rng: ThreadRng) -> Scene<'a> {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
     let mut world: HitableList = HitableList::new();
