@@ -1,7 +1,7 @@
 use crate::{Float, ThreadRng, Vec3};
 use image::Rgb;
 use rand::prelude::*;
-use std::ops::{Add, AddAssign, DivAssign, Mul, MulAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Color {
@@ -69,6 +69,16 @@ impl Color {
     }
 }
 
+impl From<[u8; 3]> for Color {
+    fn from(rgb: [u8; 3]) -> Self {
+        Color::new(
+            (rgb[0] as Float) / 255.99,
+            (rgb[1] as Float) / 255.99,
+            (rgb[2] as Float) / 255.99,
+        )
+    }
+}
+
 impl From<Color> for Vec3 {
     fn from(color: Color) -> Vec3 {
         Vec3::new(color.r, color.g, color.b)
@@ -118,5 +128,12 @@ impl DivAssign<Float> for Color {
         self.r /= rhs;
         self.g /= rhs;
         self.b /= rhs;
+    }
+}
+
+impl Div<Float> for Color {
+    type Output = Color;
+    fn div(self, rhs: Float) -> Color {
+        Color::new(self.r / rhs, self.g / rhs, self.b / rhs)
     }
 }

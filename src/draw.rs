@@ -1,7 +1,12 @@
 use crate::{
-    camera::Camera, color::Color, colorize::colorize, hitable::BVHNode, ray::Ray, scenes, Float,
+    camera::Camera,
+    color::Color,
+    colorize::colorize,
+    hitable::{BVHNode, Hitable},
+    ray::Ray,
+    scenes, Float,
 };
-use image::{ImageBuffer, ImageResult, RgbImage};
+use image::{ImageBuffer, ImageResult, Rgb, RgbImage};
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
 use rayon::prelude::*;
