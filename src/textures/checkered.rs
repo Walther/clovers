@@ -1,4 +1,4 @@
-use super::{SolidColor, Texture};
+use super::{Texture};
 use crate::{color::Color, Float, Vec3};
 
 #[derive(Copy, Clone)]
@@ -18,7 +18,7 @@ impl Checkered {
         })
     }
 
-    pub fn color(self, u: Float, v: Float, position: Vec3) -> Color {
+    pub fn color(self, _u: Float, _v: Float, position: Vec3) -> Color {
         let sines = (self.density * position.x).sin()
             * (self.density * position.y).sin()
             * (self.density * position.z).sin();

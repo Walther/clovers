@@ -10,7 +10,7 @@ use crate::{
         sphere::Sphere, translate::Translate,
     },
     // perlin::Perlin,
-    textures::{SolidColor, Texture},
+    textures::SolidColor,
     Float,
     Vec3,
 };
@@ -95,6 +95,11 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     )));
     // overall boundary sphere, big and misty inside
     let boundary2 = Sphere::new(Vec3::new(0.0, 0.0, 0.0), 5000.0, Dielectric::new(1.5));
+    world.hitables.push(Arc::new(ConstantMedium::new(
+        Arc::new(boundary2),
+        0.0001,
+        SolidColor::new(Color::new(1.0, 1.0, 1.0)),
+    )));
 
     // // noise / marble sphere TODO:
     // let pertext: Texture = Arc::new(NoiseTexture::new(Perlin::new(256, rng), 2.0));
