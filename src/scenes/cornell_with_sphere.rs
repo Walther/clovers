@@ -3,10 +3,10 @@ use crate::{
     camera::Camera,
     color::Color,
     hitable::{Hitable, HitableList},
-    materials::{Dielectric, DiffuseLight, Lambertian, Material},
+    materials::{Dielectric, DiffuseLight, Lambertian},
     objects::Sphere,
     objects::{XYRect, XZRect, YZRect},
-    textures::{SolidColor, Texture},
+    textures::SolidColor,
     Float, Vec3,
 };
 use rand::prelude::*;
