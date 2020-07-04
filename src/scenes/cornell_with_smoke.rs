@@ -6,7 +6,7 @@ use crate::{
     materials::{DiffuseLight, Lambertian, Material},
     objects::{Boxy, ConstantMedium, RotateY, Translate},
     objects::{XYRect, XZRect, YZRect},
-    textures::SolidColor,
+    textures::{SolidColor, Texture},
     Float, Vec3,
 };
 use rand::prelude::*;
@@ -18,16 +18,24 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
 
     // Cornell box
     let red = Material::Lambertian {
-        albedo: Arc::new(SolidColor::new(Color::new(0.65, 0.05, 0.05))),
+        albedo: Texture::SolidColor {
+            color: Color::new(0.65, 0.05, 0.05),
+        },
     };
     let white = Material::Lambertian {
-        albedo: Arc::new(SolidColor::new(Color::new(0.73, 0.73, 0.73))),
+        albedo: Texture::SolidColor {
+            color: Color::new(0.73, 0.73, 0.73),
+        },
     };
     let green = Material::Lambertian {
-        albedo: Arc::new(SolidColor::new(Color::new(0.12, 0.45, 0.15))),
+        albedo: Texture::SolidColor {
+            color: Color::new(0.12, 0.45, 0.15),
+        },
     };
     let light = Material::DiffuseLight {
-        emit: Arc::new(SolidColor::new(Color::new(7.0, 7.0, 7.0))),
+        emit: Texture::SolidColor {
+            color: Color::new(7.0, 7.0, 7.0),
+        },
     };
 
     world
@@ -71,12 +79,16 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let box1 = ConstantMedium::new(
         Arc::new(box1),
         0.01,
-        Arc::new(SolidColor::new(Color::new(0.0, 0.0, 0.0))),
+        Texture::SolidColor {
+            color: Color::new(0.0, 0.0, 0.0),
+        },
     );
     let box2 = ConstantMedium::new(
         Arc::new(box2),
         0.01,
-        Arc::new(SolidColor::new(Color::new(1.0, 1.0, 1.0))),
+        Texture::SolidColor {
+            color: Color::new(1.0, 1.0, 1.0),
+        },
     );
 
     world.hitables.push(Arc::new(box1));

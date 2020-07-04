@@ -5,7 +5,7 @@ use crate::{
     hitable::HitableList,
     materials::{DiffuseLight, Lambertian, Material},
     objects::{XYRect, XZRect, YZRect},
-    textures::SolidColor,
+    textures::{SolidColor, Texture},
     Float, Vec3,
 };
 use rand::prelude::*;
@@ -17,16 +17,24 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
 
     // Cornell box
     let red = Material::Lambertian {
-        albedo: Arc::new(SolidColor::new(Color::new(0.65, 0.05, 0.05))),
+        albedo: Texture::SolidColor {
+            color: Color::new(0.65, 0.05, 0.05),
+        },
     };
     let white = Material::Lambertian {
-        albedo: Arc::new(SolidColor::new(Color::new(0.73, 0.73, 0.73))),
+        albedo: Texture::SolidColor {
+            color: Color::new(0.73, 0.73, 0.73),
+        },
     };
     let green = Material::Lambertian {
-        albedo: Arc::new(SolidColor::new(Color::new(0.12, 0.45, 0.15))),
+        albedo: Texture::SolidColor {
+            color: Color::new(0.12, 0.45, 0.15),
+        },
     };
     let light = Material::DiffuseLight {
-        emit: Arc::new(SolidColor::new(Color::new(7.0, 7.0, 7.0))),
+        emit: Texture::SolidColor {
+            color: Color::new(7.0, 7.0, 7.0),
+        },
     };
 
     world

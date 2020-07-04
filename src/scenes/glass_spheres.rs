@@ -5,7 +5,7 @@ use crate::{
     hitable::HitableList,
     materials::{Dielectric, Lambertian, Material, Metal},
     objects::sphere::Sphere,
-    textures::SolidColor,
+    textures::{SolidColor, Texture},
     Float, Vec3,
 };
 use rand::prelude::*;
@@ -20,7 +20,9 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
         Vec3::new(0.0, 0.0, -1.0),
         0.5,
         Material::Lambertian {
-            albedo: Arc::new(SolidColor::new(Color::new(0.1, 0.2, 0.5))),
+            albedo: Texture::SolidColor {
+                color: Color::new(0.1, 0.2, 0.5),
+            },
         },
     )));
 
@@ -29,7 +31,9 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
         Vec3::new(0.0, -100.5, -1.0),
         100.0,
         Material::Lambertian {
-            albedo: Arc::new(SolidColor::new(Color::new(0.8, 0.8, 0.0))),
+            albedo: Texture::SolidColor {
+                color: Color::new(0.8, 0.8, 0.0),
+            },
         },
     )));
 
@@ -38,7 +42,9 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
         Material::Metal {
-            albedo: Arc::new(SolidColor::new(Color::new(0.8, 0.6, 0.2))),
+            albedo: Texture::SolidColor {
+                color: Color::new(0.8, 0.6, 0.2),
+            },
             fuzz: 0.0,
         },
     )));
