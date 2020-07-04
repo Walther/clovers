@@ -85,7 +85,6 @@ pub fn draw_window(width: u32, height: u32, samples: u32) -> Result<(), Error> {
 struct World {
     width: u32,
     height: u32,
-    rng: ThreadRng,
     scene: Scene,
     float_buffer: Vec<Float>,
     bar: ProgressBar,
@@ -102,7 +101,6 @@ impl World {
         World {
             width,
             height,
-            rng,
             scene: scenes::cornell_with_sphere::load(width, height, rng),
             float_buffer: vec![0.0; 4 * width as usize * height as usize], // rgba
             bar,
@@ -121,50 +119,55 @@ impl World {
         if frame_num > self.samples {
             return;
         }
-
-        // Often-used variables outside the loop
-        let mut u: Float;
-        let mut v: Float;
-        let mut ray: Ray;
+        let width = self.width as usize;
+        let height = self.height as usize;
+        let camera = &self.scene.camera;
+        let world: &dyn Hitable = &self.scene.world;
 
         // Update internal float-based pixel buffer with new samples
-        for (i, pixel) in self.float_buffer.chunks_exact_mut(4).enumerate() {
-            let x = (i % self.width as usize) as i16;
-            let y = self.height as i16 - (i / self.width as usize) as i16; // flip y-axis
+        self.float_buffer
+            .par_chunks_exact_mut(4)
+            .enumerate()
+            .for_each(|(i, pixel)| {
+                let x = (i % width) as i16;
+                let y = height as i16 - (i / width) as i16; // flip y-axis
 
-            let mut rng = rand::thread_rng();
-            let mut color: Color = Color::new(0.0, 0.0, 0.0);
+                let mut rng = rand::thread_rng();
+                let mut color: Color = Color::new(0.0, 0.0, 0.0);
 
-            u = (x as Float + rng.gen::<Float>()) / self.width as Float;
-            v = (y as Float + rng.gen::<Float>()) / self.height as Float;
-            ray = self.scene.camera.get_ray(u, v, rng);
-            color += colorize(&ray, background_color, &self.scene.world, 0, max_depth, rng);
+                let u = (x as Float + rng.gen::<Float>()) / width as Float;
+                let v = (y as Float + rng.gen::<Float>()) / height as Float;
+                let ray = camera.get_ray(u, v, rng);
+                color += colorize(&ray, background_color, world, 0, max_depth, rng);
 
-            // sum to previous color; remember to divide in a consumer!
-            let prev_color = Color::new(pixel[0], pixel[1], pixel[2]);
-            color = prev_color + color;
+                // sum to previous color; remember to divide in a consumer!
+                let prev_color = Color::new(pixel[0], pixel[1], pixel[2]);
+                color = prev_color + color;
 
-            // write
-            let rgba = &[color.r, color.g, color.b, 1.0];
-            pixel.copy_from_slice(rgba);
-        }
+                // write
+                let rgba = &[color.r, color.g, color.b, 1.0];
+                pixel.copy_from_slice(rgba);
+            });
 
         // Write to actual framebuffer
-        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-            let r = self.float_buffer[i * 4];
-            let g = self.float_buffer[i * 4 + 1];
-            let b = self.float_buffer[i * 4 + 2];
-            let _a = self.float_buffer[i * 4 + 3];
-            // NOTE: divided because internal floatbuffer keeps summing values
-            let color = Color::new(r, g, b) / frame_num as Float;
-            // gamma correction
-            let color = color.gamma_correction(gamma);
-            let rgb = color.to_rgb_u8();
-            // weight the pixel down based on frame number
-            let rgba = [rgb[0], rgb[1], rgb[2], 0xFF]; //TODO: alpha in color?
+        frame
+            .par_chunks_exact_mut(4)
+            .enumerate()
+            .for_each(|(i, pixel)| {
+                let r = self.float_buffer[i * 4];
+                let g = self.float_buffer[i * 4 + 1];
+                let b = self.float_buffer[i * 4 + 2];
+                let _a = self.float_buffer[i * 4 + 3];
+                // NOTE: divided because internal floatbuffer keeps summing values
+                let color = Color::new(r, g, b) / frame_num as Float;
+                // gamma correction
+                let color = color.gamma_correction(gamma);
+                let rgb = color.to_rgb_u8();
+                // weight the pixel down based on frame number
+                let rgba = [rgb[0], rgb[1], rgb[2], 0xFF]; //TODO: alpha in color?
 
-            pixel.copy_from_slice(&rgba);
-        }
+                pixel.copy_from_slice(&rgba);
+            });
         self.bar.inc(1);
     }
 
