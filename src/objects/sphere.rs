@@ -5,7 +5,6 @@ use crate::{
     Float, Vec3, PI,
 };
 use rand::prelude::*;
-use std::sync::Arc;
 
 pub struct Sphere {
     center: Vec3,

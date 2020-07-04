@@ -1,7 +1,6 @@
 use super::{SolidColor, Texture};
 use crate::{color::Color, Float, Vec3};
 
-use std::sync::Arc;
 pub struct Checkered {
     // TODO: get recursive textures back, maybe?
     even: SolidColor,

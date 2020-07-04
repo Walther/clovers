@@ -5,7 +5,6 @@ use crate::{
     Float, Ray, Vec3, PI,
 };
 use rand::prelude::*;
-use std::sync::Arc;
 
 pub struct MovingSphere {
     center_0: Vec3,

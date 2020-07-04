@@ -5,7 +5,6 @@ use crate::{
     Float, Vec3, RECT_EPSILON,
 };
 use rand::prelude::ThreadRng;
-use std::sync::Arc;
 
 // XY
 

@@ -1,7 +1,6 @@
 use super::{random_in_unit_sphere, Material};
 use crate::{color::Color, hitable::HitRecord, ray::Ray, textures::Texture};
 use rand::prelude::ThreadRng;
-use std::sync::Arc;
 pub struct Isotropic {
     albedo: Texture,
 }

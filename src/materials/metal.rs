@@ -1,7 +1,6 @@
 use super::{random_in_unit_sphere, reflect, Material};
 use crate::{color::Color, hitable::HitRecord, ray::Ray, textures::Texture, Float, Vec3};
 use rand::prelude::ThreadRng;
-use std::sync::Arc;
 
 pub struct Metal {
     albedo: Texture,
