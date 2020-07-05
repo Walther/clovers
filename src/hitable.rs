@@ -38,18 +38,6 @@ impl<'a> HitRecord<'a> {
     }
 }
 
-// pub trait Hitable: Sync + Send {
-//     /// The main function for checking whether an object is hit by a ray. If an object is hit, returns Some(HitRecord)
-//     fn hit(
-//         &self,
-//         ray: &Ray,
-//         distance_min: Float,
-//         distance_max: Float,
-//         rng: ThreadRng,
-//     ) -> Option<&HitRecord>;
-//     fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB>;
-// }
-
 #[derive(Deserialize, Serialize)]
 pub enum Hitable {
     Boxy(Boxy),

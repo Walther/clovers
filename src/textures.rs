@@ -11,10 +11,6 @@ pub use solid_color::*;
 use crate::{color::Color, Float, Vec3};
 use noise_texture::NoiseTexture;
 
-// pub trait Texture: Sync + Send {
-//     fn color(&self, u: Float, v: Float, position: Vec3) -> Color;
-// }
-
 #[derive(Copy, Clone, Deserialize, Serialize)]
 pub enum Texture {
     Checkered(Checkered),
