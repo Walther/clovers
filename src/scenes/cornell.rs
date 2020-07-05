@@ -13,7 +13,7 @@ use std::sync::Arc;
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
-    let mut world: HitableList = HitableList::new();
+    let mut world: Arc<Hitable>List = HitableList::new();
 
     // Cornell box
     let red = Lambertian::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));

@@ -14,7 +14,7 @@ use std::sync::Arc;
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
-    let mut world: HitableList = HitableList::new();
+    let mut world: Arc<Hitable>List = HitableList::new();
 
     // Cornell box
     let red = Lambertian::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
@@ -42,7 +42,7 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
         .push(Arc::new(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
 
     // glass sphere
-    let sphere: Arc<dyn Hitable> = Arc::new(Sphere::new(
+    let sphere: Arc<Hitable> = Arc::new(Sphere::new(
         Vec3::new(278.0, 278.0, 278.0),
         120.0,
         Dielectric::new(1.5),

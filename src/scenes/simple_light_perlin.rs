@@ -15,7 +15,7 @@ use std::sync::Arc;
 pub fn load<'a>(width: u32, height: u32, rng: ThreadRng) -> Scene<'a> {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
-    let mut world: HitableList = HitableList::new();
+    let mut world: Arc<Hitable>List = HitableList::new();
 
     let perlin = Perlin::new(256, rng);
     let perlin2 = Perlin::new(256, rng);

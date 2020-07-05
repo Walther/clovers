@@ -5,7 +5,7 @@ use rand::prelude::ThreadRng;
 pub fn colorize(
     ray: &Ray,
     background_color: Color,
-    world: &dyn Hitable,
+    world: &Hitable,
     depth: u32,
     max_depth: u32,
     rng: ThreadRng,

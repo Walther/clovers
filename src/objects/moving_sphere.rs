@@ -23,15 +23,15 @@ impl MovingSphere {
         time_1: Float,
         radius: Float,
         material: Material,
-    ) -> Self {
-        MovingSphere {
+    ) -> Hitable {
+        Hitable::MovingSphere(MovingSphere {
             center_0,
             center_1,
             time_0,
             time_1,
             radius,
             material,
-        }
+        })
     }
     pub fn center(&self, time: Float) -> Vec3 {
         return self.center_0
@@ -48,10 +48,8 @@ impl MovingSphere {
         let v: Float = (theta + PI / 2.0) / PI;
         (u, v)
     }
-}
 
-impl Hitable for MovingSphere {
-    fn hit(
+    pub fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -105,8 +103,7 @@ impl Hitable for MovingSphere {
         None
     }
 
-    // TODO: might need to return Option<T> ?
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         let box0: AABB = AABB::new(
             self.center(t0) - Vec3::new(self.radius, self.radius, self.radius),
             self.center(t0) + Vec3::new(self.radius, self.radius, self.radius),

@@ -7,14 +7,14 @@ use rand::prelude::*;
 use std::sync::Arc;
 
 pub struct RotateY {
-    object: Arc<dyn Hitable>,
+    object: Arc<Hitable>,
     sin_theta: Float,
     cos_theta: Float,
     bounding_box: Option<AABB>,
 }
 
 impl RotateY {
-    pub fn new(object: Arc<dyn Hitable>, angle: Float) -> RotateY {
+    pub fn new(object: Arc<Hitable>, angle: Float) -> RotateY {
         // TODO: add proper time support
         let time_0: Float = 0.0;
         let time_1: Float = 1.0;
@@ -73,10 +73,8 @@ impl RotateY {
             }
         }
     }
-}
 
-impl Hitable for RotateY {
-    fn hit(
+    pub fn hit(
         &self,
         ray: &crate::ray::Ray,
         distance_min: Float,
@@ -129,7 +127,8 @@ impl Hitable for RotateY {
             }
         }
     }
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+
+    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         self.bounding_box
     }
 }

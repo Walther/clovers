@@ -13,12 +13,12 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: Float, material: Material) -> Self {
-        Sphere {
+    pub fn new(center: Vec3, radius: Float, material: Material) -> Hitable {
+        Hitable::Sphere(Sphere {
             center,
             radius,
             material,
-        }
+        })
     }
 
     // Returns the U,V surface coordinates of a hitpoint
@@ -30,10 +30,8 @@ impl Sphere {
         let v: Float = (theta + PI / 2.0) / PI;
         (u, v)
     }
-}
 
-impl Hitable for Sphere {
-    fn hit(
+    pub fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -88,7 +86,7 @@ impl Hitable for Sphere {
         None
     }
 
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         let output_box = AABB::new(
             self.center - Vec3::new(self.radius, self.radius, self.radius),
             self.center + Vec3::new(self.radius, self.radius, self.radius),

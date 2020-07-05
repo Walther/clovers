@@ -23,7 +23,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     let time_1: Float = 1.0;
 
     // Ground: lots of boxes
-    let mut boxes1: HitableList = HitableList::new();
+    let mut boxes1: Arc<Hitable>List = HitableList::new();
     let ground: Material = Lambertian::new(SolidColor::new(Color::new(0.48, 0.83, 0.53)));
 
     let boxes_per_side = 20;
@@ -45,7 +45,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
         }
     }
 
-    let mut world: HitableList = HitableList::new();
+    let mut world: Arc<Hitable>List = HitableList::new();
 
     world
         .hitables
@@ -83,7 +83,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     )));
 
     // blue glass sphere
-    let boundary: Arc<dyn Hitable> = Arc::new(Sphere::new(
+    let boundary: Arc<Hitable> = Arc::new(Sphere::new(
         Vec3::new(360.0, 150.0, 145.0),
         70.0,
         Dielectric::new(1.5),
@@ -111,7 +111,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     )));
 
     // Sphere-rasterized pseudo-box
-    let mut boxes2: HitableList = HitableList::new();
+    let mut boxes2: Arc<Hitable>List = HitableList::new();
     let white = Lambertian::new(SolidColor::new(Color::new(0.73, 0.73, 0.73)));
     let num_spheres = 1000;
     for _j in 0..num_spheres {

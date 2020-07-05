@@ -1,4 +1,10 @@
-use crate::{materials::Material, Float, Ray, Vec3};
+use crate::{
+    materials::Material,
+    objects::{
+        Boxy, ConstantMedium, MovingSphere, RotateY, Sphere, Translate, XYRect, XZRect, YZRect,
+    },
+    Float, Ray, Vec3,
+};
 use rand::prelude::*;
 use std::{cmp::Ordering, sync::Arc};
 
@@ -31,26 +37,84 @@ impl<'a> HitRecord<'a> {
     }
 }
 
-pub trait Hitable: Sync + Send {
-    /// The main function for checking whether an object is hit by a ray. If an object is hit, returns Some(HitRecord)
-    fn hit(
-        &self,
+// pub trait Hitable: Sync + Send {
+//     /// The main function for checking whether an object is hit by a ray. If an object is hit, returns Some(HitRecord)
+//     fn hit(
+//         &self,
+//         ray: &Ray,
+//         distance_min: Float,
+//         distance_max: Float,
+//         rng: ThreadRng,
+//     ) -> Option<HitRecord>;
+//     fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB>;
+// }
+
+pub enum Hitable {
+    Boxy(Boxy),
+    ConstantMedium(ConstantMedium),
+    MovingSphere(MovingSphere),
+    XZRect(XZRect),
+    XYRect(XYRect),
+    YZRect(YZRect),
+    RotateY(RotateY),
+    Sphere(Sphere),
+    Translate(Translate),
+    BVHNode(BVHNode),
+    HitableList(HitableList),
+}
+
+impl Hitable {
+    pub fn hit(
+        self,
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
         rng: ThreadRng,
-    ) -> Option<HitRecord>;
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB>;
+    ) -> Option<HitRecord> {
+        match self {
+            Hitable::Boxy(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::ConstantMedium(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::MovingSphere(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::XZRect(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::XYRect(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::YZRect(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::RotateY(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::Sphere(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::Translate(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::BVHNode(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::HitableList(h) => h.hit(ray, distance_min, distance_max, rng),
+        }
+    }
+
+    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+        match self {
+            Hitable::Boxy(h) => h.bounding_box(t0, t1),
+            Hitable::ConstantMedium(h) => h.bounding_box(t0, t1),
+            Hitable::MovingSphere(h) => h.bounding_box(t0, t1),
+            Hitable::XZRect(h) => h.bounding_box(t0, t1),
+            Hitable::XYRect(h) => h.bounding_box(t0, t1),
+            Hitable::YZRect(h) => h.bounding_box(t0, t1),
+            Hitable::RotateY(h) => h.bounding_box(t0, t1),
+            Hitable::Sphere(h) => h.bounding_box(t0, t1),
+            Hitable::Translate(h) => h.bounding_box(t0, t1),
+            Hitable::BVHNode(h) => h.bounding_box(t0, t1),
+            Hitable::HitableList(h) => h.bounding_box(t0, t1),
+        }
+    }
 }
 
 /// Helper struct for storing multiple `Hitable` objects. This list has a `Hitable` implementation too, returning the closest possible hit
-pub struct HitableList {
-    pub hitables: Vec<Arc<dyn Hitable>>,
+pub struct HitableList(pub Vec<Hitable>);
+
+impl From<Vec<Hitable>> for HitableList {
+    fn from(v: Vec<Hitable>) -> Self {
+        HitableList(v)
+    }
 }
 
-impl Hitable for HitableList {
-    fn hit(
-        &self,
+impl HitableList {
+    pub fn hit(
+        self,
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
@@ -58,7 +122,7 @@ impl Hitable for HitableList {
     ) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest = distance_max;
-        for hitable in self.hitables.iter() {
+        for &hitable in self.0.iter() {
             if let Some(record) = hitable.hit(&ray, distance_min, closest, rng) {
                 closest = record.distance;
                 hit_record = Some(record);
@@ -67,14 +131,14 @@ impl Hitable for HitableList {
         hit_record
     }
 
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
-        if self.hitables.is_empty() {
+    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+        if self.0.is_empty() {
             return None;
         }
 
         let mut output_box: Option<AABB> = None;
 
-        for object in self.hitables.iter() {
+        for &object in self.0.iter() {
             // Check if the object has a box
             match object.bounding_box(t0, t1) {
                 // No box found, early return.
@@ -100,13 +164,9 @@ impl Hitable for HitableList {
 
         return output_box;
     }
-}
 
-impl HitableList {
     pub fn new() -> HitableList {
-        HitableList {
-            hitables: Vec::new(),
-        }
+        HitableList(Vec::new())
     }
     // TODO: figure out this helper
     //     pub fn add(&self, object: dyn Hitable) {
@@ -114,7 +174,7 @@ impl HitableList {
     //     }
 
     pub fn into_bvh(self, time_0: Float, time_1: Float, rng: ThreadRng) -> BVHNode {
-        let bvh_node = BVHNode::from_list(self, time_0, time_1, rng);
+        let bvh_node = BVHNode::from_list(self.0, time_0, time_1, rng);
         bvh_node
     }
 }
@@ -166,14 +226,14 @@ impl AABB {
 }
 
 pub struct BVHNode {
-    left: Arc<dyn Hitable>,
-    right: Arc<dyn Hitable>,
+    left: Arc<Hitable>,
+    right: Arc<Hitable>,
     bounding_box: AABB,
 }
 
 impl BVHNode {
     pub fn from_list(
-        objects: HitableList,
+        objects: Vec<Hitable>,
         time_0: Float,
         time_1: Float,
         mut rng: ThreadRng,
@@ -183,27 +243,25 @@ impl BVHNode {
             let comparators = [box_x_compare, box_y_compare, box_z_compare];
             let comparator = comparators[axis];
 
-            let mut objects = objects.hitables; // Extract the actual Vec from the HitableList struct
-
             let object_span = objects.len();
 
-            let left: Arc<dyn Hitable>;
-            let right: Arc<dyn Hitable>;
+            let left: Arc<Hitable>;
+            let right: Arc<Hitable>;
 
             if object_span == 1 {
                 // If we only have one object, return itself. Note: no explicit leaf type in our tree
-                left = Arc::clone(&objects[0]);
-                right = Arc::clone(&objects[0]);
+                left = Arc::new(objects[0]);
+                right = Arc::new(objects[0]);
             } else if object_span == 2 {
                 // If we are comparing two objects, perform the comparison
-                match comparator(&*objects[0], &*objects[1]) {
+                match comparator(&objects[0], &objects[1]) {
                     Ordering::Less => {
-                        left = Arc::clone(&objects[0]);
-                        right = Arc::clone(&objects[1]);
+                        left = Arc::new(objects[0]);
+                        right = Arc::new(objects[1]);
                     }
                     Ordering::Greater => {
-                        left = Arc::clone(&objects[1]);
-                        right = Arc::clone(&objects[0]);
+                        left = Arc::new(objects[1]);
+                        right = Arc::new(objects[0]);
                     }
                     Ordering::Equal => {
                         // TODO: what should happen here?
@@ -212,25 +270,17 @@ impl BVHNode {
                 }
             } else {
                 // Otherwise, recurse
-                objects.sort_by(|a, b| comparator(&**a, &**b));
+                objects.sort_by(|a, b| comparator(&*a, &*b));
 
                 // Split the vector; divide and conquer
                 let mid = object_span / 2;
                 let objects_right = objects.split_off(mid);
-                left = Arc::new(BVHNode::from_list(
-                    HitableList { hitables: objects },
-                    time_0,
-                    time_1,
-                    rng,
-                ));
-                right = Arc::new(BVHNode::from_list(
-                    HitableList {
-                        hitables: objects_right,
-                    },
-                    time_0,
-                    time_1,
-                    rng,
-                ));
+                left = Arc::new(Hitable::BVHNode(BVHNode::from_list(
+                    objects, time_0, time_1, rng,
+                )));
+                right = Arc::new(Hitable::BVHNode(BVHNode::from_list(
+                    objects, time_0, time_1, rng,
+                )));
             }
 
             let box_left = left.bounding_box(time_0, time_1);
@@ -249,21 +299,19 @@ impl BVHNode {
             }
         }
     }
-}
 
-impl Hitable for BVHNode {
-    fn hit(
+    pub fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
         rng: ThreadRng,
     ) -> Option<HitRecord> {
-        match self.bounding_box.hit(ray, distance_min, distance_max) {
+        match self.bounding_box.hit(&ray, distance_min, distance_max) {
             false => None,
             true => {
-                let hit_left = self.left.hit(ray, distance_min, distance_max, rng);
-                let hit_right = self.right.hit(ray, distance_min, distance_max, rng);
+                let hit_left = self.left.hit(&ray, distance_min, distance_max, rng);
+                let hit_right = self.right.hit(&ray, distance_min, distance_max, rng);
 
                 match &hit_left {
                     Some(left) => {
@@ -290,12 +338,12 @@ impl Hitable for BVHNode {
             }
         }
     }
-    fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
+    pub fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
         Some(self.bounding_box)
     }
 }
 
-fn box_compare(a: &dyn Hitable, b: &dyn Hitable, axis: usize) -> Ordering {
+fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
     let box_a: Option<AABB> = a.bounding_box(0.0, 0.0);
     let box_b: Option<AABB> = b.bounding_box(0.0, 0.0);
 
@@ -311,14 +359,14 @@ fn box_compare(a: &dyn Hitable, b: &dyn Hitable, axis: usize) -> Ordering {
     }
 }
 
-fn box_x_compare(a: &dyn Hitable, b: &dyn Hitable) -> Ordering {
+fn box_x_compare(a: &Hitable, b: &Hitable) -> Ordering {
     box_compare(a, b, 0)
 }
 
-fn box_y_compare(a: &dyn Hitable, b: &dyn Hitable) -> Ordering {
+fn box_y_compare(a: &Hitable, b: &Hitable) -> Ordering {
     box_compare(a, b, 1)
 }
 
-fn box_z_compare(a: &dyn Hitable, b: &dyn Hitable) -> Ordering {
+fn box_z_compare(a: &Hitable, b: &Hitable) -> Ordering {
     box_compare(a, b, 2)
 }
