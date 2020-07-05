@@ -6,51 +6,51 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 // Avoid keyword clash
+#[derive(Deserialize, Serialize)]
 pub struct Boxy {
     corner_0: Vec3,
     corner_1: Vec3,
-    sides: HitableList,
+    sides: Arc<HitableList>,
     material: Material,
 }
 
 impl Boxy {
-    pub fn new(corner_0: Vec3, corner_1: Vec3, material: Material) -> Boxy {
+    pub fn new(corner_0: Vec3, corner_1: Vec3, material: Material) -> Hitable {
         let mut sides = HitableList::new();
-        sides.hitables.push(Arc::new(XYRect::new(
+        sides.add(XYRect::new(
             corner_0.x, corner_1.x, corner_0.y, corner_1.y, corner_1.z, material,
-        )));
-        sides.hitables.push(Arc::new(XYRect::new(
+        ));
+        sides.add(XYRect::new(
             corner_0.x, corner_1.x, corner_0.y, corner_1.y, corner_0.z, material,
-        )));
+        ));
 
-        sides.hitables.push(Arc::new(XZRect::new(
+        sides.add(XZRect::new(
             corner_0.x, corner_1.x, corner_0.z, corner_1.z, corner_1.y, material,
-        )));
-        sides.hitables.push(Arc::new(XZRect::new(
+        ));
+        sides.add(XZRect::new(
             corner_0.x, corner_1.x, corner_0.z, corner_1.z, corner_0.y, material,
-        )));
+        ));
 
-        sides.hitables.push(Arc::new(YZRect::new(
+        sides.add(YZRect::new(
             corner_0.y, corner_1.y, corner_0.z, corner_1.z, corner_1.x, material,
-        )));
-        sides.hitables.push(Arc::new(YZRect::new(
+        ));
+        sides.add(YZRect::new(
             corner_0.y, corner_1.y, corner_0.z, corner_1.z, corner_0.x, material,
-        )));
+        ));
 
-        Boxy {
+        Hitable::Boxy(Boxy {
             corner_0,
             corner_1,
-            sides,
+            sides: Arc::new(HitableList::from(sides)),
             material,
-        }
+        })
     }
-}
 
-impl Hitable for Boxy {
-    fn hit(
+    pub fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -59,7 +59,8 @@ impl Hitable for Boxy {
     ) -> Option<HitRecord> {
         self.sides.hit(ray, distance_min, distance_max, rng)
     }
-    fn bounding_box(&self, _t0: crate::Float, _t1: crate::Float) -> Option<AABB> {
+
+    pub fn bounding_box(&self, _t0: crate::Float, _t1: crate::Float) -> Option<AABB> {
         Some(AABB::new(self.corner_0, self.corner_1))
     }
 }

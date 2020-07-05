@@ -4,24 +4,24 @@ use crate::{
     Vec3,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
+#[derive(Deserialize, Serialize)]
 pub struct Translate {
-    object: Arc<dyn Hitable>,
+    object: Arc<Hitable>,
     offset: Vec3,
 }
 
 impl Translate {
-    pub fn new(object: Arc<dyn Hitable>, offset: Vec3) -> Self {
-        Translate {
+    pub fn new(object: Arc<Hitable>, offset: Vec3) -> Hitable {
+        Hitable::Translate(Translate {
             object: Arc::clone(&object),
             offset,
-        }
+        })
     }
-}
 
-impl Hitable for Translate {
-    fn hit(
+    pub fn hit(
         &self,
         ray: &crate::ray::Ray,
         distance_min: crate::Float,
@@ -41,7 +41,8 @@ impl Hitable for Translate {
             }
         }
     }
-    fn bounding_box(&self, t0: crate::Float, t1: crate::Float) -> Option<AABB> {
+
+    pub fn bounding_box(&self, t0: crate::Float, t1: crate::Float) -> Option<AABB> {
         let object_bounding_box = self.object.bounding_box(t0, t1);
         match object_bounding_box {
             Some(aabb) => return Some(AABB::new(aabb.min + self.offset, aabb.max + self.offset)),

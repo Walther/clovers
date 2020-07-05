@@ -1,11 +1,4 @@
-use crate::{
-    camera::Camera,
-    color::Color,
-    colorize::colorize,
-    hitable::{BVHNode},
-    ray::Ray,
-    scenes, Float,
-};
+use crate::{color::Color, colorize::colorize, ray::Ray, scenes, Float};
 use image::{ImageBuffer, ImageResult, RgbImage};
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
@@ -23,8 +16,6 @@ pub fn draw(
 
     let rng = rand::thread_rng();
     let scene = scenes::cornell_with_sphere::load(width, height, rng);
-    let world: BVHNode = scene.world;
-    let camera: Camera = scene.camera;
     let background_color: Color = scene.background;
 
     // Progress bar
@@ -48,8 +39,8 @@ pub fn draw(
             for _sample in 0..samples {
                 u = (x as Float + rng.gen::<Float>()) / width as Float;
                 v = (y as Float + rng.gen::<Float>()) / height as Float;
-                ray = camera.get_ray(u, v, rng);
-                color += colorize(&ray, background_color, &world, 0, max_depth, rng);
+                ray = scene.camera.get_ray(u, v, rng);
+                color += colorize(&ray, background_color, &scene.world, 0, max_depth, rng);
             }
             color /= samples as Float;
 

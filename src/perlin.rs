@@ -125,3 +125,10 @@ impl Perlin {
         return accum.abs();
     }
 }
+
+impl Default for Perlin {
+    fn default() -> Self {
+        let rng = rand::thread_rng();
+        Perlin::new(rng)
+    }
+}

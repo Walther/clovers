@@ -15,7 +15,7 @@ use std::sync::Arc;
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
-    let mut world: HitableList = HitableList::new();
+    let mut world = HitableList::new();
 
     // Cornell box
     let red = Lambertian::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
@@ -23,24 +23,12 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let green = Lambertian::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
     let light = DiffuseLight::new(SolidColor::new(Color::new(7.0, 7.0, 7.0)));
 
-    world
-        .hitables
-        .push(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
-    world
-        .hitables
-        .push(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
-    world.hitables.push(Arc::new(XZRect::new(
-        113.0, 443.0, 127.0, 432.0, 554.0, light,
-    )));
-    world
-        .hitables
-        .push(Arc::new(XZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white)));
-    world
-        .hitables
-        .push(Arc::new(XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
-    world
-        .hitables
-        .push(Arc::new(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
+    world.add(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green));
+    world.add(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red));
+    world.add(XZRect::new(113.0, 443.0, 127.0, 432.0, 554.0, light));
+    world.add(XZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white));
+    world.add(XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
+    world.add(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
 
     // Boxes
 
@@ -52,7 +40,7 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
 
     let box1 = RotateY::new(box1, 15.0);
     let box1 = Translate::new(Arc::new(box1), Vec3::new(265.0, 0.0, 295.0));
-    world.hitables.push(Arc::new(box1));
+    world.add(box1);
 
     let box2 = Arc::new(Boxy::new(
         Vec3::new(0.0, 0.0, 0.0),
@@ -62,7 +50,7 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
 
     let box2 = RotateY::new(box2, -18.0);
     let box2 = Translate::new(Arc::new(box2), Vec3::new(130.0, 0.0, 65.0));
-    world.hitables.push(Arc::new(box2));
+    world.add(box2);
 
     let camera_position: Vec3 = Vec3::new(278.0, 278.0, -800.0);
     let camera_target: Vec3 = Vec3::new(278.0, 278.0, 0.0);

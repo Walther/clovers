@@ -1,7 +1,9 @@
 use super::Material;
 use crate::{color::Color, hitable::HitRecord, ray::Ray, textures::Texture, Float, Vec3};
 use rand::prelude::ThreadRng;
-#[derive(Copy, Clone)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct DiffuseLight {
     emit: Texture,
 }

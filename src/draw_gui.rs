@@ -1,7 +1,6 @@
 use crate::{
     color::Color,
     colorize::colorize,
-    hitable::Hitable,
     scenes::{self, Scene},
     Float,
 };
@@ -126,7 +125,7 @@ impl World {
         let width = self.width as usize;
         let height = self.height as usize;
         let camera = &self.scene.camera;
-        let world: &dyn Hitable = &self.scene.world;
+        let world = &self.scene.world;
 
         // Update internal float-based pixel buffer with new samples
         self.float_buffer

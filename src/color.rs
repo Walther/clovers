@@ -1,9 +1,11 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{Float, ThreadRng, Vec3};
 use image::Rgb;
 use rand::prelude::*;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct Color {
     pub r: Float,
     pub g: Float,

@@ -4,17 +4,19 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
+#[derive(Deserialize, Serialize)]
 pub struct RotateY {
-    object: Arc<dyn Hitable>,
+    object: Arc<Hitable>,
     sin_theta: Float,
     cos_theta: Float,
     bounding_box: Option<AABB>,
 }
 
 impl RotateY {
-    pub fn new(object: Arc<dyn Hitable>, angle: Float) -> RotateY {
+    pub fn new(object: Arc<Hitable>, angle: Float) -> Hitable {
         // TODO: add proper time support
         let time_0: Float = 0.0;
         let time_1: Float = 1.0;
@@ -25,12 +27,12 @@ impl RotateY {
 
         match bounding_box {
             // No bounding box for object
-            None => RotateY {
+            None => Hitable::RotateY(RotateY {
                 object,
                 sin_theta,
                 cos_theta,
                 bounding_box: None,
-            },
+            }),
             // Got a bounding box
             Some(bbox) => {
                 let mut min: Vec3 = Vec3::new(Float::INFINITY, Float::INFINITY, Float::INFINITY);
@@ -64,19 +66,17 @@ impl RotateY {
                     }
                 }
 
-                RotateY {
+                Hitable::RotateY(RotateY {
                     object,
                     sin_theta,
                     cos_theta,
                     bounding_box: Some(AABB::new(min, max)),
-                }
+                })
             }
         }
     }
-}
 
-impl Hitable for RotateY {
-    fn hit(
+    pub fn hit(
         &self,
         ray: &crate::ray::Ray,
         distance_min: Float,
@@ -129,7 +129,8 @@ impl Hitable for RotateY {
             }
         }
     }
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+
+    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         self.bounding_box
     }
 }

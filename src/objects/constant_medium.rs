@@ -6,32 +6,32 @@ use crate::{
     Float, Vec3, CONSTANT_MEDIUM_EPSILON,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
+#[derive(Deserialize, Serialize)]
 pub struct ConstantMedium {
-    boundary: Arc<dyn Hitable>,
+    boundary: Arc<Hitable>,
     phase_function: Material,
     neg_inv_density: Float,
 }
 
 impl ConstantMedium {
-    pub fn new(boundary: Arc<dyn Hitable>, density: Float, texture: Texture) -> Self {
-        ConstantMedium {
+    pub fn new(boundary: Arc<Hitable>, density: Float, texture: Texture) -> Hitable {
+        Hitable::ConstantMedium(ConstantMedium {
             boundary,
             phase_function: Isotropic::new(texture),
             neg_inv_density: -1.0 / density,
-        }
+        })
     }
-}
 
-impl Hitable for ConstantMedium {
-    fn hit(
+    pub fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
         mut rng: ThreadRng,
-    ) -> Option<crate::hitable::HitRecord> {
+    ) -> Option<HitRecord> {
         let mut rec1: HitRecord;
         let mut rec2: HitRecord;
 
@@ -95,7 +95,8 @@ impl Hitable for ConstantMedium {
             front_face,
         })
     }
-    fn bounding_box(&self, t0: crate::Float, t1: crate::Float) -> Option<crate::hitable::AABB> {
+
+    pub fn bounding_box(&self, t0: crate::Float, t1: crate::Float) -> Option<crate::hitable::AABB> {
         self.boundary.bounding_box(t0, t1)
     }
 }

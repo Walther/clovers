@@ -1,7 +1,9 @@
+use serde::{Deserialize, Serialize};
+
 use super::Texture;
 use crate::{color::Color, Float, Vec3};
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct SolidColor {
     pub color: Color,
 }

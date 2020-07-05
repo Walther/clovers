@@ -1,7 +1,9 @@
 use super::{random_in_unit_sphere, Material};
 use crate::{color::Color, hitable::HitRecord, ray::Ray, textures::Texture};
 use rand::prelude::ThreadRng;
-#[derive(Copy, Clone)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct Isotropic {
     albedo: Texture,
 }
