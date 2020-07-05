@@ -1,5 +1,7 @@
-use super::{random_unit_vector, Material};
-use crate::{color::Color, hitable::HitRecord, ray::Ray, textures::Texture, Vec3};
+use super::Material;
+use crate::{
+    color::Color, hitable::HitRecord, random::random_unit_vector, ray::Ray, textures::Texture, Vec3,
+};
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
 

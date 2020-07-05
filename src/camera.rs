@@ -1,17 +1,6 @@
-use crate::{Float, Ray, Vec3, PI};
+use crate::{random::random_in_unit_disk, Float, Ray, Vec3, PI};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
-
-fn random_in_unit_disk(rng: &mut ThreadRng) -> Vec3 {
-    let mut position: Vec3;
-    loop {
-        // TODO: understand this defocus disk thingy
-        position = 2.0 * Vec3::new(rng.gen(), rng.gen(), 0.0) - Vec3::new(1.0, 1.0, 0.0);
-        if position.dot(&position) >= 1.0 {
-            return position;
-        }
-    }
-}
 
 #[derive(Deserialize, Serialize)]
 pub struct Camera {

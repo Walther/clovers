@@ -1,7 +1,6 @@
-use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{color::Color, hitable::HitRecord, Float, Ray, ThreadRng, Vec3, PI};
+use crate::{color::Color, hitable::HitRecord, Float, Ray, ThreadRng, Vec3};
 pub mod dielectric;
 pub mod diffuse_light;
 pub mod isotropic;
@@ -45,25 +44,6 @@ impl Material {
             _ => Color::new(0.0, 0.0, 0.0),
         }
     }
-}
-
-// Internal helper. Originally used for lambertian reflection with flaws
-fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
-    let mut position: Vec3;
-    loop {
-        position = 2.0 * Vec3::new(rng.gen(), rng.gen(), rng.gen()) - Vec3::new(1.0, 1.0, 1.0);
-        if position.magnitude_squared() >= 1.0 {
-            return position;
-        }
-    }
-}
-
-// Internal helper. Use this for the more correct "True Lambertian" reflection
-fn random_unit_vector(mut rng: ThreadRng) -> Vec3 {
-    let a: Float = rng.gen_range(0.0, 2.0 * PI);
-    let z: Float = rng.gen_range(-1.0, 1.0);
-    let r: Float = (1.0 - z * z).sqrt();
-    return Vec3::new(r * a.cos(), r * a.sin(), z);
 }
 
 fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
