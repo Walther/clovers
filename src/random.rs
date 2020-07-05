@@ -31,3 +31,16 @@ pub fn random_in_unit_disk(rng: &mut ThreadRng) -> Vec3 {
         }
     }
 }
+
+/// Internal helper.
+pub fn random_cosine_direction(mut rng: ThreadRng) -> Vec3 {
+    let r1 = rng.gen::<Float>();
+    let r2 = rng.gen::<Float>();
+    let z = (1.0 - r2).sqrt();
+
+    let phi = 2.0 * PI * r1;
+    let x = phi.cos() * r2.sqrt();
+    let y = phi.sin() * r2.sqrt();
+
+    return Vec3::new(x, y, z);
+}

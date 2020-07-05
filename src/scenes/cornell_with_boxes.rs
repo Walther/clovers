@@ -21,11 +21,11 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let red = Lambertian::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
     let white = Lambertian::new(SolidColor::new(Color::new(0.73, 0.73, 0.73)));
     let green = Lambertian::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
-    let light = DiffuseLight::new(SolidColor::new(Color::new(7.0, 7.0, 7.0)));
+    let small_light = DiffuseLight::new(SolidColor::new(Color::new(15.0, 15.0, 15.0)));
 
     world.add(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green));
     world.add(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red));
-    world.add(XZRect::new(113.0, 443.0, 127.0, 432.0, 554.0, light));
+    world.add(XZRect::new(213.0, 343.0, 227.0, 332.0, 554.0, small_light));
     world.add(XZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white));
     world.add(XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
     world.add(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));

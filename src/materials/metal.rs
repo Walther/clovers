@@ -18,21 +18,33 @@ impl Metal {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: ThreadRng,
-    ) -> Option<(Ray, Color)> {
+    ) -> Option<(Ray, Color, Float)> {
         let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
         let scattered: Ray = Ray::new(
             hit_record.position,
             reflected + self.fuzz * random_in_unit_sphere(rng),
             ray.time,
         );
-        let attenuation: Color = self
+        let albedo: Color = self
             .albedo
             .color(hit_record.u, hit_record.v, hit_record.position);
         if scattered.direction.dot(&hit_record.normal) > 0.0 {
-            Some((scattered, attenuation))
+            let pdf = 1.0; // TODO:
+
+            Some((scattered, albedo, pdf))
         } else {
             None
         }
+    }
+
+    pub fn scattering_pdf(
+        self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        scattered: &Ray,
+        rng: ThreadRng,
+    ) -> Float {
+        todo!()
     }
 
     pub fn new(albedo: Texture, fuzz: Float) -> Material {

@@ -14,8 +14,18 @@ impl DiffuseLight {
         _ray: &Ray,
         _hit_record: &HitRecord,
         _rng: ThreadRng,
-    ) -> Option<(Ray, Color)> {
+    ) -> Option<(Ray, Color, Float)> {
         None
+    }
+
+    pub fn scattering_pdf(
+        self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        scattered: &Ray,
+        rng: ThreadRng,
+    ) -> Float {
+        todo!()
     }
 
     pub fn emit(self, u: Float, v: Float, position: Vec3) -> Color {

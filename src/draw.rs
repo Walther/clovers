@@ -15,7 +15,7 @@ pub fn draw(
     let mut img: RgbImage = ImageBuffer::new(width as u32, height as u32);
 
     let rng = rand::thread_rng();
-    let scene = scenes::cornell_with_sphere::load(width, height, rng);
+    let scene = scenes::cornell_with_boxes::load(width, height, rng);
     let background_color: Color = scene.background;
 
     // Progress bar

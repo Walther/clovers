@@ -27,10 +27,18 @@ pub fn colorize(
                     .emit(hit_record.u, hit_record.v, hit_record.position);
             // Try to scatter and colorize the new ray
             match hit_record.material.scatter(&ray, &hit_record, rng) {
-                // Got a scatter and attenuation
-                Some((scattered, attenuation)) => {
+                // Got a scatter, albedo and pdf value
+                Some((scattered, albedo, pdf)) => {
+                    // color = emitted + albedo * scatter_pdf * recurse / pdf
                     color = emitted
-                        + attenuation.component_mul(
+                        + (albedo
+                            * hit_record.material.scattering_pdf(
+                                ray,
+                                &hit_record,
+                                &scattered,
+                                rng,
+                            ))
+                        .component_mul(
                             // Recurse
                             &colorize(
                                 &scattered,
@@ -40,7 +48,7 @@ pub fn colorize(
                                 max_depth,
                                 rng,
                             ),
-                        );
+                        ) / pdf;
 
                     return color;
                 }

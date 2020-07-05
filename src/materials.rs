@@ -23,12 +23,13 @@ pub enum Material {
 }
 
 impl Material {
+    /// Scatters a ray from the material
     pub fn scatter(
         &self,
         ray: &Ray,
         hit_record: &HitRecord,
         rng: ThreadRng,
-    ) -> Option<(Ray, Color)> {
+    ) -> Option<(Ray, Color, Float)> {
         match *self {
             Material::Dielectric(d) => Dielectric::scatter(d, ray, hit_record, rng),
             Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),
@@ -37,6 +38,24 @@ impl Material {
             Material::Isotropic(i) => Isotropic::scatter(i, ray, hit_record, rng),
         }
     }
+
+    /// Returns a probability? TODO: understand
+    pub fn scattering_pdf(
+        &self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        scattered: &Ray,
+        rng: ThreadRng,
+    ) -> Float {
+        match *self {
+            Material::Dielectric(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
+            Material::Lambertian(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
+            Material::DiffuseLight(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
+            Material::Metal(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
+            Material::Isotropic(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
+        }
+    }
+
     /// Returns the amount of light the material emits. By default, materials do not emit light, returning black.
     pub fn emit(&self, u: Float, v: Float, position: Vec3) -> Color {
         match *self {

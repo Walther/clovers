@@ -14,8 +14,8 @@ impl Dielectric {
         ray: &Ray,
         hit_record: &HitRecord,
         mut rng: ThreadRng,
-    ) -> Option<(Ray, Color)> {
-        let attenuation: Color = Color::new(1.0, 1.0, 1.0); // Glass does not attenuate
+    ) -> Option<(Ray, Color, Float)> {
+        let albedo: Color = Color::new(1.0, 1.0, 1.0); // Glass does not attenuate
         let scattered: Ray;
         let etai_over_etat: Float = match hit_record.front_face {
             true => 1.0 / self.refractive_index,
@@ -38,8 +38,19 @@ impl Dielectric {
                 scattered = Ray::new(hit_record.position, refracted, ray.time);
             }
         }
+        let pdf = 1.0; // TODO:
 
-        Some((scattered, attenuation))
+        Some((scattered, albedo, pdf))
+    }
+
+    pub fn scattering_pdf(
+        self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        scattered: &Ray,
+        rng: ThreadRng,
+    ) -> Float {
+        todo!()
     }
 
     pub fn new(refractive_index: Float) -> Material {

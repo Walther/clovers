@@ -104,7 +104,7 @@ impl World {
         World {
             width,
             height,
-            scene: scenes::cornell_with_sphere::load(width, height, rng),
+            scene: scenes::cornell_with_boxes::load(width, height, rng),
             float_buffer: vec![0.0; 4 * width as usize * height as usize], // rgba
             bar,
             samples,
