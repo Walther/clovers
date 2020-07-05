@@ -9,7 +9,6 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::*;
-use std::sync::Arc;
 
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
@@ -19,16 +18,16 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let checker: Texture =
         Checkered::new(Color::new(0.2, 0.3, 0.1), Color::new(0.9, 0.9, 0.9), 10.0);
 
-    world.hitables.push(Arc::new(Sphere::new(
+    world.add(Sphere::new(
         Vec3::new(0.0, -10.0, 0.0),
         10.0,
         Lambertian::new(checker),
-    )));
-    world.hitables.push(Arc::new(Sphere::new(
+    ));
+    world.add(Sphere::new(
         Vec3::new(0.0, 10.0, 0.0),
         10.0,
         Lambertian::new(checker),
-    )));
+    ));
 
     let camera_position: Vec3 = Vec3::new(13.0, 2.0, 3.0);
     let camera_target: Vec3 = Vec3::new(0.0, 0.0, 0.0);

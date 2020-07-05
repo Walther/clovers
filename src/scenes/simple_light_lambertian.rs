@@ -10,7 +10,6 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::*;
-use std::sync::Arc;
 
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
@@ -20,26 +19,20 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let texture: Texture = SolidColor::new(Color::new(0.3, 0.2, 0.1));
     let texture2: Texture = SolidColor::new(Color::new(0.1, 0.2, 0.3));
 
-    world.hitables.push(Arc::new(Sphere::new(
+    world.add(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
         Lambertian::new(texture),
-    )));
-    world.hitables.push(Arc::new(Sphere::new(
+    ));
+    world.add(Sphere::new(
         Vec3::new(0.0, 2.0, 0.0),
         2.0,
         Lambertian::new(texture2),
-    )));
+    ));
 
     let difflight: Material = DiffuseLight::new(SolidColor::new(Color::new(4.0, 4.0, 4.0)));
-    world.hitables.push(Arc::new(Sphere::new(
-        Vec3::new(0.0, 7.0, 0.0),
-        2.0,
-        difflight,
-    )));
-    world
-        .hitables
-        .push(Arc::new(XYRect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight)));
+    world.add(Sphere::new(Vec3::new(0.0, 7.0, 0.0), 2.0, difflight));
+    world.add(XYRect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight));
 
     let camera_position: Vec3 = Vec3::new(20.0, 5.0, 2.0);
     let camera_target: Vec3 = Vec3::new(0.0, 2.0, 0.0);

@@ -9,35 +9,34 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::*;
-use std::sync::Arc;
 
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
     let mut world: HitableList = HitableList::new();
 
-    world.hitables.push(Arc::new(Sphere::new(
+    world.add(Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
         0.5,
         Lambertian::new(SolidColor::new(Color::new(0.7, 0.3, 0.3))),
-    )));
+    ));
 
-    world.hitables.push(Arc::new(Sphere::new(
+    world.add(Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
         100.0,
         Lambertian::new(SolidColor::new(Color::new(0.8, 0.8, 0.0))),
-    )));
+    ));
 
-    world.hitables.push(Arc::new(Sphere::new(
+    world.add(Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
         Metal::new(SolidColor::new(Color::new(0.8, 0.6, 0.2)), 0.3),
-    )));
-    world.hitables.push(Arc::new(Sphere::new(
+    ));
+    world.add(Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),
         0.5,
         Metal::new(SolidColor::new(Color::new(0.8, 0.8, 0.8)), 1.0),
-    )));
+    ));
 
     let camera_position: Vec3 = Vec3::new(0.0, 0.0, 5.0);
     let camera_target: Vec3 = Vec3::new(0.0, 0.0, -1.0);

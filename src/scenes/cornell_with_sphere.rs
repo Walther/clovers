@@ -2,7 +2,7 @@ use super::Scene;
 use crate::{
     camera::Camera,
     color::Color,
-    hitable::{Hitable, HitableList},
+    hitable::HitableList,
     materials::{Dielectric, DiffuseLight, Lambertian},
     objects::Sphere,
     objects::{XYRect, XZRect, YZRect},
@@ -10,7 +10,7 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::*;
-use std::sync::Arc;
+
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;

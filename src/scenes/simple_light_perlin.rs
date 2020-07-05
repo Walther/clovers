@@ -20,33 +20,30 @@ pub fn load<'a>(width: u32, height: u32, rng: ThreadRng) -> Scene<'a> {
     let perlin = Perlin::new(256, rng);
     let perlin2 = Perlin::new(256, rng);
 
-    world.hitables.push(Arc::new(Sphere::new(
-        Vec3::new(0.0, -1000.0, 0.0),
-        1000.0,
-        Arc::new(Lambertian::new(Arc::new(NoiseTexture::new(perlin, 4.0)))),
-    )));
-    world.hitables.push(Arc::new(Sphere::new(
-        Vec3::new(0.0, 2.0, 0.0),
-        2.0,
-        Arc::new(Lambertian::new(Arc::new(NoiseTexture::new(perlin2, 4.0)))),
-    )));
+    world.add(
+        (Sphere::new(
+            Vec3::new(0.0, -1000.0, 0.0),
+            1000.0,
+            Arc::new(Lambertian::new(Arc::new(NoiseTexture::new(perlin, 4.0)))),
+        )),
+    );
+    world.add(
+        (Sphere::new(
+            Vec3::new(0.0, 2.0, 0.0),
+            2.0,
+            Arc::new(Lambertian::new(Arc::new(NoiseTexture::new(perlin2, 4.0)))),
+        )),
+    );
 
     let difflight: Arc<dyn Material> = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(
         Color::new(4.0, 4.0, 4.0),
     ))));
-    world.hitables.push(Arc::new(Sphere::new(
-        Vec3::new(0.0, 7.0, 0.0),
-        2.0,
-        Arc::clone(&difflight),
-    )));
-    world.hitables.push(Arc::new(XYRect::new(
-        3.0,
-        5.0,
-        1.0,
-        3.0,
-        -2.0,
-        Arc::clone(&difflight),
-    )));
+    world
+        .hitables
+        .add((Sphere::new(Vec3::new(0.0, 7.0, 0.0), 2.0, Arc::clone(&difflight))));
+    world
+        .hitables
+        .add((XYRect::new(3.0, 5.0, 1.0, 3.0, -2.0, Arc::clone(&difflight))));
 
     let camera_position: Vec3 = Vec3::new(20.0, 5.0, 2.0);
     let camera_target: Vec3 = Vec3::new(0.0, 2.0, 0.0);

@@ -22,24 +22,12 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let green = Lambertian::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
     let light = DiffuseLight::new(SolidColor::new(Color::new(7.0, 7.0, 7.0)));
 
-    world
-        .hitables
-        .push(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
-    world
-        .hitables
-        .push(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
-    world.hitables.push(Arc::new(XZRect::new(
-        113.0, 443.0, 127.0, 432.0, 554.0, light,
-    )));
-    world
-        .hitables
-        .push(Arc::new(XZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white)));
-    world
-        .hitables
-        .push(Arc::new(XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
-    world
-        .hitables
-        .push(Arc::new(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
+    world.add(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green));
+    world.add(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red));
+    world.add(XZRect::new(113.0, 443.0, 127.0, 432.0, 554.0, light));
+    world.add(XZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white));
+    world.add(XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
+    world.add(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
 
     // Boxes
 
@@ -71,8 +59,8 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
         SolidColor::new(Color::new(1.0, 1.0, 1.0)),
     );
 
-    world.hitables.push(Arc::new(box1));
-    world.hitables.push(Arc::new(box2));
+    world.add(box1);
+    world.add(box2);
 
     let camera_position: Vec3 = Vec3::new(278.0, 278.0, -800.0);
     let camera_target: Vec3 = Vec3::new(278.0, 278.0, 0.0);
