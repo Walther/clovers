@@ -1,10 +1,5 @@
 use crate::{
-    camera::Camera,
-    color::Color,
-    colorize::colorize,
-    hitable::{BVHNode},
-    ray::Ray,
-    scenes, Float,
+    camera::Camera, color::Color, colorize::colorize, hitable::BVHNode, ray::Ray, scenes, Float,
 };
 use image::{ImageBuffer, ImageResult, RgbImage};
 use indicatif::{ProgressBar, ProgressStyle};
@@ -23,7 +18,7 @@ pub fn draw(
 
     let rng = rand::thread_rng();
     let scene = scenes::cornell_with_sphere::load(width, height, rng);
-    let world: BVHNode = scene.world;
+    let world = scene.world;
     let camera: Camera = scene.camera;
     let background_color: Color = scene.background;
 

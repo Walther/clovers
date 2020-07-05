@@ -45,7 +45,7 @@ impl<'a> HitRecord<'a> {
 //         distance_min: Float,
 //         distance_max: Float,
 //         rng: ThreadRng,
-//     ) -> Option<HitRecord>;
+//     ) -> Option<&HitRecord>;
 //     fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB>;
 // }
 
@@ -123,7 +123,7 @@ impl HitableList {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest = distance_max;
         for &hitable in self.0.iter() {
-            if let Some(record) = hitable.hit(&ray, distance_min, closest, rng) {
+            if let Some(record) = hitable.hit(ray, distance_min, closest, rng) {
                 closest = record.distance;
                 hit_record = Some(record);
             }
@@ -168,14 +168,14 @@ impl HitableList {
     pub fn new() -> HitableList {
         HitableList(Vec::new())
     }
-    // TODO: figure out this helper
-    //     pub fn add(&self, object: dyn Hitable) {
-    //         self.hitables.push(Box::new(object));
-    //     }
 
-    pub fn into_bvh(self, time_0: Float, time_1: Float, rng: ThreadRng) -> BVHNode {
+    pub fn add(&self, object: Hitable) {
+        self.0.push(object);
+    }
+
+    pub fn into_bvh(self, time_0: Float, time_1: Float, rng: ThreadRng) -> Hitable {
         let bvh_node = BVHNode::from_list(self.0, time_0, time_1, rng);
-        bvh_node
+        Hitable::BVHNode(bvh_node)
     }
 }
 

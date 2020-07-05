@@ -15,7 +15,7 @@ use std::sync::Arc;
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
-    let mut world: Arc<Hitable>List = HitableList::new();
+    let mut world = HitableList::new().0;
 
     // Cornell box
     let red = Lambertian::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
@@ -23,46 +23,34 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let green = Lambertian::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
     let light = DiffuseLight::new(SolidColor::new(Color::new(7.0, 7.0, 7.0)));
 
-    world
-        .hitables
-        .push(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
-    world
-        .hitables
-        .push(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
-    world.hitables.push(Arc::new(XZRect::new(
-        113.0, 443.0, 127.0, 432.0, 554.0, light,
-    )));
-    world
-        .hitables
-        .push(Arc::new(XZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white)));
-    world
-        .hitables
-        .push(Arc::new(XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
-    world
-        .hitables
-        .push(Arc::new(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
+    world.push((YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
+    world.push((YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
+    world.push((XZRect::new(113.0, 443.0, 127.0, 432.0, 554.0, light)));
+    world.push((XZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white)));
+    world.push((XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
+    world.push((XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
 
     // Boxes
 
-    let box1 = Arc::new(Boxy::new(
+    let box1 = (Boxy::new(
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(165.0, 330.0, 165.0),
         white,
     ));
 
     let box1 = RotateY::new(box1, 15.0);
-    let box1 = Translate::new(Arc::new(box1), Vec3::new(265.0, 0.0, 295.0));
-    world.hitables.push(Arc::new(box1));
+    let box1 = Translate::new((box1), Vec3::new(265.0, 0.0, 295.0));
+    world.push((box1));
 
-    let box2 = Arc::new(Boxy::new(
+    let box2 = (Boxy::new(
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(165.0, 165.0, 165.0),
         white,
     ));
 
     let box2 = RotateY::new(box2, -18.0);
-    let box2 = Translate::new(Arc::new(box2), Vec3::new(130.0, 0.0, 65.0));
-    world.hitables.push(Arc::new(box2));
+    let box2 = Translate::new((box2), Vec3::new(130.0, 0.0, 65.0));
+    world.push((box2));
 
     let camera_position: Vec3 = Vec3::new(278.0, 278.0, -800.0);
     let camera_target: Vec3 = Vec3::new(278.0, 278.0, 0.0);

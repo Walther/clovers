@@ -14,7 +14,7 @@ use std::sync::Arc;
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
-    let mut world: Arc<Hitable>List = HitableList::new();
+    let mut world: HitableList = HitableList::new();
 
     let checker: Texture =
         Checkered::new(Color::new(0.2, 0.3, 0.1), Color::new(0.9, 0.9, 0.9), 10.0);

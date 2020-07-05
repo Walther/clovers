@@ -29,7 +29,7 @@ impl ConstantMedium {
         distance_min: Float,
         distance_max: Float,
         mut rng: ThreadRng,
-    ) -> Option<crate::hitable::HitRecord> {
+    ) -> Option<HitRecord> {
         let mut rec1: HitRecord;
         let mut rec2: HitRecord;
 

@@ -12,7 +12,7 @@ use std::sync::Arc;
 pub struct Boxy {
     corner_0: Vec3,
     corner_1: Vec3,
-    sides: HitableList,
+    sides: Arc<HitableList>,
     material: Material,
 }
 
@@ -43,7 +43,7 @@ impl Boxy {
         Hitable::Boxy(Boxy {
             corner_0,
             corner_1,
-            sides: HitableList::from(sides),
+            sides: Arc::new(HitableList::from(sides)),
             material,
         })
     }
