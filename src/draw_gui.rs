@@ -1,7 +1,6 @@
 use crate::{
     color::Color,
     colorize::colorize,
-    hitable::Hitable,
     scenes::{self, Scene},
     Float,
 };
