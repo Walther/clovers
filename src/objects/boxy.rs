@@ -18,25 +18,25 @@ pub struct Boxy {
 
 impl Boxy {
     pub fn new(corner_0: Vec3, corner_1: Vec3, material: Material) -> Hitable {
-        let mut sides: Vec<Hitable> = Vec::new();
-        sides.push(XYRect::new(
+        let mut sides = HitableList::new();
+        sides.add(XYRect::new(
             corner_0.x, corner_1.x, corner_0.y, corner_1.y, corner_1.z, material,
         ));
-        sides.push(XYRect::new(
+        sides.add(XYRect::new(
             corner_0.x, corner_1.x, corner_0.y, corner_1.y, corner_0.z, material,
         ));
 
-        sides.push(XZRect::new(
+        sides.add(XZRect::new(
             corner_0.x, corner_1.x, corner_0.z, corner_1.z, corner_1.y, material,
         ));
-        sides.push(XZRect::new(
+        sides.add(XZRect::new(
             corner_0.x, corner_1.x, corner_0.z, corner_1.z, corner_0.y, material,
         ));
 
-        sides.push(YZRect::new(
+        sides.add(YZRect::new(
             corner_0.y, corner_1.y, corner_0.z, corner_1.z, corner_1.x, material,
         ));
-        sides.push(YZRect::new(
+        sides.add(YZRect::new(
             corner_0.y, corner_1.y, corner_0.z, corner_1.z, corner_0.x, material,
         ));
 

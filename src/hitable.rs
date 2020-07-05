@@ -65,7 +65,7 @@ pub enum Hitable {
 
 impl Hitable {
     pub fn hit(
-        self,
+        &self,
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
@@ -104,17 +104,17 @@ impl Hitable {
 }
 
 /// Helper struct for storing multiple `Hitable` objects. This list has a `Hitable` implementation too, returning the closest possible hit
-pub struct HitableList(pub Vec<Hitable>);
+pub struct HitableList(pub Vec<Arc<Hitable>>);
 
-impl From<Vec<Hitable>> for HitableList {
-    fn from(v: Vec<Hitable>) -> Self {
+impl From<Vec<Arc<Hitable>>> for HitableList {
+    fn from(v: Vec<Arc<Hitable>>) -> Self {
         HitableList(v)
     }
 }
 
 impl HitableList {
     pub fn hit(
-        self,
+        &self,
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
@@ -122,7 +122,7 @@ impl HitableList {
     ) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest = distance_max;
-        for &hitable in self.0.iter() {
+        for hitable in self.0.iter() {
             if let Some(record) = hitable.hit(ray, distance_min, closest, rng) {
                 closest = record.distance;
                 hit_record = Some(record);
@@ -138,7 +138,7 @@ impl HitableList {
 
         let mut output_box: Option<AABB> = None;
 
-        for &object in self.0.iter() {
+        for object in self.0.iter() {
             // Check if the object has a box
             match object.bounding_box(t0, t1) {
                 // No box found, early return.
@@ -169,8 +169,8 @@ impl HitableList {
         HitableList(Vec::new())
     }
 
-    pub fn add(&self, object: Hitable) {
-        self.0.push(object);
+    pub fn add(&mut self, object: Hitable) {
+        self.0.push(Arc::new(object));
     }
 
     pub fn into_bvh(self, time_0: Float, time_1: Float, rng: ThreadRng) -> Hitable {
@@ -233,7 +233,7 @@ pub struct BVHNode {
 
 impl BVHNode {
     pub fn from_list(
-        objects: Vec<Hitable>,
+        mut objects: Vec<Arc<Hitable>>,
         time_0: Float,
         time_1: Float,
         mut rng: ThreadRng,
@@ -250,18 +250,18 @@ impl BVHNode {
 
             if object_span == 1 {
                 // If we only have one object, return itself. Note: no explicit leaf type in our tree
-                left = Arc::new(objects[0]);
-                right = Arc::new(objects[0]);
+                left = Arc::clone(&objects[0]);
+                right = Arc::clone(&objects[0]);
             } else if object_span == 2 {
                 // If we are comparing two objects, perform the comparison
                 match comparator(&objects[0], &objects[1]) {
                     Ordering::Less => {
-                        left = Arc::new(objects[0]);
-                        right = Arc::new(objects[1]);
+                        left = Arc::clone(&objects[0]);
+                        right = Arc::clone(&objects[1]);
                     }
                     Ordering::Greater => {
-                        left = Arc::new(objects[1]);
-                        right = Arc::new(objects[0]);
+                        left = Arc::clone(&objects[1]);
+                        right = Arc::clone(&objects[0]);
                     }
                     Ordering::Equal => {
                         // TODO: what should happen here?
@@ -279,7 +279,10 @@ impl BVHNode {
                     objects, time_0, time_1, rng,
                 )));
                 right = Arc::new(Hitable::BVHNode(BVHNode::from_list(
-                    objects, time_0, time_1, rng,
+                    objects_right,
+                    time_0,
+                    time_1,
+                    rng,
                 )));
             }
 
