@@ -6,9 +6,11 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 // Avoid keyword clash
+#[derive(Deserialize, Serialize)]
 pub struct Boxy {
     corner_0: Vec3,
     corner_1: Vec3,

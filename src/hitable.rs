@@ -6,6 +6,7 @@ use crate::{
     Float, Ray, Vec3,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::{cmp::Ordering, sync::Arc};
 
 pub struct HitRecord<'a> {
@@ -49,6 +50,7 @@ impl<'a> HitRecord<'a> {
 //     fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB>;
 // }
 
+#[derive(Deserialize, Serialize)]
 pub enum Hitable {
     Boxy(Boxy),
     ConstantMedium(ConstantMedium),
@@ -104,6 +106,7 @@ impl Hitable {
 }
 
 /// Helper struct for storing multiple `Hitable` objects. This list has a `Hitable` implementation too, returning the closest possible hit
+#[derive(Deserialize, Serialize)]
 pub struct HitableList(pub Vec<Arc<Hitable>>);
 
 impl From<Vec<Arc<Hitable>>> for HitableList {
@@ -179,7 +182,7 @@ impl HitableList {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Deserialize, Serialize)]
 pub struct AABB {
     pub min: Vec3,
     pub max: Vec3,
@@ -225,6 +228,7 @@ impl AABB {
     }
 }
 
+#[derive(Deserialize, Serialize)]
 pub struct BVHNode {
     left: Arc<Hitable>,
     right: Arc<Hitable>,

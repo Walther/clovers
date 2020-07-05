@@ -1,5 +1,6 @@
 use crate::{Float, Ray, Vec3, PI};
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 
 fn random_in_unit_disk(rng: &mut ThreadRng) -> Vec3 {
     let mut position: Vec3;
@@ -12,6 +13,7 @@ fn random_in_unit_disk(rng: &mut ThreadRng) -> Vec3 {
     }
 }
 
+#[derive(Deserialize, Serialize)]
 pub struct Camera {
     pub lower_left_corner: Vec3,
     pub horizontal: Vec3,

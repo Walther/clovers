@@ -5,6 +5,7 @@ use crate::{
     Float,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 
 pub mod cornell;
 pub mod cornell_with_boxes;
@@ -18,6 +19,7 @@ pub mod random_scene;
 pub mod simple_light_lambertian;
 pub mod two_spheres;
 
+#[derive(Deserialize, Serialize)]
 pub struct Scene {
     pub world: Hitable, // BVHNode
     pub camera: Camera,

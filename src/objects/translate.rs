@@ -4,8 +4,10 @@ use crate::{
     Vec3,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
+#[derive(Deserialize, Serialize)]
 pub struct Translate {
     object: Arc<Hitable>,
     offset: Vec3,

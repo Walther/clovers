@@ -5,9 +5,11 @@ use crate::{
     Float, Vec3, RECT_EPSILON,
 };
 use rand::prelude::ThreadRng;
+use serde::{Deserialize, Serialize};
 
 // XY
 
+#[derive(Deserialize, Serialize)]
 pub struct XYRect {
     x0: Float,
     x1: Float,
@@ -84,6 +86,7 @@ impl XYRect {
 
 // XZ
 
+#[derive(Deserialize, Serialize)]
 pub struct XZRect {
     x0: Float,
     x1: Float,
@@ -160,6 +163,7 @@ impl XZRect {
 
 // YZ
 
+#[derive(Deserialize, Serialize)]
 pub struct YZRect {
     y0: Float,
     y1: Float,
