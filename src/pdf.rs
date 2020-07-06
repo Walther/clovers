@@ -6,6 +6,7 @@ pub enum PDF {
     CosinePDF(CosinePDF),
     HitablePDF(HitablePDF),
     MixturePDF(MixturePDF),
+    ZeroPDF(ZeroPDF),
 }
 
 impl PDF {
@@ -14,6 +15,7 @@ impl PDF {
             PDF::CosinePDF(p) => p.value(direction, time, rng),
             PDF::HitablePDF(p) => p.value(direction, time, rng),
             PDF::MixturePDF(p) => p.value(direction, time, rng),
+            PDF::ZeroPDF(p) => p.value(direction, time, rng),
         }
     }
     pub fn generate(&self, rng: ThreadRng) -> Vec3 {
@@ -21,6 +23,7 @@ impl PDF {
             PDF::CosinePDF(p) => p.generate(rng),
             PDF::HitablePDF(p) => p.generate(rng),
             PDF::MixturePDF(p) => p.generate(rng),
+            PDF::ZeroPDF(p) => p.generate(rng),
         }
     }
 }
@@ -56,14 +59,14 @@ pub struct HitablePDF {
 }
 
 impl HitablePDF {
-    pub fn new(hitable: Hitable, origin: Vec3) -> PDF {
+    pub fn new(hitable: Arc<Hitable>, origin: Vec3) -> PDF {
         PDF::HitablePDF(HitablePDF {
             origin,
-            hitable: Arc::new(hitable),
+            hitable: Arc::clone(&hitable),
         })
     }
 
-    pub fn value(&self, direction: Vec3, time: Float, mut rng: ThreadRng) -> Float {
+    pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
         self.hitable.pdf_value(self.origin, direction, time, rng)
     }
 
@@ -97,5 +100,22 @@ impl MixturePDF {
         } else {
             self.pdf2.generate(rng)
         }
+    }
+}
+
+// TODO: this is an ugly hack due to tutorial saying `srec.pdf_ptr = 0;` in 12.2 Handling Specular for Metal
+pub struct ZeroPDF {}
+
+impl ZeroPDF {
+    pub fn new() -> PDF {
+        PDF::ZeroPDF(ZeroPDF {})
+    }
+
+    pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
+        0.0
+    }
+
+    pub fn generate(&self, mut rng: ThreadRng) -> Vec3 {
+        Vec3::new(1.0, 0.0, 0.0)
     }
 }

@@ -14,7 +14,7 @@ use rand::prelude::*;
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
-    let mut world: HitableList = HitableList::new();
+    let mut world = HitableList::new();
 
     let texture: Texture = SolidColor::new(Color::new(0.3, 0.2, 0.1));
     let texture2: Texture = SolidColor::new(Color::new(0.1, 0.2, 0.3));

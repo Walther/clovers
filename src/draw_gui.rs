@@ -1,7 +1,11 @@
 use crate::{
     color::Color,
     colorize::colorize,
+    hitable::{Hitable, HitableList},
+    materials::DiffuseLight,
+    objects::{FlipFace, XZRect},
     scenes::{self, Scene},
+    textures::SolidColor,
     Float,
 };
 
@@ -11,6 +15,7 @@ use rayon::prelude::*;
 
 #[cfg(feature = "gui")]
 use pixels::{wgpu::Surface, Error, Pixels, SurfaceTexture};
+use std::sync::Arc;
 #[cfg(feature = "gui")]
 use winit::{
     dpi::{LogicalSize, PhysicalSize},
@@ -89,6 +94,7 @@ struct World {
     width: u32,
     height: u32,
     scene: Scene,
+    lights: Arc<Hitable>, // TODO: fix / improve
     float_buffer: Vec<Float>,
     bar: ProgressBar,
     samples: u32,
@@ -101,10 +107,21 @@ impl World {
         bar.set_style(ProgressStyle::default_bar().template(
             "Elapsed: {elapsed_precise}\nSamples:  {bar} {pos}/{len}\nETA:     {eta_precise}",
         ));
+
+        // TODO: remove temporary
+        let small_light = DiffuseLight::new(SolidColor::new(Color::new(15.0, 15.0, 15.0)));
+        let small_light_obj = XZRect::new(213.0, 343.0, 227.0, 332.0, 554.0, small_light);
+        // let small_light_obj = FlipFace::new(small_light_obj);
+        let mut lights = HitableList::new();
+        lights.add(small_light_obj);
+        let lights = lights.into_hitable(); // TODO: fixme, silly
+        let lights = Arc::new(lights);
+
         World {
             width,
             height,
             scene: scenes::cornell_with_boxes::load(width, height, rng),
+            lights,
             float_buffer: vec![0.0; 4 * width as usize * height as usize], // rgba
             bar,
             samples,
@@ -126,6 +143,7 @@ impl World {
         let height = self.height as usize;
         let camera = &self.scene.camera;
         let world = &self.scene.world;
+        let lights = &self.lights;
 
         // Update internal float-based pixel buffer with new samples
         self.float_buffer
@@ -141,7 +159,15 @@ impl World {
                 let u = (x as Float + rng.gen::<Float>()) / width as Float;
                 let v = (y as Float + rng.gen::<Float>()) / height as Float;
                 let ray = camera.get_ray(u, v, rng);
-                color += colorize(&ray, background_color, world, 0, max_depth, rng);
+                color += colorize(
+                    &ray,
+                    background_color,
+                    world,
+                    Arc::clone(&lights), // TODO: Fixme, ridiculous and unusable
+                    0,
+                    max_depth,
+                    rng,
+                );
 
                 // sum to previous color; remember to divide in a consumer!
                 let prev_color = Color::new(pixel[0], pixel[1], pixel[2]);

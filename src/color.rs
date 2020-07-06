@@ -125,6 +125,13 @@ impl Mul<Color> for Float {
     }
 }
 
+impl Mul<Color> for Color {
+    type Output = Color;
+    fn mul(self, rhs: Color) -> Self::Output {
+        Color::new(rhs.r * self.r, rhs.g * self.g, rhs.b * self.b)
+    }
+}
+
 impl DivAssign<Float> for Color {
     fn div_assign(&mut self, rhs: Float) {
         self.r /= rhs;

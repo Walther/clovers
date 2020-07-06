@@ -3,7 +3,7 @@ use crate::{
     camera::Camera,
     color::Color,
     hitable::HitableList,
-    materials::{DiffuseLight, Lambertian},
+    materials::{DiffuseLight, Lambertian, Metal},
     objects::{Boxy, FlipFace, RotateY, Translate},
     objects::{XYRect, XZRect, YZRect},
     textures::SolidColor,
@@ -36,10 +36,11 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
 
     // Boxes
 
+    let aluminum = Metal::new(SolidColor::new(Color::new(0.8, 0.85, 0.88)), 0.0);
     let box1 = Arc::new(Boxy::new(
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(165.0, 330.0, 165.0),
-        white,
+        aluminum,
     ));
 
     let box1 = RotateY::new(box1, 15.0);

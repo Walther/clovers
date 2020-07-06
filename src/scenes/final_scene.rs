@@ -23,7 +23,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     let time_1: Float = 1.0;
 
     // Ground: lots of boxes
-    let mut boxes1: HitableList = HitableList::new();
+    let mut boxes1 = HitableList::new();
     let ground: Material = Lambertian::new(SolidColor::new(Color::new(0.48, 0.83, 0.53)));
 
     let boxes_per_side = 20;
@@ -45,7 +45,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
         }
     }
 
-    let mut world: HitableList = HitableList::new();
+    let mut world = HitableList::new();
 
     world.add(boxes1.into_bvh(time_0, time_1, rng));
 

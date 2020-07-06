@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{color::Color, hitable::HitRecord, Float, Ray, ThreadRng, Vec3};
+use crate::{color::Color, hitable::HitRecord, pdf::PDF, Float, Ray, ThreadRng, Vec3};
 pub mod dielectric;
 pub mod diffuse_light;
 pub mod isotropic;
@@ -12,6 +12,7 @@ pub use diffuse_light::*;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
+use std::sync::Arc;
 
 #[derive(Copy, Clone, Deserialize, Serialize)]
 pub enum Material {
@@ -29,13 +30,14 @@ impl Material {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: ThreadRng,
-    ) -> Option<(Ray, Color, Float)> {
+    ) -> Option<ScatterRecord> {
         match *self {
-            Material::Dielectric(d) => Dielectric::scatter(d, ray, hit_record, rng),
             Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),
             Material::DiffuseLight(d) => DiffuseLight::scatter(d, ray, hit_record, rng),
             Material::Metal(m) => Metal::scatter(m, ray, hit_record, rng),
-            Material::Isotropic(i) => Isotropic::scatter(i, ray, hit_record, rng),
+            _ => todo!()
+            // Material::Dielectric(d) => Dielectric::scatter(d, ray, hit_record, rng),
+            // Material::Isotropic(i) => Isotropic::scatter(i, ray, hit_record, rng),
         }
     }
 
@@ -57,12 +59,31 @@ impl Material {
     }
 
     /// Returns the amount of light the material emits. By default, materials do not emit light, returning black.
-    pub fn emit(&self, hit_record: &HitRecord, u: Float, v: Float, position: Vec3) -> Color {
+    pub fn emit(
+        &self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        u: Float,
+        v: Float,
+        position: Vec3,
+    ) -> Color {
         match *self {
-            Material::DiffuseLight(d) => DiffuseLight::emit(d, hit_record, u, v, position),
+            Material::DiffuseLight(d) => d.emit(ray, hit_record, u, v, position),
             _ => Color::new(0.0, 0.0, 0.0),
         }
     }
+}
+
+pub enum MaterialType {
+    Diffuse,
+    Specular,
+}
+
+pub struct ScatterRecord {
+    pub material_type: MaterialType,
+    pub specular_ray: Option<Ray>,
+    pub attenuation: Color,
+    pub pdf_ptr: PDF,
 }
 
 fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {

@@ -99,6 +99,7 @@ impl Hitable {
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, mut rng: ThreadRng) -> Float {
         match self {
             Hitable::XZRect(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
             _ => return 0.0,
         }
     }
@@ -106,7 +107,15 @@ impl Hitable {
     pub fn random(&self, origin: Vec3, rng: ThreadRng) -> Vec3 {
         match self {
             Hitable::XZRect(h) => h.random(origin, rng),
+            Hitable::HitableList(h) => h.random(origin, rng),
             _ => return Vec3::new(1.0, 0.0, 0.0),
+        }
+    }
+
+    pub fn add(&mut self, object: Hitable) {
+        match self {
+            Hitable::HitableList(h) => h.add(object),
+            _ => panic!("Cannot add to other types of Hitable"),
         }
     }
 }
@@ -173,6 +182,21 @@ impl HitableList {
 
         return output_box;
     }
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
+        let weight = 1.0 / self.0.len() as Float;
+        let mut sum = 0.0;
+
+        self.0.iter().for_each(|object| {
+            sum += weight * object.pdf_value(origin, vector, time, rng);
+        });
+
+        return sum;
+    }
+
+    pub fn random(&self, origin: Vec3, mut rng: ThreadRng) -> Vec3 {
+        let int_size = self.0.len();
+        return self.0[rng.gen_range(0, int_size)].random(origin, rng);
+    }
 
     pub fn new() -> HitableList {
         HitableList(Vec::new())
@@ -185,6 +209,11 @@ impl HitableList {
     pub fn into_bvh(self, time_0: Float, time_1: Float, rng: ThreadRng) -> Hitable {
         let bvh_node = BVHNode::from_list(self.0, time_0, time_1, rng);
         Hitable::BVHNode(bvh_node)
+    }
+
+    // TODO: fixme, silly
+    pub fn into_hitable(self) -> Hitable {
+        Hitable::HitableList(self)
     }
 }
 

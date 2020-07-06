@@ -1,8 +1,9 @@
-use super::Material;
+use super::{Material, MaterialType, ScatterRecord};
 use crate::{
     color::Color,
     hitable::HitRecord,
     onb::ONB,
+    pdf::CosinePDF,
     random::{random_cosine_direction, random_unit_vector},
     ray::Ray,
     textures::Texture,
@@ -10,6 +11,7 @@ use crate::{
 };
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct Lambertian {
@@ -23,15 +25,15 @@ impl Lambertian {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: ThreadRng,
-    ) -> Option<(Ray, Color, Float)> {
-        let uvw = ONB::build_from_w(hit_record.normal);
-        let direction: Vec3 = uvw.local(random_cosine_direction(rng));
-        let scattered = Ray::new(hit_record.position, direction.normalize(), ray.time);
-        let albedo = self
-            .albedo
-            .color(hit_record.u, hit_record.v, hit_record.position);
-        let pdf = uvw.w.dot(&scattered.direction) / PI;
-        Some((scattered, albedo, pdf))
+    ) -> Option<ScatterRecord> {
+        Some(ScatterRecord {
+            material_type: MaterialType::Diffuse,
+            specular_ray: None,
+            attenuation: self
+                .albedo
+                .color(hit_record.u, hit_record.v, hit_record.position),
+            pdf_ptr: CosinePDF::new(hit_record.normal),
+        })
     }
 
     pub fn scattering_pdf(
