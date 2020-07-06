@@ -57,9 +57,9 @@ impl Material {
     }
 
     /// Returns the amount of light the material emits. By default, materials do not emit light, returning black.
-    pub fn emit(&self, u: Float, v: Float, position: Vec3) -> Color {
+    pub fn emit(&self, hit_record: &HitRecord, u: Float, v: Float, position: Vec3) -> Color {
         match *self {
-            Material::DiffuseLight(d) => DiffuseLight::emit(d, u, v, position),
+            Material::DiffuseLight(d) => DiffuseLight::emit(d, hit_record, u, v, position),
             _ => Color::new(0.0, 0.0, 0.0),
         }
     }

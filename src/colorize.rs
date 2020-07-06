@@ -1,5 +1,7 @@
-use crate::{color::Color, hitable::Hitable, ray::Ray, Float, SHADOW_EPSILON};
-use rand::prelude::ThreadRng;
+use crate::{
+    color::Color, hitable::Hitable, pdf::CosinePDF, ray::Ray, Float, Vec3, SHADOW_EPSILON,
+};
+use rand::prelude::*;
 
 /// The main coloring function
 pub fn colorize(
@@ -8,7 +10,7 @@ pub fn colorize(
     world: &Hitable,
     depth: u32,
     max_depth: u32,
-    rng: ThreadRng,
+    mut rng: ThreadRng,
 ) -> Color {
     let color: Color;
 
@@ -21,14 +23,22 @@ pub fn colorize(
     match world.hit(&ray, SHADOW_EPSILON, Float::MAX, rng) {
         // Hit an object
         Some(hit_record) => {
-            let emitted: Color =
-                hit_record
-                    .material
-                    .emit(hit_record.u, hit_record.v, hit_record.position);
+            let emitted: Color = hit_record.material.emit(
+                &hit_record,
+                hit_record.u,
+                hit_record.v,
+                hit_record.position,
+            );
             // Try to scatter and colorize the new ray
             match hit_record.material.scatter(&ray, &hit_record, rng) {
                 // Got a scatter, albedo and pdf value
                 Some((scattered, albedo, pdf)) => {
+                    // Compute a probability density function value; where to scatter?
+                    let cosine_pdf = CosinePDF::new(hit_record.normal);
+                    let scattered =
+                        Ray::new(hit_record.position, cosine_pdf.generate(rng), ray.time);
+                    let pdf_val = cosine_pdf.value(scattered.direction);
+
                     // color = emitted + albedo * scatter_pdf * recurse / pdf
                     color = emitted
                         + (albedo
@@ -48,7 +58,7 @@ pub fn colorize(
                                 max_depth,
                                 rng,
                             ),
-                        ) / pdf;
+                        ) / pdf_val;
 
                     return color;
                 }

@@ -28,8 +28,12 @@ impl DiffuseLight {
         todo!()
     }
 
-    pub fn emit(self, u: Float, v: Float, position: Vec3) -> Color {
-        self.emit.color(u, v, position)
+    pub fn emit(self, hit_record: &HitRecord, u: Float, v: Float, position: Vec3) -> Color {
+        if hit_record.front_face {
+            self.emit.color(u, v, position)
+        } else {
+            Color::new(0.0, 0.0, 0.0)
+        }
     }
 
     pub fn new(emission: Texture) -> Material {

@@ -4,7 +4,7 @@ use crate::{
     color::Color,
     hitable::HitableList,
     materials::{DiffuseLight, Lambertian},
-    objects::{Boxy, RotateY, Translate},
+    objects::{Boxy, FlipFace, RotateY, Translate},
     objects::{XYRect, XZRect, YZRect},
     textures::SolidColor,
     Float, Vec3,
@@ -23,9 +23,13 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let green = Lambertian::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
     let small_light = DiffuseLight::new(SolidColor::new(Color::new(15.0, 15.0, 15.0)));
 
+    // Lights are one-sided. Flip this one!
+    let small_light_obj = XZRect::new(213.0, 343.0, 227.0, 332.0, 554.0, small_light);
+    let small_light_obj = FlipFace::new(small_light_obj);
+    world.add(small_light_obj);
+
     world.add(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green));
     world.add(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red));
-    world.add(XZRect::new(213.0, 343.0, 227.0, 332.0, 554.0, small_light));
     world.add(XZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white));
     world.add(XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
     world.add(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
