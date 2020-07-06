@@ -3,7 +3,7 @@ use crate::{
     hitable::Hitable,
     materials::{DiffuseLight, Lambertian},
     objects::XZRect,
-    pdf::{CosinePDF, HitablePDF},
+    pdf::{CosinePDF, HitablePDF, MixturePDF},
     ray::Ray,
     textures::SolidColor,
     Float, Vec3, SHADOW_EPSILON,
@@ -15,6 +15,7 @@ pub fn colorize(
     ray: &Ray,
     background_color: Color,
     world: &Hitable,
+    // lights: &Hitable, // NOTE: possibly hitablelist, or bvhnode, or something new?
     depth: u32,
     max_depth: u32,
     mut rng: ThreadRng,
@@ -51,11 +52,15 @@ pub fn colorize(
                         554.0,
                         Lambertian::new(SolidColor::new(Color::new(1.0, 1.0, 1.0))),
                     );
+
+                    // TODO: PDF-based sampling might be severely slowing down frames?
                     let hitable_pdf = HitablePDF::new(light_shape, hit_record.position);
+                    let cosine_pdf = CosinePDF::new(hit_record.normal);
+                    let mixture_pdf = MixturePDF::new(hitable_pdf, cosine_pdf);
 
                     let scattered =
-                        Ray::new(hit_record.position, hitable_pdf.generate(rng), ray.time);
-                    let pdf_val = hitable_pdf.value(scattered.direction, ray.time, rng);
+                        Ray::new(hit_record.position, mixture_pdf.generate(rng), ray.time);
+                    let pdf_val = mixture_pdf.value(scattered.direction, ray.time, rng);
 
                     // color = emitted + albedo * scatter_pdf * recurse / pdf
                     color = emitted
@@ -72,6 +77,7 @@ pub fn colorize(
                                 &scattered,
                                 background_color,
                                 world,
+                                // lights, // TODO:
                                 depth + 1,
                                 max_depth,
                                 rng,

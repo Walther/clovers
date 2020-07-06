@@ -5,19 +5,22 @@ use std::sync::Arc;
 pub enum PDF {
     CosinePDF(CosinePDF),
     HitablePDF(HitablePDF),
+    MixturePDF(MixturePDF),
 }
 
 impl PDF {
     pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
         match self {
-            PDF::CosinePDF(p) => p.value(direction),
+            PDF::CosinePDF(p) => p.value(direction, time, rng),
             PDF::HitablePDF(p) => p.value(direction, time, rng),
+            PDF::MixturePDF(p) => p.value(direction, time, rng),
         }
     }
     pub fn generate(&self, rng: ThreadRng) -> Vec3 {
         match self {
             PDF::CosinePDF(p) => p.generate(rng),
             PDF::HitablePDF(p) => p.generate(rng),
+            PDF::MixturePDF(p) => p.generate(rng),
         }
     }
 }
@@ -33,7 +36,7 @@ impl CosinePDF {
         })
     }
 
-    pub fn value(&self, direction: Vec3) -> Float {
+    pub fn value(&self, direction: Vec3, time: Float, mut rng: ThreadRng) -> Float {
         let cosine = direction.normalize().dot(&self.uvw.w);
         if cosine <= 0.0 {
             0.0
@@ -66,5 +69,33 @@ impl HitablePDF {
 
     pub fn generate(&self, rng: ThreadRng) -> Vec3 {
         self.hitable.random(self.origin, rng)
+    }
+}
+
+pub struct MixturePDF {
+    // Arc to prevent infinite size
+    pdf1: Arc<PDF>,
+    pdf2: Arc<PDF>,
+}
+
+impl MixturePDF {
+    pub fn new(pdf1: PDF, pdf2: PDF) -> PDF {
+        PDF::MixturePDF(MixturePDF {
+            pdf1: Arc::new(pdf1),
+            pdf2: Arc::new(pdf2),
+        })
+    }
+
+    pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
+        return 0.5 * self.pdf1.value(direction, time, rng)
+            + 0.5 * self.pdf2.value(direction, time, rng);
+    }
+
+    pub fn generate(&self, mut rng: ThreadRng) -> Vec3 {
+        if rng.gen::<bool>() {
+            self.pdf1.generate(rng)
+        } else {
+            self.pdf2.generate(rng)
+        }
     }
 }
