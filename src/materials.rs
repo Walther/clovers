@@ -35,9 +35,8 @@ impl Material {
             Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),
             Material::DiffuseLight(d) => DiffuseLight::scatter(d, ray, hit_record, rng),
             Material::Metal(m) => Metal::scatter(m, ray, hit_record, rng),
-            _ => todo!()
-            // Material::Dielectric(d) => Dielectric::scatter(d, ray, hit_record, rng),
-            // Material::Isotropic(i) => Isotropic::scatter(i, ray, hit_record, rng),
+            Material::Dielectric(d) => Dielectric::scatter(d, ray, hit_record, rng),
+            _ => todo!(), // Material::Isotropic(i) => Isotropic::scatter(i, ray, hit_record, rng),
         }
     }
 

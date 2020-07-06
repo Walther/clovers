@@ -100,6 +100,7 @@ impl Hitable {
         match self {
             Hitable::XZRect(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
             _ => return 0.0,
         }
     }
@@ -108,6 +109,7 @@ impl Hitable {
         match self {
             Hitable::XZRect(h) => h.random(origin, rng),
             Hitable::HitableList(h) => h.random(origin, rng),
+            Hitable::Sphere(h) => h.random(origin, rng),
             _ => return Vec3::new(1.0, 0.0, 0.0),
         }
     }

@@ -8,6 +8,7 @@ use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 
 pub mod cornell;
+pub mod cornell_book3_final;
 pub mod cornell_with_boxes;
 pub mod cornell_with_smoke;
 pub mod cornell_with_sphere;

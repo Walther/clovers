@@ -2,12 +2,12 @@ use crate::{
     color::Color,
     colorize::colorize,
     hitable::HitableList,
-    materials::DiffuseLight,
-    objects::{FlipFace, XZRect},
+    materials::{Dielectric, DiffuseLight},
+    objects::{FlipFace, Sphere, XZRect},
     ray::Ray,
     scenes,
     textures::SolidColor,
-    Float,
+    Float, Vec3,
 };
 use image::{ImageBuffer, ImageResult, RgbImage};
 use indicatif::{ProgressBar, ProgressStyle};
@@ -26,7 +26,7 @@ pub fn draw(
     let mut img: RgbImage = ImageBuffer::new(width as u32, height as u32);
 
     let rng = rand::thread_rng();
-    let scene = scenes::cornell_with_boxes::load(width, height, rng);
+    let scene = scenes::cornell_book3_final::load(width, height, rng);
     let background_color: Color = scene.background;
 
     // Progress bar
@@ -40,9 +40,10 @@ pub fn draw(
     // TODO: remove temporary
     let small_light = DiffuseLight::new(SolidColor::new(Color::new(15.0, 15.0, 15.0)));
     let small_light_obj = XZRect::new(213.0, 343.0, 227.0, 332.0, 554.0, small_light);
-    // let small_light_obj = FlipFace::new(small_light_obj);
+    let sphere = Sphere::new(Vec3::new(190.0, 90.0, 190.0), 90.0, Dielectric::new(1.5));
     let mut lights = HitableList::new();
     lights.add(small_light_obj);
+    lights.add(sphere);
     let lights = lights.into_hitable(); // TODO: fixme, silly
     let lights = Arc::new(lights);
 

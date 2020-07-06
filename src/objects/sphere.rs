@@ -1,8 +1,10 @@
 use crate::{
     hitable::{HitRecord, Hitable, AABB},
     materials::Material,
+    onb::ONB,
+    random::random_to_sphere,
     ray::Ray,
-    Float, Vec3, PI,
+    Float, Vec3, PI, SHADOW_EPSILON,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -94,5 +96,31 @@ impl Sphere {
             self.center + Vec3::new(self.radius, self.radius, self.radius),
         );
         Some(output_box)
+    }
+
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
+        match self.hit(
+            &Ray::new(origin, vector, time),
+            SHADOW_EPSILON,
+            Float::INFINITY,
+            rng,
+        ) {
+            None => 0.0,
+            Some(_hit_record) => {
+                let cos_theta_max = (1.0
+                    - self.radius * self.radius / (self.center - origin).norm_squared())
+                .sqrt();
+                let solid_angle = 2.0 * PI * (1.0 - cos_theta_max);
+
+                return 1.0 / solid_angle;
+            }
+        }
+    }
+
+    pub fn random(&self, origin: Vec3, mut rng: ThreadRng) -> Vec3 {
+        let direction: Vec3 = self.center - origin;
+        let distance_squared: Float = direction.norm_squared();
+        let uvw = ONB::build_from_w(direction);
+        return uvw.local(random_to_sphere(self.radius, distance_squared, rng));
     }
 }
