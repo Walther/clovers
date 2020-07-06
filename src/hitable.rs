@@ -1,7 +1,8 @@
 use crate::{
     materials::Material,
     objects::{
-        Boxy, ConstantMedium, MovingSphere, RotateY, Sphere, Translate, XYRect, XZRect, YZRect,
+        Boxy, ConstantMedium, FlipFace, MovingSphere, RotateY, Sphere, Translate, XYRect, XZRect,
+        YZRect,
     },
     Float, Ray, Vec3,
 };
@@ -51,6 +52,7 @@ pub enum Hitable {
     Translate(Translate),
     BVHNode(BVHNode),
     HitableList(HitableList),
+    FlipFace(FlipFace),
 }
 
 impl Hitable {
@@ -73,6 +75,7 @@ impl Hitable {
             Hitable::Translate(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::BVHNode(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::HitableList(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::FlipFace(h) => h.hit(ray, distance_min, distance_max, rng),
         }
     }
 
@@ -89,6 +92,7 @@ impl Hitable {
             Hitable::Translate(h) => h.bounding_box(t0, t1),
             Hitable::BVHNode(h) => h.bounding_box(t0, t1),
             Hitable::HitableList(h) => h.bounding_box(t0, t1),
+            Hitable::FlipFace(h) => h.bounding_box(t0, t1),
         }
     }
 }
