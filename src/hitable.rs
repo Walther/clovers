@@ -95,6 +95,20 @@ impl Hitable {
             Hitable::FlipFace(h) => h.bounding_box(t0, t1),
         }
     }
+
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, mut rng: ThreadRng) -> Float {
+        match self {
+            Hitable::XZRect(h) => h.pdf_value(origin, vector, time, rng),
+            _ => return 0.0,
+        }
+    }
+
+    pub fn random(&self, origin: Vec3, rng: ThreadRng) -> Vec3 {
+        match self {
+            Hitable::XZRect(h) => h.random(origin, rng),
+            _ => return Vec3::new(1.0, 0.0, 0.0),
+        }
+    }
 }
 
 /// Helper struct for storing multiple `Hitable` objects. This list has a `Hitable` implementation too, returning the closest possible hit

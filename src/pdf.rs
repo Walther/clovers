@@ -1,19 +1,23 @@
-use crate::{onb::ONB, random::random_cosine_direction, Float, Vec3, PI};
+use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Float, Vec3, PI};
 use rand::prelude::*;
+use std::sync::Arc;
 
 pub enum PDF {
     CosinePDF(CosinePDF),
+    HitablePDF(HitablePDF),
 }
 
 impl PDF {
-    pub fn value(&self, direction: Vec3) -> Float {
+    pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
         match self {
             PDF::CosinePDF(p) => p.value(direction),
+            PDF::HitablePDF(p) => p.value(direction, time, rng),
         }
     }
     pub fn generate(&self, rng: ThreadRng) -> Vec3 {
         match self {
             PDF::CosinePDF(p) => p.generate(rng),
+            PDF::HitablePDF(p) => p.generate(rng),
         }
     }
 }
@@ -43,19 +47,24 @@ impl CosinePDF {
     }
 }
 
-// class cosine_pdf : public pdf {
-//   public:
-//       cosine_pdf(const vec3& w) { uvw.build_from_w(w); }
+pub struct HitablePDF {
+    origin: Vec3,
+    hitable: Arc<Hitable>,
+}
 
-//       virtual double value(const vec3& direction) const {
-//           auto cosine = dot(unit_vector(direction), uvw.w());
-//           return (cosine <= 0) ? 0 : cosine/pi;
-//       }
+impl HitablePDF {
+    pub fn new(hitable: Hitable, origin: Vec3) -> PDF {
+        PDF::HitablePDF(HitablePDF {
+            origin,
+            hitable: Arc::new(hitable),
+        })
+    }
 
-//       virtual vec3 generate() const {
-//           return uvw.local(random_cosine_direction());
-//       }
+    pub fn value(&self, direction: Vec3, time: Float, mut rng: ThreadRng) -> Float {
+        self.hitable.pdf_value(self.origin, direction, time, rng)
+    }
 
-//   public:
-//       onb uvw;
-// };
+    pub fn generate(&self, rng: ThreadRng) -> Vec3 {
+        self.hitable.random(self.origin, rng)
+    }
+}

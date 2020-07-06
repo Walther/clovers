@@ -1,5 +1,12 @@
 use crate::{
-    color::Color, hitable::Hitable, pdf::CosinePDF, ray::Ray, Float, Vec3, SHADOW_EPSILON,
+    color::Color,
+    hitable::Hitable,
+    materials::{DiffuseLight, Lambertian},
+    objects::XZRect,
+    pdf::{CosinePDF, HitablePDF},
+    ray::Ray,
+    textures::SolidColor,
+    Float, Vec3, SHADOW_EPSILON,
 };
 use rand::prelude::*;
 
@@ -34,10 +41,21 @@ pub fn colorize(
                 // Got a scatter, albedo and pdf value
                 Some((scattered, albedo, pdf)) => {
                     // Compute a probability density function value; where to scatter?
-                    let cosine_pdf = CosinePDF::new(hit_record.normal);
+
+                    // TEMPORARY: manually specified target for rays; same location as actual light in the cornell_with_boxes scene
+                    let light_shape = XZRect::new(
+                        213.0,
+                        343.0,
+                        227.0,
+                        332.0,
+                        554.0,
+                        Lambertian::new(SolidColor::new(Color::new(1.0, 1.0, 1.0))),
+                    );
+                    let hitable_pdf = HitablePDF::new(light_shape, hit_record.position);
+
                     let scattered =
-                        Ray::new(hit_record.position, cosine_pdf.generate(rng), ray.time);
-                    let pdf_val = cosine_pdf.value(scattered.direction);
+                        Ray::new(hit_record.position, hitable_pdf.generate(rng), ray.time);
+                    let pdf_val = hitable_pdf.value(scattered.direction, ray.time, rng);
 
                     // color = emitted + albedo * scatter_pdf * recurse / pdf
                     color = emitted
