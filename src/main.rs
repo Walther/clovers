@@ -26,6 +26,7 @@ mod materials;
 mod scenes;
 use draw::draw;
 mod onb;
+mod pdf;
 mod perlin;
 mod random;
 mod textures;
