@@ -36,9 +36,9 @@ impl MovingSphere {
         })
     }
     pub fn center(&self, time: Float) -> Vec3 {
-        return self.center_0
+        self.center_0
             + ((time - self.time_0) / (self.time_1 - self.time_0))
-                * (self.center_1 - self.center_0);
+                * (self.center_1 - self.center_0)
     }
 
     // Returns the U,V surface coordinates of a hitpoint

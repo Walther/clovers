@@ -1,6 +1,7 @@
 use super::Material;
 use crate::{
     color::Color, hitable::HitRecord, random::random_in_unit_sphere, ray::Ray, textures::Texture,
+    Float,
 };
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
@@ -20,12 +21,24 @@ impl Isotropic {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: ThreadRng,
-    ) -> Option<(Ray, Color)> {
+    ) -> Option<(Ray, Color, Float)> {
         let scattered: Ray = Ray::new(hit_record.position, random_in_unit_sphere(rng), ray.time);
-        let attenuation: Color = self
+        let albedo: Color = self
             .albedo
             .color(hit_record.u, hit_record.v, hit_record.position);
 
-        Some((scattered, attenuation))
+        let pdf = 1.0; // TODO:
+
+        Some((scattered, albedo, pdf))
+    }
+
+    pub fn scattering_pdf(
+        self,
+        _ray: &Ray,
+        _hit_record: &HitRecord,
+        _scattered: &Ray,
+        _rng: ThreadRng,
+    ) -> Float {
+        todo!()
     }
 }

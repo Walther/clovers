@@ -37,7 +37,7 @@ impl Translate {
             Some(mut hit_record) => {
                 hit_record.position += self.offset;
                 hit_record.set_face_normal(&moved_ray, hit_record.normal);
-                return Some(hit_record);
+                Some(hit_record)
             }
         }
     }
@@ -45,9 +45,9 @@ impl Translate {
     pub fn bounding_box(&self, t0: crate::Float, t1: crate::Float) -> Option<AABB> {
         let object_bounding_box = self.object.bounding_box(t0, t1);
         match object_bounding_box {
-            Some(aabb) => return Some(AABB::new(aabb.min + self.offset, aabb.max + self.offset)),
+            Some(aabb) => Some(AABB::new(aabb.min + self.offset, aabb.max + self.offset)),
             None => {
-                return None;
+                None
             }
         }
     }

@@ -2,9 +2,9 @@ use crate::{
     hitable::{HitRecord, Hitable, AABB},
     materials::Material,
     ray::Ray,
-    Float, Vec3, RECT_EPSILON,
+    Float, Vec3, RECT_EPSILON, SHADOW_EPSILON,
 };
-use rand::prelude::ThreadRng;
+use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 
 // XY
@@ -34,7 +34,7 @@ impl XYRect {
             y0,
             y1,
             k,
-            material: material,
+            material,
         })
     }
 
@@ -68,7 +68,7 @@ impl XYRect {
             front_face: false, // TODO: fix having to declare it before calling face_normal
         };
         record.set_face_normal(ray, outward_normal);
-        return Some(record);
+        Some(record)
     }
     pub fn bounding_box(
         &self,
@@ -111,7 +111,7 @@ impl XZRect {
             z0,
             z1,
             k,
-            material: material,
+            material,
         })
     }
 
@@ -145,7 +145,7 @@ impl XZRect {
             front_face: false, // TODO: fix having to declare it before calling face_normal
         };
         record.set_face_normal(ray, outward_normal);
-        return Some(record);
+        Some(record)
     }
     pub fn bounding_box(
         &self,
@@ -158,6 +158,34 @@ impl XZRect {
             Vec3::new(self.x1, self.k + RECT_EPSILON, self.z1),
         );
         Some(output_box)
+    }
+
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
+        match self.hit(
+            &Ray::new(origin, vector, time),
+            SHADOW_EPSILON,
+            Float::INFINITY,
+            rng,
+        ) {
+            Some(hit_record) => {
+                let area = (self.x1 - self.x0) * (self.z1 - self.z0); // NOTE: should this have an abs()?
+                let distance_squared =
+                    hit_record.distance * hit_record.distance * vector.norm_squared();
+                let cosine = vector.dot(&hit_record.normal).abs() / vector.norm();
+
+                distance_squared / (cosine * area)
+            }
+            None => 0.0,
+        }
+    }
+
+    pub fn random(&self, origin: Vec3, mut rng: ThreadRng) -> Vec3 {
+        let random_point = Vec3::new(
+            rng.gen_range(self.x0, self.x1),
+            self.k,
+            rng.gen_range(self.z0, self.z1),
+        );
+        random_point - origin
     }
 }
 
@@ -188,7 +216,7 @@ impl YZRect {
             z0,
             z1,
             k,
-            material: material,
+            material,
         })
     }
 
@@ -222,7 +250,7 @@ impl YZRect {
             front_face: false, // TODO: fix having to declare it before calling face_normal
         };
         record.set_face_normal(ray, outward_normal);
-        return Some(record);
+        Some(record)
     }
     pub fn bounding_box(
         &self,

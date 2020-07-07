@@ -3,14 +3,13 @@ use crate::{
     camera::Camera,
     color::Color,
     hitable::HitableList,
-    materials::{DiffuseLight, Lambertian, Metal},
-    objects::{Boxy, FlipFace, RotateY, Translate},
+    materials::{Dielectric, DiffuseLight, Lambertian},
+    objects::{Boxy, FlipFace},
     objects::{XYRect, XZRect, YZRect},
     textures::SolidColor,
     Float, Vec3,
 };
 use rand::prelude::*;
-use std::sync::Arc;
 
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
@@ -34,28 +33,13 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     world.add(XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
     world.add(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
 
-    // Boxes
-
-    let aluminum = Metal::new(SolidColor::new(Color::new(0.8, 0.85, 0.88)), 0.0);
-    let box1 = Arc::new(Boxy::new(
-        Vec3::new(0.0, 0.0, 0.0),
-        Vec3::new(165.0, 330.0, 165.0),
-        aluminum,
-    ));
-
-    let box1 = RotateY::new(box1, 15.0);
-    let box1 = Translate::new(Arc::new(box1), Vec3::new(265.0, 0.0, 295.0));
-    world.add(box1);
-
-    let box2 = Arc::new(Boxy::new(
-        Vec3::new(0.0, 0.0, 0.0),
-        Vec3::new(165.0, 165.0, 165.0),
-        white,
-    ));
-
-    let box2 = RotateY::new(box2, -18.0);
-    let box2 = Translate::new(Arc::new(box2), Vec3::new(130.0, 0.0, 65.0));
-    world.add(box2);
+    // glass cube
+    let cube = Boxy::new(
+        Vec3::new(178.0, 178.0, 178.0),
+        Vec3::new(378.0, 378.0, 378.0),
+        Dielectric::new(1.5),
+    );
+    world.add(cube);
 
     let camera_position: Vec3 = Vec3::new(278.0, 278.0, -800.0);
     let camera_target: Vec3 = Vec3::new(278.0, 278.0, 0.0);

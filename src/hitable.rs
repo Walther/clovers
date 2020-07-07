@@ -1,7 +1,8 @@
 use crate::{
     materials::Material,
     objects::{
-        Boxy, ConstantMedium, MovingSphere, RotateY, Sphere, Translate, XYRect, XZRect, YZRect,
+        Boxy, ConstantMedium, FlipFace, MovingSphere, RotateY, Sphere, Translate, XYRect, XZRect,
+        YZRect,
     },
     Float, Ray, Vec3,
 };
@@ -51,6 +52,7 @@ pub enum Hitable {
     Translate(Translate),
     BVHNode(BVHNode),
     HitableList(HitableList),
+    FlipFace(FlipFace),
 }
 
 impl Hitable {
@@ -73,6 +75,7 @@ impl Hitable {
             Hitable::Translate(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::BVHNode(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::HitableList(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::FlipFace(h) => h.hit(ray, distance_min, distance_max, rng),
         }
     }
 
@@ -89,6 +92,32 @@ impl Hitable {
             Hitable::Translate(h) => h.bounding_box(t0, t1),
             Hitable::BVHNode(h) => h.bounding_box(t0, t1),
             Hitable::HitableList(h) => h.bounding_box(t0, t1),
+            Hitable::FlipFace(h) => h.bounding_box(t0, t1),
+        }
+    }
+
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
+        match self {
+            Hitable::XZRect(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
+            _ => 0.0,
+        }
+    }
+
+    pub fn random(&self, origin: Vec3, rng: ThreadRng) -> Vec3 {
+        match self {
+            Hitable::XZRect(h) => h.random(origin, rng),
+            Hitable::HitableList(h) => h.random(origin, rng),
+            Hitable::Sphere(h) => h.random(origin, rng),
+            _ => Vec3::new(1.0, 0.0, 0.0),
+        }
+    }
+
+    pub fn add(&mut self, object: Hitable) {
+        match self {
+            Hitable::HitableList(h) => h.add(object),
+            _ => panic!("Cannot add to other types of Hitable"),
         }
     }
 }
@@ -153,7 +182,22 @@ impl HitableList {
             }
         }
 
-        return output_box;
+        output_box
+    }
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
+        let weight = 1.0 / self.0.len() as Float;
+        let mut sum = 0.0;
+
+        self.0.iter().for_each(|object| {
+            sum += weight * object.pdf_value(origin, vector, time, rng);
+        });
+
+        sum
+    }
+
+    pub fn random(&self, origin: Vec3, mut rng: ThreadRng) -> Vec3 {
+        let int_size = self.0.len();
+        self.0[rng.gen_range(0, int_size)].random(origin, rng)
     }
 
     pub fn new() -> HitableList {
@@ -167,6 +211,11 @@ impl HitableList {
     pub fn into_bvh(self, time_0: Float, time_1: Float, rng: ThreadRng) -> Hitable {
         let bvh_node = BVHNode::from_list(self.0, time_0, time_1, rng);
         Hitable::BVHNode(bvh_node)
+    }
+
+    // TODO: fixme, silly
+    pub fn into_hitable(self) -> Hitable {
+        Hitable::HitableList(self)
     }
 }
 
@@ -196,7 +245,7 @@ impl AABB {
                 return false;
             }
         }
-        return true;
+        true
     }
 
     pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
@@ -314,20 +363,20 @@ impl BVHNode {
                             // Both hit
                             Some(right) => {
                                 if left.distance < right.distance {
-                                    return hit_left;
+                                    hit_left
                                 } else {
-                                    return hit_right;
+                                    hit_right
                                 }
                             }
                             // Left hit
-                            None => return hit_left,
+                            None => hit_left,
                         }
                     }
                     None => match &hit_right {
                         // Right hit
-                        Some(_right) => return hit_right,
+                        Some(_right) => hit_right,
                         // Neither hit
-                        None => return None,
+                        None => None,
                     },
                 }
             }
@@ -344,13 +393,11 @@ fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
 
     if box_a.is_none() || box_b.is_none() {
         panic!("No bounding box in BVHNode constructor.")
+    } else if box_a.unwrap().min[axis] < box_b.unwrap().min[axis] {
+        Ordering::Less
     } else {
-        if box_a.unwrap().min[axis] < box_b.unwrap().min[axis] {
-            Ordering::Less
-        } else {
-            // Default to greater, even if equal
-            Ordering::Greater
-        }
+        // Default to greater, even if equal
+        Ordering::Greater
     }
 }
 

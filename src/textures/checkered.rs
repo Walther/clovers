@@ -26,10 +26,10 @@ impl Checkered {
             * (self.density * position.z).sin();
         if sines < 0.0 {
             // return odd.color(u, v, position); TODO:
-            return self.odd;
+            self.odd
         } else {
             // return even.color(u, v, position); TODO:
-            return self.even;
+            self.even
         }
     }
 }

@@ -20,16 +20,14 @@ fn perlin_generate_perm(rng: ThreadRng) -> [usize; 256] {
     }
     permute(&mut perm, rng);
 
-    return perm;
+    perm
 }
 
 fn permute(p: &mut [usize; 256], mut rng: ThreadRng) {
     // For some reason the tutorial wants the reverse loop
     for i in (1..256).rev() {
         let target: usize = rng.gen_range(0, i);
-        let tmp: usize = p[i];
-        p[i] = p[target];
-        p[target] = tmp;
+        p.swap(i, target);
     }
 }
 
@@ -53,7 +51,7 @@ fn perlin_interp(c: [[[Vec3; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Float 
             }
         }
     }
-    return accum;
+    accum
 }
 
 impl Perlin {
@@ -108,7 +106,7 @@ impl Perlin {
                 }
             }
         }
-        return perlin_interp(c, u, v, w);
+        perlin_interp(c, u, v, w)
     }
 
     pub fn turbulence(&self, position: Vec3, depth: usize) -> Float {
@@ -122,7 +120,7 @@ impl Perlin {
             temp_p *= 2.0;
         }
 
-        return accum.abs();
+        accum.abs()
     }
 }
 

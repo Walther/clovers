@@ -96,7 +96,7 @@ impl RotateY {
 
         match self.object.hit(&rotated_r, distance_min, distance_max, rng) {
             // Did not hit rotated object, return None
-            None => return None,
+            None => None,
             // Hit the rotated object
             Some(hit_record) => {
                 // Determine where the intersection is
@@ -125,7 +125,7 @@ impl RotateY {
                     front_face: false, // TODO: fix having to declare it before calling face_normal
                 };
                 record.set_face_normal(&rotated_r, normal);
-                return Some(record);
+                Some(record)
             }
         }
     }
