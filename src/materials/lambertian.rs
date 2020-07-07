@@ -45,9 +45,9 @@ impl Lambertian {
     ) -> Float {
         let cosine = hit_record.normal.dot(&scattered.direction.normalize());
         if cosine < 0.0 {
-            return 0.0;
+            0.0
         } else {
-            return cosine / PI;
+            cosine / PI
         }
     }
 

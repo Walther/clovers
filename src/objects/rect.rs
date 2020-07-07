@@ -34,7 +34,7 @@ impl XYRect {
             y0,
             y1,
             k,
-            material: material,
+            material,
         })
     }
 
@@ -68,7 +68,7 @@ impl XYRect {
             front_face: false, // TODO: fix having to declare it before calling face_normal
         };
         record.set_face_normal(ray, outward_normal);
-        return Some(record);
+        Some(record)
     }
     pub fn bounding_box(
         &self,
@@ -111,7 +111,7 @@ impl XZRect {
             z0,
             z1,
             k,
-            material: material,
+            material,
         })
     }
 
@@ -145,7 +145,7 @@ impl XZRect {
             front_face: false, // TODO: fix having to declare it before calling face_normal
         };
         record.set_face_normal(ray, outward_normal);
-        return Some(record);
+        Some(record)
     }
     pub fn bounding_box(
         &self,
@@ -173,7 +173,7 @@ impl XZRect {
                     hit_record.distance * hit_record.distance * vector.norm_squared();
                 let cosine = vector.dot(&hit_record.normal).abs() / vector.norm();
 
-                return distance_squared / (cosine * area);
+                distance_squared / (cosine * area)
             }
             None => 0.0,
         }
@@ -185,7 +185,7 @@ impl XZRect {
             self.k,
             rng.gen_range(self.z0, self.z1),
         );
-        return random_point - origin;
+        random_point - origin
     }
 }
 
@@ -216,7 +216,7 @@ impl YZRect {
             z0,
             z1,
             k,
-            material: material,
+            material,
         })
     }
 
@@ -250,7 +250,7 @@ impl YZRect {
             front_face: false, // TODO: fix having to declare it before calling face_normal
         };
         record.set_face_normal(ray, outward_normal);
-        return Some(record);
+        Some(record)
     }
     pub fn bounding_box(
         &self,

@@ -29,32 +29,32 @@ impl Dielectric {
         if etai_over_etat * sin_theta > 1.0 {
             let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
             specular_ray = Ray::new(hit_record.position, reflected, ray.time);
-            return Some(ScatterRecord {
+            Some(ScatterRecord {
                 material_type: MaterialType::Specular,
                 specular_ray: Some(specular_ray),
                 attenuation: albedo,
                 pdf_ptr: ZeroPDF::new(), //TODO: ugly hack due to nullptr in original tutorial
-            });
+            })
         } else {
             let reflect_probability: Float = schlick(cos_theta, etai_over_etat);
             if rng.gen::<Float>() < reflect_probability {
                 let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
                 specular_ray = Ray::new(hit_record.position, reflected, ray.time);
-                return Some(ScatterRecord {
+                Some(ScatterRecord {
                     material_type: MaterialType::Specular,
                     specular_ray: Some(specular_ray),
                     attenuation: albedo,
                     pdf_ptr: ZeroPDF::new(), //TODO: ugly hack due to nullptr in original tutorial
-                });
+                })
             } else {
                 let refracted: Vec3 = refract(unit_direction, hit_record.normal, etai_over_etat);
                 specular_ray = Ray::new(hit_record.position, refracted, ray.time);
-                return Some(ScatterRecord {
+                Some(ScatterRecord {
                     material_type: MaterialType::Specular,
                     specular_ray: Some(specular_ray),
                     attenuation: albedo,
                     pdf_ptr: ZeroPDF::new(), //TODO: ugly hack due to nullptr in original tutorial
-                });
+                })
             }
         }
     }

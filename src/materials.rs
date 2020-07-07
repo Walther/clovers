@@ -93,7 +93,7 @@ fn refract(uv: Vec3, normal: Vec3, etai_over_etat: Float) -> Vec3 {
     let cos_theta: Float = -uv.dot(&normal);
     let r_out_parallel: Vec3 = etai_over_etat * (uv + cos_theta * normal);
     let r_out_perp: Vec3 = -(1.0 - r_out_parallel.norm_squared()).sqrt() * normal;
-    return r_out_parallel + r_out_perp;
+    r_out_parallel + r_out_perp
 }
 
 fn schlick(cosine: Float, refractive_index: Float) -> Float {

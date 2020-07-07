@@ -112,7 +112,7 @@ impl Sphere {
                 .sqrt();
                 let solid_angle = 2.0 * PI * (1.0 - cos_theta_max);
 
-                return 1.0 / solid_angle;
+                1.0 / solid_angle
             }
         }
     }
@@ -121,6 +121,6 @@ impl Sphere {
         let direction: Vec3 = self.center - origin;
         let distance_squared: Float = direction.norm_squared();
         let uvw = ONB::build_from_w(direction);
-        return uvw.local(random_to_sphere(self.radius, distance_squared, rng));
+        uvw.local(random_to_sphere(self.radius, distance_squared, rng))
     }
 }

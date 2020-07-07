@@ -50,7 +50,7 @@ pub fn colorize(
                     match scatter_record.material_type {
                         // If we hit a specular, return a specular ray
                         crate::materials::MaterialType::Specular => {
-                            return scatter_record.attenuation
+                            scatter_record.attenuation
                                 * colorize(
                                     &scatter_record.specular_ray.unwrap(), // should always have a ray at this point
                                     background_color,
@@ -59,7 +59,7 @@ pub fn colorize(
                                     depth + 1,
                                     max_depth,
                                     rng,
-                                );
+                                )
                         }
                         crate::materials::MaterialType::Diffuse => {
                             // Use a probability density function to figure out where to scatter a new ray
@@ -83,7 +83,7 @@ pub fn colorize(
                             );
 
                             // Blend it all together
-                            return emitted
+                            emitted
                                 + scatter_record.attenuation
                                     * hit_record.material.scattering_pdf(
                                         ray,
@@ -92,7 +92,7 @@ pub fn colorize(
                                         rng,
                                     )
                                     * recurse
-                                    / pdf_val;
+                                    / pdf_val
                         }
                     }
                 }

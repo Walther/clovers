@@ -101,7 +101,7 @@ impl Hitable {
             Hitable::XZRect(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
-            _ => return 0.0,
+            _ => 0.0,
         }
     }
 
@@ -110,7 +110,7 @@ impl Hitable {
             Hitable::XZRect(h) => h.random(origin, rng),
             Hitable::HitableList(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
-            _ => return Vec3::new(1.0, 0.0, 0.0),
+            _ => Vec3::new(1.0, 0.0, 0.0),
         }
     }
 
@@ -182,7 +182,7 @@ impl HitableList {
             }
         }
 
-        return output_box;
+        output_box
     }
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
         let weight = 1.0 / self.0.len() as Float;
@@ -192,12 +192,12 @@ impl HitableList {
             sum += weight * object.pdf_value(origin, vector, time, rng);
         });
 
-        return sum;
+        sum
     }
 
     pub fn random(&self, origin: Vec3, mut rng: ThreadRng) -> Vec3 {
         let int_size = self.0.len();
-        return self.0[rng.gen_range(0, int_size)].random(origin, rng);
+        self.0[rng.gen_range(0, int_size)].random(origin, rng)
     }
 
     pub fn new() -> HitableList {
@@ -245,7 +245,7 @@ impl AABB {
                 return false;
             }
         }
-        return true;
+        true
     }
 
     pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
@@ -363,20 +363,20 @@ impl BVHNode {
                             // Both hit
                             Some(right) => {
                                 if left.distance < right.distance {
-                                    return hit_left;
+                                    hit_left
                                 } else {
-                                    return hit_right;
+                                    hit_right
                                 }
                             }
                             // Left hit
-                            None => return hit_left,
+                            None => hit_left,
                         }
                     }
                     None => match &hit_right {
                         // Right hit
-                        Some(_right) => return hit_right,
+                        Some(_right) => hit_right,
                         // Neither hit
-                        None => return None,
+                        None => None,
                     },
                 }
             }
@@ -393,13 +393,11 @@ fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
 
     if box_a.is_none() || box_b.is_none() {
         panic!("No bounding box in BVHNode constructor.")
+    } else if box_a.unwrap().min[axis] < box_b.unwrap().min[axis] {
+        Ordering::Less
     } else {
-        if box_a.unwrap().min[axis] < box_b.unwrap().min[axis] {
-            Ordering::Less
-        } else {
-            // Default to greater, even if equal
-            Ordering::Greater
-        }
+        // Default to greater, even if equal
+        Ordering::Greater
     }
 }
 

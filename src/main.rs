@@ -77,7 +77,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let rays: u64 =
         opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
     println!("approx. rays: {}", rays);
-    println!(""); // Empty line before progress bar
+    println!(); // Empty line before progress bar
 
     if opts.gui {
         if cfg!(feature = "gui") {
@@ -101,7 +101,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     )?; // Note: live progress bar printed within draw
     let duration = Instant::now() - start;
 
-    println!(""); // Empty line after progress bar
+    println!(); // Empty line after progress bar
     println!("finished render in {}", format_duration(duration));
 
     // Timestamp & write

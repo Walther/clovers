@@ -44,7 +44,7 @@ impl Metal {
 
     pub fn new(albedo: Texture, fuzz: Float) -> Material {
         Material::Metal(Metal {
-            albedo: albedo,
+            albedo,
             fuzz: fuzz.min(1.0),
         })
     }

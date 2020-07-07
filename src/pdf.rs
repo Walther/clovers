@@ -90,8 +90,8 @@ impl MixturePDF {
     }
 
     pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
-        return 0.5 * self.pdf1.value(direction, time, rng)
-            + 0.5 * self.pdf2.value(direction, time, rng);
+        0.5 * self.pdf1.value(direction, time, rng)
+            + 0.5 * self.pdf2.value(direction, time, rng)
     }
 
     pub fn generate(&self, mut rng: ThreadRng) -> Vec3 {

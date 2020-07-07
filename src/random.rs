@@ -17,7 +17,7 @@ pub fn random_unit_vector(mut rng: ThreadRng) -> Vec3 {
     let a: Float = rng.gen_range(0.0, 2.0 * PI);
     let z: Float = rng.gen_range(-1.0, 1.0);
     let r: Float = (1.0 - z * z).sqrt();
-    return Vec3::new(r * a.cos(), r * a.sin(), z);
+    Vec3::new(r * a.cos(), r * a.sin(), z)
 }
 
 /// Internal helper.
@@ -42,7 +42,7 @@ pub fn random_cosine_direction(mut rng: ThreadRng) -> Vec3 {
     let x = phi.cos() * r2.sqrt();
     let y = phi.sin() * r2.sqrt();
 
-    return Vec3::new(x, y, z);
+    Vec3::new(x, y, z)
 }
 
 /// Internal helper.
@@ -55,5 +55,5 @@ pub fn random_to_sphere(radius: Float, distance_squared: Float, mut rng: ThreadR
     let x = phi.cos() * (1.0 - z * z).sqrt();
     let y = phi.sin() * (1.0 - z * z).sqrt();
 
-    return Vec3::new(x, y, z);
+    Vec3::new(x, y, z)
 }

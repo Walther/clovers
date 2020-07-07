@@ -45,7 +45,7 @@ impl Boxy {
         Hitable::Boxy(Boxy {
             corner_0,
             corner_1,
-            sides: Arc::new(HitableList::from(sides)),
+            sides: Arc::new(sides),
             material,
         })
     }
