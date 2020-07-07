@@ -9,7 +9,7 @@ use nalgebra::Vector3;
 use chrono::Utc;
 use humantime::format_duration;
 
-use std::{error::Error, time::Instant};
+use std::{error::Error, fs, time::Instant};
 
 use clap::Clap;
 
@@ -46,6 +46,9 @@ const CONSTANT_MEDIUM_EPSILON: Float = 0.0001;
 #[derive(Clap)]
 #[clap(version = "0.1.0", author = "Walther")]
 struct Opts {
+    /// Output filename / location. [default: renders/timestamp.png]
+    #[clap(short, long)]
+    output: Option<String>,
     /// Width of the image in pixels
     #[clap(short, long, default_value = "1024")]
     width: u32,
@@ -104,9 +107,21 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!(); // Empty line after progress bar
     println!("finished render in {}", format_duration(duration));
 
-    // Timestamp & write
-    let timestamp = Utc::now().timestamp();
-    println!("output saved: renders/{}.png", timestamp);
-    img.save(format!("renders/{}.png", timestamp))?;
+    // Write
+    let target: String;
+    match opts.output {
+        Some(filename) => {
+            target = filename;
+        }
+        None => {
+            // Default to using a timestamp & `renders/` directory
+            let timestamp = Utc::now().timestamp();
+            fs::create_dir_all("renders")?;
+            target = format!("renders/{}.png", timestamp);
+        }
+    };
+    img.save(format!("{}", target))?;
+    println!("output saved: {}", target);
+
     Ok(())
 }
