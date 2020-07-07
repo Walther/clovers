@@ -117,7 +117,7 @@ impl Sphere {
         }
     }
 
-    pub fn random(&self, origin: Vec3, mut rng: ThreadRng) -> Vec3 {
+    pub fn random(&self, origin: Vec3, rng: ThreadRng) -> Vec3 {
         let direction: Vec3 = self.center - origin;
         let distance_squared: Float = direction.norm_squared();
         let uvw = ONB::build_from_w(direction);

@@ -11,7 +11,7 @@ use crate::{
 };
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
+
 
 #[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct Lambertian {
@@ -22,9 +22,9 @@ impl Lambertian {
     /// Returns None, if ray is absorbed. Otherwise, returns a ray, albedo of what was hit, and (?) a value used for probability density function based sampling
     pub fn scatter(
         self,
-        ray: &Ray,
+        _ray: &Ray,
         hit_record: &HitRecord,
-        rng: ThreadRng,
+        _rng: ThreadRng,
     ) -> Option<ScatterRecord> {
         Some(ScatterRecord {
             material_type: MaterialType::Diffuse,
@@ -38,10 +38,10 @@ impl Lambertian {
 
     pub fn scattering_pdf(
         self,
-        ray: &Ray,
+        _ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
-        rng: ThreadRng,
+        _rng: ThreadRng,
     ) -> Float {
         let cosine = hit_record.normal.dot(&scattered.direction.normalize());
         if cosine < 0.0 {

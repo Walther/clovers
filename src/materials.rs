@@ -12,7 +12,7 @@ pub use diffuse_light::*;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
-use std::sync::Arc;
+
 
 #[derive(Copy, Clone, Deserialize, Serialize)]
 pub enum Material {

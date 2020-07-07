@@ -39,7 +39,7 @@ impl CosinePDF {
         })
     }
 
-    pub fn value(&self, direction: Vec3, time: Float, mut rng: ThreadRng) -> Float {
+    pub fn value(&self, direction: Vec3, _time: Float, _rng: ThreadRng) -> Float {
         let cosine = direction.normalize().dot(&self.uvw.w);
         if cosine <= 0.0 {
             0.0
@@ -111,11 +111,11 @@ impl ZeroPDF {
         PDF::ZeroPDF(ZeroPDF {})
     }
 
-    pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
+    pub fn value(&self, _direction: Vec3, _time: Float, _rng: ThreadRng) -> Float {
         0.0
     }
 
-    pub fn generate(&self, mut rng: ThreadRng) -> Vec3 {
+    pub fn generate(&self, _rng: ThreadRng) -> Vec3 {
         Vec3::new(1.0, 0.0, 0.0)
     }
 }

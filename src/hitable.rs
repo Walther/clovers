@@ -96,7 +96,7 @@ impl Hitable {
         }
     }
 
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, mut rng: ThreadRng) -> Float {
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
         match self {
             Hitable::XZRect(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),

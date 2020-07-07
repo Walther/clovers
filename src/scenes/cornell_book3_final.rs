@@ -3,7 +3,7 @@ use crate::{
     camera::Camera,
     color::Color,
     hitable::HitableList,
-    materials::{Dielectric, DiffuseLight, Lambertian, Metal},
+    materials::{Dielectric, DiffuseLight, Lambertian},
     objects::{Boxy, FlipFace, RotateY, Sphere, Translate},
     objects::{XYRect, XZRect, YZRect},
     textures::SolidColor,

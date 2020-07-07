@@ -61,10 +61,10 @@ impl Dielectric {
 
     pub fn scattering_pdf(
         self,
-        ray: &Ray,
-        hit_record: &HitRecord,
-        scattered: &Ray,
-        rng: ThreadRng,
+        _ray: &Ray,
+        _hit_record: &HitRecord,
+        _scattered: &Ray,
+        _rng: ThreadRng,
     ) -> Float {
         todo!()
     }

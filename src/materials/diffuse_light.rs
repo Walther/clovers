@@ -20,17 +20,17 @@ impl DiffuseLight {
 
     pub fn scattering_pdf(
         self,
-        ray: &Ray,
-        hit_record: &HitRecord,
-        scattered: &Ray,
-        rng: ThreadRng,
+        _ray: &Ray,
+        _hit_record: &HitRecord,
+        _scattered: &Ray,
+        _rng: ThreadRng,
     ) -> Float {
         0.0 // TODO: cleanup
     }
 
     pub fn emit(
         self,
-        ray: &Ray,
+        _ray: &Ray,
         hit_record: &HitRecord,
         u: Float,
         v: Float,

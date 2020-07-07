@@ -3,7 +3,7 @@ use crate::{
     colorize::colorize,
     hitable::{Hitable, HitableList},
     materials::DiffuseLight,
-    objects::{FlipFace, XZRect},
+    objects::{XZRect},
     scenes::{self, Scene},
     textures::SolidColor,
     Float,

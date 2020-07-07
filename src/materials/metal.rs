@@ -1,6 +1,6 @@
 use super::{reflect, Material, MaterialType, ScatterRecord};
 use crate::{
-    color::Color, hitable::HitRecord, pdf::ZeroPDF, random::random_in_unit_sphere, ray::Ray,
+    hitable::HitRecord, pdf::ZeroPDF, random::random_in_unit_sphere, ray::Ray,
     textures::Texture, Float, Vec3,
 };
 use rand::prelude::ThreadRng;
@@ -34,10 +34,10 @@ impl Metal {
 
     pub fn scattering_pdf(
         self,
-        ray: &Ray,
-        hit_record: &HitRecord,
-        scattered: &Ray,
-        rng: ThreadRng,
+        _ray: &Ray,
+        _hit_record: &HitRecord,
+        _scattered: &Ray,
+        _rng: ThreadRng,
     ) -> Float {
         0.0 // TODO: why does metal scatter 0? No mention in tutorial afaiu
     }
