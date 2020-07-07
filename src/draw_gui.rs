@@ -3,7 +3,7 @@ use crate::{
     colorize::colorize,
     hitable::{Hitable, HitableList},
     materials::DiffuseLight,
-    objects::{XZRect},
+    objects::XZRect,
     scenes::{self, Scene},
     textures::SolidColor,
     Float,
@@ -18,7 +18,7 @@ use pixels::{wgpu::Surface, Error, Pixels, SurfaceTexture};
 use std::sync::Arc;
 #[cfg(feature = "gui")]
 use winit::{
-    dpi::{LogicalSize, PhysicalSize},
+    dpi::PhysicalSize,
     event::{Event, VirtualKeyCode},
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
