@@ -120,7 +120,7 @@ impl World {
         World {
             width,
             height,
-            scene: scenes::cornell_with_boxes::load(width, height, rng),
+            scene: scenes::cornell_book3_final::load(width, height, rng),
             lights,
             float_buffer: vec![0.0; 4 * width as usize * height as usize], // rgba
             bar,
