@@ -1,17 +1,7 @@
 use super::{Material, MaterialType, ScatterRecord};
-use crate::{
-    color::Color,
-    hitable::HitRecord,
-    onb::ONB,
-    pdf::CosinePDF,
-    random::{random_cosine_direction, random_unit_vector},
-    ray::Ray,
-    textures::Texture,
-    Float, Vec3, PI,
-};
+use crate::{hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI};
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
-
 
 #[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct Lambertian {

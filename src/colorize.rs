@@ -1,12 +1,9 @@
 use crate::{
     color::Color,
-    hitable::{Hitable, HitableList},
-    materials::{DiffuseLight, Lambertian},
-    objects::XZRect,
-    pdf::{CosinePDF, HitablePDF, MixturePDF},
+    hitable::Hitable,
+    pdf::{HitablePDF, MixturePDF},
     ray::Ray,
-    textures::SolidColor,
-    Float, Vec3, SHADOW_EPSILON,
+    Float, SHADOW_EPSILON,
 };
 use rand::prelude::*;
 use std::sync::Arc;
