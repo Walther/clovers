@@ -4,10 +4,8 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::*;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-#[derive(Deserialize, Serialize)]
 pub struct RotateY {
     object: Arc<Hitable>,
     sin_theta: Float,

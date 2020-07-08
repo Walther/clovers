@@ -1,5 +1,3 @@
-use serde::{Deserialize, Serialize};
-
 pub mod checkered;
 pub mod noise_texture;
 pub mod solid_color;
@@ -11,7 +9,7 @@ pub use solid_color::*;
 use crate::{color::Color, Float, Vec3};
 use noise_texture::NoiseTexture;
 
-#[derive(Copy, Clone, Deserialize, Serialize)]
+#[derive(Copy, Clone)]
 pub enum Texture {
     Checkered(Checkered),
     SolidColor(SolidColor),

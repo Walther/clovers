@@ -1,9 +1,8 @@
 use super::{Material, MaterialType, ScatterRecord};
 use crate::{hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI};
 use rand::prelude::ThreadRng;
-use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, Deserialize, Serialize)]
+#[derive(Copy, Clone)]
 pub struct Lambertian {
     albedo: Texture,
 }

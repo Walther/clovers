@@ -2,45 +2,20 @@
 // A lot of loader functions etc, suppresses some warning noise
 #![allow(dead_code)]
 
-use rand::prelude::*;
-
-use nalgebra::Vector3;
-
+// External imports
 use chrono::Utc;
+use clap::Clap;
 use humantime::format_duration;
-
 use std::{error::Error, fs, time::Instant};
 
-use clap::Clap;
-
-mod hitable;
-mod objects;
-mod ray;
-use ray::Ray;
-mod camera;
-mod color;
-mod colorize;
+// Internal imports
+use clovers::*;
 mod draw;
-mod draw_gui;
-mod materials;
-mod scenes;
 use draw::draw;
-mod onb;
-mod pdf;
-mod perlin;
-mod random;
-mod textures;
-
+#[cfg(feature = "gui")]
+mod draw_gui;
 #[cfg(feature = "gui")]
 use draw_gui::draw_gui;
-
-// Handy aliases for internal use
-type Float = f32;
-pub const PI: Float = std::f32::consts::PI as Float;
-type Vec3 = Vector3<Float>;
-const SHADOW_EPSILON: Float = 0.001;
-const RECT_EPSILON: Float = 0.0001;
-const CONSTANT_MEDIUM_EPSILON: Float = 0.0001;
 
 // Configure CLI parameters
 #[derive(Clap)]
@@ -70,6 +45,7 @@ struct Opts {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    #[cfg(feature = "cli")]
     let opts: Opts = Opts::parse();
 
     println!("clovers 🍀    ray tracing in rust 🦀");
