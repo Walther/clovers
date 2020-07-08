@@ -1,11 +1,8 @@
-use serde::{Deserialize, Serialize};
-
-use crate::{Float, ThreadRng, Vec3};
-use image::Rgb;
+use crate::{Float, Vec3};
 use rand::prelude::*;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 
-#[derive(Copy, Clone, Deserialize, Serialize)]
+#[derive(Copy, Clone)]
 pub struct Color {
     pub r: Float,
     pub g: Float,
@@ -44,7 +41,7 @@ impl Color {
         }
     }
 
-    pub fn to_rgb_u8(&self) -> Rgb<u8> {
+    pub fn to_rgb_u8(&self) -> [u8; 3] {
         // TODO: might be possible to optimize
         let mut r = self.r;
         let mut g = self.g;
@@ -67,7 +64,7 @@ impl Color {
         let r = (255.99 * r).floor() as u8;
         let g = (255.99 * g).floor() as u8;
         let b = (255.99 * b).floor() as u8;
-        Rgb([r, g, b])
+        [r, g, b]
     }
 }
 

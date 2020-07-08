@@ -5,9 +5,7 @@ use crate::{
     Float, Ray, Vec3, PI,
 };
 use rand::prelude::*;
-use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize)]
 pub struct MovingSphere {
     center_0: Vec3,
     center_1: Vec3,
@@ -37,8 +35,7 @@ impl MovingSphere {
     }
     pub fn center(&self, time: Float) -> Vec3 {
         self.center_0
-            + ((time - self.time_0) / (self.time_1 - self.time_0))
-                * (self.center_1 - self.center_0)
+            + ((time - self.time_0) / (self.time_1 - self.time_0)) * (self.center_1 - self.center_0)
     }
 
     // Returns the U,V surface coordinates of a hitpoint

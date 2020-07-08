@@ -4,10 +4,8 @@ use crate::{
     Float,
 };
 use rand::prelude::*;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-#[derive(Deserialize, Serialize)]
 pub struct FlipFace {
     object: Arc<Hitable>,
 }

@@ -1,12 +1,11 @@
 use super::{reflect, Material, MaterialType, ScatterRecord};
 use crate::{
-    hitable::HitRecord, pdf::ZeroPDF, random::random_in_unit_sphere, ray::Ray,
-    textures::Texture, Float, Vec3,
+    hitable::HitRecord, pdf::ZeroPDF, random::random_in_unit_sphere, ray::Ray, textures::Texture,
+    Float, Vec3,
 };
 use rand::prelude::ThreadRng;
-use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, Deserialize, Serialize)]
+#[derive(Copy, Clone)]
 pub struct Metal {
     albedo: Texture,
     fuzz: Float,

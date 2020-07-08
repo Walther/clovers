@@ -9,7 +9,7 @@ use crate::{
     textures::SolidColor,
     Float, Vec3,
 };
-use image::{ImageBuffer, ImageResult, RgbImage};
+use image::{ImageBuffer, ImageResult, Rgb, RgbImage};
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
 use rayon::prelude::*;
@@ -74,7 +74,7 @@ pub fn draw(
             color /= samples as Float;
 
             color = color.gamma_correction(gamma);
-            *pixel = color.to_rgb_u8();
+            *pixel = Rgb(color.to_rgb_u8());
 
             bar.inc(1);
         });

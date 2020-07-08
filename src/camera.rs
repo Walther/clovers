@@ -1,8 +1,6 @@
 use crate::{random::random_in_unit_disk, Float, Ray, Vec3, PI};
 use rand::prelude::*;
-use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize)]
 pub struct Camera {
     pub lower_left_corner: Vec3,
     pub horizontal: Vec3,

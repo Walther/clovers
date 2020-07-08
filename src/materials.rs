@@ -1,6 +1,4 @@
-use serde::{Deserialize, Serialize};
-
-use crate::{color::Color, hitable::HitRecord, pdf::PDF, Float, Ray, ThreadRng, Vec3};
+use crate::{color::Color, hitable::HitRecord, pdf::PDF, Float, Ray, Vec3};
 pub mod dielectric;
 pub mod diffuse_light;
 pub mod isotropic;
@@ -12,9 +10,9 @@ pub use diffuse_light::*;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
+use rand::prelude::ThreadRng;
 
-
-#[derive(Copy, Clone, Deserialize, Serialize)]
+#[derive(Copy, Clone)]
 pub enum Material {
     Dielectric(Dielectric),
     Lambertian(Lambertian),

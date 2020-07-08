@@ -4,10 +4,8 @@ use crate::{
     Vec3,
 };
 use rand::prelude::*;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-#[derive(Deserialize, Serialize)]
 pub struct Translate {
     object: Arc<Hitable>,
     offset: Vec3,
@@ -46,9 +44,7 @@ impl Translate {
         let object_bounding_box = self.object.bounding_box(t0, t1);
         match object_bounding_box {
             Some(aabb) => Some(AABB::new(aabb.min + self.offset, aabb.max + self.offset)),
-            None => {
-                None
-            }
+            None => None,
         }
     }
 }
