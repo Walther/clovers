@@ -6,6 +6,7 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 // Avoid keyword clash

@@ -1,5 +1,7 @@
 use crate::{Float, Vec3};
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 
 // TODO: This might be currently oddly broken and resulting in overflowy surfaces
 
@@ -10,6 +12,16 @@ pub struct Perlin {
     perm_x: [usize; 256],
     perm_y: [usize; 256],
     perm_z: [usize; 256],
+}
+
+impl Debug for Perlin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("perlin object")
+            .field("random_vectors", &"[]")
+            .field("perm_y", &"[]")
+            .field("perm_z", &"[]")
+            .finish()
+    }
 }
 
 fn perlin_generate_perm(rng: ThreadRng) -> [usize; 256] {

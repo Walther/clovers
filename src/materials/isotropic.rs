@@ -4,8 +4,8 @@ use crate::{
     Float,
 };
 use rand::prelude::ThreadRng;
-
-#[derive(Copy, Clone)]
+use serde::{Deserialize, Serialize};
+#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 pub struct Isotropic {
     albedo: Texture,
 }

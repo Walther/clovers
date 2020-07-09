@@ -1,7 +1,8 @@
 use super::Texture;
 use crate::{color::Color, Float, Vec3};
+use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Deserialize, Serialize, Debug)]
 pub struct Checkered {
     // TODO: get recursive textures back, maybe?
     even: Color,

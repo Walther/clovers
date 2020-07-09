@@ -11,8 +11,8 @@ pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
 use rand::prelude::ThreadRng;
-
-#[derive(Copy, Clone)]
+use serde::{Deserialize, Serialize};
+#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 pub enum Material {
     Dielectric(Dielectric),
     Lambertian(Lambertian),

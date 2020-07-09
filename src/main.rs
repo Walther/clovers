@@ -6,6 +6,10 @@
 use chrono::Utc;
 use clap::Clap;
 use humantime::format_duration;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::fs::File;
+use std::io::prelude::*;
 use std::{error::Error, fs, time::Instant};
 
 // Internal imports
@@ -14,8 +18,13 @@ mod draw;
 use draw::draw;
 #[cfg(feature = "gui")]
 mod draw_gui;
+use camera::{Camera, CameraInit};
+use color::Color;
 #[cfg(feature = "gui")]
 use draw_gui::draw_gui;
+use hitable::Hitable;
+use objects::XZRect;
+use textures::Texture;
 
 // Configure CLI parameters
 #[derive(Clap)]
@@ -68,6 +77,32 @@ fn main() -> Result<(), Box<dyn Error>> {
             return Ok(());
         }
     }
+
+    // TODO: temporary let's try this serde thing out
+    #[derive(Serialize, Deserialize, Debug)]
+    struct SceneFile {
+        background_color: Color,
+        camera: CameraInit,
+        objects: Vec<XZRect>,
+    }
+    let mut file = File::open("scenes/scene.json")?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+    let scene: SceneFile = serde_json::from_str(&contents)?;
+    let camera = Camera::new(
+        scene.camera.look_from,
+        scene.camera.look_at,
+        scene.camera.up,
+        scene.camera.vertical_fov,
+        opts.width as Float / opts.height as Float,
+        scene.camera.aperture,
+        scene.camera.focus_distance,
+        scene.camera.time_0,
+        scene.camera.time_1,
+    );
+    dbg!(&scene.objects);
+    return Ok(());
+    // TODO: temp early return
 
     // png writing version
     let start = Instant::now();

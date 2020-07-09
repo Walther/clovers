@@ -5,7 +5,8 @@ use crate::{
     Float, Ray, Vec3, PI,
 };
 use rand::prelude::*;
-
+use serde::{Deserialize, Serialize};
+#[derive(Deserialize, Serialize, Debug)]
 pub struct MovingSphere {
     center_0: Vec3,
     center_1: Vec3,

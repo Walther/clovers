@@ -1,0 +1,51 @@
+{
+  "camera": {
+    "look_from": [
+      278.0,
+      278.0,
+      -800.0
+    ],
+    "look_at": [
+      278.0,
+      278.0,
+      0.0
+    ],
+    "up": [
+      0.0,
+      1.0,
+      0.0
+    ],
+    "vertical_fov": 40.0,
+    "aperture": 0.0,
+    "focus_distance": 10.0,
+    "time_0": 0.0,
+    "time_1": 0.0
+  },
+  "background_color": [
+    1.0,
+    0.8,
+    0.2
+  ],
+  "objects": [
+    {
+      "x0": 0.0,
+      "x1": 555.0,
+      "z0": 0.0,
+      "z1": 555.0,
+      "k": 0.0,
+      "material": {
+        "Lambertian": {
+          "albedo": {
+            "SolidColor": {
+              "color": [
+                0.73,
+                0.73,
+                0.73
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

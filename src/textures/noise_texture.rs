@@ -1,9 +1,11 @@
 use super::Texture;
 use crate::{color::Color, perlin::Perlin, Float, Vec3};
+use serde::{Deserialize, Serialize};
 
 // TODO: This might be currently oddly broken and resulting in overflowy surfaces
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Deserialize, Serialize, Debug)]
 pub struct NoiseTexture {
+    #[serde(skip)]
     noise: Perlin,
     scale: Float,
 }
