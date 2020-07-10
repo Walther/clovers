@@ -90,16 +90,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
-    // TODO: temporary priority lights
-    let small_light = DiffuseLight::new(SolidColor::new(Color::new(15.0, 15.0, 15.0)));
-    let small_light_obj = XZRect::new(213.0, 343.0, 227.0, 332.0, 554.0, small_light);
-    let sphere = Sphere::new(Vec3::new(190.0, 90.0, 190.0), 90.0, Dielectric::new(1.5));
-    let mut lights = HitableList::new();
-    lights.add(small_light_obj);
-    lights.add(sphere);
-    let lights = lights.into_hitable(); // TODO: fixme, silly
-    let lights = Arc::new(lights);
-
     // TODO: temporary let's try this serde thing out
     #[derive(Serialize, Deserialize, Debug)]
     struct SceneFile {
@@ -108,31 +98,39 @@ fn main() -> Result<(), Box<dyn Error>> {
         background_color: Color,
         camera: CameraInit,
         objects: Vec<Object>,
+        priority_objects: Vec<Object>,
     }
     let mut file = File::open("scenes/scene.json")?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
-    let scene: SceneFile = serde_json::from_str(&contents)?;
-    let time_0 = scene.time_0;
-    let time_1 = scene.time_1;
+    let scene_file: SceneFile = serde_json::from_str(&contents)?;
+    let time_0 = scene_file.time_0;
+    let time_1 = scene_file.time_1;
     let rng = rand::thread_rng();
-    let background_color = scene.background_color;
+    let background_color = scene_file.background_color;
     let camera = Camera::new(
-        scene.camera.look_from,
-        scene.camera.look_at,
-        scene.camera.up,
-        scene.camera.vertical_fov,
+        scene_file.camera.look_from,
+        scene_file.camera.look_at,
+        scene_file.camera.up,
+        scene_file.camera.vertical_fov,
         opts.width as Float / opts.height as Float,
-        scene.camera.aperture,
-        scene.camera.focus_distance,
+        scene_file.camera.aperture,
+        scene_file.camera.focus_distance,
         time_0,
         time_1,
     );
     let mut hitables = HitableList::new();
-    for obj in scene.objects {
+    for obj in scene_file.objects {
         hitables.add(obj.into());
     }
     let scene = Scene::new(hitables, camera, time_0, time_1, background_color, rng);
+
+    let mut priority_objects = HitableList::new();
+    for obj in scene_file.priority_objects {
+        priority_objects.add(obj.into());
+    }
+    let priority_objects = priority_objects.into_hitable();
+    let priority_objects = Arc::new(priority_objects);
 
     // gui version
     if opts.gui {
@@ -145,7 +143,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 opts.max_depth,
                 opts.gamma,
                 scene,
-                lights,
+                priority_objects,
             );
             return Ok(());
         } else {
@@ -163,7 +161,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         opts.max_depth,
         opts.gamma,
         scene,
-        lights,
+        priority_objects,
     )?; // Note: live progress bar printed within draw
     let duration = Instant::now() - start;
 

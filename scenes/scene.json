@@ -174,5 +174,44 @@
         }
       }
     }
+  ],
+  "priority_objects": [
+    {
+      "XZRect": {
+        "x0": 213.0,
+        "x1": 343.0,
+        "z0": 227.0,
+        "z1": 332.0,
+        "k": 554.0,
+        "material": {
+          "DiffuseLight": {
+            "emit": {
+              "SolidColor": {
+                "color": [
+                  15.0,
+                  15.0,
+                  15.0
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "Sphere": {
+        "center": [
+          190.0,
+          90.0,
+          190.0
+        ],
+        "radius": 90.0,
+        "material": {
+          "Dielectric": {
+            "refractive_index": 1.5
+          }
+        }
+      }
+    }
   ]
 }
