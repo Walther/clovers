@@ -9,6 +9,14 @@ use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
+/// Used for the scene files etc
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+pub struct BoxyInit {
+    pub corner_0: Vec3,
+    pub corner_1: Vec3,
+    pub material: Material,
+}
+
 // Avoid keyword clash
 pub struct Boxy {
     corner_0: Vec3,

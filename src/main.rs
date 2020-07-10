@@ -24,7 +24,7 @@ use color::Color;
 use draw_gui::draw_gui;
 use hitable::{Hitable, HitableList};
 use materials::{Dielectric, DiffuseLight};
-use objects::{FlipFace, Sphere, XYRect, XZRect, YZRect};
+use objects::{Boxy, BoxyInit, FlipFace, RotateY, Sphere, Translate, XYRect, XZRect, YZRect};
 use scenes::Scene;
 use textures::{SolidColor, Texture};
 
@@ -69,23 +69,75 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("approx. rays: {}", rays);
     println!(); // Empty line before progress bar
 
-    #[derive(Deserialize, Serialize, Debug)]
-    enum Object {
+    #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+    enum ObjectLiteral {
         XZRect(XZRect),
         XYRect(XYRect),
         YZRect(YZRect),
         Sphere(Sphere),
-        FlipFace(XZRect),
+        Boxy(BoxyInit),
+    }
+
+    impl From<ObjectLiteral> for Hitable {
+        fn from(obj: ObjectLiteral) -> Hitable {
+            match obj {
+                ObjectLiteral::XZRect(x) => Hitable::XZRect(x),
+                ObjectLiteral::XYRect(x) => Hitable::XYRect(x),
+                ObjectLiteral::YZRect(x) => Hitable::YZRect(x),
+                ObjectLiteral::Sphere(x) => Hitable::Sphere(x),
+                ObjectLiteral::Boxy(x) => Boxy::new(x.corner_0, x.corner_1, x.material),
+            }
+        }
+    }
+    #[derive(Serialize, Deserialize, Debug)]
+    enum MetaObject {
+        FlipFace(ObjectLiteral),
+        RotateY(RotateInit),
+        Translate(TranslateInit),
+    }
+
+    impl From<MetaObject> for Hitable {
+        fn from(obj: MetaObject) -> Hitable {
+            match obj {
+                MetaObject::FlipFace(x) => FlipFace::new(x.into()),
+                MetaObject::RotateY(x) => {
+                    let obj = *x.object;
+                    let obj: Hitable = obj.into();
+                    RotateY::new(Arc::new(obj), x.angle)
+                }
+                MetaObject::Translate(x) => {
+                    let obj = *x.object;
+                    let obj: Hitable = obj.into();
+                    Translate::new(Arc::new(obj), x.offset)
+                }
+            }
+        }
+    }
+
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct RotateInit {
+        object: Box<Object>,
+        angle: Float,
+    }
+
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct TranslateInit {
+        object: Box<Object>,
+        offset: Vec3,
+    }
+
+    #[derive(Serialize, Deserialize, Debug)]
+    #[serde(untagged)]
+    enum Object {
+        ObjectLiteral(ObjectLiteral),
+        MetaObject(MetaObject),
     }
 
     impl From<Object> for Hitable {
         fn from(obj: Object) -> Hitable {
             match obj {
-                Object::XZRect(x) => Hitable::XZRect(x),
-                Object::XYRect(x) => Hitable::XYRect(x),
-                Object::YZRect(x) => Hitable::YZRect(x),
-                Object::Sphere(x) => Hitable::Sphere(x),
-                Object::FlipFace(x) => FlipFace::new(Hitable::XZRect(x)),
+                Object::ObjectLiteral(obj) => obj.into(),
+                Object::MetaObject(obj) => obj.into(),
             }
         }
     }

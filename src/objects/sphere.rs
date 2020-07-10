@@ -9,7 +9,7 @@ use crate::{
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 pub struct Sphere {
     center: Vec3,
     radius: Float,
