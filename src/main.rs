@@ -69,51 +69,49 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("approx. rays: {}", rays);
     println!(); // Empty line before progress bar
 
-    #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
-    enum ObjectLiteral {
+    #[derive(Deserialize, Serialize, Debug)]
+    enum Object {
         XZRect(XZRect),
         XYRect(XYRect),
         YZRect(YZRect),
         Sphere(Sphere),
         Boxy(BoxyInit),
-    }
-
-    impl From<ObjectLiteral> for Hitable {
-        fn from(obj: ObjectLiteral) -> Hitable {
-            match obj {
-                ObjectLiteral::XZRect(x) => Hitable::XZRect(x),
-                ObjectLiteral::XYRect(x) => Hitable::XYRect(x),
-                ObjectLiteral::YZRect(x) => Hitable::YZRect(x),
-                ObjectLiteral::Sphere(x) => Hitable::Sphere(x),
-                ObjectLiteral::Boxy(x) => Boxy::new(x.corner_0, x.corner_1, x.material),
-            }
-        }
-    }
-    #[derive(Serialize, Deserialize, Debug)]
-    enum MetaObject {
-        FlipFace(ObjectLiteral),
         RotateY(RotateInit),
         Translate(TranslateInit),
+        FlipFace(FlipFaceInit),
     }
 
-    impl From<MetaObject> for Hitable {
-        fn from(obj: MetaObject) -> Hitable {
+    impl From<Object> for Hitable {
+        fn from(obj: Object) -> Hitable {
             match obj {
-                MetaObject::FlipFace(x) => FlipFace::new(x.into()),
-                MetaObject::RotateY(x) => {
+                Object::XZRect(x) => Hitable::XZRect(x),
+                Object::XYRect(x) => Hitable::XYRect(x),
+                Object::YZRect(x) => Hitable::YZRect(x),
+                Object::Sphere(x) => Hitable::Sphere(x),
+                Object::Boxy(x) => Boxy::new(x.corner_0, x.corner_1, x.material),
+                Object::RotateY(x) => {
                     let obj = *x.object;
                     let obj: Hitable = obj.into();
                     RotateY::new(Arc::new(obj), x.angle)
                 }
-                MetaObject::Translate(x) => {
+                Object::Translate(x) => {
                     let obj = *x.object;
                     let obj: Hitable = obj.into();
                     Translate::new(Arc::new(obj), x.offset)
+                }
+                Object::FlipFace(x) => {
+                    let obj = *x.object;
+                    let obj: Hitable = obj.into();
+                    FlipFace::new(obj)
                 }
             }
         }
     }
 
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct FlipFaceInit {
+        object: Box<Object>,
+    }
     #[derive(Serialize, Deserialize, Debug)]
     pub struct RotateInit {
         object: Box<Object>,
@@ -124,22 +122,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     pub struct TranslateInit {
         object: Box<Object>,
         offset: Vec3,
-    }
-
-    #[derive(Serialize, Deserialize, Debug)]
-    #[serde(untagged)]
-    enum Object {
-        ObjectLiteral(ObjectLiteral),
-        MetaObject(MetaObject),
-    }
-
-    impl From<Object> for Hitable {
-        fn from(obj: Object) -> Hitable {
-            match obj {
-                Object::ObjectLiteral(obj) => obj.into(),
-                Object::MetaObject(obj) => obj.into(),
-            }
-        }
     }
 
     // TODO: temporary let's try this serde thing out
