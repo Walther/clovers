@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fs::File;
 use std::io::prelude::*;
-use std::{error::Error, fs, time::Instant};
+use std::{error::Error, fs, sync::Arc, time::Instant};
 
 // Internal imports
 use clovers::*;
@@ -22,9 +22,11 @@ use camera::{Camera, CameraInit};
 use color::Color;
 #[cfg(feature = "gui")]
 use draw_gui::draw_gui;
-use hitable::Hitable;
-use objects::XZRect;
-use textures::Texture;
+use hitable::{Hitable, HitableList};
+use materials::{Dielectric, DiffuseLight};
+use objects::{FlipFace, Sphere, XYRect, XZRect, YZRect};
+use scenes::Scene;
+use textures::{SolidColor, Texture};
 
 // Configure CLI parameters
 #[derive(Clap)]
@@ -67,28 +69,54 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("approx. rays: {}", rays);
     println!(); // Empty line before progress bar
 
-    if opts.gui {
-        if cfg!(feature = "gui") {
-            #[cfg(feature = "gui")]
-            let _result = draw_gui(opts.width, opts.height, opts.samples);
-            return Ok(());
-        } else {
-            println!("clovers not built with feature 'gui' enabled");
-            return Ok(());
+    #[derive(Deserialize, Serialize, Debug)]
+    enum Object {
+        XZRect(XZRect),
+        XYRect(XYRect),
+        YZRect(YZRect),
+        Sphere(Sphere),
+        FlipFace(XZRect),
+    }
+
+    impl From<Object> for Hitable {
+        fn from(obj: Object) -> Hitable {
+            match obj {
+                Object::XZRect(x) => Hitable::XZRect(x),
+                Object::XYRect(x) => Hitable::XYRect(x),
+                Object::YZRect(x) => Hitable::YZRect(x),
+                Object::Sphere(x) => Hitable::Sphere(x),
+                Object::FlipFace(x) => FlipFace::new(Hitable::XZRect(x)),
+            }
         }
     }
+
+    // TODO: temporary priority lights
+    let small_light = DiffuseLight::new(SolidColor::new(Color::new(15.0, 15.0, 15.0)));
+    let small_light_obj = XZRect::new(213.0, 343.0, 227.0, 332.0, 554.0, small_light);
+    let sphere = Sphere::new(Vec3::new(190.0, 90.0, 190.0), 90.0, Dielectric::new(1.5));
+    let mut lights = HitableList::new();
+    lights.add(small_light_obj);
+    lights.add(sphere);
+    let lights = lights.into_hitable(); // TODO: fixme, silly
+    let lights = Arc::new(lights);
 
     // TODO: temporary let's try this serde thing out
     #[derive(Serialize, Deserialize, Debug)]
     struct SceneFile {
+        time_0: Float,
+        time_1: Float,
         background_color: Color,
         camera: CameraInit,
-        objects: Vec<XZRect>,
+        objects: Vec<Object>,
     }
     let mut file = File::open("scenes/scene.json")?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
     let scene: SceneFile = serde_json::from_str(&contents)?;
+    let time_0 = scene.time_0;
+    let time_1 = scene.time_1;
+    let rng = rand::thread_rng();
+    let background_color = scene.background_color;
     let camera = Camera::new(
         scene.camera.look_from,
         scene.camera.look_at,
@@ -97,14 +125,36 @@ fn main() -> Result<(), Box<dyn Error>> {
         opts.width as Float / opts.height as Float,
         scene.camera.aperture,
         scene.camera.focus_distance,
-        scene.camera.time_0,
-        scene.camera.time_1,
+        time_0,
+        time_1,
     );
-    dbg!(&scene.objects);
-    return Ok(());
-    // TODO: temp early return
+    let mut hitables = HitableList::new();
+    for obj in scene.objects {
+        hitables.add(obj.into());
+    }
+    let scene = Scene::new(hitables, camera, time_0, time_1, background_color, rng);
 
-    // png writing version
+    // gui version
+    if opts.gui {
+        if cfg!(feature = "gui") {
+            #[cfg(feature = "gui")]
+            let _result = draw_gui(
+                opts.width,
+                opts.height,
+                opts.samples,
+                opts.max_depth,
+                opts.gamma,
+                scene,
+                lights,
+            );
+            return Ok(());
+        } else {
+            println!("clovers not built with feature 'gui' enabled");
+            return Ok(());
+        }
+    }
+
+    // cli version
     let start = Instant::now();
     let img = draw(
         opts.width,
@@ -112,6 +162,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         opts.samples,
         opts.max_depth,
         opts.gamma,
+        scene,
+        lights,
     )?; // Note: live progress bar printed within draw
     let duration = Instant::now() - start;
 

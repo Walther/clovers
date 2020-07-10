@@ -27,8 +27,15 @@ use winit::{
 use winit_input_helper::WinitInputHelper;
 
 #[cfg(feature = "gui")]
-pub fn draw_gui(width: u32, height: u32, samples: u32) -> Result<(), Error> {
-    let rng = thread_rng();
+pub fn draw_gui(
+    width: u32,
+    height: u32,
+    samples: u32,
+    max_depth: u32,
+    gamma: Float,
+    scene: Scene,
+    lights: Arc<Hitable>,
+) -> Result<(), Error> {
     let event_loop = EventLoop::new();
     let mut input = WinitInputHelper::new();
     let window = {
@@ -47,7 +54,7 @@ pub fn draw_gui(width: u32, height: u32, samples: u32) -> Result<(), Error> {
         Pixels::new(width, height, surface_texture)?
     };
 
-    let mut world = World::new(width, height, samples, rng);
+    let mut world = World::new(width, height, samples, max_depth, gamma, scene, lights);
     let mut frame_num = 0;
 
     event_loop.run(move |event, _, control_flow| {
@@ -98,41 +105,41 @@ struct World {
     float_buffer: Vec<Float>,
     bar: ProgressBar,
     samples: u32,
+    max_depth: u32,
+    gamma: Float,
 }
 
 impl World {
-    fn new(width: u32, height: u32, samples: u32, rng: ThreadRng) -> Self {
+    fn new(
+        width: u32,
+        height: u32,
+        samples: u32,
+        max_depth: u32,
+        gamma: Float,
+        scene: Scene,
+        lights: Arc<Hitable>,
+    ) -> Self {
         // Progress bar
         let bar = ProgressBar::new(samples as u64);
         bar.set_style(ProgressStyle::default_bar().template(
             "Elapsed: {elapsed_precise}\nSamples:  {bar} {pos}/{len}\nETA:     {eta_precise}",
         ));
 
-        // TODO: remove temporary
-        let small_light = DiffuseLight::new(SolidColor::new(Color::new(15.0, 15.0, 15.0)));
-        let small_light_obj = XZRect::new(213.0, 343.0, 227.0, 332.0, 554.0, small_light);
-        // let small_light_obj = FlipFace::new(small_light_obj);
-        let mut lights = HitableList::new();
-        lights.add(small_light_obj);
-        let lights = lights.into_hitable(); // TODO: fixme, silly
-        let lights = Arc::new(lights);
-
         World {
             width,
             height,
-            scene: scenes::cornell_book3_final::load(width, height, rng),
+            scene,
             lights,
             float_buffer: vec![0.0; 4 * width as usize * height as usize], // rgba
             bar,
             samples,
+            max_depth,
+            gamma,
         }
     }
 
     // Assumes the default texture format: [`wgpu::TextureFormat::Rgba8UnormSrgb`]
     fn draw(&mut self, frame: &mut [u8], frame_num: u32) {
-        // TODO: un-hardcode
-        let gamma = 2.0;
-        let max_depth = 100;
         let background_color = self.scene.background;
 
         // Stop iterating
@@ -144,6 +151,7 @@ impl World {
         let camera = &self.scene.camera;
         let world = &self.scene.world;
         let lights = &self.lights;
+        let d = self.max_depth.clone(); // TODO: cleanup, silly
 
         // Update internal float-based pixel buffer with new samples
         self.float_buffer
@@ -165,7 +173,7 @@ impl World {
                     world,
                     Arc::clone(&lights), // TODO: Fixme, ridiculous and unusable
                     0,
-                    max_depth,
+                    d,
                     rng,
                 );
 
@@ -190,7 +198,7 @@ impl World {
                 // NOTE: divided because internal floatbuffer keeps summing values
                 let color = Color::new(r, g, b) / frame_num as Float;
                 // gamma correction
-                let color = color.gamma_correction(gamma);
+                let color = color.gamma_correction(self.gamma);
                 let rgb = color.to_rgb_u8();
                 // weight the pixel down based on frame number
                 let rgba = [rgb[0], rgb[1], rgb[2], 0xFF]; //TODO: alpha in color?

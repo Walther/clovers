@@ -27,7 +27,7 @@ pub struct Scene {
 }
 
 impl Scene {
-    fn new(
+    pub fn new(
         world: HitableList,
         camera: Camera,
         time_0: Float,

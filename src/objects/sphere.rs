@@ -7,7 +7,9 @@ use crate::{
     Float, Vec3, PI, SHADOW_EPSILON,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Sphere {
     center: Vec3,
     radius: Float,

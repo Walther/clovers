@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 // XY
 
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct XYRect {
     x0: Float,
     x1: Float,
@@ -190,6 +191,7 @@ impl XZRect {
 
 // YZ
 
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct YZRect {
     y0: Float,
     y1: Float,

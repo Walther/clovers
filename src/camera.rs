@@ -26,8 +26,6 @@ pub struct CameraInit {
     pub vertical_fov: Float,
     pub aperture: Float,
     pub focus_distance: Float,
-    pub time_0: Float,
-    pub time_1: Float,
 }
 
 impl Camera {
