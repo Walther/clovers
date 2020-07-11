@@ -95,7 +95,7 @@ impl ConstantMedium {
         })
     }
 
-    pub fn bounding_box(&self, t0: crate::Float, t1: crate::Float) -> Option<crate::hitable::AABB> {
+    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<crate::hitable::AABB> {
         self.boundary.bounding_box(t0, t1)
     }
 }

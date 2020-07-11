@@ -1,21 +1,9 @@
-use crate::{
-    color::Color,
-    colorize::colorize,
-    hitable::HitableList,
-    materials::{Dielectric, DiffuseLight},
-    objects::{Sphere, XZRect},
-    ray::Ray,
-    scenes,
-    textures::SolidColor,
-    Float, Vec3,
-};
-use clovers::hitable::Hitable;
+use crate::{color::Color, colorize::colorize, ray::Ray, scenes, Float};
 use image::{ImageBuffer, ImageResult, Rgb, RgbImage};
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
 use rayon::prelude::*;
 use scenes::Scene;
-use std::sync::Arc;
 
 /// The main drawing function, returns an `ImageResult`.
 pub fn draw(

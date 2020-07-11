@@ -1,7 +1,7 @@
 use crate::{
     hitable::{HitRecord, Hitable, AABB},
     ray::Ray,
-    Vec3,
+    Float, Vec3,
 };
 use rand::prelude::*;
 use std::sync::Arc;
@@ -14,16 +14,16 @@ pub struct Translate {
 impl Translate {
     pub fn new(object: Arc<Hitable>, offset: Vec3) -> Hitable {
         Hitable::Translate(Translate {
-            object: Arc::clone(&object),
+            object: object,
             offset,
         })
     }
 
     pub fn hit(
         &self,
-        ray: &crate::ray::Ray,
-        distance_min: crate::Float,
-        distance_max: crate::Float,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
         rng: ThreadRng,
     ) -> Option<HitRecord> {
         let moved_ray: Ray = Ray::new(ray.origin - self.offset, ray.direction, ray.time);
@@ -40,7 +40,7 @@ impl Translate {
         }
     }
 
-    pub fn bounding_box(&self, t0: crate::Float, t1: crate::Float) -> Option<AABB> {
+    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         let object_bounding_box = self.object.bounding_box(t0, t1);
         match object_bounding_box {
             Some(aabb) => Some(AABB::new(aabb.min + self.offset, aabb.max + self.offset)),

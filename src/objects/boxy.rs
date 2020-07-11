@@ -67,7 +67,7 @@ impl Boxy {
         self.sides.hit(ray, distance_min, distance_max, rng)
     }
 
-    pub fn bounding_box(&self, _t0: crate::Float, _t1: crate::Float) -> Option<AABB> {
+    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         Some(AABB::new(self.corner_0, self.corner_1))
     }
 }

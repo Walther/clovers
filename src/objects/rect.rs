@@ -70,11 +70,7 @@ impl XYRect {
         record.set_face_normal(ray, outward_normal);
         Some(record)
     }
-    pub fn bounding_box(
-        &self,
-        _t0: crate::Float,
-        _t1: crate::Float,
-    ) -> Option<crate::hitable::AABB> {
+    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<crate::hitable::AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
             Vec3::new(self.x0, self.y0, self.k - RECT_EPSILON),
@@ -147,11 +143,7 @@ impl XZRect {
         record.set_face_normal(ray, outward_normal);
         Some(record)
     }
-    pub fn bounding_box(
-        &self,
-        _t0: crate::Float,
-        _t1: crate::Float,
-    ) -> Option<crate::hitable::AABB> {
+    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<crate::hitable::AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
             Vec3::new(self.x0, self.k - RECT_EPSILON, self.z0),
@@ -252,11 +244,7 @@ impl YZRect {
         record.set_face_normal(ray, outward_normal);
         Some(record)
     }
-    pub fn bounding_box(
-        &self,
-        _t0: crate::Float,
-        _t1: crate::Float,
-    ) -> Option<crate::hitable::AABB> {
+    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<crate::hitable::AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
             Vec3::new(self.k - RECT_EPSILON, self.y0, self.z0),

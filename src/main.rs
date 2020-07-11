@@ -6,11 +6,8 @@
 use chrono::Utc;
 use clap::Clap;
 use humantime::format_duration;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::fs::File;
-use std::io::prelude::*;
-use std::{error::Error, fs, sync::Arc, time::Instant};
+use std::{error::Error, fs, time::Instant};
 
 // Internal imports
 use clovers::*;
@@ -18,17 +15,9 @@ mod draw;
 use draw::draw;
 #[cfg(feature = "gui")]
 mod draw_gui;
-use camera::{Camera, CameraInit};
-use color::Color;
 #[cfg(feature = "gui")]
 use draw_gui::draw_gui;
-use hitable::{Hitable, HitableList};
-use materials::{Dielectric, DiffuseLight};
-use objects::{
-    Boxy, BoxyInit, FlipFace, Object, RotateY, Sphere, Translate, XYRect, XZRect, YZRect,
-};
 use scenes::Scene;
-use textures::{SolidColor, Texture};
 
 // Configure CLI parameters
 #[derive(Clap)]

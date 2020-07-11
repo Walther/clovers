@@ -38,7 +38,7 @@ impl FlipFace {
         }
     }
 
-    pub fn bounding_box(&self, t0: crate::Float, t1: crate::Float) -> Option<AABB> {
+    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         self.object.bounding_box(t0, t1)
     }
 }

@@ -1,13 +1,4 @@
-use crate::{
-    color::Color,
-    colorize::colorize,
-    hitable::{Hitable, HitableList},
-    materials::DiffuseLight,
-    objects::XZRect,
-    scenes::{self, Scene},
-    textures::SolidColor,
-    Float,
-};
+use crate::{color::Color, colorize::colorize, scenes::Scene, Float};
 
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
@@ -15,7 +6,6 @@ use rayon::prelude::*;
 
 #[cfg(feature = "gui")]
 use pixels::{wgpu::Surface, Error, Pixels, SurfaceTexture};
-use std::sync::Arc;
 #[cfg(feature = "gui")]
 use winit::{
     dpi::PhysicalSize,
