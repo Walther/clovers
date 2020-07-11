@@ -1,6 +1,6 @@
 use crate::{Float, Vec3};
 use rand::prelude::*;
-use serde::{Deserialize, Serialize};
+
 use std::fmt::Debug;
 
 // TODO: This might be currently oddly broken and resulting in overflowy surfaces

@@ -1,6 +1,5 @@
 use crate::{
     color::Color,
-    hitable::Hitable,
     pdf::{HitablePDF, MixturePDF},
     ray::Ray,
     scenes::Scene,

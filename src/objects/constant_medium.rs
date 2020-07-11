@@ -6,7 +6,7 @@ use crate::{
     Float, Vec3, CONSTANT_MEDIUM_EPSILON,
 };
 use rand::prelude::*;
-use serde::{Deserialize, Serialize};
+
 use std::sync::Arc;
 
 pub struct ConstantMedium {
