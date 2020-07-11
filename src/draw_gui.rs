@@ -34,7 +34,6 @@ pub fn draw_gui(
     max_depth: u32,
     gamma: Float,
     scene: Scene,
-    lights: Arc<Hitable>,
 ) -> Result<(), Error> {
     let event_loop = EventLoop::new();
     let mut input = WinitInputHelper::new();
@@ -54,7 +53,7 @@ pub fn draw_gui(
         Pixels::new(width, height, surface_texture)?
     };
 
-    let mut world = World::new(width, height, samples, max_depth, gamma, scene, lights);
+    let mut world = World::new(width, height, samples, max_depth, gamma, scene);
     let mut frame_num = 0;
 
     event_loop.run(move |event, _, control_flow| {
@@ -101,7 +100,6 @@ struct World {
     width: u32,
     height: u32,
     scene: Scene,
-    lights: Arc<Hitable>, // TODO: fix / improve
     float_buffer: Vec<Float>,
     bar: ProgressBar,
     samples: u32,
@@ -117,7 +115,6 @@ impl World {
         max_depth: u32,
         gamma: Float,
         scene: Scene,
-        lights: Arc<Hitable>,
     ) -> Self {
         // Progress bar
         let bar = ProgressBar::new(samples as u64);
@@ -129,7 +126,6 @@ impl World {
             width,
             height,
             scene,
-            lights,
             float_buffer: vec![0.0; 4 * width as usize * height as usize], // rgba
             bar,
             samples,
@@ -140,8 +136,6 @@ impl World {
 
     // Assumes the default texture format: [`wgpu::TextureFormat::Rgba8UnormSrgb`]
     fn draw(&mut self, frame: &mut [u8], frame_num: u32) {
-        let background_color = self.scene.background;
-
         // Stop iterating
         if frame_num > self.samples {
             return;
@@ -149,8 +143,7 @@ impl World {
         let width = self.width as usize;
         let height = self.height as usize;
         let camera = &self.scene.camera;
-        let world = &self.scene.world;
-        let lights = &self.lights;
+        let scene = &self.scene;
         let d = self.max_depth.clone(); // TODO: cleanup, silly
 
         // Update internal float-based pixel buffer with new samples
@@ -167,15 +160,7 @@ impl World {
                 let u = (x as Float + rng.gen::<Float>()) / width as Float;
                 let v = (y as Float + rng.gen::<Float>()) / height as Float;
                 let ray = camera.get_ray(u, v, rng);
-                color += colorize(
-                    &ray,
-                    background_color,
-                    world,
-                    Arc::clone(&lights), // TODO: Fixme, ridiculous and unusable
-                    0,
-                    d,
-                    rng,
-                );
+                color += colorize(&ray, scene, 0, d, rng);
 
                 // sum to previous color; remember to divide in a consumer!
                 let prev_color = Color::new(pixel[0], pixel[1], pixel[2]);

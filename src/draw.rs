@@ -25,11 +25,8 @@ pub fn draw(
     max_depth: u32,
     gamma: Float,
     scene: Scene,
-    lights: Arc<Hitable>,
 ) -> ImageResult<ImageBuffer<image::Rgb<u8>, std::vec::Vec<u8>>> {
     let mut img: RgbImage = ImageBuffer::new(width as u32, height as u32);
-
-    let background_color: Color = scene.background;
 
     // Progress bar
     let pixels = (width * height) as u64;
@@ -53,15 +50,7 @@ pub fn draw(
                 u = (x as Float + rng.gen::<Float>()) / width as Float;
                 v = (y as Float + rng.gen::<Float>()) / height as Float;
                 ray = scene.camera.get_ray(u, v, rng);
-                color += colorize(
-                    &ray,
-                    background_color,
-                    &scene.world,
-                    Arc::clone(&lights), // TODO: fixme, this is silly
-                    0,
-                    max_depth,
-                    rng,
-                );
+                color += colorize(&ray, &scene, 0, max_depth, rng);
             }
             color /= samples as Float;
 

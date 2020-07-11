@@ -24,7 +24,9 @@ use color::Color;
 use draw_gui::draw_gui;
 use hitable::{Hitable, HitableList};
 use materials::{Dielectric, DiffuseLight};
-use objects::{Boxy, BoxyInit, FlipFace, RotateY, Sphere, Translate, XYRect, XZRect, YZRect};
+use objects::{
+    Boxy, BoxyInit, FlipFace, Object, RotateY, Sphere, Translate, XYRect, XZRect, YZRect,
+};
 use scenes::Scene;
 use textures::{SolidColor, Texture};
 
@@ -32,6 +34,9 @@ use textures::{SolidColor, Texture};
 #[derive(Clap)]
 #[clap(version = "0.1.0", author = "Walther")]
 struct Opts {
+    /// Input filename / location
+    #[clap(short, long)]
+    input: String,
     /// Output filename / location. [default: renders/timestamp.png]
     #[clap(short, long)]
     output: Option<String>,
@@ -69,102 +74,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("approx. rays: {}", rays);
     println!(); // Empty line before progress bar
 
-    #[derive(Deserialize, Serialize, Debug)]
-    enum Object {
-        XZRect(XZRect),
-        XYRect(XYRect),
-        YZRect(YZRect),
-        Sphere(Sphere),
-        Boxy(BoxyInit),
-        RotateY(RotateInit),
-        Translate(TranslateInit),
-        FlipFace(FlipFaceInit),
-    }
-
-    impl From<Object> for Hitable {
-        fn from(obj: Object) -> Hitable {
-            match obj {
-                Object::XZRect(x) => Hitable::XZRect(x),
-                Object::XYRect(x) => Hitable::XYRect(x),
-                Object::YZRect(x) => Hitable::YZRect(x),
-                Object::Sphere(x) => Hitable::Sphere(x),
-                Object::Boxy(x) => Boxy::new(x.corner_0, x.corner_1, x.material),
-                Object::RotateY(x) => {
-                    let obj = *x.object;
-                    let obj: Hitable = obj.into();
-                    RotateY::new(Arc::new(obj), x.angle)
-                }
-                Object::Translate(x) => {
-                    let obj = *x.object;
-                    let obj: Hitable = obj.into();
-                    Translate::new(Arc::new(obj), x.offset)
-                }
-                Object::FlipFace(x) => {
-                    let obj = *x.object;
-                    let obj: Hitable = obj.into();
-                    FlipFace::new(obj)
-                }
-            }
-        }
-    }
-
-    #[derive(Serialize, Deserialize, Debug)]
-    pub struct FlipFaceInit {
-        object: Box<Object>,
-    }
-    #[derive(Serialize, Deserialize, Debug)]
-    pub struct RotateInit {
-        object: Box<Object>,
-        angle: Float,
-    }
-
-    #[derive(Serialize, Deserialize, Debug)]
-    pub struct TranslateInit {
-        object: Box<Object>,
-        offset: Vec3,
-    }
-
-    // TODO: temporary let's try this serde thing out
-    #[derive(Serialize, Deserialize, Debug)]
-    struct SceneFile {
-        time_0: Float,
-        time_1: Float,
-        background_color: Color,
-        camera: CameraInit,
-        objects: Vec<Object>,
-        priority_objects: Vec<Object>,
-    }
-    let mut file = File::open("scenes/scene.json")?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
-    let scene_file: SceneFile = serde_json::from_str(&contents)?;
-    let time_0 = scene_file.time_0;
-    let time_1 = scene_file.time_1;
-    let rng = rand::thread_rng();
-    let background_color = scene_file.background_color;
-    let camera = Camera::new(
-        scene_file.camera.look_from,
-        scene_file.camera.look_at,
-        scene_file.camera.up,
-        scene_file.camera.vertical_fov,
-        opts.width as Float / opts.height as Float,
-        scene_file.camera.aperture,
-        scene_file.camera.focus_distance,
-        time_0,
-        time_1,
-    );
-    let mut hitables = HitableList::new();
-    for obj in scene_file.objects {
-        hitables.add(obj.into());
-    }
-    let scene = Scene::new(hitables, camera, time_0, time_1, background_color, rng);
-
-    let mut priority_objects = HitableList::new();
-    for obj in scene_file.priority_objects {
-        priority_objects.add(obj.into());
-    }
-    let priority_objects = priority_objects.into_hitable();
-    let priority_objects = Arc::new(priority_objects);
+    // Read the given scene file
+    let file = File::open(opts.input)?;
+    let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
 
     // gui version
     if opts.gui {
@@ -177,7 +89,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                 opts.max_depth,
                 opts.gamma,
                 scene,
-                priority_objects,
             );
             return Ok(());
         } else {
@@ -195,7 +106,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         opts.max_depth,
         opts.gamma,
         scene,
-        priority_objects,
     )?; // Note: live progress bar printed within draw
     let duration = Instant::now() - start;
 
