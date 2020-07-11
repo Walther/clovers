@@ -7,6 +7,7 @@ use crate::{
     Float, Ray, Vec3,
 };
 use rand::prelude::*;
+
 use std::{cmp::Ordering, sync::Arc};
 
 pub struct HitRecord<'a> {

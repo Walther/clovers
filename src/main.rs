@@ -6,7 +6,11 @@
 use chrono::Utc;
 use clap::Clap;
 use humantime::format_duration;
-use std::{error::Error, fs, time::Instant};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::fs::File;
+use std::io::prelude::*;
+use std::{error::Error, fs, sync::Arc, time::Instant};
 
 // Internal imports
 use clovers::*;
@@ -14,13 +18,25 @@ mod draw;
 use draw::draw;
 #[cfg(feature = "gui")]
 mod draw_gui;
+use camera::{Camera, CameraInit};
+use color::Color;
 #[cfg(feature = "gui")]
 use draw_gui::draw_gui;
+use hitable::{Hitable, HitableList};
+use materials::{Dielectric, DiffuseLight};
+use objects::{
+    Boxy, BoxyInit, FlipFace, Object, RotateY, Sphere, Translate, XYRect, XZRect, YZRect,
+};
+use scenes::Scene;
+use textures::{SolidColor, Texture};
 
 // Configure CLI parameters
 #[derive(Clap)]
 #[clap(version = "0.1.0", author = "Walther")]
 struct Opts {
+    /// Input filename / location
+    #[clap(short, long)]
+    input: String,
     /// Output filename / location. [default: renders/timestamp.png]
     #[clap(short, long)]
     output: Option<String>,
@@ -58,10 +74,22 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("approx. rays: {}", rays);
     println!(); // Empty line before progress bar
 
+    // Read the given scene file
+    let file = File::open(opts.input)?;
+    let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
+
+    // gui version
     if opts.gui {
         if cfg!(feature = "gui") {
             #[cfg(feature = "gui")]
-            let _result = draw_gui(opts.width, opts.height, opts.samples);
+            let _result = draw_gui(
+                opts.width,
+                opts.height,
+                opts.samples,
+                opts.max_depth,
+                opts.gamma,
+                scene,
+            );
             return Ok(());
         } else {
             println!("clovers not built with feature 'gui' enabled");
@@ -69,7 +97,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
-    // png writing version
+    // cli version
     let start = Instant::now();
     let img = draw(
         opts.width,
@@ -77,6 +105,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         opts.samples,
         opts.max_depth,
         opts.gamma,
+        scene,
     )?; // Note: live progress bar printed within draw
     let duration = Instant::now() - start;
 

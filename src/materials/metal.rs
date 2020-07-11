@@ -4,8 +4,8 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::ThreadRng;
-
-#[derive(Copy, Clone)]
+use serde::{Deserialize, Serialize};
+#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 pub struct Metal {
     albedo: Texture,
     fuzz: Float,

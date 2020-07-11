@@ -5,9 +5,11 @@ use crate::{
     Float, Vec3, RECT_EPSILON, SHADOW_EPSILON,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 
 // XY
 
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct XYRect {
     x0: Float,
     x1: Float,
@@ -84,6 +86,7 @@ impl XYRect {
 
 // XZ
 
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct XZRect {
     x0: Float,
     x1: Float,
@@ -188,6 +191,7 @@ impl XZRect {
 
 // YZ
 
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct YZRect {
     y0: Float,
     y1: Float,

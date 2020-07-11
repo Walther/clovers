@@ -1,44 +1,102 @@
 use crate::{
-    camera::Camera,
+    camera::{Camera, CameraInit},
     color::Color,
     hitable::{Hitable, HitableList},
+    objects::Object,
     Float,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
+use std::io::prelude::*;
+use std::{fs::File, sync::Arc};
 
-pub mod cornell;
-pub mod cornell_book3_final;
-pub mod cornell_with_boxes;
-pub mod cornell_with_glass_cube;
-pub mod cornell_with_smoke;
-pub mod cornell_with_sphere;
-pub mod cornell_with_subsurface_sphere;
-pub mod final_scene;
-pub mod glass_spheres;
-pub mod metal_spheres;
-pub mod random_scene;
-pub mod simple_light_lambertian;
-pub mod two_spheres;
+// TODO: convert these to json or other
+// pub mod cornell;
+// pub mod cornell_book3_final;
+// pub mod cornell_with_boxes;
+// pub mod cornell_with_glass_cube;
+// pub mod cornell_with_smoke;
+// pub mod cornell_with_sphere;
+// pub mod cornell_with_subsurface_sphere;
+// pub mod final_scene;
+// pub mod glass_spheres;
+// pub mod metal_spheres;
+// pub mod random_scene;
+// pub mod simple_light_lambertian;
+// pub mod two_spheres;
 
 pub struct Scene {
-    pub world: Hitable, // BVHNode
+    pub objects: Hitable, // BVHNode
     pub camera: Camera,
-    pub background: Color, // TODO: make into Texture or something?
+    pub background_color: Color, // TODO: make into Texture or something?
+    pub priority_objects: Arc<Hitable>, // TODO: fix silly arc due to colorize
 }
 
 impl Scene {
-    fn new(
-        world: HitableList,
-        camera: Camera,
+    pub fn new(
         time_0: Float,
         time_1: Float,
-        background: Color,
+        camera: Camera,
+        objects: HitableList,
+        priority_objects: HitableList,
+        background_color: Color,
         rng: ThreadRng,
     ) -> Scene {
         Scene {
-            world: world.into_bvh(time_0, time_1, rng),
+            objects: objects.into_bvh(time_0, time_1, rng),
             camera,
-            background,
+            background_color,
+            priority_objects: Arc::new(priority_objects.into_hitable()),
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SceneFile {
+    time_0: Float,
+    time_1: Float,
+    background_color: Color,
+    camera: CameraInit,
+    objects: Vec<Object>,
+    priority_objects: Vec<Object>,
+}
+
+pub fn initialize(mut file: File, width: u32, height: u32) -> Result<Scene, std::io::Error> {
+    let mut contents: String = String::new();
+    file.read_to_string(&mut contents)?;
+    let scene_file: SceneFile = serde_json::from_str(&contents)?;
+    let time_0 = scene_file.time_0;
+    let time_1 = scene_file.time_1;
+    let rng = rand::thread_rng();
+    let background_color = scene_file.background_color;
+    let camera = Camera::new(
+        scene_file.camera.look_from,
+        scene_file.camera.look_at,
+        scene_file.camera.up,
+        scene_file.camera.vertical_fov,
+        width as Float / height as Float,
+        scene_file.camera.aperture,
+        scene_file.camera.focus_distance,
+        time_0,
+        time_1,
+    );
+    let mut hitables = HitableList::new();
+    for obj in scene_file.objects {
+        hitables.add(obj.into());
+    }
+
+    let mut priority_objects = HitableList::new();
+    for obj in scene_file.priority_objects {
+        priority_objects.add(obj.into());
+    }
+
+    Ok(Scene::new(
+        time_0,
+        time_1,
+        camera,
+        hitables,
+        priority_objects,
+        background_color,
+        rng,
+    ))
 }

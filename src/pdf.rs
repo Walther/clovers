@@ -60,10 +60,7 @@ pub struct HitablePDF {
 
 impl HitablePDF {
     pub fn new(hitable: Arc<Hitable>, origin: Vec3) -> PDF {
-        PDF::HitablePDF(HitablePDF {
-            origin,
-            hitable: Arc::clone(&hitable),
-        })
+        PDF::HitablePDF(HitablePDF { origin, hitable })
     }
 
     pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
@@ -90,8 +87,7 @@ impl MixturePDF {
     }
 
     pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
-        0.5 * self.pdf1.value(direction, time, rng)
-            + 0.5 * self.pdf2.value(direction, time, rng)
+        0.5 * self.pdf1.value(direction, time, rng) + 0.5 * self.pdf2.value(direction, time, rng)
     }
 
     pub fn generate(&self, mut rng: ThreadRng) -> Vec3 {

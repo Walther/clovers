@@ -1,6 +1,8 @@
 use crate::{random::random_in_unit_disk, Float, Ray, Vec3, PI};
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct Camera {
     pub lower_left_corner: Vec3,
     pub horizontal: Vec3,
@@ -13,6 +15,17 @@ pub struct Camera {
     pub u: Vec3,
     pub v: Vec3,
     pub w: Vec3,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+/// Represents the fields that can be described in a Scene file. Some other fields the main Camera struct requires (such as aspect_ratio) are derived from other info (such as width, height)
+pub struct CameraInit {
+    pub look_from: Vec3,
+    pub look_at: Vec3,
+    pub up: Vec3,
+    pub vertical_fov: Float,
+    pub aperture: Float,
+    pub focus_distance: Float,
 }
 
 impl Camera {
@@ -59,7 +72,7 @@ impl Camera {
     }
 
     // TODO: fix the mysterious (u,v) vs (s,t) change that came from the tutorial
-    pub fn get_ray(&self, s: Float, t: Float, mut rng: ThreadRng) -> Ray {
+    pub fn get_ray(self, s: Float, t: Float, mut rng: ThreadRng) -> Ray {
         // TODO: add a better defocus blur / depth of field implementation
         let rd: Vec3 = self.lens_radius * random_in_unit_disk(&mut rng);
         let offset: Vec3 = self.u * rd.x + self.v * rd.y;
