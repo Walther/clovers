@@ -98,6 +98,8 @@ impl Hitable {
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
         match self {
             Hitable::XZRect(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::XYRect(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::YZRect(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
             _ => 0.0,
@@ -107,6 +109,8 @@ impl Hitable {
     pub fn random(&self, origin: Vec3, rng: ThreadRng) -> Vec3 {
         match self {
             Hitable::XZRect(h) => h.random(origin, rng),
+            Hitable::XYRect(h) => h.random(origin, rng),
+            Hitable::YZRect(h) => h.random(origin, rng),
             Hitable::HitableList(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
             _ => Vec3::new(1.0, 0.0, 0.0),
