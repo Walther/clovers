@@ -19,7 +19,7 @@ pub fn draw(
     // Progress bar
     let pixels = (width * height) as u64;
     let bar = ProgressBar::new(pixels);
-    bar.set_draw_delta(pixels / 1000);
+    bar.set_draw_delta(pixels / 1_000);
     bar.set_style(ProgressStyle::default_bar().template(
         "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
     ));
