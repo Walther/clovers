@@ -23,8 +23,8 @@ impl Dielectric {
             false => self.refractive_index,
         };
 
-        let unit_direction: Vec3 = ray.direction.normalize();
-        let cos_theta: Float = (-unit_direction.dot(&hit_record.normal)).min(1.0);
+        let unit_direction: Vec3 = ray.direction.normalized();
+        let cos_theta: Float = (-unit_direction.dot(hit_record.normal)).min(1.0);
         let sin_theta: Float = (1.0 - cos_theta * cos_theta).sqrt();
         if etai_over_etat * sin_theta > 1.0 {
             let reflected: Vec3 = reflect(unit_direction, hit_record.normal);

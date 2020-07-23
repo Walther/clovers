@@ -1,5 +1,6 @@
 // Externals
-use nalgebra::Vector3;
+// use nalgebra::Vector3;
+use ultraviolet::vec::Vec3;
 
 // Internals
 pub mod color;
@@ -20,7 +21,7 @@ pub mod textures;
 // Handy aliases for internal use
 pub type Float = f32;
 pub const PI: Float = std::f32::consts::PI as Float;
-pub type Vec3 = Vector3<Float>;
+// pub type Vec3 = Vector3<Float>;
 pub const SHADOW_EPSILON: Float = 0.001;
 pub const RECT_EPSILON: Float = 0.0001;
 pub const CONSTANT_MEDIUM_EPSILON: Float = 0.0001;

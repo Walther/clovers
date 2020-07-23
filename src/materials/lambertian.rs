@@ -33,7 +33,7 @@ impl Lambertian {
         scattered: &Ray,
         _rng: ThreadRng,
     ) -> Float {
-        let cosine = hit_record.normal.dot(&scattered.direction.normalize());
+        let cosine = hit_record.normal.dot(scattered.direction.normalized());
         if cosine < 0.0 {
             0.0
         } else {

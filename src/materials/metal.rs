@@ -18,7 +18,7 @@ impl Metal {
         hit_record: &HitRecord,
         rng: ThreadRng,
     ) -> Option<ScatterRecord> {
-        let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
+        let reflected: Vec3 = reflect(ray.direction.normalized(), hit_record.normal);
         Some(ScatterRecord {
             specular_ray: Some(Ray::new(
                 hit_record.position,

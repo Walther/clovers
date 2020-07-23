@@ -40,7 +40,7 @@ impl CosinePDF {
     }
 
     pub fn value(&self, direction: Vec3, _time: Float, _rng: ThreadRng) -> Float {
-        let cosine = direction.normalize().dot(&self.uvw.w);
+        let cosine = direction.normalized().dot(self.uvw.w);
         if cosine <= 0.0 {
             0.0
         } else {

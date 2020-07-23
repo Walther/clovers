@@ -88,9 +88,8 @@ impl XYRect {
         ) {
             Some(hit_record) => {
                 let area = (self.x1 - self.x0) * (self.y1 - self.y0); // NOTE: should this have an abs()?
-                let distance_squared =
-                    hit_record.distance * hit_record.distance * vector.norm_squared();
-                let cosine = vector.dot(&hit_record.normal).abs() / vector.norm();
+                let distance_squared = hit_record.distance * hit_record.distance * vector.mag_sq();
+                let cosine = vector.dot(hit_record.normal).abs() / vector.mag();
 
                 distance_squared / (cosine * area)
             }
@@ -189,9 +188,8 @@ impl XZRect {
         ) {
             Some(hit_record) => {
                 let area = (self.x1 - self.x0) * (self.z1 - self.z0); // NOTE: should this have an abs()?
-                let distance_squared =
-                    hit_record.distance * hit_record.distance * vector.norm_squared();
-                let cosine = vector.dot(&hit_record.normal).abs() / vector.norm();
+                let distance_squared = hit_record.distance * hit_record.distance * vector.mag_sq();
+                let cosine = vector.dot(hit_record.normal).abs() / vector.mag();
 
                 distance_squared / (cosine * area)
             }
@@ -290,9 +288,8 @@ impl YZRect {
         ) {
             Some(hit_record) => {
                 let area = (self.y1 - self.y0) * (self.z1 - self.z0); // NOTE: should this have an abs()?
-                let distance_squared =
-                    hit_record.distance * hit_record.distance * vector.norm_squared();
-                let cosine = vector.dot(&hit_record.normal).abs() / vector.norm();
+                let distance_squared = hit_record.distance * hit_record.distance * vector.mag_sq();
+                let cosine = vector.dot(hit_record.normal).abs() / vector.mag();
 
                 distance_squared / (cosine * area)
             }

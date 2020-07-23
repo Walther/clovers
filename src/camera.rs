@@ -45,9 +45,9 @@ impl Camera {
         let half_height: Float = (theta / 2.0).tan();
         let half_width: Float = aspect_ratio * half_height;
         let origin: Vec3 = look_from;
-        let w: Vec3 = (look_from - look_at).normalize();
-        let u: Vec3 = (up.cross(&w)).normalize();
-        let v: Vec3 = w.cross(&u);
+        let w: Vec3 = (look_from - look_at).normalized();
+        let u: Vec3 = (up.cross(w)).normalized();
+        let v: Vec3 = w.cross(u);
 
         // TODO: understand this defocus
         let lower_left_corner: Vec3 = origin

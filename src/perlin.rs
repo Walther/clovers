@@ -59,7 +59,7 @@ fn perlin_interp(c: [[[Vec3; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Float 
                 accum += (i_f * uu + (1.0 - i_f) * (1.0 - uu))
                     * (j_f * vv + (1.0 - j_f) * (1.0 - vv))
                     * (k_f * ww + (1.0 - k_f) * (1.0 - ww))
-                    * c[i][j][k].dot(&weight_v);
+                    * c[i][j][k].dot(weight_v);
             }
         }
     }
@@ -70,7 +70,11 @@ impl Perlin {
     pub fn new(mut rng: ThreadRng) -> Self {
         let mut random_vectors: [Vec3; 256] = [Vec3::new(0.0, 0.0, 0.0); 256];
         for i in 0..256 {
-            random_vectors[i] = rng.gen::<Vec3>();
+            random_vectors[i] = Vec3 {
+                x: rng.gen(),
+                y: rng.gen(),
+                z: rng.gen(),
+            };
         }
 
         let perm_x = perlin_generate_perm(rng);

@@ -8,14 +8,14 @@ pub struct ONB {
 
 impl ONB {
     pub fn build_from_w(normal: Vec3) -> ONB {
-        let w = (normal).normalize();
+        let w = (normal).normalized();
         let a: Vec3 = if (w.x).abs() > 0.9 {
             Vec3::new(0.0, 1.0, 0.0)
         } else {
             Vec3::new(1.0, 0.0, 0.0)
         };
-        let v = (w.cross(&a)).normalize();
-        let u = w.cross(&v);
+        let v = (w.cross(a)).normalized();
+        let u = w.cross(v);
 
         ONB { u, v, w }
     }
