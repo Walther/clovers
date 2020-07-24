@@ -8,13 +8,13 @@ pub struct Dielectric {
     refractive_index: Float,
 }
 
-impl Dielectric {
+impl<'a> Dielectric {
     pub fn scatter(
         self,
         ray: &Ray,
         hit_record: &HitRecord,
         mut rng: ThreadRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'a>> {
         let albedo: Color = Color::new(1.0, 1.0, 1.0); // Glass does not attenuate
         let specular_ray: Ray;
 
