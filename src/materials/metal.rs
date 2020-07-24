@@ -11,13 +11,13 @@ pub struct Metal {
     fuzz: Float,
 }
 
-impl Metal {
+impl<'a> Metal {
     pub fn scatter(
         self,
         ray: &Ray,
         hit_record: &HitRecord,
         rng: ThreadRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'a>> {
         let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
         Some(ScatterRecord {
             specular_ray: Some(Ray::new(

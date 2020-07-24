@@ -50,10 +50,8 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
                         }
                         crate::materials::MaterialType::Diffuse => {
                             // Use a probability density function to figure out where to scatter a new ray
-                            let light_ptr = HitablePDF::new(
-                                Arc::clone(&scene.priority_objects), // TODO: fix silly arc
-                                hit_record.position,
-                            );
+                            let light_ptr =
+                                HitablePDF::new(&scene.priority_objects, hit_record.position);
                             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
 
                             let scattered =

@@ -76,11 +76,11 @@ pub enum MaterialType {
     Specular,
 }
 
-pub struct ScatterRecord {
+pub struct ScatterRecord<'a> {
     pub material_type: MaterialType,
     pub specular_ray: Option<Ray>,
     pub attenuation: Color,
-    pub pdf_ptr: PDF,
+    pub pdf_ptr: PDF<'a>,
 }
 
 fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {

@@ -8,14 +8,14 @@ pub struct Lambertian {
     albedo: Texture,
 }
 
-impl Lambertian {
+impl<'a> Lambertian {
     /// Returns None, if ray is absorbed. Otherwise, returns a ray, albedo of what was hit, and (?) a value used for probability density function based sampling
     pub fn scatter(
         self,
         _ray: &Ray,
         hit_record: &HitRecord,
         _rng: ThreadRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'a>> {
         Some(ScatterRecord {
             material_type: MaterialType::Diffuse,
             specular_ray: None,

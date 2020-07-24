@@ -2,14 +2,14 @@ use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Float, 
 use rand::prelude::*;
 use std::sync::Arc;
 
-pub enum PDF {
+pub enum PDF<'a> {
     CosinePDF(CosinePDF),
-    HitablePDF(HitablePDF),
-    MixturePDF(MixturePDF),
+    HitablePDF(HitablePDF<'a>),
+    MixturePDF(MixturePDF<'a>),
     ZeroPDF(ZeroPDF),
 }
 
-impl PDF {
+impl<'a> PDF<'a> {
     pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
         match self {
             PDF::CosinePDF(p) => p.value(direction, time, rng),
@@ -32,8 +32,8 @@ pub struct CosinePDF {
     uvw: ONB,
 }
 
-impl CosinePDF {
-    pub fn new(w: Vec3) -> PDF {
+impl<'a> CosinePDF {
+    pub fn new(w: Vec3) -> PDF<'a> {
         PDF::CosinePDF(CosinePDF {
             uvw: ONB::build_from_w(w),
         })
@@ -53,13 +53,13 @@ impl CosinePDF {
     }
 }
 
-pub struct HitablePDF {
+pub struct HitablePDF<'a> {
     origin: Vec3,
-    hitable: Arc<Hitable>,
+    hitable: &'a Hitable,
 }
 
-impl HitablePDF {
-    pub fn new(hitable: Arc<Hitable>, origin: Vec3) -> PDF {
+impl<'a> HitablePDF<'a> {
+    pub fn new(hitable: &'a Hitable, origin: Vec3) -> PDF {
         PDF::HitablePDF(HitablePDF { origin, hitable })
     }
 
@@ -72,14 +72,14 @@ impl HitablePDF {
     }
 }
 
-pub struct MixturePDF {
+pub struct MixturePDF<'a> {
     // Arc to prevent infinite size
-    pdf1: Arc<PDF>,
-    pdf2: Arc<PDF>,
+    pdf1: Arc<PDF<'a>>,
+    pdf2: Arc<PDF<'a>>,
 }
 
-impl MixturePDF {
-    pub fn new(pdf1: PDF, pdf2: PDF) -> PDF {
+impl<'a> MixturePDF<'a> {
+    pub fn new(pdf1: PDF<'a>, pdf2: PDF<'a>) -> PDF<'a> {
         PDF::MixturePDF(MixturePDF {
             pdf1: Arc::new(pdf1),
             pdf2: Arc::new(pdf2),
@@ -102,8 +102,8 @@ impl MixturePDF {
 // TODO: this is an ugly hack due to tutorial saying `srec.pdf_ptr = 0;` in 12.2 Handling Specular for Metal
 pub struct ZeroPDF {}
 
-impl ZeroPDF {
-    pub fn new() -> PDF {
+impl<'a> ZeroPDF {
+    pub fn new() -> PDF<'a> {
         PDF::ZeroPDF(ZeroPDF {})
     }
 

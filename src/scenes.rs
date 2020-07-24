@@ -29,7 +29,7 @@ pub struct Scene {
     pub objects: Hitable, // BVHNode
     pub camera: Camera,
     pub background_color: Color, // TODO: make into Texture or something?
-    pub priority_objects: Arc<Hitable>, // TODO: fix silly arc due to colorize
+    pub priority_objects: Hitable,
 }
 
 impl Scene {
@@ -46,7 +46,7 @@ impl Scene {
             objects: objects.into_bvh(time_0, time_1, rng),
             camera,
             background_color,
-            priority_objects: Arc::new(priority_objects.into_hitable()),
+            priority_objects: priority_objects.into_hitable(),
         }
     }
 }

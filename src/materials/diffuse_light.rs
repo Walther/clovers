@@ -8,13 +8,13 @@ pub struct DiffuseLight {
     emit: Texture,
 }
 
-impl DiffuseLight {
+impl<'a> DiffuseLight {
     pub fn scatter(
         self,
         _ray: &Ray,
         _hit_record: &HitRecord,
         _rng: ThreadRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'a>> {
         None
     }
 
