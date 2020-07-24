@@ -53,13 +53,13 @@ impl CosinePDF {
     }
 }
 
-pub struct HitablePDF {
+pub struct HitablePDF<'a> {
     origin: Vec3,
-    hitable: Arc<Hitable>,
+    hitable: &'a Hitable,
 }
 
-impl HitablePDF {
-    pub fn new(hitable: Arc<Hitable>, origin: Vec3) -> PDF {
+impl<'a> HitablePDF<'a> {
+    pub fn new(hitable: &'a Hitable, origin: Vec3) -> PDF {
         PDF::HitablePDF(HitablePDF { origin, hitable })
     }
 
