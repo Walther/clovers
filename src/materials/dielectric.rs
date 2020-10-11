@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Copy, Clone, Deserialize, Serialize, Debug)]
 pub struct Dielectric {
     refractive_index: Float,
+    color: Color,
 }
 
 impl<'a> Dielectric {
@@ -15,7 +16,7 @@ impl<'a> Dielectric {
         hit_record: &HitRecord,
         mut rng: ThreadRng,
     ) -> Option<ScatterRecord<'a>> {
-        let albedo: Color = Color::new(1.0, 1.0, 1.0); // Glass does not attenuate
+        let albedo = self.color;
         let specular_ray: Ray;
 
         let etai_over_etat: Float = match hit_record.front_face {
@@ -69,7 +70,10 @@ impl<'a> Dielectric {
         todo!()
     }
 
-    pub fn new(refractive_index: Float) -> Material {
-        Material::Dielectric(Dielectric { refractive_index })
+    pub fn new(refractive_index: Float, color: Color) -> Material {
+        Material::Dielectric(Dielectric {
+            refractive_index,
+            color,
+        })
     }
 }
