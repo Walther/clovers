@@ -1,4 +1,4 @@
-use crate::{hitable::Hitable, Float, Vec3};
+use crate::{hitable::Hitable, textures::Texture, Float, Vec3};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -32,6 +32,7 @@ pub enum Object {
     RotateY(RotateInit),
     Translate(TranslateInit),
     FlipFace(FlipFaceInit),
+    ConstantMedium(ConstantMediumInit),
 }
 
 impl From<Object> for Hitable {
@@ -57,6 +58,11 @@ impl From<Object> for Hitable {
                 let obj: Hitable = obj.into();
                 FlipFace::new(obj)
             }
+            Object::ConstantMedium(x) => {
+                let obj = *x.boundary;
+                let obj: Hitable = obj.into();
+                ConstantMedium::new(Arc::new(obj), x.density, *x.texture)
+            }
         }
     }
 }
@@ -75,4 +81,11 @@ pub struct RotateInit {
 pub struct TranslateInit {
     object: Box<Object>,
     offset: Vec3,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ConstantMediumInit {
+    boundary: Box<Object>,
+    density: Float,
+    texture: Box<Texture>,
 }

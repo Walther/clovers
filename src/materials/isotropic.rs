@@ -1,7 +1,6 @@
-use super::Material;
+use super::{Material, MaterialType, ScatterRecord};
 use crate::{
-    color::Color, hitable::HitRecord, random::random_in_unit_sphere, ray::Ray, textures::Texture,
-    Float,
+    color::Color, hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI,
 };
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
@@ -10,34 +9,45 @@ pub struct Isotropic {
     albedo: Texture,
 }
 
-impl Isotropic {
+impl<'a> Isotropic {
     pub fn new(emission: Texture) -> Material {
         Material::Isotropic(Isotropic { albedo: emission })
     }
 
     pub fn scatter(
         self,
-        ray: &Ray,
+        _ray: &Ray,
         hit_record: &HitRecord,
-        rng: ThreadRng,
-    ) -> Option<(Ray, Color, Float)> {
-        let scattered: Ray = Ray::new(hit_record.position, random_in_unit_sphere(rng), ray.time);
+        _rng: ThreadRng,
+    ) -> Option<ScatterRecord<'a>> {
+        // TODO: fix / verify correctness!
+        // this is just copied from lambertian as an experiment
         let albedo: Color = self
             .albedo
             .color(hit_record.u, hit_record.v, hit_record.position);
 
-        let pdf = 1.0; // TODO:
-
-        Some((scattered, albedo, pdf))
+        Some(ScatterRecord {
+            material_type: MaterialType::Diffuse,
+            specular_ray: None,
+            attenuation: albedo,
+            pdf_ptr: CosinePDF::new(hit_record.normal),
+        })
     }
 
     pub fn scattering_pdf(
         self,
         _ray: &Ray,
-        _hit_record: &HitRecord,
-        _scattered: &Ray,
+        hit_record: &HitRecord,
+        scattered: &Ray,
         _rng: ThreadRng,
     ) -> Float {
-        todo!()
+        // TODO: fix / verify correctness!
+        // this is just copied from lambertian as an experiment
+        let cosine = hit_record.normal.dot(&scattered.direction.normalize());
+        if cosine < 0.0 {
+            0.0
+        } else {
+            cosine / PI
+        }
     }
 }
