@@ -5,7 +5,7 @@ use rand::prelude::*;
 use rayon::prelude::*;
 
 #[cfg(feature = "gui")]
-use pixels::{wgpu::Surface, Error, Pixels, SurfaceTexture};
+use pixels::{Error, Pixels, SurfaceTexture};
 #[cfg(feature = "gui")]
 use winit::{
     dpi::PhysicalSize,
@@ -36,7 +36,6 @@ pub fn draw_gui(
             .build(&event_loop)
             .unwrap()
     };
-    let mut hidpi_factor = window.scale_factor();
     let mut pixels = {
         let surface_texture = SurfaceTexture::new(width, height, &window);
         Pixels::new(width, height, surface_texture)?
@@ -66,11 +65,6 @@ pub fn draw_gui(
             if input.key_pressed(VirtualKeyCode::Escape) || input.quit() {
                 *control_flow = ControlFlow::Exit;
                 return;
-            }
-
-            // Adjust high DPI factor
-            if let Some(factor) = input.scale_factor_changed() {
-                hidpi_factor = factor;
             }
 
             // Resize the window

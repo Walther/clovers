@@ -7,8 +7,8 @@ use crate::{
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::fs::File;
 use std::io::prelude::*;
-use std::{fs::File, sync::Arc};
 
 // TODO: convert these to json or other
 // pub mod cornell;

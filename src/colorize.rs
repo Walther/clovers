@@ -6,7 +6,6 @@ use crate::{
     Float, SHADOW_EPSILON,
 };
 use rand::prelude::*;
-use std::sync::Arc;
 
 /// The main coloring function
 pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: ThreadRng) -> Color {
