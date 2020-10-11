@@ -38,8 +38,7 @@ pub fn draw_gui(
     };
     let mut hidpi_factor = window.scale_factor();
     let mut pixels = {
-        let surface = Surface::create(&window);
-        let surface_texture = SurfaceTexture::new(width, height, surface);
+        let surface_texture = SurfaceTexture::new(width, height, &window);
         Pixels::new(width, height, surface_texture)?
     };
 
