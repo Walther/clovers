@@ -35,7 +35,6 @@ impl Material {
             Material::Metal(m) => Metal::scatter(m, ray, hit_record, rng),
             Material::Dielectric(d) => Dielectric::scatter(d, ray, hit_record, rng),
             Material::Isotropic(i) => Isotropic::scatter(i, ray, hit_record, rng),
-            _ => todo!(),
         }
     }
 

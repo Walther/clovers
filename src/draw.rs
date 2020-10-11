@@ -38,7 +38,11 @@ pub fn draw(
                 u = (x as Float + rng.gen::<Float>()) / width as Float;
                 v = (y as Float + rng.gen::<Float>()) / height as Float;
                 ray = scene.camera.get_ray(u, v, rng);
-                color += colorize(&ray, &scene, 0, max_depth, rng);
+                let new_color = colorize(&ray, &scene, 0, max_depth, rng);
+                // skip NaN and Infinity
+                if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
+                    color += new_color;
+                }
             }
             color /= samples as Float;
 

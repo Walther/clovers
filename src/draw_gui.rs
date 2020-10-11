@@ -143,7 +143,11 @@ impl World {
                 let u = (x as Float + rng.gen::<Float>()) / width as Float;
                 let v = (y as Float + rng.gen::<Float>()) / height as Float;
                 let ray = camera.get_ray(u, v, rng);
-                color += colorize(&ray, scene, 0, d, rng);
+                let new_color = colorize(&ray, &scene, 0, d, rng);
+                // skip NaN and Infinity
+                if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
+                    color += new_color;
+                }
 
                 // sum to previous color; remember to divide in a consumer!
                 let prev_color = Color::new(pixel[0], pixel[1], pixel[2]);
