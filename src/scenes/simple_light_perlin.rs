@@ -40,10 +40,10 @@ pub fn load<'a>(width: u32, height: u32, rng: ThreadRng) -> Scene<'a> {
     ))));
     world
         .hitables
-        .add((Sphere::new(Vec3::new(0.0, 7.0, 0.0), 2.0, Arc::clone(&difflight))));
+        .add((Sphere::new(Vec3::new(0.0, 7.0, 0.0), 2.0, difflight.clone())));
     world
         .hitables
-        .add((XYRect::new(3.0, 5.0, 1.0, 3.0, -2.0, Arc::clone(&difflight))));
+        .add((XYRect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight.clone())));
 
     let camera_position: Vec3 = Vec3::new(20.0, 5.0, 2.0);
     let camera_target: Vec3 = Vec3::new(0.0, 2.0, 0.0);

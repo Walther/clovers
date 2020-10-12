@@ -292,18 +292,18 @@ impl BVHNode {
 
             if object_span == 1 {
                 // If we only have one object, return itself. Note: no explicit leaf type in our tree
-                left = Arc::clone(&objects[0]);
-                right = Arc::clone(&objects[0]);
+                left = objects[0].clone();
+                right = objects[0].clone();
             } else if object_span == 2 {
                 // If we are comparing two objects, perform the comparison
                 match comparator(&objects[0], &objects[1]) {
                     Ordering::Less => {
-                        left = Arc::clone(&objects[0]);
-                        right = Arc::clone(&objects[1]);
+                        left = objects[0].clone();
+                        right = objects[1].clone();
                     }
                     Ordering::Greater => {
-                        left = Arc::clone(&objects[1]);
-                        right = Arc::clone(&objects[0]);
+                        left = objects[1].clone();
+                        right = objects[0].clone();
                     }
                     Ordering::Equal => {
                         // TODO: what should happen here?
