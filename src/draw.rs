@@ -1,11 +1,10 @@
 use crate::{color::Color, colorize::colorize, ray::Ray, scenes, Float};
-use image::{ImageBuffer, ImageResult, Rgb, RgbImage};
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
 use rayon::prelude::*;
 use scenes::Scene;
 
-/// The main drawing function, returns an `ImageResult`.
+/// The main drawing function, returns a Vec<Color> as a pixelbuffer.
 pub fn draw(
     width: u32,
     height: u32,
@@ -13,9 +12,7 @@ pub fn draw(
     max_depth: u32,
     gamma: Float,
     scene: Scene,
-) -> ImageResult<ImageBuffer<image::Rgb<u8>, std::vec::Vec<u8>>> {
-    let mut img: RgbImage = ImageBuffer::new(width as u32, height as u32);
-
+) -> Vec<Color> {
     // Progress bar
     let pixels = (width * height) as u64;
     let bar = ProgressBar::new(pixels);
@@ -24,9 +21,16 @@ pub fn draw(
         "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
     ));
 
-    img.enumerate_pixels_mut()
-        .par_bridge()
-        .for_each(|(x, y, pixel)| {
+    let black = Color::new(0.0, 0.0, 0.0);
+    let mut pixelbuffer = vec![black; pixels as usize];
+
+    pixelbuffer
+        .par_iter_mut()
+        .enumerate()
+        .for_each(|(index, pixel)| {
+            let x = index % width as usize;
+            let y = index / width as usize;
+
             let mut rng = rand::thread_rng();
             let mut color: Color = Color::new(0.0, 0.0, 0.0);
             let mut u: Float;
@@ -47,13 +51,10 @@ pub fn draw(
             color /= samples as Float;
 
             color = color.gamma_correction(gamma);
-            *pixel = Rgb(color.to_rgb_u8());
+            *pixel = color;
 
             bar.inc(1);
         });
 
-    // Graphics assume origin at bottom left corner of the screen
-    // Our buffer writes pixels from top left corner. Simple fix, just flip it!
-    image::imageops::flip_vertical_in_place(&mut img);
-    Ok(img)
+    pixelbuffer
 }

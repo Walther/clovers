@@ -144,6 +144,7 @@ impl HitableList {
     ) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest = distance_max;
+        // TODO: with more objects, this may become a significant bottleneck?
         for hitable in self.0.iter() {
             if let Some(record) = hitable.hit(ray, distance_min, closest, rng) {
                 closest = record.distance;
