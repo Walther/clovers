@@ -6,6 +6,7 @@
 use chrono::Utc;
 use clap::Clap;
 use humantime::format_duration;
+use image::{ImageBuffer, Rgb, RgbImage};
 use std::fs::File;
 use std::{error::Error, fs, time::Instant};
 
@@ -87,17 +88,31 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     // cli version
+    // Note: live progress bar printed within draw
     let start = Instant::now();
-    let img = draw(
+    let pixelbuffer = draw(
         opts.width,
         opts.height,
         opts.samples,
         opts.max_depth,
         opts.gamma,
         scene,
-    )?; // Note: live progress bar printed within draw
-    let duration = Instant::now() - start;
+    );
 
+    // Translate our internal pixelbuffer into an Image buffer
+    let width = opts.width;
+    let height = opts.height;
+    let mut img: RgbImage = ImageBuffer::new(width, height);
+    img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
+        let index = y * width + x;
+        *pixel = Rgb(pixelbuffer[index as usize].to_rgb_u8());
+    });
+
+    // Graphics assume origin at bottom left corner of the screen
+    // Our buffer writes pixels from top left corner. Simple fix, just flip it!
+    image::imageops::flip_vertical_in_place(&mut img);
+
+    let duration = Instant::now() - start;
     println!(); // Empty line after progress bar
     println!("finished render in {}", format_duration(duration));
 
