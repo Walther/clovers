@@ -21,13 +21,19 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
 
         // Hit something
         Some(hit_record) => {
-            let emitted: Color = hit_record.material.emit(
+            let mut emitted: Color = hit_record.material.emit(
                 ray,
                 &hit_record,
                 hit_record.u,
                 hit_record.v,
                 hit_record.position,
             );
+
+            if emitted.r.is_nan() || emitted.g.is_nan() || emitted.b.is_nan() {
+                // TODO: figure out the source
+                eprintln!("an emitted component was NaN; skipping");
+                emitted = Color::new(0.0, 0.0, 0.0);
+            }
 
             // Do we scatter?
             match hit_record.material.scatter(&ray, &hit_record, rng) {
@@ -55,10 +61,29 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
 
                             let scattered =
                                 Ray::new(hit_record.position, mixture_pdf.generate(rng), ray.time);
-                            let pdf_val = mixture_pdf.value(scattered.direction, ray.time, rng);
+                            let mut pdf_val = mixture_pdf.value(scattered.direction, ray.time, rng);
+
+                            if pdf_val == 0.0 {
+                                // TODO: figure out the source
+                                eprintln!("a pdf_val was zero, would divzero; skipping");
+                                pdf_val = 1.0;
+                            }
+
+                            if pdf_val.is_nan() || pdf_val.is_nan() || pdf_val.is_nan() {
+                                // TODO: figure out the source
+                                eprintln!("a pdf_val was NaN; skipping");
+                                pdf_val = 1.0;
+                            }
 
                             // recurse
-                            let recurse = colorize(&scattered, scene, depth + 1, max_depth, rng);
+                            let mut recurse =
+                                colorize(&scattered, scene, depth + 1, max_depth, rng);
+
+                            if recurse.r.is_nan() || recurse.g.is_nan() || recurse.b.is_nan() {
+                                // TODO: figure out the source
+                                eprintln!("a recurse component was NaN; skipping");
+                                recurse = Color::new(0.0, 0.0, 0.0);
+                            }
 
                             // Blend it all together
                             let color = emitted
