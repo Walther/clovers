@@ -45,6 +45,10 @@ struct Opts {
     /// Gamma correction value
     #[clap(short, long, default_value = "2.0")]
     gamma: Float,
+    /// Suppress progress bar printout.
+    // TODO: make cleaner
+    #[clap(long)]
+    no_progress: bool,
     /// Optional GUI with iterative rendering
     #[clap(long)]
     gui: bool,
@@ -96,6 +100,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         opts.samples,
         opts.max_depth,
         opts.gamma,
+        opts.no_progress,
         scene,
     );
 

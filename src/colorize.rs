@@ -61,7 +61,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
                             let recurse = colorize(&scattered, scene, depth + 1, max_depth, rng);
 
                             // Blend it all together
-                            emitted
+                            let color = emitted
                                 + scatter_record.attenuation
                                     * hit_record.material.scattering_pdf(
                                         ray,
@@ -70,7 +70,16 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
                                         rng,
                                     )
                                     * recurse
-                                    / pdf_val
+                                    / pdf_val;
+
+                            if color.r.is_nan() || color.g.is_nan() || color.b.is_nan() {
+                                // TODO: figure out the source
+                                eprintln!("a color component was NaN; skipping");
+                                return Color::new(0.0, 0.0, 0.0);
+                            }
+
+                            // Return blended color
+                            color
                         }
                     }
                 }

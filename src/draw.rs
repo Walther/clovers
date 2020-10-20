@@ -11,15 +11,19 @@ pub fn draw(
     samples: u32,
     max_depth: u32,
     gamma: Float,
+    no_progress: bool,
     scene: Scene,
 ) -> Vec<Color> {
     // Progress bar
     let pixels = (width * height) as u64;
+
     let bar = ProgressBar::new(pixels);
-    bar.set_draw_delta(pixels / 1000);
-    bar.set_style(ProgressStyle::default_bar().template(
-        "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
-    ));
+    if !no_progress {
+        bar.set_draw_delta(pixels / 1000);
+        bar.set_style(ProgressStyle::default_bar().template(
+            "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
+        ));
+    }
 
     let black = Color::new(0.0, 0.0, 0.0);
     let mut pixelbuffer = vec![black; pixels as usize];
@@ -53,7 +57,9 @@ pub fn draw(
             color = color.gamma_correction(gamma);
             *pixel = color;
 
-            bar.inc(1);
+            if !no_progress {
+                bar.inc(1);
+            }
         });
 
     pixelbuffer
