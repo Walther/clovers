@@ -4,6 +4,8 @@ use rand::prelude::*;
 /// Internal helper. Originally used for lambertian reflection with flaws
 pub fn random_in_unit_sphere(mut rng: ThreadRng) -> Vec3 {
     let mut position: Vec3;
+    // TODO: figure out a non-loop method
+    // See https://github.com/RayTracing/raytracing.github.io/issues/765
     loop {
         position = 2.0 * Vec3::new(rng.gen(), rng.gen(), rng.gen()) - Vec3::new(1.0, 1.0, 1.0);
         if position.magnitude_squared() >= 1.0 {
@@ -23,6 +25,8 @@ pub fn random_unit_vector(mut rng: ThreadRng) -> Vec3 {
 /// Internal helper.
 pub fn random_in_unit_disk(rng: &mut ThreadRng) -> Vec3 {
     let mut position: Vec3;
+    // TODO: figure out a non-loop method
+    // See https://github.com/RayTracing/raytracing.github.io/issues/765
     loop {
         // TODO: understand this defocus disk thingy
         position = 2.0 * Vec3::new(rng.gen(), rng.gen(), 0.0) - Vec3::new(1.0, 1.0, 0.0);
