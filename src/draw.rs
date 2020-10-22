@@ -1,8 +1,12 @@
 use crate::{color::Color, colorize::colorize, ray::Ray, scenes, Float};
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
-use rayon::prelude::*;
+
 use scenes::Scene;
+
+// Attempt using a more manual thread approach
+use std::sync::{Arc, Mutex};
+use std::thread;
 
 /// The main drawing function, returns a Vec<Color> as a pixelbuffer.
 pub fn draw(
@@ -22,39 +26,68 @@ pub fn draw(
     ));
 
     let black = Color::new(0.0, 0.0, 0.0);
-    let mut pixelbuffer = vec![black; pixels as usize];
+    let pixelbuffer = vec![black; pixels as usize];
 
-    pixelbuffer
-        .par_iter_mut()
-        .enumerate()
-        .for_each(|(index, pixel)| {
-            let x = index % width as usize;
-            let y = index / width as usize;
+    let safe_pixelbuffer = Arc::new(Mutex::new(pixelbuffer));
+    let safe_scene = Arc::new(Mutex::new(scene));
+    let safe_bar = Arc::new(Mutex::new(bar));
 
-            let mut rng = rand::thread_rng();
-            let mut color: Color = Color::new(0.0, 0.0, 0.0);
-            let mut u: Float;
-            let mut v: Float;
-            let mut ray: Ray;
+    // TODO: fix work division
+    let cpus: u64 = num_cpus::get() as u64;
+    let pixels_per_cpu = pixels / cpus;
+    println!("thread count: {}", cpus);
+    println!("pixels_per_cpu: {}", pixels_per_cpu);
 
-            // Multisampling for antialiasing
-            for _sample in 0..samples {
-                u = (x as Float + rng.gen::<Float>()) / width as Float;
-                v = (y as Float + rng.gen::<Float>()) / height as Float;
-                ray = scene.camera.get_ray(u, v, rng);
-                let new_color = colorize(&ray, &scene, 0, max_depth, rng);
-                // skip NaN and Infinity
-                if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
-                    color += new_color;
+    let handles = (0..cpus)
+        .map(|cpu| {
+            let scene = safe_scene.clone();
+            let pixelbuffer = safe_pixelbuffer.clone();
+            let bar = safe_bar.clone();
+            thread::spawn(move || {
+                // unlock mutex
+                let scene = scene.lock().unwrap();
+                let mut pixelbuffer = pixelbuffer.lock().unwrap();
+                let bar = bar.lock().unwrap();
+                // reusables
+                let mut rng = rand::thread_rng();
+                let mut color: Color = Color::new(0.0, 0.0, 0.0);
+                let mut u: Float;
+                let mut v: Float;
+                let mut ray: Ray;
+                // TODO: fix work division
+                for index in (cpu * pixels_per_cpu)..(cpu * pixels_per_cpu + pixels_per_cpu) {
+                    let x = index % width as u64;
+                    let y = index / width as u64;
+
+                    // Multisampling for antialiasing
+                    for _sample in 0..samples {
+                        u = (x as Float + rng.gen::<Float>()) / width as Float;
+                        v = (y as Float + rng.gen::<Float>()) / height as Float;
+                        ray = scene.camera.get_ray(u, v, rng);
+                        let new_color = colorize(&ray, &scene, 0, max_depth, rng);
+                        // skip NaN and Infinity
+                        if new_color.r.is_finite()
+                            && new_color.g.is_finite()
+                            && new_color.b.is_finite()
+                        {
+                            color += new_color;
+                        }
+                    }
+                    color /= samples as Float;
+
+                    color = color.gamma_correction(gamma);
+                    pixelbuffer[index as usize] = color;
+
+                    bar.inc(1);
                 }
-            }
-            color /= samples as Float;
+            })
+        })
+        .collect::<Vec<thread::JoinHandle<_>>>();
 
-            color = color.gamma_correction(gamma);
-            *pixel = color;
+    for thread in handles {
+        thread.join().unwrap();
+    }
 
-            bar.inc(1);
-        });
-
-    pixelbuffer
+    let result = safe_pixelbuffer.lock().unwrap().clone();
+    result
 }
