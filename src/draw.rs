@@ -32,7 +32,7 @@ pub fn draw(
     let safe_scene = Arc::new(Mutex::new(scene));
     let safe_bar = Arc::new(Mutex::new(bar));
 
-    // TODO: fix work division
+    // TODO: better work division?
     let cpus: u64 = num_cpus::get() as u64;
     let pixels_per_cpu = pixels / cpus;
     println!("thread count: {}", cpus);
@@ -44,23 +44,27 @@ pub fn draw(
             let pixelbuffer = safe_pixelbuffer.clone();
             let bar = safe_bar.clone();
             thread::spawn(move || {
-                // unlock mutex
-                let scene = scene.lock().unwrap();
-                let mut pixelbuffer = pixelbuffer.lock().unwrap();
-                let bar = bar.lock().unwrap();
                 // reusables
                 let mut rng = rand::thread_rng();
-                let mut color: Color = Color::new(0.0, 0.0, 0.0);
+                let mut color;
                 let mut u: Float;
                 let mut v: Float;
+                let mut x: u64;
+                let mut y: u64;
                 let mut ray: Ray;
-                // TODO: fix work division
-                for index in (cpu * pixels_per_cpu)..(cpu * pixels_per_cpu + pixels_per_cpu) {
-                    let x = index % width as u64;
-                    let y = index / width as u64;
+
+                let range = (cpu * pixels_per_cpu)..(cpu * pixels_per_cpu + pixels_per_cpu);
+                println!("range: {} {}", range.start, range.end);
+                for index in range {
+                    x = index % width as u64;
+                    y = index / width as u64;
+                    color = Color::new(0.0, 0.0, 0.0);
 
                     // Multisampling for antialiasing
                     for _sample in 0..samples {
+                        // unlock mutex
+                        let scene = scene.lock().unwrap();
+
                         u = (x as Float + rng.gen::<Float>()) / width as Float;
                         v = (y as Float + rng.gen::<Float>()) / height as Float;
                         ray = scene.camera.get_ray(u, v, rng);
@@ -76,8 +80,11 @@ pub fn draw(
                     color /= samples as Float;
 
                     color = color.gamma_correction(gamma);
+
+                    let mut pixelbuffer = pixelbuffer.lock().unwrap();
                     pixelbuffer[index as usize] = color;
 
+                    let bar = bar.lock().unwrap();
                     bar.inc(1);
                 }
             })
