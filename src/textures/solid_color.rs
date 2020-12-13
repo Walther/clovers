@@ -16,3 +16,11 @@ impl SolidColor {
         self.color
     }
 }
+
+impl Default for SolidColor {
+    fn default() -> Self {
+        SolidColor {
+            color: Color::default(),
+        }
+    }
+}

@@ -1,4 +1,4 @@
-use crate::{color::Color, hitable::HitRecord, pdf::PDF, Float, Ray, Vec3};
+use crate::{color::Color, hitable::HitRecord, pdf::PDF, textures::SolidColor, Float, Ray, Vec3};
 pub mod dielectric;
 pub mod diffuse_light;
 pub mod isotropic;
@@ -19,6 +19,12 @@ pub enum Material {
     DiffuseLight(DiffuseLight),
     Metal(Metal),
     Isotropic(Isotropic),
+}
+
+impl Default for Material {
+    fn default() -> Self {
+        Lambertian::new(SolidColor::new(Color::default()))
+    }
 }
 
 impl Material {

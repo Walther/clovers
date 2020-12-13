@@ -10,6 +10,17 @@ pub struct Color {
     pub b: Float,
 }
 
+impl Default for Color {
+    /// Default color: middle gray 18%
+    fn default() -> Self {
+        Color {
+            r: 0.18,
+            g: 0.18,
+            b: 0.18,
+        }
+    }
+}
+
 impl Color {
     pub fn new(r: Float, g: Float, b: Float) -> Color {
         Color { r, g, b }

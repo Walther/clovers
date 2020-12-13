@@ -14,7 +14,7 @@ use std::sync::Arc;
 pub struct BoxyInit {
     pub corner_0: Vec3,
     pub corner_1: Vec3,
-    pub material: Material,
+    pub material: Option<Material>,
 }
 
 // Avoid keyword clash

@@ -1,4 +1,4 @@
-use crate::{hitable::Hitable, textures::Texture, Float, Vec3};
+use crate::{hitable::Hitable, materials::Material, textures::Texture, Float, Vec3};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -24,10 +24,10 @@ pub use translate::*;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub enum Object {
-    XZRect(XZRect),
-    XYRect(XYRect),
-    YZRect(YZRect),
-    Sphere(Sphere),
+    XZRect(XZRectInit),
+    XYRect(XYRectInit),
+    YZRect(YZRectInit),
+    Sphere(SphereInit),
     Boxy(BoxyInit),
     RotateY(RotateInit),
     Translate(TranslateInit),
@@ -38,11 +38,17 @@ pub enum Object {
 impl From<Object> for Hitable {
     fn from(obj: Object) -> Hitable {
         match obj {
-            Object::XZRect(x) => Hitable::XZRect(x),
-            Object::XYRect(x) => Hitable::XYRect(x),
-            Object::YZRect(x) => Hitable::YZRect(x),
-            Object::Sphere(x) => Hitable::Sphere(x),
-            Object::Boxy(x) => Boxy::new(x.corner_0, x.corner_1, x.material),
+            Object::XZRect(x) => {
+                XZRect::new(x.x0, x.x1, x.z0, x.z1, x.k, x.material.unwrap_or_default())
+            }
+            Object::XYRect(x) => {
+                XYRect::new(x.x0, x.x1, x.y0, x.y1, x.k, x.material.unwrap_or_default())
+            }
+            Object::YZRect(x) => {
+                YZRect::new(x.y0, x.y1, x.z0, x.z1, x.k, x.material.unwrap_or_default())
+            }
+            Object::Sphere(x) => Sphere::new(x.center, x.radius, x.material.unwrap_or_default()),
+            Object::Boxy(x) => Boxy::new(x.corner_0, x.corner_1, x.material.unwrap_or_default()),
             Object::RotateY(x) => {
                 let obj = *x.object;
                 let obj: Hitable = obj.into();
@@ -61,10 +67,47 @@ impl From<Object> for Hitable {
             Object::ConstantMedium(x) => {
                 let obj = *x.boundary;
                 let obj: Hitable = obj.into();
-                ConstantMedium::new(Arc::new(obj), x.density, *x.texture)
+                ConstantMedium::new(Arc::new(obj), x.density, x.texture.unwrap_or_default())
             }
         }
     }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+pub struct XYRectInit {
+    x0: Float,
+    x1: Float,
+    y0: Float,
+    y1: Float,
+    k: Float,
+    material: Option<Material>,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+pub struct XZRectInit {
+    x0: Float,
+    x1: Float,
+    z0: Float,
+    z1: Float,
+    k: Float,
+    material: Option<Material>,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+pub struct YZRectInit {
+    y0: Float,
+    y1: Float,
+    z0: Float,
+    z1: Float,
+    k: Float,
+    material: Option<Material>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SphereInit {
+    center: Vec3,
+    radius: Float,
+    material: Option<Material>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -87,5 +130,5 @@ pub struct TranslateInit {
 pub struct ConstantMediumInit {
     boundary: Box<Object>,
     density: Float,
-    texture: Box<Texture>,
+    texture: Option<Texture>,
 }

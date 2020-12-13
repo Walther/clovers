@@ -26,3 +26,9 @@ impl Texture {
         }
     }
 }
+
+impl Default for Texture {
+    fn default() -> Self {
+        SolidColor::new(Color::default())
+    }
+}
