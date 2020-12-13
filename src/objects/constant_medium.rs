@@ -11,7 +11,7 @@ use std::sync::Arc;
 
 pub struct ConstantMedium {
     boundary: Arc<Hitable>,
-    phase_function: Material,
+    phase_function: dyn Material,
     neg_inv_density: Float,
 }
 

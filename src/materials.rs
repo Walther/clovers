@@ -11,17 +11,17 @@ pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
 use rand::prelude::ThreadRng;
-use serde::{Deserialize, Serialize};
-#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
-pub enum Material {
-    Dielectric(Dielectric),
-    Lambertian(Lambertian),
-    DiffuseLight(DiffuseLight),
-    Metal(Metal),
-    Isotropic(Isotropic),
-}
+// use serde::{Deserialize, Serialize};
+// #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+// pub enum Material {
+//     Dielectric(Dielectric),
+//     Lambertian(Lambertian),
+//     DiffuseLight(DiffuseLight),
+//     Metal(Metal),
+//     Isotropic(Isotropic),
+// }
 
-impl Default for Material {
+impl Default for dyn Material {
     fn default() -> Self {
         // TODO: why does this have to be so manual? Compare to:
         // Lambertian::default()
@@ -29,7 +29,21 @@ impl Default for Material {
     }
 }
 
-impl Material {
+pub trait Material: Sync + Send + Copy + Clone {
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord, rng: ThreadRng) -> Option<ScatterRecord>;
+
+    fn scattering_pdf(
+        &self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        scattered: &Ray,
+        rng: ThreadRng,
+    ) -> Float;
+
+    fn emit(&self, ray: &Ray, hit_record: &HitRecord, u: Float, v: Float, position: Vec3) -> Color;
+}
+
+impl dyn Material {
     /// Scatters a ray from the material
     pub fn scatter(
         &self,

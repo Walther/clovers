@@ -58,7 +58,7 @@ impl<'a> Lambertian {
         }
     }
 
-    pub fn new(albedo: Texture) -> Material {
+    pub fn new(albedo: Texture) -> dyn Material {
         Material::Lambertian(Lambertian { albedo })
     }
 }

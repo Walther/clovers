@@ -16,7 +16,7 @@ pub struct XYRect {
     y0: Float,
     y1: Float,
     k: Float,
-    material: Material,
+    material: dyn Material,
 }
 
 impl XYRect {
@@ -26,7 +26,7 @@ impl XYRect {
         y0: Float,
         y1: Float,
         k: Float,
-        material: Material,
+        material: dyn Material,
     ) -> Hitable {
         Hitable::XYRect(XYRect {
             x0,
@@ -117,7 +117,7 @@ pub struct XZRect {
     z0: Float,
     z1: Float,
     k: Float,
-    material: Material,
+    material: dyn Material,
 }
 
 impl XZRect {
@@ -127,7 +127,7 @@ impl XZRect {
         z0: Float,
         z1: Float,
         k: Float,
-        material: Material,
+        material: dyn Material,
     ) -> Hitable {
         Hitable::XZRect(XZRect {
             x0,
@@ -218,7 +218,7 @@ pub struct YZRect {
     z0: Float,
     z1: Float,
     k: Float,
-    material: Material,
+    material: dyn Material,
 }
 
 impl YZRect {
@@ -228,7 +228,7 @@ impl YZRect {
         z0: Float,
         z1: Float,
         k: Float,
-        material: Material,
+        material: dyn Material,
     ) -> Hitable {
         Hitable::YZRect(YZRect {
             y0,

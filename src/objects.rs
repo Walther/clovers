@@ -80,7 +80,7 @@ pub struct XYRectInit {
     y0: Float,
     y1: Float,
     k: Float,
-    material: Option<Material>,
+    material: Option<dyn Material>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
@@ -90,7 +90,7 @@ pub struct XZRectInit {
     z0: Float,
     z1: Float,
     k: Float,
-    material: Option<Material>,
+    material: Option<dyn Material>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
@@ -100,14 +100,14 @@ pub struct YZRectInit {
     z0: Float,
     z1: Float,
     k: Float,
-    material: Option<Material>,
+    material: Option<dyn Material>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SphereInit {
     center: Vec3,
     radius: Float,
-    material: Option<Material>,
+    material: Option<dyn Material>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

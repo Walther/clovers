@@ -41,7 +41,7 @@ impl<'a> Metal {
         0.0 // TODO: why does metal scatter 0? No mention in tutorial afaiu
     }
 
-    pub fn new(albedo: Texture, fuzz: Float) -> Material {
+    pub fn new(albedo: Texture, fuzz: Float) -> dyn Material {
         Material::Metal(Metal {
             albedo,
             fuzz: fuzz.min(1.0),

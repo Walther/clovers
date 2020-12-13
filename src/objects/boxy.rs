@@ -14,7 +14,7 @@ use std::sync::Arc;
 pub struct BoxyInit {
     pub corner_0: Vec3,
     pub corner_1: Vec3,
-    pub material: Option<Material>,
+    pub material: Option<dyn Material>,
 }
 
 // Avoid keyword clash
@@ -22,11 +22,11 @@ pub struct Boxy {
     corner_0: Vec3,
     corner_1: Vec3,
     sides: Arc<HitableList>,
-    pub material: Material,
+    pub material: dyn Material,
 }
 
 impl Boxy {
-    pub fn new(corner_0: Vec3, corner_1: Vec3, material: Material) -> Hitable {
+    pub fn new(corner_0: Vec3, corner_1: Vec3, material: dyn Material) -> Hitable {
         let mut sides = HitableList::new();
         sides.add(XYRect::new(
             corner_0.x, corner_1.x, corner_0.y, corner_1.y, corner_1.z, material,
