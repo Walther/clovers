@@ -10,7 +10,7 @@ pub struct Isotropic {
 }
 
 impl<'a> Isotropic {
-    pub fn new(emission: Texture) -> Material {
+    pub fn new(emission: Texture) -> dyn Material {
         Material::Isotropic(Isotropic { albedo: emission })
     }
 

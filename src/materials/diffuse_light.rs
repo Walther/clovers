@@ -59,7 +59,7 @@ impl<'a> DiffuseLight {
         }
     }
 
-    pub fn new(emission: Texture) -> Material {
+    pub fn new(emission: Texture) -> dyn Material {
         Material::DiffuseLight(DiffuseLight { emit: emission })
     }
 }

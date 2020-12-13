@@ -13,11 +13,11 @@ use serde::{Deserialize, Serialize};
 pub struct Sphere {
     center: Vec3,
     radius: Float,
-    material: Material,
+    material: dyn Material,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: Float, material: Material) -> Hitable {
+    pub fn new(center: Vec3, radius: Float, material: dyn Material) -> Hitable {
         Hitable::Sphere(Sphere {
             center,
             radius,

@@ -70,7 +70,7 @@ impl<'a> Dielectric {
         todo!()
     }
 
-    pub fn new(refractive_index: Float, color: Color) -> Material {
+    pub fn new(refractive_index: Float, color: Color) -> dyn Material {
         Material::Dielectric(Dielectric {
             refractive_index,
             color,

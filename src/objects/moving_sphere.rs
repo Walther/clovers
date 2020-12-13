@@ -12,7 +12,7 @@ pub struct MovingSphere {
     time_0: Float,
     time_1: Float,
     radius: Float,
-    material: Material,
+    material: dyn Material,
 }
 
 impl MovingSphere {
@@ -22,7 +22,7 @@ impl MovingSphere {
         time_0: Float,
         time_1: Float,
         radius: Float,
-        material: Material,
+        material: dyn Material,
     ) -> Hitable {
         Hitable::MovingSphere(MovingSphere {
             center_0,
