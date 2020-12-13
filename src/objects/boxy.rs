@@ -1,9 +1,9 @@
 use super::{XYRect, XZRect, YZRect};
 use crate::{
-    hitable::{HitRecord, Hitable, HitableList, AABB},
+    hitable::{HitRecord, Hitable, HitableList},
     materials::Material,
     ray::Ray,
-    Float, Vec3,
+    Float, Vec3, AABB,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
