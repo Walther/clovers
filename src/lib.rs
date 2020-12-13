@@ -9,6 +9,8 @@ pub mod ray;
 pub use ray::Ray;
 pub mod aabb;
 pub use aabb::AABB;
+pub mod bvhnode;
+pub use bvhnode::BVHNode;
 pub mod camera;
 pub mod colorize;
 pub mod materials;
