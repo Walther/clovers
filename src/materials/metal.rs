@@ -7,7 +7,9 @@ use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 pub struct Metal {
+    #[serde(default)]
     albedo: Texture,
+    #[serde(default)]
     fuzz: Float,
 }
 
