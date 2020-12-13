@@ -3,7 +3,7 @@ use crate::{
     materials::{isotropic::Isotropic, Material},
     ray::Ray,
     textures::Texture,
-    Float, Vec3, CONSTANT_MEDIUM_EPSILON,
+    Float, Vec3, AABB, CONSTANT_MEDIUM_EPSILON,
 };
 use rand::prelude::*;
 
@@ -95,7 +95,7 @@ impl ConstantMedium {
         })
     }
 
-    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<crate::hitable::AABB> {
+    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         self.boundary.bounding_box(t0, t1)
     }
 }

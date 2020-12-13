@@ -1,8 +1,8 @@
 use crate::{
-    hitable::{HitRecord, Hitable, AABB},
+    hitable::{HitRecord, Hitable},
     materials::Material,
     ray::Ray,
-    Float, Vec3, RECT_EPSILON, SHADOW_EPSILON,
+    Float, Vec3, AABB, RECT_EPSILON, SHADOW_EPSILON,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -70,7 +70,7 @@ impl XYRect {
         record.set_face_normal(ray, outward_normal);
         Some(record)
     }
-    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<crate::hitable::AABB> {
+    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
             Vec3::new(self.x0, self.y0, self.k - RECT_EPSILON),
@@ -171,7 +171,7 @@ impl XZRect {
         record.set_face_normal(ray, outward_normal);
         Some(record)
     }
-    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<crate::hitable::AABB> {
+    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
             Vec3::new(self.x0, self.k - RECT_EPSILON, self.z0),
@@ -272,7 +272,7 @@ impl YZRect {
         record.set_face_normal(ray, outward_normal);
         Some(record)
     }
-    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<crate::hitable::AABB> {
+    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
             Vec3::new(self.k - RECT_EPSILON, self.y0, self.z0),

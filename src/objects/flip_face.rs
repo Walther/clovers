@@ -1,7 +1,7 @@
 use crate::{
-    hitable::{HitRecord, Hitable, AABB},
+    hitable::{HitRecord, Hitable},
     ray::Ray,
-    Float,
+    Float, AABB,
 };
 use rand::prelude::*;
 use std::sync::Arc;

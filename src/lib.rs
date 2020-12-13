@@ -7,6 +7,8 @@ pub mod hitable;
 pub mod objects;
 pub mod ray;
 pub use ray::Ray;
+pub mod aabb;
+pub use aabb::AABB;
 pub mod camera;
 pub mod colorize;
 pub mod materials;

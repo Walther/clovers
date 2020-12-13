@@ -1,10 +1,10 @@
 use crate::{
-    hitable::{HitRecord, Hitable, AABB},
+    hitable::{HitRecord, Hitable},
     materials::Material,
     onb::ONB,
     random::random_to_sphere,
     ray::Ray,
-    Float, Vec3, PI, SHADOW_EPSILON,
+    Float, Vec3, AABB, PI, SHADOW_EPSILON,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
