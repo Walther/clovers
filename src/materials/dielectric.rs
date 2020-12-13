@@ -5,8 +5,18 @@ use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 #[derive(Copy, Clone, Deserialize, Serialize, Debug)]
 pub struct Dielectric {
+    #[serde(default = "default_index")]
     refractive_index: Float,
+    #[serde(default = "default_color")]
     color: Color,
+}
+
+fn default_index() -> Float {
+    1.5
+}
+
+fn default_color() -> Color {
+    Color::new(1.0, 1.0, 1.0)
 }
 
 impl<'a> Dielectric {

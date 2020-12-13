@@ -1,3 +1,5 @@
+#![deny(clippy::all)]
+
 // Externals
 use nalgebra::Vector3;
 

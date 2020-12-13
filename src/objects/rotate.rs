@@ -4,7 +4,16 @@ use crate::{
     Float, Vec3, AABB,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
+
+use super::Object;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RotateInit {
+    pub object: Box<Object>,
+    pub angle: Float,
+}
 
 pub struct RotateY {
     object: Arc<Hitable>,

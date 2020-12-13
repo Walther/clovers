@@ -5,9 +5,25 @@ use serde::{Deserialize, Serialize};
 #[derive(Copy, Clone, Deserialize, Serialize, Debug)]
 pub struct Checkered {
     // TODO: get recursive textures back, maybe?
+    #[serde(default = "default_even")]
     even: Color,
+    #[serde(default = "default_odd")]
     odd: Color,
+    #[serde(default = "default_density")]
     density: Float,
+}
+
+fn default_even() -> Color {
+    Color::new(0.82, 0.82, 0.82)
+}
+
+fn default_odd() -> Color {
+    Color::new(0.18, 0.18, 0.18)
+}
+
+fn default_density() -> Float {
+    // TODO: this density parameter feels odd to intuit and manipulate
+    0.1
 }
 
 impl Checkered {

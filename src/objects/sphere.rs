@@ -9,6 +9,14 @@ use crate::{
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+pub struct SphereInit {
+    pub center: Vec3,
+    pub radius: Float,
+    #[serde(default)]
+    pub material: Material,
+}
+
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 pub struct Sphere {
     center: Vec3,

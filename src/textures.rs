@@ -29,6 +29,24 @@ impl Texture {
 
 impl Default for Texture {
     fn default() -> Self {
-        SolidColor::new(Color::default())
+        SolidColor::default().into()
+    }
+}
+
+impl From<SolidColor> for Texture {
+    fn from(s: SolidColor) -> Self {
+        Texture::SolidColor(s)
+    }
+}
+
+impl From<Checkered> for Texture {
+    fn from(s: Checkered) -> Self {
+        Texture::Checkered(s)
+    }
+}
+
+impl From<NoiseTexture> for Texture {
+    fn from(s: NoiseTexture) -> Self {
+        Texture::NoiseTexture(s)
     }
 }

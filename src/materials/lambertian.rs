@@ -1,27 +1,11 @@
-use super::{Material, MaterialType, ScatterRecord};
-use crate::{
-    color::Color,
-    hitable::HitRecord,
-    pdf::CosinePDF,
-    ray::Ray,
-    textures::{SolidColor, Texture},
-    Float, PI,
-};
+use super::{MaterialType, ScatterRecord};
+use crate::{hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI};
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
 
-impl Default for Lambertian {
-    fn default() -> Self {
-        Lambertian {
-            // TODO: why does this have to be so manual? Compare to:
-            // SolidColor::default()
-            albedo: SolidColor::new(Color::default()),
-        }
-    }
-}
-
-#[derive(Copy, Clone, Deserialize, Serialize, Debug)]
+#[derive(Copy, Clone, Deserialize, Serialize, Debug, Default)]
 pub struct Lambertian {
+    #[serde(default)]
     albedo: Texture,
 }
 
@@ -58,7 +42,9 @@ impl<'a> Lambertian {
         }
     }
 
-    pub fn new(albedo: Texture) -> Material {
-        Material::Lambertian(Lambertian { albedo })
+    pub fn new(albedo: impl Into<Texture>) -> Self {
+        Lambertian {
+            albedo: albedo.into(),
+        }
     }
 }
