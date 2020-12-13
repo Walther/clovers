@@ -1,4 +1,4 @@
-use crate::{hitable::Hitable, materials::Material, textures::Texture, Float, Vec3};
+use crate::hitable::Hitable;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -38,17 +38,11 @@ pub enum Object {
 impl From<Object> for Hitable {
     fn from(obj: Object) -> Hitable {
         match obj {
-            Object::XZRect(x) => {
-                XZRect::new(x.x0, x.x1, x.z0, x.z1, x.k, x.material.unwrap_or_default())
-            }
-            Object::XYRect(x) => {
-                XYRect::new(x.x0, x.x1, x.y0, x.y1, x.k, x.material.unwrap_or_default())
-            }
-            Object::YZRect(x) => {
-                YZRect::new(x.y0, x.y1, x.z0, x.z1, x.k, x.material.unwrap_or_default())
-            }
-            Object::Sphere(x) => Sphere::new(x.center, x.radius, x.material.unwrap_or_default()),
-            Object::Boxy(x) => Boxy::new(x.corner_0, x.corner_1, x.material.unwrap_or_default()),
+            Object::XZRect(x) => XZRect::new(x.x0, x.x1, x.z0, x.z1, x.k, x.material),
+            Object::XYRect(x) => XYRect::new(x.x0, x.x1, x.y0, x.y1, x.k, x.material),
+            Object::YZRect(x) => YZRect::new(x.y0, x.y1, x.z0, x.z1, x.k, x.material),
+            Object::Sphere(x) => Sphere::new(x.center, x.radius, x.material),
+            Object::Boxy(x) => Boxy::new(x.corner_0, x.corner_1, x.material),
             Object::RotateY(x) => {
                 let obj = *x.object;
                 let obj: Hitable = obj.into();
@@ -67,68 +61,8 @@ impl From<Object> for Hitable {
             Object::ConstantMedium(x) => {
                 let obj = *x.boundary;
                 let obj: Hitable = obj.into();
-                ConstantMedium::new(Arc::new(obj), x.density, x.texture.unwrap_or_default())
+                ConstantMedium::new(Arc::new(obj), x.density, x.texture)
             }
         }
     }
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct XYRectInit {
-    x0: Float,
-    x1: Float,
-    y0: Float,
-    y1: Float,
-    k: Float,
-    material: Option<Material>,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct XZRectInit {
-    x0: Float,
-    x1: Float,
-    z0: Float,
-    z1: Float,
-    k: Float,
-    material: Option<Material>,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct YZRectInit {
-    y0: Float,
-    y1: Float,
-    z0: Float,
-    z1: Float,
-    k: Float,
-    material: Option<Material>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SphereInit {
-    center: Vec3,
-    radius: Float,
-    material: Option<Material>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct FlipFaceInit {
-    object: Box<Object>,
-}
-#[derive(Serialize, Deserialize, Debug)]
-pub struct RotateInit {
-    object: Box<Object>,
-    angle: Float,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct TranslateInit {
-    object: Box<Object>,
-    offset: Vec3,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ConstantMediumInit {
-    boundary: Box<Object>,
-    density: Float,
-    texture: Option<Texture>,
 }

@@ -6,8 +6,27 @@ use crate::{
     Float, Vec3, AABB, CONSTANT_MEDIUM_EPSILON,
 };
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 
 use std::sync::Arc;
+
+use super::Object;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ConstantMediumInit {
+    pub boundary: Box<Object>,
+    #[serde(default = "default_density")]
+    pub density: Float,
+    #[serde(default)]
+    pub texture: Texture,
+}
+
+// TODO: does this density setting even work?
+fn default_density() -> Float {
+    0.1
+    // 1e-9
+    // 1e9
+}
 
 pub struct ConstantMedium {
     boundary: Arc<Hitable>,
