@@ -13,6 +13,8 @@ use serde::{Deserialize, Serialize};
 impl Default for Lambertian {
     fn default() -> Self {
         Lambertian {
+            // TODO: why does this have to be so manual? Compare to:
+            // SolidColor::default()
             albedo: SolidColor::new(Color::default()),
         }
     }

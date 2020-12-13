@@ -23,6 +23,8 @@ pub enum Material {
 
 impl Default for Material {
     fn default() -> Self {
+        // TODO: why does this have to be so manual? Compare to:
+        // Lambertian::default()
         Lambertian::new(SolidColor::new(Color::default()))
     }
 }
