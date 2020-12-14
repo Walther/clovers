@@ -20,13 +20,13 @@ cli = ["image", "chrono", "humantime", "indicatif", "clap", "toml"]
 
 [dependencies]
 # Required for everything
-nalgebra = { version = "0.22.0", features = ["serde-serialize"] }
-rayon = "1.4.1"
+nalgebra = { version = "0.23.1", features = ["serde-serialize"] }
+rayon = "1.5.0"
 rand = "0.7.3"
-serde = { version = "1.0.116", features = ["derive", "rc"] }
-serde_json = "1.0.58"
+serde = { version = "1.0.118", features = ["derive", "rc"] }
+serde_json = "1.0.60"
 # Required for CLI
-image = { version = "0.23.10", optional = true }
+image = { version = "0.23.12", optional = true }
 chrono = { version = "0.4.19", optional = true }
 humantime = { version = "2.0.1", optional = true }
 indicatif = { version = "0.15.0", features = ["rayon"], optional = true }
