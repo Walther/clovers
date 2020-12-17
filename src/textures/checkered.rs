@@ -1,8 +1,9 @@
 use super::Texture;
-use crate::{color::Color, Float, Vec3};
+use crate::{color::Color, Float, Vec3, PI};
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Deserialize, Serialize, Debug)]
+// A standard checkered texture.
 pub struct Checkered {
     // TODO: get recursive textures back, maybe?
     #[serde(default = "default_even")]
@@ -10,6 +11,7 @@ pub struct Checkered {
     #[serde(default = "default_odd")]
     odd: Color,
     #[serde(default = "default_density")]
+    /// Controls the density of the checkered pattern. Default value is 1.0, which corresponds to filling a 1.0 unit square in the coordinate system with one color of the pattern.
     density: Float,
 }
 
@@ -22,8 +24,7 @@ fn default_odd() -> Color {
 }
 
 fn default_density() -> Float {
-    // TODO: this density parameter feels odd to intuit and manipulate
-    0.1
+    1.0
 }
 
 impl Checkered {
@@ -36,9 +37,12 @@ impl Checkered {
     }
 
     pub fn color(self, _u: Float, _v: Float, position: Vec3) -> Color {
-        let sines = (self.density * position.x).sin()
-            * (self.density * position.y).sin()
-            * (self.density * position.z).sin();
+        // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
+        let density = self.density * PI;
+        let sines = 1.0 // cosmetic 1 for readability of following lines :)
+            * (density * position.x).sin()
+            * (density * position.y).sin()
+            * (density * position.z).sin();
         if sines < 0.0 {
             // return odd.color(u, v, position); TODO:
             self.odd
