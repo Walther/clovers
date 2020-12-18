@@ -81,7 +81,7 @@
         "material": {
           "Lambertian": {
             "albedo": {
-              "Checkered": {}
+              "SpatialChecker": {}
             }
           }
         }

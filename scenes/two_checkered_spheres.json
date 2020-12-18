@@ -38,7 +38,7 @@
         "material": {
           "Lambertian": {
             "albedo": {
-              "Checkered": {
+              "SurfaceChecker": {
                 "even": [
                   0.2,
                   0.3,
@@ -67,7 +67,7 @@
         "material": {
           "Lambertian": {
             "albedo": {
-              "Checkered": {
+              "SurfaceChecker": {
                 "even": [
                   0.2,
                   0.3,
@@ -98,7 +98,7 @@
         "material": {
           "Lambertian": {
             "albedo": {
-              "Checkered": {
+              "SurfaceChecker": {
                 "even": [
                   0.2,
                   0.3,
@@ -127,7 +127,7 @@
         "material": {
           "Lambertian": {
             "albedo": {
-              "Checkered": {
+              "SurfaceChecker": {
                 "even": [
                   0.2,
                   0.3,
