@@ -12,7 +12,8 @@ use noise_texture::NoiseTexture;
 
 #[derive(Copy, Clone, Deserialize, Serialize, Debug)]
 pub enum Texture {
-    Checkered(Checkered),
+    SpatialChecker(SpatialChecker),
+    SurfaceChecker(SurfaceChecker),
     SolidColor(SolidColor),
     NoiseTexture(NoiseTexture),
 }
@@ -20,7 +21,8 @@ pub enum Texture {
 impl Texture {
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match *self {
-            Texture::Checkered(c) => Checkered::color(c, u, v, position),
+            Texture::SpatialChecker(c) => SpatialChecker::color(c, u, v, position),
+            Texture::SurfaceChecker(c) => SurfaceChecker::color(c, u, v, position),
             Texture::SolidColor(s) => SolidColor::color(s, u, v, position),
             Texture::NoiseTexture(n) => NoiseTexture::color(n, u, v, position),
         }
@@ -39,9 +41,15 @@ impl From<SolidColor> for Texture {
     }
 }
 
-impl From<Checkered> for Texture {
-    fn from(s: Checkered) -> Self {
-        Texture::Checkered(s)
+impl From<SpatialChecker> for Texture {
+    fn from(s: SpatialChecker) -> Self {
+        Texture::SpatialChecker(s)
+    }
+}
+
+impl From<SurfaceChecker> for Texture {
+    fn from(s: SurfaceChecker) -> Self {
+        Texture::SurfaceChecker(s)
     }
 }
 

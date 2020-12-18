@@ -78,7 +78,7 @@ let ground = {
     "material": {
       "Lambertian": {
         "albedo": {
-          "Checkered": {}
+          "SpatialChecker": {}
         }
       }
     }
@@ -110,10 +110,9 @@ for (var y = -2; y <= 2; y += 1) {
       sphere["Sphere"]["material"] = {
         "Lambertian": {
           "albedo": {
-            "Checkered": {
+            "SurfaceChecker": {
               "even": color,
               "odd": [color[0] / 2.0, color[1] / 2.0, color[2] / 2.0],
-              "density": 2.0
             }
           }
         }

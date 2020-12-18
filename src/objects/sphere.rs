@@ -33,7 +33,7 @@ impl Sphere {
         })
     }
 
-    // Returns the U,V surface coordinates of a hitpoint
+    /// Returns the U,V surface coordinates of a hitpoint
     pub fn get_uv(&self, hit_position: Vec3, _time: Float) -> (Float, Float) {
         let translated: Vec3 = (hit_position - self.center) / self.radius;
         let phi: Float = translated.z.atan2(translated.x);
