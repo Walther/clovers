@@ -1,0 +1,98 @@
+{
+  "time_0": 0,
+  "time_1": 1,
+  "camera": {
+    "look_from": [
+      30,
+      10,
+      0
+    ],
+    "look_at": [
+      0,
+      0,
+      0
+    ],
+    "up": [
+      -0.25,
+      1,
+      -0.25
+    ],
+    "vertical_fov": 40,
+    "aperture": 0,
+    "focus_distance": 10
+  },
+  "background_color": [
+    0,
+    0,
+    0
+  ],
+  "objects": [
+    {
+      "FlipFace": {
+        "object": {
+          "XZRect": {
+            "x0": -100,
+            "x1": 100,
+            "z0": -100,
+            "z1": 0,
+            "k": 80,
+            "material": {
+              "DiffuseLight": {
+                "emit": {
+                  "SolidColor": {
+                    "color": [
+                      2.5,
+                      2.5,
+                      2.5
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "Sphere": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 8,
+        "material": {
+          "Lambertian": {}
+        }
+      }
+    }
+  ],
+  "priority_objects": [
+    {
+      "FlipFace": {
+        "object": {
+          "XZRect": {
+            "x0": -100,
+            "x1": 100,
+            "z0": -100,
+            "z1": 0,
+            "k": 80,
+            "material": {
+              "DiffuseLight": {
+                "emit": {
+                  "SolidColor": {
+                    "color": [
+                      2.5,
+                      2.5,
+                      2.5
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
