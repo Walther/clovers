@@ -1,9 +1,10 @@
 use crate::{
+    aabb::AABB,
     hitable::{HitRecord, Hitable},
     materials::{isotropic::Isotropic, Material},
     ray::Ray,
     textures::Texture,
-    Float, Vec3, AABB, CONSTANT_MEDIUM_EPSILON,
+    Float, Vec3, CONSTANT_MEDIUM_EPSILON,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};

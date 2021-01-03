@@ -1,8 +1,9 @@
 use crate::{
+    aabb::AABB,
     hitable::{HitRecord, Hitable},
     materials::Material,
     ray::Ray,
-    Float, Vec3, AABB, RECT_EPSILON, SHADOW_EPSILON,
+    Float, Vec3, RECT_EPSILON, SHADOW_EPSILON,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};

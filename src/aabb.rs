@@ -1,4 +1,4 @@
-use crate::{Float, Ray, Vec3};
+use crate::{ray::Ray, Float, Vec3};
 
 #[derive(Clone, Copy)]
 pub struct AABB {

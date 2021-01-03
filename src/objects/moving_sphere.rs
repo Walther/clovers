@@ -1,7 +1,9 @@
 use crate::{
+    aabb::AABB,
     hitable::{HitRecord, Hitable},
     materials::Material,
-    Float, Ray, Vec3, AABB, PI,
+    ray::Ray,
+    Float, Vec3, PI,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};

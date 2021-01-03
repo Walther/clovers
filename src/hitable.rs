@@ -1,10 +1,13 @@
 use crate::{
+    aabb::AABB,
+    bvhnode::BVHNode,
     materials::Material,
     objects::{
         Boxy, ConstantMedium, FlipFace, MovingSphere, RotateY, Sphere, Translate, XYRect, XZRect,
         YZRect,
     },
-    BVHNode, Float, Ray, Vec3, AABB,
+    ray::Ray,
+    Float, Vec3,
 };
 use rand::prelude::*;
 

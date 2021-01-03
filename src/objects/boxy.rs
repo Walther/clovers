@@ -1,9 +1,10 @@
 use super::{XYRect, XZRect, YZRect};
 use crate::{
+    aabb::AABB,
     hitable::{HitRecord, Hitable, HitableList},
     materials::Material,
     ray::Ray,
-    Float, Vec3, AABB,
+    Float, Vec3,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};

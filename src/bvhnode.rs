@@ -3,8 +3,10 @@ use std::{cmp::Ordering, sync::Arc};
 use rand::prelude::*;
 
 use crate::{
+    aabb::AABB,
     hitable::{HitRecord, Hitable},
-    Float, Ray, AABB,
+    ray::Ray,
+    Float,
 };
 
 pub struct BVHNode {

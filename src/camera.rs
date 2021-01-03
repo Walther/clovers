@@ -1,4 +1,4 @@
-use crate::{random::random_in_unit_disk, Float, Ray, Vec3, PI};
+use crate::{random::random_in_unit_disk, ray::Ray, Float, Vec3, PI};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 
