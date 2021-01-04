@@ -3,7 +3,7 @@ use crate::{
     pdf::{HitablePDF, MixturePDF},
     ray::Ray,
     scenes::Scene,
-    Float, SHADOW_EPSILON,
+    Float, EPSILON_SHADOW_ACNE,
 };
 use rand::prelude::*;
 
@@ -15,7 +15,10 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
     }
 
     // Here, smoothing is used to avoid "shadow acne"
-    match scene.objects.hit(&ray, SHADOW_EPSILON, Float::MAX, rng) {
+    match scene
+        .objects
+        .hit(&ray, EPSILON_SHADOW_ACNE, Float::MAX, rng)
+    {
         // If the ray hits nothing, return the background color.
         None => scene.background_color,
 

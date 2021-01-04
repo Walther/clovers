@@ -5,7 +5,7 @@ use crate::{
     onb::ONB,
     random::random_to_sphere,
     ray::Ray,
-    Float, Vec3, PI, SHADOW_EPSILON,
+    Float, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -110,7 +110,7 @@ impl Sphere {
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
-            SHADOW_EPSILON,
+            EPSILON_SHADOW_ACNE,
             Float::INFINITY,
             rng,
         ) {

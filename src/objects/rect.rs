@@ -3,7 +3,7 @@ use crate::{
     hitable::{HitRecord, Hitable},
     materials::Material,
     ray::Ray,
-    Float, Vec3, RECT_EPSILON, SHADOW_EPSILON,
+    Float, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -85,8 +85,8 @@ impl XYRect {
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
-            Vec3::new(self.x0, self.y0, self.k - RECT_EPSILON),
-            Vec3::new(self.x1, self.y1, self.k + RECT_EPSILON),
+            Vec3::new(self.x0, self.y0, self.k - EPSILON_RECT_THICKNESS),
+            Vec3::new(self.x1, self.y1, self.k + EPSILON_RECT_THICKNESS),
         );
         Some(output_box)
     }
@@ -94,7 +94,7 @@ impl XYRect {
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
-            SHADOW_EPSILON,
+            EPSILON_SHADOW_ACNE,
             Float::INFINITY,
             rng,
         ) {
@@ -197,8 +197,8 @@ impl XZRect {
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
-            Vec3::new(self.x0, self.k - RECT_EPSILON, self.z0),
-            Vec3::new(self.x1, self.k + RECT_EPSILON, self.z1),
+            Vec3::new(self.x0, self.k - EPSILON_RECT_THICKNESS, self.z0),
+            Vec3::new(self.x1, self.k + EPSILON_RECT_THICKNESS, self.z1),
         );
         Some(output_box)
     }
@@ -206,7 +206,7 @@ impl XZRect {
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
-            SHADOW_EPSILON,
+            EPSILON_SHADOW_ACNE,
             Float::INFINITY,
             rng,
         ) {
@@ -309,8 +309,8 @@ impl YZRect {
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         // The bounding box must have non-zero width in each dimension, so pad the Z dimension a small amount.
         let output_box = AABB::new(
-            Vec3::new(self.k - RECT_EPSILON, self.y0, self.z0),
-            Vec3::new(self.k + RECT_EPSILON, self.y1, self.z1),
+            Vec3::new(self.k - EPSILON_RECT_THICKNESS, self.y0, self.z0),
+            Vec3::new(self.k + EPSILON_RECT_THICKNESS, self.y1, self.z1),
         );
         Some(output_box)
     }
@@ -318,7 +318,7 @@ impl YZRect {
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
-            SHADOW_EPSILON,
+            EPSILON_SHADOW_ACNE,
             Float::INFINITY,
             rng,
         ) {

@@ -73,9 +73,16 @@ pub mod scenes;
 pub mod textures;
 
 // Handy aliases for internal use
+
+/// Internal type alias: this allows the crate to easily switch between float precision without modifying a lot of files.
 pub type Float = f32;
+/// Internal helper: re-exports the pi constant as our internal [Float] type. TODO: selectable at run time instead of build time?
 pub const PI: Float = std::f32::consts::PI as Float;
+/// Internal type alias: a nalgebra [Vector3](nalgebra::Vector3) which is a vector with three dimensions, containing three of our internal [Float] types
 pub type Vec3 = Vector3<Float>;
-pub const SHADOW_EPSILON: Float = 0.001;
-pub const RECT_EPSILON: Float = 0.0001;
-pub const CONSTANT_MEDIUM_EPSILON: Float = 0.0001;
+/// Internal const: epsilon used for avoiding "shadow acne". See e.g. [Raytracing In One Weekend](https://raytracing.github.io/)
+pub const EPSILON_SHADOW_ACNE: Float = 0.001;
+/// Internal const: epsilon used for having a finitely-sized thickness for the bounding box of an infinitely-thin rectangle
+pub const EPSILON_RECT_THICKNESS: Float = 0.0001;
+/// Internal const: epsilon used in the hit calculation of a [ConstantMedium](objects::constant_medium::ConstantMedium)
+pub const EPSILON_CONSTANT_MEDIUM: Float = 0.0001;
