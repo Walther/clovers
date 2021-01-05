@@ -1,3 +1,5 @@
+//! Various internal helper functions for getting specific kinds of random values.
+
 use crate::{Float, Vec3, PI};
 use rand::prelude::*;
 

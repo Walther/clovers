@@ -1,3 +1,5 @@
+//! Perlin noise implementation. Used for e.g. [NoiseTexture](crate::textures::Texture::NoiseTexture)
+
 use crate::{Float, Vec3};
 use rand::prelude::*;
 

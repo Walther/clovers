@@ -1,3 +1,5 @@
+//! An opinionated colorize method. Given a [Ray](crate::ray::Ray) and a [Scene](crate::scenes::Scene), evaluates the ray's path and returns a color.
+
 use crate::{
     color::Color,
     pdf::{HitablePDF, MixturePDF},

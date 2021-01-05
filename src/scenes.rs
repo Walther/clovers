@@ -1,3 +1,5 @@
+//! A collection of objects, camera, and other things necessary to describe the environment you wish to render.
+
 use crate::{
     camera::{Camera, CameraInit},
     color::Color,

@@ -1,3 +1,5 @@
+//! Orthonormal bases
+
 use crate::Vec3;
 
 pub struct ONB {

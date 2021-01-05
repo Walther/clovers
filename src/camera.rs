@@ -1,3 +1,5 @@
+//! Camera. Used for creating [Rays](crate::ray::Ray) towards the scene, with directions defined by the camera properties.
+
 use crate::{random::random_in_unit_disk, ray::Ray, Float, Vec3, PI};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};

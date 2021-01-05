@@ -1,3 +1,5 @@
+//! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
+
 use crate::hitable::Hitable;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;

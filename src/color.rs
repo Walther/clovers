@@ -1,8 +1,11 @@
+//! Color utilities.
+
 use crate::{Float, Vec3};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 
+/// RGB color based on three [Floats](crate::Float)
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub struct Color {
     pub r: Float,

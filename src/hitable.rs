@@ -1,3 +1,5 @@
+//! An abstraction for things that can be hit by [Rays](crate::ray::Ray).
+
 use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
@@ -13,6 +15,7 @@ use rand::prelude::*;
 
 use std::sync::Arc;
 
+/// Represents a ray-object intersection, with plenty of data about the intersection.
 pub struct HitRecord<'a> {
     /// Distance from the ray origin to the hitpoint
     pub distance: Float,
@@ -31,7 +34,7 @@ pub struct HitRecord<'a> {
 }
 
 impl<'a> HitRecord<'a> {
-    // Helper function for getting normals pointing at the correct direction
+    /// Helper function for getting normals pointing at the correct direction. TODO: consider removal?
     pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
         self.front_face = ray.direction.dot(&outward_normal) < 0.0;
         if self.front_face {
@@ -42,6 +45,9 @@ impl<'a> HitRecord<'a> {
     }
 }
 
+/// An abstraction for things that can be hit by [Rays](crate::ray::Ray).
+///
+/// TODO: ideally, for cleaner abstraction, this could be a Trait. However, the performance implications might need deeper investigation and consideration...
 pub enum Hitable {
     Boxy(Boxy),
     ConstantMedium(ConstantMedium),
