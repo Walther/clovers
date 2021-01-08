@@ -3,12 +3,16 @@ use crate::{color::Color, hitable::HitRecord, pdf::ZeroPDF, ray::Ray, Float, Vec
 use rand::prelude::*;
 
 use serde::{Deserialize, Serialize};
+
+/// A dielectric material. This resembless glass and other transparent and reflective materials.
 #[derive(Copy, Clone, Deserialize, Serialize, Debug)]
 pub struct Dielectric {
+    /// Refractive index of the material. Used for calculating the new direction of a ray when entering the material at an angle. Follows Snell's law of refraction. Default value: 1.5, based on typical window glass.
     #[serde(default = "default_index")]
-    refractive_index: Float,
+    pub refractive_index: Float,
+    /// Color of the material. Used for colorizing the rays. Default value: [`Color::new(1.0, 1.0, 1.0)`](crate::color::Color), producing a fully transparent, clear glass.
     #[serde(default = "default_color")]
-    color: Color,
+    pub color: Color,
 }
 
 fn default_index() -> Float {

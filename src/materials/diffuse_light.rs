@@ -10,6 +10,7 @@ use rand::prelude::ThreadRng;
 
 use serde::{Deserialize, Serialize};
 
+/// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
 #[derive(Copy, Clone, Deserialize, Serialize, Debug)]
 pub struct DiffuseLight {
     emit: Texture,

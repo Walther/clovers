@@ -1,9 +1,10 @@
 use crate::{
+    aabb::AABB,
     hitable::{HitRecord, Hitable},
     materials::{isotropic::Isotropic, Material},
     ray::Ray,
     textures::Texture,
-    Float, Vec3, AABB, CONSTANT_MEDIUM_EPSILON,
+    Float, Vec3, EPSILON_CONSTANT_MEDIUM,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -63,7 +64,7 @@ impl ConstantMedium {
 
         rec2 = match self.boundary.hit(
             ray,
-            rec1.distance + CONSTANT_MEDIUM_EPSILON,
+            rec1.distance + EPSILON_CONSTANT_MEDIUM,
             Float::INFINITY,
             rng,
         ) {

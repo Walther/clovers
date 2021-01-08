@@ -1,4 +1,6 @@
-use crate::{color::Color, hitable::HitRecord, pdf::PDF, Float, Ray, Vec3};
+//! Materials enable different behaviors of light on objects.
+
+use crate::{color::Color, hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
 pub mod dielectric;
 pub mod diffuse_light;
 pub mod isotropic;

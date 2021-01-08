@@ -1,3 +1,5 @@
+//! Textures enable different surface textures for colorizing objects in various ways.
+
 pub mod checkered;
 pub mod noise_texture;
 pub mod solid_color;

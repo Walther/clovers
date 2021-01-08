@@ -1,12 +1,17 @@
+//! Bounding Volume Hierarchy Node.
+
 use std::{cmp::Ordering, sync::Arc};
 
 use rand::prelude::*;
 
 use crate::{
+    aabb::AABB,
     hitable::{HitRecord, Hitable},
-    Float, Ray, AABB,
+    ray::Ray,
+    Float,
 };
 
+/// Bounding Volume Hierarchy Node. A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also BVHNodes. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 pub struct BVHNode {
     left: Arc<Hitable>,
     right: Arc<Hitable>,
@@ -14,6 +19,7 @@ pub struct BVHNode {
 }
 
 impl BVHNode {
+    /// Create a new BVHNode tree from a given list of [Objects](crate::objects::Object)
     pub fn from_list(
         mut objects: Vec<Arc<Hitable>>,
         time_0: Float,
