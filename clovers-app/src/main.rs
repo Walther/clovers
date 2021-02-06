@@ -1,17 +1,12 @@
 #![deny(clippy::all)]
-// A lot of loader functions etc, suppresses some warning noise
-#![allow(dead_code)]
 
 // TODO: this is a temporary hack: main.rs mostly copied from the CLI version
 // Eventually, this GUI version should have, well, a GUI for adjusting these parameters.
 
 // External imports
-use chrono::Utc;
 use clap::Clap;
-use humantime::format_duration;
-use image::{ImageBuffer, Rgb, RgbImage};
+use std::error::Error;
 use std::fs::File;
-use std::{error::Error, fs, time::Instant};
 
 // Internal imports
 use clovers::*;
@@ -27,8 +22,8 @@ struct Opts {
     #[clap(short, long)]
     input: String,
     /// Output filename / location. [default: renders/timestamp.png]
-    #[clap(short, long)]
-    output: Option<String>,
+    // #[clap(short, long)]
+    // output: Option<String>,
     /// Width of the image in pixels
     #[clap(short, long, default_value = "1024")]
     width: u32,
@@ -44,9 +39,6 @@ struct Opts {
     /// Gamma correction value
     #[clap(short, long, default_value = "2.0")]
     gamma: Float,
-    /// Optional GUI with iterative rendering
-    #[clap(long)]
-    gui: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -75,6 +67,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         opts.gamma,
         scene,
     );
-    return Ok(());
-        
+
+    Ok(())
 }

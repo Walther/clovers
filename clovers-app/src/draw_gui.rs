@@ -4,7 +4,6 @@ use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
 use rayon::prelude::*;
 
-
 use pixels::{Error, Pixels, SurfaceTexture};
 
 use winit::{
@@ -15,7 +14,6 @@ use winit::{
 };
 
 use winit_input_helper::WinitInputHelper;
-
 
 pub fn draw_gui(
     width: u32,
@@ -127,7 +125,7 @@ impl World {
         let height = self.height as usize;
         let camera = &self.scene.camera;
         let scene = &self.scene;
-        let d = self.max_depth.clone(); // TODO: cleanup, silly
+        let max_depth = self.max_depth;
 
         // Update internal float-based pixel buffer with new samples
         self.float_buffer
@@ -143,7 +141,7 @@ impl World {
                 let u = (x as Float + rng.gen::<Float>()) / width as Float;
                 let v = (y as Float + rng.gen::<Float>()) / height as Float;
                 let ray = camera.get_ray(u, v, rng);
-                let new_color = colorize(&ray, &scene, 0, d, rng);
+                let new_color = colorize(&ray, &scene, 0, max_depth, rng);
                 // skip NaN and Infinity
                 if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
                     color += new_color;

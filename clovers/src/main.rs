@@ -1,6 +1,4 @@
 #![deny(clippy::all)]
-// A lot of loader functions etc, suppresses some warning noise
-#![allow(dead_code)]
 
 // External imports
 use chrono::Utc;
@@ -14,10 +12,6 @@ use std::{error::Error, fs, time::Instant};
 use clovers::*;
 mod draw;
 use draw::draw;
-#[cfg(feature = "gui")]
-mod draw_gui;
-#[cfg(feature = "gui")]
-use draw_gui::draw_gui;
 use scenes::Scene;
 
 // Configure CLI parameters
@@ -45,9 +39,6 @@ struct Opts {
     /// Gamma correction value
     #[clap(short, long, default_value = "2.0")]
     gamma: Float,
-    /// Optional GUI with iterative rendering
-    #[clap(long)]
-    gui: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -68,26 +59,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let file = File::open(opts.input)?;
     let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
 
-    // gui version
-    if opts.gui {
-        if cfg!(feature = "gui") {
-            #[cfg(feature = "gui")]
-            let _result = draw_gui(
-                opts.width,
-                opts.height,
-                opts.samples,
-                opts.max_depth,
-                opts.gamma,
-                scene,
-            );
-            return Ok(());
-        } else {
-            println!("clovers not built with feature 'gui' enabled");
-            return Ok(());
-        }
-    }
-
-    // cli version
     // Note: live progress bar printed within draw
     let start = Instant::now();
     let pixelbuffer = draw(
