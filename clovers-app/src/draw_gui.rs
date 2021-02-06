@@ -4,19 +4,19 @@ use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
 use rayon::prelude::*;
 
-#[cfg(feature = "gui")]
+
 use pixels::{Error, Pixels, SurfaceTexture};
-#[cfg(feature = "gui")]
+
 use winit::{
     dpi::PhysicalSize,
     event::{Event, VirtualKeyCode},
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
-#[cfg(feature = "gui")]
+
 use winit_input_helper::WinitInputHelper;
 
-#[cfg(feature = "gui")]
+
 pub fn draw_gui(
     width: u32,
     height: u32,
