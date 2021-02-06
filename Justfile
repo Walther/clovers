@@ -1,7 +1,7 @@
 default:
   @just --list
 
-scene:
+cli:
   pushd clovers; cargo run --bin clovers --release --features "cli" -- --input scenes/scene.json; popd;
 
 gui:
