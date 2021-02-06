@@ -42,7 +42,6 @@ struct Opts {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    #[cfg(feature = "cli")]
     let opts: Opts = Opts::parse();
 
     println!("clovers 🍀    ray tracing in rust 🦀");
