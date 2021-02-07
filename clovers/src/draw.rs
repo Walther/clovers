@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{color::Color, colorize::colorize, ray::Ray, scenes, Float};
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
@@ -11,7 +13,7 @@ pub fn draw(
     samples: u32,
     max_depth: u32,
     gamma: Float,
-    scene: Scene,
+    scene: Arc<Scene>,
 ) -> Vec<Color> {
     // Progress bar
     let pixels = (width * height) as u64;
@@ -31,7 +33,7 @@ pub fn draw(
             let x = index % width as usize;
             let y = index / width as usize;
 
-            let mut rng = rand::thread_rng();
+            let mut rng = thread_rng();
             let mut color: Color = Color::new(0.0, 0.0, 0.0);
             let mut u: Float;
             let mut v: Float;

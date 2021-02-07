@@ -82,6 +82,9 @@ pub mod ray;
 pub mod scenes;
 pub mod textures;
 
+// TODO: should this be exported?
+pub mod draw;
+
 // Handy aliases for internal use
 
 /// Internal type alias: this allows the crate to easily switch between float precision without modifying a lot of files.

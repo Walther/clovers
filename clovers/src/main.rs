@@ -5,19 +5,19 @@ use chrono::Utc;
 use clap::Clap;
 use humantime::format_duration;
 use image::{ImageBuffer, Rgb, RgbImage};
-use std::fs::File;
 use std::{error::Error, fs, time::Instant};
+use std::{fs::File, sync::Arc};
 
 // Internal imports
 use clovers::*;
-mod draw;
+pub mod draw;
 use draw::draw;
 use scenes::Scene;
 
 // Configure CLI parameters
 #[derive(Clap)]
 #[clap(version = "0.1.0", author = "Walther")]
-struct Opts {
+pub struct Opts {
     /// Input filename / location
     #[clap(short, long)]
     input: String,
@@ -57,6 +57,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Read the given scene file
     let file = File::open(opts.input)?;
     let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
+    let scene: Arc<Scene> = Arc::new(scene);
 
     // Note: live progress bar printed within draw
     let start = Instant::now();
