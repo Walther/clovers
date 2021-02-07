@@ -50,7 +50,17 @@
 //!
 //! At the end, use your pixel buffer - save to an image file, draw a frame in a GUI window, etc.
 
+// Lints
 #![deny(clippy::all)]
+#![deny(explicit_outlives_requirements)]
+#![deny(trivial_casts)]
+#![deny(trivial_numeric_casts)]
+#![deny(unsafe_code)]
+#![deny(unused_lifetimes)]
+#![deny(unused_qualifications)]
+// TODO:
+//#![warn(missing_debug_implementations)]
+//#![warn(missing_docs)]
 
 // Externals
 use nalgebra::Vector3;
@@ -77,7 +87,7 @@ pub mod textures;
 /// Internal type alias: this allows the crate to easily switch between float precision without modifying a lot of files.
 pub type Float = f32;
 /// Internal helper: re-exports the pi constant as our internal [Float] type. TODO: selectable at run time instead of build time?
-pub const PI: Float = std::f32::consts::PI as Float;
+pub const PI: Float = std::f32::consts::PI;
 /// Internal type alias: a nalgebra [Vector3](nalgebra::Vector3) which is a vector with three dimensions, containing three of our internal [Float] types
 pub type Vec3 = Vector3<Float>;
 /// Internal const: epsilon used for avoiding "shadow acne". See e.g. [Raytracing In One Weekend](https://raytracing.github.io/)

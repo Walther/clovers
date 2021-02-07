@@ -86,7 +86,7 @@ impl RotateY {
 
     pub fn hit(
         &self,
-        ray: &crate::ray::Ray,
+        ray: &Ray,
         distance_min: Float,
         distance_max: Float,
         rng: ThreadRng,

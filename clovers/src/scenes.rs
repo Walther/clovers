@@ -69,7 +69,7 @@ pub fn initialize(mut file: File, width: u32, height: u32) -> Result<Scene, std:
     let scene_file: SceneFile = serde_json::from_str(&contents)?;
     let time_0 = scene_file.time_0;
     let time_1 = scene_file.time_1;
-    let rng = rand::thread_rng();
+    let rng = thread_rng();
     let background_color = scene_file.background_color;
     let camera = Camera::new(
         scene_file.camera.look_from,

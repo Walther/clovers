@@ -140,7 +140,7 @@ impl Perlin {
 
 impl Default for Perlin {
     fn default() -> Self {
-        let rng = rand::thread_rng();
+        let rng = thread_rng();
         Perlin::new(rng)
     }
 }
