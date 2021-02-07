@@ -1,42 +1,6 @@
-[package]
-name = "clovers"
-version = "0.1.0"
-authors = ["Walther <veeti.haapsamo@gmail.com>"]
-edition = "2018"
+[workspace]
 
-
-[lib]
-name = "clovers"
-path = "src/lib.rs"
-
-[[bin]]
-name = "clovers"
-path = "src/main.rs"
-required-features = ["cli"]
-
-[features]
-gui = ["pixels", "winit", "winit_input_helper"]
-cli = ["image", "chrono", "humantime", "indicatif", "clap", "toml"]
-
-[dependencies]
-# Required for everything
-nalgebra = { version = "0.23.1", features = ["serde-serialize"] }
-rayon = "1.5.0"
-rand = "0.7.3"
-serde = { version = "1.0.118", features = ["derive", "rc"] }
-serde_json = "1.0.60"
-# Required for CLI
-image = { version = "0.23.12", optional = true }
-chrono = { version = "0.4.19", optional = true }
-humantime = { version = "2.0.1", optional = true }
-indicatif = { version = "0.15.0", features = ["rayon"], optional = true }
-clap = { version = "3.0.0-beta.2", optional = true }
-toml = { version = "0.5.7", optional = true }
-# Required for GUI
-pixels = { version = "0.2.0", optional = true }
-winit = { version = "0.23.0", optional = true }
-winit_input_helper = { version = "0.8.0", optional = true }
-
-[dev-dependencies]
-quickcheck = "0.9.2"
-quickcheck_macros = "0.9.1"
+members = [
+  "clovers",
+  "clovers-app"
+]

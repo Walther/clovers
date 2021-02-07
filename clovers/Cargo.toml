@@ -1,0 +1,36 @@
+[package]
+name = "clovers"
+version = "0.1.0"
+authors = ["Walther <veeti.haapsamo@gmail.com>"]
+edition = "2018"
+
+
+[lib]
+name = "clovers"
+path = "src/lib.rs"
+
+[[bin]]
+name = "clovers"
+path = "src/main.rs"
+
+[dependencies]
+# Required for everything
+nalgebra = { version = "0.23.1", features = ["serde-serialize"] }
+rayon = "1.5.0"
+rand = "0.7.3"
+serde = { version = "1.0.118", features = ["derive", "rc"] }
+serde_json = "1.0.60"
+# Required for CLI
+# TODO: separate dependencies for library and binary
+# https://github.com/rust-lang/rfcs/pull/2887
+# https://github.com/rust-lang/rfcs/pull/2887#issuecomment-655802434
+image = { version = "0.23.12" }
+chrono = { version = "0.4.19" }
+humantime = { version = "2.0.1" }
+indicatif = { version = "0.15.0", features = ["rayon"] }
+clap = { version = "3.0.0-beta.2" }
+toml = { version = "0.5.7" }
+
+[dev-dependencies]
+quickcheck = "0.9.2"
+quickcheck_macros = "0.9.1"
