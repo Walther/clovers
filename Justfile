@@ -4,7 +4,7 @@ default:
 
 # Run a basic scene with default settings with the CLI
 scene:
-  cargo run --manifest-path clovers/Cargo.toml --bin clovers --release -- --input clovers/scenes/scene.json; popd;
+  cargo run --manifest-path clovers/Cargo.toml --bin clovers --release -- --input clovers/scenes/scene.json;
 
 # Run a basic scene with default settings with the GUI
 gui:
