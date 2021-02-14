@@ -14,7 +14,7 @@ pub use lambertian::*;
 pub use metal::*;
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
-#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub enum Material {
     Dielectric(Dielectric),
     Lambertian(Lambertian),

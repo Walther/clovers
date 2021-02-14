@@ -1,12 +1,12 @@
 use super::{MaterialType, ScatterRecord};
-use crate::{hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI};
+use crate::{hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::TextureTrait, Float, PI};
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, Deserialize, Serialize, Debug, Default)]
+#[derive(Clone, Deserialize, Serialize, Debug, Default)]
 pub struct Lambertian {
     #[serde(default)]
-    albedo: Texture,
+    albedo: dyn TextureTrait,
 }
 
 impl<'a> Lambertian {
@@ -42,7 +42,7 @@ impl<'a> Lambertian {
         }
     }
 
-    pub fn new(albedo: impl Into<Texture>) -> Self {
+    pub fn new(albedo: impl Into<dyn TextureTrait>) -> Self {
         Lambertian {
             albedo: albedo.into(),
         }

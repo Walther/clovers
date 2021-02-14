@@ -1,14 +1,18 @@
 use super::{reflect, Material, MaterialType, ScatterRecord};
 use crate::{
-    hitable::HitRecord, pdf::ZeroPDF, random::random_in_unit_sphere, ray::Ray, textures::Texture,
+    hitable::HitRecord,
+    pdf::ZeroPDF,
+    random::random_in_unit_sphere,
+    ray::Ray,
+    textures::{Texture, TextureTrait},
     Float, Vec3,
 };
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
-#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Metal {
     #[serde(default)]
-    albedo: Texture,
+    albedo: dyn TextureTrait,
     #[serde(default)]
     fuzz: Float,
 }
@@ -43,7 +47,7 @@ impl<'a> Metal {
         0.0 // TODO: why does metal scatter 0? No mention in tutorial afaiu
     }
 
-    pub fn new(albedo: Texture, fuzz: Float) -> Material {
+    pub fn new(albedo: dyn TextureTrait, fuzz: Float) -> Material {
         Material::Metal(Metal {
             albedo,
             fuzz: fuzz.min(1.0),

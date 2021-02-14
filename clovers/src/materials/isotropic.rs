@@ -1,17 +1,22 @@
 use super::{Material, MaterialType, ScatterRecord};
 use crate::{
-    color::Color, hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI,
+    color::Color,
+    hitable::HitRecord,
+    pdf::CosinePDF,
+    ray::Ray,
+    textures::{Texture, TextureTrait},
+    Float, PI,
 };
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
-#[derive(Deserialize, Serialize, Debug, Copy, Clone, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Isotropic {
     #[serde(default)]
-    albedo: Texture,
+    albedo: dyn TextureTrait,
 }
 
 impl<'a> Isotropic {
-    pub fn new(emission: Texture) -> Material {
+    pub fn new(emission: dyn TextureTrait) -> Material {
         Material::Isotropic(Isotropic { albedo: emission })
     }
 

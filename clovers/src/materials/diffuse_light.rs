@@ -3,7 +3,7 @@ use crate::{
     color::Color,
     hitable::HitRecord,
     ray::Ray,
-    textures::{SolidColor, Texture},
+    textures::{SolidColor, Texture, TextureTrait},
     Float, Vec3,
 };
 use rand::prelude::ThreadRng;
@@ -11,9 +11,9 @@ use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
 
 /// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
-#[derive(Copy, Clone, Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug)]
 pub struct DiffuseLight {
-    emit: Texture,
+    emit: dyn TextureTrait,
 }
 
 impl Default for DiffuseLight {
@@ -60,7 +60,7 @@ impl<'a> DiffuseLight {
         }
     }
 
-    pub fn new(emission: Texture) -> Material {
+    pub fn new(emission: dyn TextureTrait) -> Material {
         Material::DiffuseLight(DiffuseLight { emit: emission })
     }
 }

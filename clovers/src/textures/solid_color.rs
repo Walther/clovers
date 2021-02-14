@@ -1,4 +1,4 @@
-use super::Texture;
+use super::{Texture, TextureTrait};
 use crate::{color::Color, Float, Vec3};
 use serde::{Deserialize, Serialize};
 
@@ -8,11 +8,13 @@ pub struct SolidColor {
 }
 
 impl SolidColor {
-    pub fn new(color: Color) -> Texture {
+    pub fn new(color: Color) -> dyn TextureTrait {
         Texture::SolidColor(SolidColor { color })
     }
+}
 
-    pub fn color(self, _u: Float, _v: Float, _position: Vec3) -> Color {
+impl TextureTrait for SolidColor {
+    fn color(self, _u: Float, _v: Float, _position: Vec3) -> Color {
         self.color
     }
 }

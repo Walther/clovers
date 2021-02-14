@@ -12,15 +12,24 @@ pub use solid_color::*;
 use crate::{color::Color, Float, Vec3};
 use noise_texture::NoiseTexture;
 
-#[derive(Copy, Clone, Deserialize, Serialize, Debug)]
-pub enum Texture {
-    SpatialChecker(SpatialChecker),
-    SurfaceChecker(SurfaceChecker),
-    SolidColor(SolidColor),
-    NoiseTexture(NoiseTexture),
+pub trait TextureTrait {
+    fn color(&self, _u: Float, _v: Float, _position: Vec3) -> Color {
+        Color::default()
+    }
 }
 
-impl Texture {
+#[derive(Copy, Clone, Deserialize, Serialize, Debug)]
+pub struct Texture<T>
+where
+    T: TextureTrait,
+{
+    texture: T,
+}
+
+impl<T> Texture<T>
+where
+    T: TextureTrait,
+{
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match *self {
             Texture::SpatialChecker(c) => SpatialChecker::color(c, u, v, position),
@@ -31,31 +40,46 @@ impl Texture {
     }
 }
 
-impl Default for Texture {
+impl<T> Default for Texture<T>
+where
+    T: TextureTrait,
+{
     fn default() -> Self {
         SolidColor::default().into()
     }
 }
 
-impl From<SolidColor> for Texture {
+impl<T> From<SolidColor> for Texture<T>
+where
+    T: TextureTrait,
+{
     fn from(s: SolidColor) -> Self {
         Texture::SolidColor(s)
     }
 }
 
-impl From<SpatialChecker> for Texture {
+impl<T> From<SpatialChecker> for Texture<T>
+where
+    T: TextureTrait,
+{
     fn from(s: SpatialChecker) -> Self {
         Texture::SpatialChecker(s)
     }
 }
 
-impl From<SurfaceChecker> for Texture {
+impl<T> From<SurfaceChecker> for Texture<T>
+where
+    T: TextureTrait,
+{
     fn from(s: SurfaceChecker) -> Self {
         Texture::SurfaceChecker(s)
     }
 }
 
-impl From<NoiseTexture> for Texture {
+impl<T> From<NoiseTexture> for Texture<T>
+where
+    T: TextureTrait,
+{
     fn from(s: NoiseTexture) -> Self {
         Texture::NoiseTexture(s)
     }

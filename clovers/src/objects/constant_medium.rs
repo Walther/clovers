@@ -3,7 +3,7 @@ use crate::{
     hitable::{HitRecord, Hitable},
     materials::{isotropic::Isotropic, Material},
     ray::Ray,
-    textures::Texture,
+    textures::{Texture, TextureTrait},
     Float, Vec3, EPSILON_CONSTANT_MEDIUM,
 };
 use rand::prelude::*;
@@ -19,7 +19,7 @@ pub struct ConstantMediumInit {
     #[serde(default = "default_density")]
     pub density: Float,
     #[serde(default)]
-    pub texture: Texture,
+    pub texture: dyn TextureTrait,
 }
 
 // TODO: does this density setting even work?
@@ -36,7 +36,7 @@ pub struct ConstantMedium {
 }
 
 impl ConstantMedium {
-    pub fn new(boundary: Arc<Hitable>, density: Float, texture: Texture) -> Hitable {
+    pub fn new(boundary: Arc<Hitable>, density: Float, texture: dyn TextureTrait) -> Hitable {
         Hitable::ConstantMedium(ConstantMedium {
             boundary,
             phase_function: Isotropic::new(texture),
