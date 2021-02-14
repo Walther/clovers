@@ -30,22 +30,14 @@ pub fn draw(
         .for_each(|(index, pixel)| {
             let x = index % width as usize;
             let y = index / width as usize;
-
-            let mut rng = rand::thread_rng();
+            let rng = rand::thread_rng();
             let mut color: Color = Color::new(0.0, 0.0, 0.0);
-            let mut u: Float;
-            let mut v: Float;
-            let mut ray: Ray;
 
             // Multisampling for antialiasing
             for _sample in 0..samples {
-                u = (x as Float + rng.gen::<Float>()) / width as Float;
-                v = (y as Float + rng.gen::<Float>()) / height as Float;
-                ray = scene.camera.get_ray(u, v, rng);
-                let new_color = colorize(&ray, &scene, 0, max_depth, rng);
-                // skip NaN and Infinity
-                if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
-                    color += new_color;
+                match sample(&scene, x, y, width, height, rng, max_depth) {
+                    Some(s) => color += s,
+                    None => {}
                 }
             }
             color /= samples as Float;
@@ -57,4 +49,25 @@ pub fn draw(
         });
 
     pixelbuffer
+}
+
+/// Get a single sample for a single pixel in the scene. Has slight jitter for antialiasing when multisampling.
+fn sample(
+    scene: &Scene,
+    x: usize,
+    y: usize,
+    width: u32,
+    height: u32,
+    mut rng: ThreadRng,
+    max_depth: u32,
+) -> Option<Color> {
+    let u = (x as Float + rng.gen::<Float>()) / width as Float;
+    let v = (y as Float + rng.gen::<Float>()) / height as Float;
+    let ray: Ray = scene.camera.get_ray(u, v, rng);
+    let new_color = colorize(&ray, &scene, 0, max_depth, rng);
+    // skip NaN and Infinity
+    if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
+        return Some(new_color);
+    }
+    None
 }
