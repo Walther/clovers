@@ -1,4 +1,6 @@
-use super::Texture;
+use std::sync::Arc;
+
+use super::{Texture, TextureTrait};
 use crate::{color::Color, Float, Vec3, PI};
 use serde::{Deserialize, Serialize};
 
@@ -33,15 +35,17 @@ fn default_density_surface() -> Float {
 }
 
 impl SpatialChecker {
-    pub fn new(color1: Color, color2: Color, density: Float) -> Texture {
-        Texture::SpatialChecker(SpatialChecker {
+    fn new(color1: Color, color2: Color, density: Float) -> Arc<dyn TextureTrait> {
+        Arc::new(SpatialChecker {
             even: color1,
             odd: color2,
             density,
         })
     }
+}
 
-    pub fn color(self, _u: Float, _v: Float, position: Vec3) -> Color {
+impl TextureTrait for SpatialChecker {
+    fn color(&self, _u: Float, _v: Float, position: Vec3) -> Color {
         // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;
         let sines = 1.0 // cosmetic 1 for readability of following lines :)
@@ -69,15 +73,17 @@ pub struct SurfaceChecker {
 }
 
 impl SurfaceChecker {
-    pub fn new(color1: Color, color2: Color, density: Float) -> Texture {
-        Texture::SurfaceChecker(SurfaceChecker {
+    pub fn new(color1: Color, color2: Color, density: Float) -> Arc<dyn TextureTrait> {
+        Arc::new(SurfaceChecker {
             even: color1,
             odd: color2,
             density,
         })
     }
+}
 
-    pub fn color(self, u: Float, v: Float, _position: Vec3) -> Color {
+impl TextureTrait for SurfaceChecker {
+    fn color(&self, u: Float, v: Float, _position: Vec3) -> Color {
         // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;
         let sines = 1.0 // cosmetic 1 for readability of following lines :)
