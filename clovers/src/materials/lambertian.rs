@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Deserialize, Serialize, Debug, Default)]
 pub struct Lambertian {
     #[serde(default)]
-    albedo: dyn TextureTrait,
+    albedo: Arc<dyn TextureTrait>,
 }
 
 impl<'a> Lambertian {
@@ -42,7 +42,7 @@ impl<'a> Lambertian {
         }
     }
 
-    pub fn new(albedo: impl Into<dyn TextureTrait>) -> Self {
+    pub fn new(albedo: impl Into<Arc<dyn TextureTrait>>) -> Self {
         Lambertian {
             albedo: albedo.into(),
         }

@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Metal {
     #[serde(default)]
-    albedo: dyn TextureTrait,
+    albedo: Arc<dyn TextureTrait>,
     #[serde(default)]
     fuzz: Float,
 }
@@ -47,7 +47,7 @@ impl<'a> Metal {
         0.0 // TODO: why does metal scatter 0? No mention in tutorial afaiu
     }
 
-    pub fn new(albedo: dyn TextureTrait, fuzz: Float) -> Material {
+    pub fn new(albedo: Arc<dyn TextureTrait>, fuzz: Float) -> Material {
         Material::Metal(Metal {
             albedo,
             fuzz: fuzz.min(1.0),

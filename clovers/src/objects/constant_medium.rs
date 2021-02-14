@@ -19,7 +19,7 @@ pub struct ConstantMediumInit {
     #[serde(default = "default_density")]
     pub density: Float,
     #[serde(default)]
-    pub texture: dyn TextureTrait,
+    pub texture: Arc<dyn TextureTrait>,
 }
 
 // TODO: does this density setting even work?
@@ -36,7 +36,7 @@ pub struct ConstantMedium {
 }
 
 impl ConstantMedium {
-    pub fn new(boundary: Arc<Hitable>, density: Float, texture: dyn TextureTrait) -> Hitable {
+    pub fn new(boundary: Arc<Hitable>, density: Float, texture: Arc<dyn TextureTrait>) -> Hitable {
         Hitable::ConstantMedium(ConstantMedium {
             boundary,
             phase_function: Isotropic::new(texture),

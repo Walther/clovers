@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::{Material, ScatterRecord};
 use crate::{
     color::Color,
@@ -13,7 +15,7 @@ use serde::{Deserialize, Serialize};
 /// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
 #[derive(Clone, Deserialize, Serialize, Debug)]
 pub struct DiffuseLight {
-    emit: dyn TextureTrait,
+    emit: Arc<dyn TextureTrait>,
 }
 
 impl Default for DiffuseLight {
@@ -60,7 +62,7 @@ impl<'a> DiffuseLight {
         }
     }
 
-    pub fn new(emission: dyn TextureTrait) -> Material {
+    pub fn new(emission: Arc<dyn TextureTrait>) -> Material {
         Material::DiffuseLight(DiffuseLight { emit: emission })
     }
 }

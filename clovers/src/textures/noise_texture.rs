@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::{Texture, TextureTrait};
 use crate::{color::Color, perlin::Perlin, Float, Vec3};
 use serde::{Deserialize, Serialize};
@@ -11,14 +13,14 @@ pub struct NoiseTexture {
 }
 
 impl NoiseTexture {
-    pub fn new(noise: Perlin, scale: Float) -> dyn TextureTrait {
-        Texture::NoiseTexture(NoiseTexture { noise, scale })
+    pub fn new(noise: Perlin, scale: Float) -> Arc<dyn TextureTrait> {
+        Arc::new(NoiseTexture { noise, scale })
     }
 }
 
 impl TextureTrait for NoiseTexture {
     // TODO: investigate why this does not swirl as well as the example marble in tutorial
-    fn color(self, _u: Float, _v: Float, position: Vec3) -> Color {
+    fn color(&self, _u: Float, _v: Float, position: Vec3) -> Color {
         let depth = 7;
         Color::new(1.0, 1.0, 1.0)
             * 0.5

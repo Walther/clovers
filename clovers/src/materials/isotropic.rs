@@ -12,11 +12,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Isotropic {
     #[serde(default)]
-    albedo: dyn TextureTrait,
+    albedo: Arc<dyn TextureTrait>,
 }
 
 impl<'a> Isotropic {
-    pub fn new(emission: dyn TextureTrait) -> Material {
+    pub fn new(emission: Arc<dyn TextureTrait>) -> Material {
         Material::Isotropic(Isotropic { albedo: emission })
     }
 
