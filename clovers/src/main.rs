@@ -11,7 +11,7 @@ use std::{error::Error, fs, time::Instant};
 // Internal imports
 use clovers::*;
 mod draw;
-use draw::draw;
+mod draw_spectral;
 use scenes::Scene;
 
 // Configure CLI parameters
@@ -60,7 +60,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Note: live progress bar printed within draw
     let start = Instant::now();
-    let pixelbuffer = draw(
+    let pixelbuffer = draw_spectral::draw_spectral(
         opts.width,
         opts.height,
         opts.samples,

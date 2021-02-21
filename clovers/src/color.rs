@@ -3,9 +3,13 @@
 use crate::{Float, Vec3};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
+use std::{
+    iter::Sum,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign},
+};
 
 /// RGB color based on three [Floats](crate::Float)
+/// TODO: introduce color spaces properly; CIE XYZ, separate from RGB, etc
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub struct Color {
     pub r: Float,
@@ -21,6 +25,60 @@ impl Default for Color {
             g: 0.18,
             b: 0.18,
         }
+    }
+}
+
+// TODO: meaningful separation into modules for color vs photon vs others
+
+pub type Wavelength = Float;
+
+/// Photon is a wavelength-specific result for a single ray. For a true photon, we wouldn't have intensity, and would only integrate over collecting individual photons that we either receive or don't. However, for computational optimization, we also encode an intensity in order to accumulate results faster.
+pub struct Photon {
+    /// Wavelength, nanometers. Should be between 300-1000, for the full scale of ultraviolet to infrared.
+    pub wavelength: Wavelength,
+    /// Intensity. TODO: does this make sense?
+    pub intensity: Float,
+}
+
+/// Helper function adapted from https://en.wikipedia.org/wiki/CIE_1931_color_space#Analytical_approximation
+fn gaussian(x: Float, alpha: Float, mu: Float, sigma1: Float, sigma2: Float) -> Float {
+    let t = (x - mu) / (if x < mu { sigma1 } else { sigma2 });
+    return alpha * (-(t * t) / 2.0).exp();
+}
+
+/// Helper function adapted from https://en.wikipedia.org/wiki/CIE_1931_color_space#Analytical_approximation
+impl From<Wavelength> for Color {
+    fn from(lambda: Wavelength) -> Self {
+        let l: Float = lambda.into();
+        let x = 0.0 // for readability of next lines
+            + gaussian(l, 1.056, 5998.0, 379.0, 310.0)
+            + gaussian(l, 0.362, 4420.0, 160.0, 267.0)
+            + gaussian(l, -0.065, 5011.0, 204.0, 262.0);
+        let y = gaussian(l, 0.821, 5688.0, 469.0, 405.0) + gaussian(l, 0.286, 5309.0, 163.0, 311.0);
+        let z = gaussian(l, 1.217, 4370.0, 118.0, 360.0) + gaussian(l, 0.681, 4590.0, 260.0, 138.0);
+        return Color { r: x, g: y, b: z };
+    }
+}
+
+impl From<Vec<Wavelength>> for Color {
+    fn from(spectrum: Vec<Wavelength>) -> Self {
+        // TODO: wonder if this should be an actual sum or if an average should be used instead?
+        // Or some perceptual method? Dunno.
+
+        // TODO: how to impl sum?
+        // spectrum.iter().map(|photon| photon.into()).sum()
+        let mut sum = Color::default();
+        for &photon in spectrum.iter() {
+            sum += photon.into();
+        }
+        sum
+    }
+}
+
+impl From<Photon> for Color {
+    // TODO: take intensity into account better? Figure out better ways to do this all?
+    fn from(p: Photon) -> Self {
+        p.wavelength.into()
     }
 }
 

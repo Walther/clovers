@@ -1,6 +1,12 @@
 //! Materials enable different behaviors of light on objects.
 
-use crate::{color::Color, hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
+use crate::{
+    color::{Color, Wavelength},
+    hitable::HitRecord,
+    pdf::PDF,
+    ray::Ray,
+    Float, Vec3,
+};
 pub mod dielectric;
 pub mod diffuse_light;
 pub mod isotropic;
@@ -60,6 +66,28 @@ impl Material {
             Material::DiffuseLight(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
             Material::Metal(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
             Material::Isotropic(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
+        }
+    }
+
+    /// Scatters a ray from the material, taking wavelength into account
+    /// TODO: awful initial guess implementation, clean up
+    pub fn scatter_spectral(
+        &self,
+        ray: &Ray,
+        wavelength: &Wavelength,
+        hit_record: &HitRecord,
+        rng: ThreadRng,
+    ) -> Option<ScatterRecord> {
+        match *self {
+            // TODO: fix the method calls
+            Material::Dielectric(d) => {
+                Dielectric::scatter_spectral(d, ray, wavelength, hit_record, rng)
+            }
+            // TODO: implement
+            Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),
+            Material::DiffuseLight(d) => DiffuseLight::scatter(d, ray, hit_record, rng),
+            Material::Metal(m) => Metal::scatter(m, ray, hit_record, rng),
+            Material::Isotropic(i) => Isotropic::scatter(i, ray, hit_record, rng),
         }
     }
 
