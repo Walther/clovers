@@ -1,5 +1,11 @@
 use super::{reflect, refract, schlick, Material, MaterialType, ScatterRecord};
-use crate::{color::Color, hitable::HitRecord, pdf::ZeroPDF, ray::Ray, Float, Vec3};
+use crate::{
+    color::{Color, Photon, Wavelength},
+    hitable::HitRecord,
+    pdf::ZeroPDF,
+    ray::Ray,
+    Float, Vec3,
+};
 use rand::prelude::*;
 
 use serde::{Deserialize, Serialize};
@@ -36,6 +42,63 @@ impl<'a> Dielectric {
         let etai_over_etat: Float = match hit_record.front_face {
             true => 1.0 / self.refractive_index,
             false => self.refractive_index,
+        };
+
+        let unit_direction: Vec3 = ray.direction.normalize();
+        let cos_theta: Float = (-unit_direction.dot(&hit_record.normal)).min(1.0);
+        let sin_theta: Float = (1.0 - cos_theta * cos_theta).sqrt();
+        if etai_over_etat * sin_theta > 1.0 {
+            let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
+            specular_ray = Ray::new(hit_record.position, reflected, ray.time);
+            Some(ScatterRecord {
+                material_type: MaterialType::Specular,
+                specular_ray: Some(specular_ray),
+                attenuation: albedo,
+                pdf_ptr: ZeroPDF::new(), //TODO: ugly hack due to nullptr in original tutorial
+            })
+        } else {
+            let reflect_probability: Float = schlick(cos_theta, etai_over_etat);
+            if rng.gen::<Float>() < reflect_probability {
+                let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
+                specular_ray = Ray::new(hit_record.position, reflected, ray.time);
+                Some(ScatterRecord {
+                    material_type: MaterialType::Specular,
+                    specular_ray: Some(specular_ray),
+                    attenuation: albedo,
+                    pdf_ptr: ZeroPDF::new(), //TODO: ugly hack due to nullptr in original tutorial
+                })
+            } else {
+                let refracted: Vec3 = refract(unit_direction, hit_record.normal, etai_over_etat);
+                specular_ray = Ray::new(hit_record.position, refracted, ray.time);
+                Some(ScatterRecord {
+                    material_type: MaterialType::Specular,
+                    specular_ray: Some(specular_ray),
+                    attenuation: albedo,
+                    pdf_ptr: ZeroPDF::new(), //TODO: ugly hack due to nullptr in original tutorial
+                })
+            }
+        }
+    }
+
+    // TODO: fix awful initial guess implementation
+    pub fn scatter_spectral(
+        self,
+        ray: &Ray,
+        photon: &Photon,
+        hit_record: &HitRecord,
+        mut rng: ThreadRng,
+    ) -> Option<ScatterRecord<'a>> {
+        let albedo = self.color;
+        let specular_ray: Ray;
+        // TODO: fix awful initial guess implementation
+        // Basing this around Cauchy's equation https://en.wikipedia.org/wiki/Cauchy%27s_equation
+        let wavelength_micrometers = photon.wavelength / 1000.0;
+        let adjusted_refractive_index =
+            self.refractive_index + (0.00420 / (wavelength_micrometers * wavelength_micrometers));
+
+        let etai_over_etat: Float = match hit_record.front_face {
+            true => 1.0 / adjusted_refractive_index,
+            false => adjusted_refractive_index,
         };
 
         let unit_direction: Vec3 = ray.direction.normalize();
