@@ -1,6 +1,6 @@
 use super::{reflect, refract, schlick, Material, MaterialType, ScatterRecord};
 use crate::{
-    color::{Color, Wavelength},
+    color::{Color, Photon, Wavelength},
     hitable::HitRecord,
     pdf::ZeroPDF,
     ray::Ray,
@@ -84,7 +84,7 @@ impl<'a> Dielectric {
     pub fn scatter_spectral(
         self,
         ray: &Ray,
-        wavelength: &Wavelength,
+        photon: &Photon,
         hit_record: &HitRecord,
         mut rng: ThreadRng,
     ) -> Option<ScatterRecord<'a>> {
@@ -92,15 +92,9 @@ impl<'a> Dielectric {
         let specular_ray: Ray;
         // TODO: fix awful initial guess implementation
         // Basing this around Cauchy's equation https://en.wikipedia.org/wiki/Cauchy%27s_equation
-        // But this ends up being so small it disappears and debug print is ~always 1.5?
-        // let adjusted_refractive_index =
-        //     self.refractive_index + (0.00420 / (wavelength * wavelength));
-
-        // This should be massively large difference, so at least _this_ should be visible, right?
-        // Shows up in prints and results in a visible difference, but still not sure if seeing any prismatic effects...
-        let adjusted_refractive_index = self.refractive_index + (1000.0 / wavelength);
-
-        // dbg!(&adjusted_refractive_index);
+        let wavelength_micrometers = photon.wavelength / 1000.0;
+        let adjusted_refractive_index =
+            self.refractive_index + (0.00420 / (wavelength_micrometers * wavelength_micrometers));
 
         let etai_over_etat: Float = match hit_record.front_face {
             true => 1.0 / adjusted_refractive_index,

@@ -50,6 +50,7 @@ fn gaussian(x: Float, alpha: Float, mu: Float, sigma1: Float, sigma2: Float) -> 
 impl From<Wavelength> for Color {
     fn from(lambda: Wavelength) -> Self {
         let l: Float = lambda.into();
+        let l = l * 10.0; // the algorithm below works in ångström, not nanometers.
         let x = 0.0 // for readability of next lines
             + gaussian(l, 1.056, 5998.0, 379.0, 310.0)
             + gaussian(l, 0.362, 4420.0, 160.0, 267.0)
@@ -78,6 +79,14 @@ impl From<Vec<Wavelength>> for Color {
 impl From<Photon> for Color {
     // TODO: take intensity into account better? Figure out better ways to do this all?
     fn from(p: Photon) -> Self {
+        p.wavelength.into()
+    }
+}
+
+// TODO: why do i have to implement separately for reference
+impl From<&Photon> for Color {
+    // TODO: take intensity into account better? Figure out better ways to do this all?
+    fn from(p: &Photon) -> Self {
         p.wavelength.into()
     }
 }

@@ -1,7 +1,7 @@
 //! Materials enable different behaviors of light on objects.
 
 use crate::{
-    color::{Color, Wavelength},
+    color::{Color, Photon, Wavelength},
     hitable::HitRecord,
     pdf::PDF,
     ray::Ray,
@@ -74,14 +74,14 @@ impl Material {
     pub fn scatter_spectral(
         &self,
         ray: &Ray,
-        wavelength: &Wavelength,
+        photon: &Photon,
         hit_record: &HitRecord,
         rng: ThreadRng,
     ) -> Option<ScatterRecord> {
         match *self {
             // TODO: fix the method calls
             Material::Dielectric(d) => {
-                Dielectric::scatter_spectral(d, ray, wavelength, hit_record, rng)
+                Dielectric::scatter_spectral(d, ray, photon, hit_record, rng)
             }
             // TODO: implement
             Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),

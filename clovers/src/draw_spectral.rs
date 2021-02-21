@@ -22,8 +22,12 @@ fn sample(
     let u = (x as Float + rng.gen::<Float>()) / width as Float;
     let v = (y as Float + rng.gen::<Float>()) / height as Float;
     let ray: Ray = scene.camera.get_ray(u, v, rng);
-    let wavelength = rng.gen_range(300.0, 1000.0); // TODO: remove hardcoded guess
-    let new_color = colorize_spectral(&ray, &wavelength, &scene, 0, max_depth, rng);
+    let wavelength = rng.gen_range(400.0, 700.0); // Visible spectrum; https://en.wikipedia.org/wiki/Light
+    let photon: Photon = Photon {
+        wavelength,
+        intensity: 1.0,
+    };
+    let new_color = colorize_spectral(&ray, &photon, &scene, 0, max_depth, rng);
     // skip NaN and Infinity
     if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
         return Some(new_color);
@@ -79,7 +83,7 @@ pub fn draw_spectral(
 
 pub fn colorize_spectral(
     ray: &Ray,
-    wavelength: &Wavelength,
+    photon: &Photon,
     scene: &Scene,
     depth: u32,
     max_depth: u32,
@@ -108,11 +112,14 @@ pub fn colorize_spectral(
                 hit_record.v,
                 hit_record.position,
             );
+            // Does this make sense?
+            let tint: Color = photon.into();
+            let emitted: Color = emitted * tint;
 
             // Do we scatter?
             match hit_record
                 .material
-                .scatter_spectral(&ray, &wavelength, &hit_record, rng)
+                .scatter_spectral(&ray, photon, &hit_record, rng)
             {
                 // No scatter, emit only
                 None => emitted, // TODO: photon turned into Color here
@@ -124,7 +131,7 @@ pub fn colorize_spectral(
                             scatter_record.attenuation
                                 * colorize_spectral(
                                     &scatter_record.specular_ray.unwrap(), // should always have a ray at this point
-                                    wavelength,
+                                    photon,
                                     scene,
                                     depth + 1,
                                     max_depth,
@@ -144,7 +151,7 @@ pub fn colorize_spectral(
                             // recurse
                             let recurse = colorize_spectral(
                                 &scattered,
-                                wavelength,
+                                photon,
                                 scene,
                                 depth + 1,
                                 max_depth,
