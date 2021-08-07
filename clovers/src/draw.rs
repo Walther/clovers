@@ -14,7 +14,9 @@ pub fn draw(
     gamma: Float,
     scene: Scene,
 ) -> Vec<Color> {
-    span!(Level::TRACE, "draw");
+    let span = span!(Level::TRACE, "draw");
+    let _enter = span.enter();
+
     // Progress bar
     let pixels = (width * height) as u64;
     let bar = ProgressBar::new(pixels);
