@@ -52,80 +52,78 @@ fn main() -> Result<(), Box<dyn Error>> {
     let d = Dispatch::new(s);
     let d2 = d.clone();
 
-    let result = dispatcher::with_default(&d2, || -> Result<_, _> {
-        // Tracing debug: uncommenting this makes the hashmap assert pass
-        // trace_span!("draw").in_scope(|| {
-        //     trace!("ray_color");
-        //     trace!("ray_none");
-        // });
+    let _dispatcher_result = dispatcher::set_global_default(d2);
 
-        // CLI
-        let opts: Opts = Opts::parse();
+    // Tracing debug: uncommenting this makes the hashmap assert pass
+    // trace_span!("draw").in_scope(|| {
+    //     trace!("ray_color");
+    //     trace!("ray_none");
+    // });
 
-        println!("clovers 🍀    ray tracing in rust 🦀");
-        println!("width:        {}", opts.width);
-        println!("height:       {}", opts.height);
-        println!("samples:      {}", opts.samples);
-        println!("max depth:    {}", opts.max_depth);
-        let rays: u64 =
-            opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
-        println!("approx. rays: {}", rays);
-        println!(); // Empty line before progress bar
+    // CLI
+    let opts: Opts = Opts::parse();
 
-        // Read the given scene file
-        let file = File::open(&opts.input)?;
-        let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
+    println!("clovers 🍀    ray tracing in rust 🦀");
+    println!("width:        {}", opts.width);
+    println!("height:       {}", opts.height);
+    println!("samples:      {}", opts.samples);
+    println!("max depth:    {}", opts.max_depth);
+    let rays: u64 =
+        opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
+    println!("approx. rays: {}", rays);
+    println!(); // Empty line before progress bar
 
-        // Note: live progress bar printed within draw
-        let start = Instant::now();
-        let mut pixelbuffer: Vec<Color> = Vec::new();
+    // Read the given scene file
+    let file = File::open(&opts.input)?;
+    let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
 
-        pixelbuffer = draw(
-            opts.width,
-            opts.height,
-            opts.samples,
-            opts.max_depth,
-            opts.gamma,
-            scene,
-        );
+    // Note: live progress bar printed within draw
+    let start = Instant::now();
 
-        // Translate our internal pixelbuffer into an Image buffer
-        let width = opts.width;
-        let height = opts.height;
-        let mut img: RgbImage = ImageBuffer::new(width, height);
-        img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
-            let index = y * width + x;
-            *pixel = Rgb(pixelbuffer[index as usize].to_rgb_u8());
-        });
+    let pixelbuffer = draw(
+        opts.width,
+        opts.height,
+        opts.samples,
+        opts.max_depth,
+        opts.gamma,
+        scene,
+    );
 
-        // Graphics assume origin at bottom left corner of the screen
-        // Our buffer writes pixels from top left corner. Simple fix, just flip it!
-        image::imageops::flip_vertical_in_place(&mut img);
-        // Our coordinate system is weird in general, try flipping this way too.
-        image::imageops::flip_horizontal_in_place(&mut img);
-        // TODO: fix the coordinate system
-
-        let duration = Instant::now() - start;
-        println!(); // Empty line after progress bar
-        println!("finished render in {}", format_duration(duration));
-
-        // Write
-        let target: String;
-        match opts.output {
-            Some(filename) => {
-                target = filename;
-            }
-            None => {
-                // Default to using a timestamp & `renders/` directory
-                let timestamp = Utc::now().timestamp();
-                fs::create_dir_all("renders")?;
-                target = format!("renders/{}.png", timestamp);
-            }
-        };
-        img.save(format!("{}", target))?;
-        println!("output saved: {}", target);
-        Ok(())
+    // Translate our internal pixelbuffer into an Image buffer
+    let width = opts.width;
+    let height = opts.height;
+    let mut img: RgbImage = ImageBuffer::new(width, height);
+    img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
+        let index = y * width + x;
+        *pixel = Rgb(pixelbuffer[index as usize].to_rgb_u8());
     });
+
+    // Graphics assume origin at bottom left corner of the screen
+    // Our buffer writes pixels from top left corner. Simple fix, just flip it!
+    image::imageops::flip_vertical_in_place(&mut img);
+    // Our coordinate system is weird in general, try flipping this way too.
+    image::imageops::flip_horizontal_in_place(&mut img);
+    // TODO: fix the coordinate system
+
+    let duration = Instant::now() - start;
+    println!(); // Empty line after progress bar
+    println!("finished render in {}", format_duration(duration));
+
+    // Write
+    let target: String;
+    match opts.output {
+        Some(filename) => {
+            target = filename;
+        }
+        None => {
+            // Default to using a timestamp & `renders/` directory
+            let timestamp = Utc::now().timestamp();
+            fs::create_dir_all("renders")?;
+            target = format!("renders/{}.png", timestamp);
+        }
+    };
+    img.save(format!("{}", target))?;
+    println!("output saved: {}", target);
 
     // prettyprint a histogram
     sid.downcast(&d).unwrap().with_histograms(|hs| {
@@ -187,8 +185,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     });
 
-    // return result
-    result
+    Ok(())
 }
 
 // https://github.com/jonhoo/tracing-timing/blob/master/examples/pretty.rs
