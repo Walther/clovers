@@ -3,6 +3,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
 use rayon::prelude::*;
 use scenes::Scene;
+use tracing::*;
 
 /// The main drawing function, returns a Vec<Color> as a pixelbuffer.
 pub fn draw(
@@ -13,42 +14,49 @@ pub fn draw(
     gamma: Float,
     scene: Scene,
 ) -> Vec<Color> {
-    // Progress bar
-    let pixels = (width * height) as u64;
-    let bar = ProgressBar::new(pixels);
-    bar.set_draw_delta(pixels / 1000);
-    bar.set_style(ProgressStyle::default_bar().template(
-        "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
-    ));
+    trace_span!("draw").in_scope(|| {
+        // Progress bar
+        let pixels = (width * height) as u64;
+        let bar = ProgressBar::new(pixels);
+        bar.set_draw_delta(pixels / 1000);
+        bar.set_style(ProgressStyle::default_bar().template(
+            "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
+        ));
 
-    let black = Color::new(0.0, 0.0, 0.0);
-    let mut pixelbuffer = vec![black; pixels as usize];
+        let black = Color::new(0.0, 0.0, 0.0);
+        let mut pixelbuffer = vec![black; pixels as usize];
 
-    pixelbuffer
-        .par_iter_mut()
-        .enumerate()
-        .for_each(|(index, pixel)| {
-            let x = index % width as usize;
-            let y = index / width as usize;
-            let rng = rand::thread_rng();
-            let mut color: Color = Color::new(0.0, 0.0, 0.0);
+        pixelbuffer
+            .par_iter_mut()
+            .enumerate()
+            .for_each(|(index, pixel)| {
+                let x = index % width as usize;
+                let y = index / width as usize;
+                let rng = rand::thread_rng();
+                let mut color: Color = Color::new(0.0, 0.0, 0.0);
 
-            // Multisampling for antialiasing
-            for _sample in 0..samples {
-                match sample(&scene, x, y, width, height, rng, max_depth) {
-                    Some(s) => color += s,
-                    None => {}
+                // Multisampling for antialiasing
+                for _sample in 0..samples {
+                    match sample(&scene, x, y, width, height, rng, max_depth) {
+                        Some(s) => {
+                            trace!("ray_color");
+                            color += s;
+                        }
+                        None => {
+                            trace!("ray_none");
+                        }
+                    }
                 }
-            }
-            color /= samples as Float;
+                color /= samples as Float;
 
-            color = color.gamma_correction(gamma);
-            *pixel = color;
+                color = color.gamma_correction(gamma);
+                *pixel = color;
 
-            bar.inc(1);
-        });
+                bar.inc(1);
+            });
 
-    pixelbuffer
+        return pixelbuffer;
+    })
 }
 
 /// Get a single sample for a single pixel in the scene. Has slight jitter for antialiasing when multisampling.

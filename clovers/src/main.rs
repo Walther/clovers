@@ -3,10 +3,13 @@
 // External imports
 use chrono::Utc;
 use clap::Clap;
+use clovers::color::Color;
 use humantime::format_duration;
 use image::{ImageBuffer, Rgb, RgbImage};
 use std::fs::File;
 use std::{error::Error, fs, time::Instant};
+use tracing::*;
+use tracing_timing::{Builder, Histogram};
 
 // Internal imports
 use clovers::*;
@@ -42,68 +45,171 @@ struct Opts {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let opts: Opts = Opts::parse();
+    // Tracing
+    let s = Builder::default().build(|| Histogram::new_with_bounds(10_000, 1_000_000, 3).unwrap());
+    let sid = s.downcaster();
 
-    println!("clovers 🍀    ray tracing in rust 🦀");
-    println!("width:        {}", opts.width);
-    println!("height:       {}", opts.height);
-    println!("samples:      {}", opts.samples);
-    println!("max depth:    {}", opts.max_depth);
-    let rays: u64 =
-        opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
-    println!("approx. rays: {}", rays);
-    println!(); // Empty line before progress bar
+    let d = Dispatch::new(s);
+    let d2 = d.clone();
 
-    // Read the given scene file
-    let file = File::open(opts.input)?;
-    let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
+    let result = dispatcher::with_default(&d2, || -> Result<_, _> {
+        // Tracing debug: uncommenting this makes the hashmap assert pass
+        // trace_span!("draw").in_scope(|| {
+        //     trace!("ray_color");
+        //     trace!("ray_none");
+        // });
 
-    // Note: live progress bar printed within draw
-    let start = Instant::now();
-    let pixelbuffer = draw(
-        opts.width,
-        opts.height,
-        opts.samples,
-        opts.max_depth,
-        opts.gamma,
-        scene,
-    );
+        // CLI
+        let opts: Opts = Opts::parse();
 
-    // Translate our internal pixelbuffer into an Image buffer
-    let width = opts.width;
-    let height = opts.height;
-    let mut img: RgbImage = ImageBuffer::new(width, height);
-    img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
-        let index = y * width + x;
-        *pixel = Rgb(pixelbuffer[index as usize].to_rgb_u8());
+        println!("clovers 🍀    ray tracing in rust 🦀");
+        println!("width:        {}", opts.width);
+        println!("height:       {}", opts.height);
+        println!("samples:      {}", opts.samples);
+        println!("max depth:    {}", opts.max_depth);
+        let rays: u64 =
+            opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
+        println!("approx. rays: {}", rays);
+        println!(); // Empty line before progress bar
+
+        // Read the given scene file
+        let file = File::open(&opts.input)?;
+        let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
+
+        // Note: live progress bar printed within draw
+        let start = Instant::now();
+        let mut pixelbuffer: Vec<Color> = Vec::new();
+
+        pixelbuffer = draw(
+            opts.width,
+            opts.height,
+            opts.samples,
+            opts.max_depth,
+            opts.gamma,
+            scene,
+        );
+
+        // Translate our internal pixelbuffer into an Image buffer
+        let width = opts.width;
+        let height = opts.height;
+        let mut img: RgbImage = ImageBuffer::new(width, height);
+        img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
+            let index = y * width + x;
+            *pixel = Rgb(pixelbuffer[index as usize].to_rgb_u8());
+        });
+
+        // Graphics assume origin at bottom left corner of the screen
+        // Our buffer writes pixels from top left corner. Simple fix, just flip it!
+        image::imageops::flip_vertical_in_place(&mut img);
+        // Our coordinate system is weird in general, try flipping this way too.
+        image::imageops::flip_horizontal_in_place(&mut img);
+        // TODO: fix the coordinate system
+
+        let duration = Instant::now() - start;
+        println!(); // Empty line after progress bar
+        println!("finished render in {}", format_duration(duration));
+
+        // Write
+        let target: String;
+        match opts.output {
+            Some(filename) => {
+                target = filename;
+            }
+            None => {
+                // Default to using a timestamp & `renders/` directory
+                let timestamp = Utc::now().timestamp();
+                fs::create_dir_all("renders")?;
+                target = format!("renders/{}.png", timestamp);
+            }
+        };
+        img.save(format!("{}", target))?;
+        println!("output saved: {}", target);
+        Ok(())
     });
 
-    // Graphics assume origin at bottom left corner of the screen
-    // Our buffer writes pixels from top left corner. Simple fix, just flip it!
-    image::imageops::flip_vertical_in_place(&mut img);
-    // Our coordinate system is weird in general, try flipping this way too.
-    image::imageops::flip_horizontal_in_place(&mut img);
-    // TODO: fix the coordinate system
+    // prettyprint a histogram
+    sid.downcast(&d).unwrap().with_histograms(|hs| {
+        assert_eq!(hs.len(), 1);
+        let hs = &mut hs.get_mut("draw").unwrap();
+        assert_eq!(hs.len(), 2);
 
-    let duration = Instant::now() - start;
-    println!(); // Empty line after progress bar
-    println!("finished render in {}", format_duration(duration));
+        hs.get_mut("ray_color").unwrap().refresh();
+        hs.get_mut("ray_none").unwrap().refresh();
 
-    // Write
-    let target: String;
-    match opts.output {
-        Some(filename) => {
-            target = filename;
+        println!("ray_color:");
+        let h = &hs["ray_color"];
+        println!(
+            "mean: {:.1}µs, p50: {}µs, p90: {}µs, p99: {}µs, p999: {}µs, max: {}µs",
+            h.mean() / 1000.0,
+            h.value_at_quantile(0.5) / 1_000,
+            h.value_at_quantile(0.9) / 1_000,
+            h.value_at_quantile(0.99) / 1_000,
+            h.value_at_quantile(0.999) / 1_000,
+            h.max() / 1_000,
+        );
+        for v in break_once(
+            h.iter_linear(25_000).skip_while(|v| v.quantile() < 0.01),
+            |v| v.quantile() > 0.95,
+        ) {
+            println!(
+                "{:4}µs | {:40} | {:4.1}th %-ile",
+                (v.value_iterated_to() + 1) / 1_000,
+                "*".repeat(
+                    (v.count_since_last_iteration() as f64 * 40.0 / h.len() as f64).ceil() as usize
+                ),
+                v.percentile(),
+            );
         }
-        None => {
-            // Default to using a timestamp & `renders/` directory
-            let timestamp = Utc::now().timestamp();
-            fs::create_dir_all("renders")?;
-            target = format!("renders/{}.png", timestamp);
-        }
-    };
-    img.save(format!("{}", target))?;
-    println!("output saved: {}", target);
 
-    Ok(())
+        println!("\nray_none:");
+        let h = &hs["ray_none"];
+        println!(
+            "mean: {:.1}µs, p50: {}µs, p90: {}µs, p99: {}µs, p999: {}µs, max: {}µs",
+            h.mean() / 1000.0,
+            h.value_at_quantile(0.5) / 1_000,
+            h.value_at_quantile(0.9) / 1_000,
+            h.value_at_quantile(0.99) / 1_000,
+            h.value_at_quantile(0.999) / 1_000,
+            h.max() / 1_000,
+        );
+        for v in break_once(
+            h.iter_linear(25_000).skip_while(|v| v.quantile() < 0.01),
+            |v| v.quantile() > 0.95,
+        ) {
+            println!(
+                "{:4}µs | {:40} | {:4.1}th %-ile",
+                (v.value_iterated_to() + 1) / 1_000,
+                "*".repeat(
+                    (v.count_since_last_iteration() as f64 * 40.0 / h.len() as f64).ceil() as usize
+                ),
+                v.percentile(),
+            );
+        }
+    });
+
+    // return result
+    result
+}
+
+// https://github.com/jonhoo/tracing-timing/blob/master/examples/pretty.rs
+// until we have https://github.com/rust-lang/rust/issues/62208
+fn break_once<I, F>(it: I, mut f: F) -> impl Iterator<Item = I::Item>
+where
+    I: IntoIterator,
+    F: FnMut(&I::Item) -> bool,
+{
+    let mut got_true = false;
+    it.into_iter().take_while(move |i| {
+        if got_true {
+            // we've already yielded when f was true
+            return false;
+        }
+        if f(i) {
+            // this must be the first time f returns true
+            // we should yield i, and then no more
+            got_true = true;
+        }
+        // f returned false, so we should keep yielding
+        true
+    })
 }
