@@ -7,7 +7,7 @@ use clovers::color::Color;
 use humantime::format_duration;
 use image::{ImageBuffer, Rgb, RgbImage};
 use std::fs::File;
-use std::{error::Error, fs, time::Instant};
+use std::{error::Error, fs, sync::Arc, time::Instant};
 use tracing::*;
 use tracing_timing::{Builder, Histogram};
 
@@ -45,23 +45,33 @@ struct Opts {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    // Tracing
-    let s = Builder::default().build(|| Histogram::new_with_bounds(10_000, 1_000_000, 3).unwrap());
-    let sid = s.downcaster();
-
-    let d = Dispatch::new(s);
-    let d2 = d.clone();
-
-    let _dispatcher_result = dispatcher::set_global_default(d2);
-
-    // Tracing debug: uncommenting this makes the hashmap assert pass
-    // trace_span!("draw").in_scope(|| {
-    //     trace!("ray_color");
-    //     trace!("ray_none");
-    // });
+    use tracing_subscriber::prelude::*;
 
     // CLI
     let opts: Opts = Opts::parse();
+
+    let timestamp = Utc::now().timestamp();
+    // Write
+    let target: String;
+    match opts.output {
+        Some(filename) => {
+            target = filename;
+        }
+        None => {
+            // Default to using a timestamp & `renders/` directory
+            fs::create_dir_all("renders")?;
+            target = format!("renders/{}.png", timestamp);
+        }
+    };
+    // Tracing
+    let timing =
+        Builder::default().layer(|| Histogram::new_with_bounds(10_000, 1_000_000, 3).unwrap());
+    let sid = timing.downcaster();
+    let fmt = tracing_subscriber::fmt::layer()
+        .with_ansi(false)
+        .with_writer(Arc::new(File::create(format!("{}.log", target)).unwrap()));
+    let d = Dispatch::new(tracing_subscriber::registry().with(fmt).with(timing));
+    tracing::dispatcher::set_global_default(d.clone()).unwrap();
 
     println!("clovers 🍀    ray tracing in rust 🦀");
     println!("width:        {}", opts.width);
@@ -109,19 +119,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!(); // Empty line after progress bar
     println!("finished render in {}", format_duration(duration));
 
-    // Write
-    let target: String;
-    match opts.output {
-        Some(filename) => {
-            target = filename;
-        }
-        None => {
-            // Default to using a timestamp & `renders/` directory
-            let timestamp = Utc::now().timestamp();
-            fs::create_dir_all("renders")?;
-            target = format!("renders/{}.png", timestamp);
-        }
-    };
     img.save(format!("{}", target))?;
     println!("output saved: {}", target);
 
