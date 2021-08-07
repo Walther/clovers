@@ -126,62 +126,39 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("output saved: {}", target);
 
     // prettyprint a histogram
-    sid.downcast(&d).unwrap().with_histograms(|hs| {
-        assert_eq!(hs.len(), 1);
-        let hs = &mut hs.get_mut("draw").unwrap();
-        assert_eq!(hs.len(), 2);
-
-        hs.get_mut("ray_color").unwrap().refresh();
-        hs.get_mut("ray_none").unwrap().refresh();
-
-        println!("ray_color:");
-        let h = &hs["ray_color"];
-        println!(
-            "mean: {:.1}µs, p50: {}µs, p90: {}µs, p99: {}µs, p999: {}µs, max: {}µs",
-            h.mean() / 1000.0,
-            h.value_at_quantile(0.5) / 1_000,
-            h.value_at_quantile(0.9) / 1_000,
-            h.value_at_quantile(0.99) / 1_000,
-            h.value_at_quantile(0.999) / 1_000,
-            h.max() / 1_000,
-        );
-        for v in break_once(
-            h.iter_linear(25_000).skip_while(|v| v.quantile() < 0.01),
-            |v| v.quantile() > 0.95,
-        ) {
-            println!(
-                "{:4}µs | {:40} | {:4.1}th %-ile",
-                (v.value_iterated_to() + 1) / 1_000,
-                "*".repeat(
-                    (v.count_since_last_iteration() as f64 * 40.0 / h.len() as f64).ceil() as usize
-                ),
-                v.percentile(),
-            );
-        }
-
-        println!("\nray_none:");
-        let h = &hs["ray_none"];
-        println!(
-            "mean: {:.1}µs, p50: {}µs, p90: {}µs, p99: {}µs, p999: {}µs, max: {}µs",
-            h.mean() / 1000.0,
-            h.value_at_quantile(0.5) / 1_000,
-            h.value_at_quantile(0.9) / 1_000,
-            h.value_at_quantile(0.99) / 1_000,
-            h.value_at_quantile(0.999) / 1_000,
-            h.max() / 1_000,
-        );
-        for v in break_once(
-            h.iter_linear(25_000).skip_while(|v| v.quantile() < 0.01),
-            |v| v.quantile() > 0.95,
-        ) {
-            println!(
-                "{:4}µs | {:40} | {:4.1}th %-ile",
-                (v.value_iterated_to() + 1) / 1_000,
-                "*".repeat(
-                    (v.count_since_last_iteration() as f64 * 40.0 / h.len() as f64).ceil() as usize
-                ),
-                v.percentile(),
-            );
+    let timings = sid.downcast(&d).unwrap();
+    // Now that we are done rendering, ensure all metrics are up to date.
+    timings.force_synchronize();
+    timings.with_histograms(|hs| {
+        for (span_group, hs) in hs {
+            for (event_group, h) in hs {
+                // make sure we see the latest samples:
+                h.refresh_timeout(std::time::Duration::from_secs(10));
+                println!("\n{} -> {}:", span_group, event_group,);
+                println!(
+                    " | mean: {:.1}µs, p50: {}µs, p90: {}µs, p99: {}µs, p999: {}µs, max: {}µs\n | ",
+                    h.mean() / 1000.0,
+                    h.value_at_quantile(0.5) / 1_000,
+                    h.value_at_quantile(0.9) / 1_000,
+                    h.value_at_quantile(0.99) / 1_000,
+                    h.value_at_quantile(0.999) / 1_000,
+                    h.max() / 1_000,
+                );
+                for v in break_once(
+                    h.iter_linear(25_000).skip_while(|v| v.quantile() < 0.01),
+                    |v| v.quantile() > 0.95,
+                ) {
+                    println!(
+                        " | {:4}µs | {:40} | {:4.1}th %-ile",
+                        (v.value_iterated_to() + 1) / 1_000,
+                        "*".repeat(
+                            (v.count_since_last_iteration() as f64 * 40.0 / h.len() as f64).ceil()
+                                as usize
+                        ),
+                        v.percentile(),
+                    );
+                }
+            }
         }
     });
 
