@@ -14,10 +14,9 @@ pub fn draw(
     gamma: Float,
     scene: Scene,
 ) -> Vec<Color> {
+    // Progress bar
     let span = span!(Level::TRACE, "draw");
     let _enter = span.enter();
-
-    // Progress bar
     let pixels = (width * height) as u64;
     let bar = ProgressBar::new(pixels);
     bar.set_draw_delta(pixels / 1000);
@@ -32,7 +31,8 @@ pub fn draw(
         .par_iter_mut()
         .enumerate()
         .for_each(|(index, pixel)| {
-            let _enter = span.enter();
+            let _e = span.enter();
+            let _e = trace_span!("draw_pixel", index, ?pixel).entered();
             let x = index % width as usize;
             let y = index / width as usize;
             let rng = rand::thread_rng();
