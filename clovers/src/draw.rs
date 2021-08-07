@@ -32,6 +32,7 @@ pub fn draw(
         .par_iter_mut()
         .enumerate()
         .for_each(|(index, pixel)| {
+            let _enter = span.enter();
             let x = index % width as usize;
             let y = index / width as usize;
             let rng = rand::thread_rng();
