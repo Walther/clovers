@@ -1,3 +1,5 @@
+//! A metal material.
+
 use super::{reflect, MaterialType, ScatterRecord};
 use crate::{
     hitable::HitRecord, pdf::ZeroPDF, random::random_in_unit_sphere, ray::Ray, textures::Texture,

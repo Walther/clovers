@@ -1,3 +1,5 @@
+//! A diffuse light material.
+
 use super::ScatterRecord;
 use crate::{
     color::Color,

@@ -1,3 +1,5 @@
+//! Isotropic material.
+
 use super::{MaterialType, ScatterRecord};
 use crate::{
     color::Color, hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI,

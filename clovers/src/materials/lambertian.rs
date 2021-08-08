@@ -1,3 +1,5 @@
+//! Lambertian material. This is the default material with a smooth, matte surface.
+
 use super::{MaterialType, ScatterRecord};
 use crate::{hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI};
 use rand::prelude::ThreadRng;

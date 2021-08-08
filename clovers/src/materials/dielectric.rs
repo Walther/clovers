@@ -1,11 +1,13 @@
+//! A dielectric material. This resembles glass and other transparent and reflective materials.
+
 use super::{reflect, refract, schlick, MaterialType, ScatterRecord};
 use crate::{color::Color, hitable::HitRecord, pdf::ZeroPDF, ray::Ray, Float, Vec3};
 use rand::prelude::*;
 
 use serde::{Deserialize, Serialize};
 
-/// A dielectric material. This resembless glass and other transparent and reflective materials.
 #[derive(Copy, Clone, Deserialize, Serialize, Debug)]
+/// A dielectric material. This resembles glass and other transparent and reflective materials.
 pub struct Dielectric {
     /// Refractive index of the material. Used for calculating the new direction of a ray when entering the material at an angle. Follows Snell's law of refraction. Default value: 1.5, based on typical window glass.
     #[serde(default = "default_index")]
