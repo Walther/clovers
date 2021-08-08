@@ -59,8 +59,8 @@
 #![deny(unused_lifetimes)]
 #![deny(unused_qualifications)]
 #![warn(missing_debug_implementations)]
+#![warn(missing_docs)]
 // TODO:
-#![warn(missing_docs)] // Lots of undocumented things for now
 #![allow(clippy::many_single_char_names)] // Lots of places with coordinates etc
 #![allow(clippy::new_ret_no_self)] // Material types return a Material instead of Self for now
 
