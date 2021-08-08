@@ -11,14 +11,19 @@ use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+/// SphereInit structure describes the necessary data for constructing a [Sphere]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct SphereInit {
+    /// Center of the sphere.
     pub center: Vec3,
+    /// Radius of the sphere.
     pub radius: Float,
     #[serde(default)]
+    /// Material of the sphere.
     pub material: Material,
 }
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+/// A sphere object.
 pub struct Sphere {
     center: Vec3,
     radius: Float,
@@ -26,6 +31,7 @@ pub struct Sphere {
 }
 
 impl Sphere {
+    /// Creates a new `Sphere` object with the given center, radius and material.
     pub fn new(center: Vec3, radius: Float, material: Material) -> Hitable {
         Hitable::Sphere(Sphere {
             center,
@@ -44,6 +50,7 @@ impl Sphere {
         (u, v)
     }
 
+    /// Hit method for the [Sphere] object. Returns a [HitRecord] if the given [Ray] intersects with the sphere at the given distance interval.
     pub fn hit(
         &self,
         ray: &Ray,
@@ -99,6 +106,7 @@ impl Sphere {
         None
     }
 
+    /// Returns the axis-aligned bounding box [AABB] for the sphere.
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         let output_box = AABB::new(
             self.center - Vec3::new(self.radius, self.radius, self.radius),
@@ -107,6 +115,7 @@ impl Sphere {
         Some(output_box)
     }
 
+    /// Returns the probability density function for the sphere? TODO: what does this do again and how
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
@@ -126,6 +135,8 @@ impl Sphere {
         }
     }
 
+    // TODO: understand, document
+    /// Utility function from Ray Tracing: The Rest of Your Life. TODO: understand, document
     pub fn random(&self, origin: Vec3, rng: ThreadRng) -> Vec3 {
         let direction: Vec3 = self.center - origin;
         let distance_squared: Float = direction.norm_squared();
