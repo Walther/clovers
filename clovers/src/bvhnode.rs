@@ -11,12 +11,17 @@ use crate::{
     Float,
 };
 
-/// Bounding Volume Hierarchy Node. A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also BVHNodes. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
+/// Bounding Volume Hierarchy Node.
+///
+/// A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also BVHNodes. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 #[derive(Debug)]
 pub struct BVHNode {
-    left: Arc<Hitable>,
-    right: Arc<Hitable>,
-    bounding_box: AABB,
+    /// Left child of the BVHNode
+    pub left: Arc<Hitable>,
+    /// Right child of the BVHNode
+    pub right: Arc<Hitable>,
+    /// Bounding box containing both of the child nodes
+    pub bounding_box: AABB,
 }
 
 impl BVHNode {
@@ -96,6 +101,7 @@ impl BVHNode {
         }
     }
 
+    /// The main `hit` function for a [BVHNode]. Given a [Ray](crate::ray::Ray), and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the encased objects during that interval.
     pub fn hit(
         &self,
         ray: &Ray,
@@ -134,6 +140,8 @@ impl BVHNode {
             }
         }
     }
+
+    /// Returns the axis-aligned bounding box [AABB] of the objects within this [BVHNode].
     pub fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
         Some(self.bounding_box)
     }
