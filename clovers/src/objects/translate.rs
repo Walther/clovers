@@ -24,10 +24,7 @@ pub struct Translate {
 
 impl Translate {
     pub fn new(object: Arc<Hitable>, offset: Vec3) -> Hitable {
-        Hitable::Translate(Translate {
-            object: object,
-            offset,
-        })
+        Hitable::Translate(Translate { object, offset })
     }
 
     pub fn hit(
