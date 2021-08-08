@@ -29,6 +29,7 @@ fn default_density() -> Float {
     // 1e9
 }
 
+#[derive(Debug)]
 pub struct ConstantMedium {
     boundary: Arc<Hitable>,
     phase_function: Material,

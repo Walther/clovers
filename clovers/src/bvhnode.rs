@@ -12,6 +12,7 @@ use crate::{
 };
 
 /// Bounding Volume Hierarchy Node. A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also BVHNodes. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
+#[derive(Debug)]
 pub struct BVHNode {
     left: Arc<Hitable>,
     right: Arc<Hitable>,

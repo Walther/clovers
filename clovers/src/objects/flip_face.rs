@@ -15,6 +15,7 @@ pub struct FlipFaceInit {
     pub object: Box<Object>,
 }
 
+#[derive(Debug)]
 pub struct FlipFace {
     object: Arc<Hitable>,
 }

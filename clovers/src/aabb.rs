@@ -5,7 +5,7 @@ use crate::{ray::Ray, Float, Vec3};
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
 /// This is useful for creating bounding volume hierarchies, which is an optimization for reducing the time spent on calculating ray-object intersections.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct AABB {
     pub min: Vec3,
     pub max: Vec3,

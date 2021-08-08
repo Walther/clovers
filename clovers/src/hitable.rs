@@ -48,6 +48,7 @@ impl<'a> HitRecord<'a> {
 /// An abstraction for things that can be hit by [Rays](crate::ray::Ray).
 ///
 /// TODO: ideally, for cleaner abstraction, this could be a Trait. However, the performance implications might need deeper investigation and consideration...
+#[derive(Debug)]
 pub enum Hitable {
     Boxy(Boxy),
     ConstantMedium(ConstantMedium),
@@ -135,6 +136,7 @@ impl Hitable {
 }
 
 /// Helper struct for storing multiple `Hitable` objects. This list has a `Hitable` implementation too, returning the closest possible hit
+#[derive(Debug)]
 pub struct HitableList(pub Vec<Arc<Hitable>>);
 
 impl From<Vec<Arc<Hitable>>> for HitableList {

@@ -16,6 +16,7 @@ pub struct TranslateInit {
     pub offset: Vec3,
 }
 
+#[derive(Debug)]
 pub struct Translate {
     object: Arc<Hitable>,
     offset: Vec3,

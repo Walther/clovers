@@ -16,6 +16,7 @@ pub struct RotateInit {
     pub angle: Float,
 }
 
+#[derive(Debug)]
 pub struct RotateY {
     object: Arc<Hitable>,
     sin_theta: Float,
