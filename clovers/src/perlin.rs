@@ -1,5 +1,7 @@
 //! Perlin noise implementation. Used for e.g. [NoiseTexture](crate::textures::Texture::NoiseTexture)
 
+#![allow(clippy::needless_range_loop)] // TODO: figure out what clippy wants here
+
 use crate::{Float, Vec3};
 use rand::prelude::*;
 

@@ -1,5 +1,7 @@
 //! Textures enable different surface textures for colorizing objects in various ways.
 
+#![allow(clippy::large_enum_variant)] // TODO: NoiseTexture is massive compared to others.
+
 pub mod checkered;
 pub mod noise_texture;
 pub mod solid_color;
