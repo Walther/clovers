@@ -13,6 +13,7 @@ use super::Object;
 #[derive(Serialize, Deserialize, Debug)]
 /// FlipFaceInit structure describes the necessary data for constructing a [FlipFace]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct FlipFaceInit {
+    /// The object to wrap with the face flipping feature.
     pub object: Box<Object>,
 }
 
