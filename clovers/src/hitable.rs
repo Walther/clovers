@@ -233,3 +233,9 @@ impl HitableList {
         Hitable::HitableList(self)
     }
 }
+
+impl Default for HitableList {
+    fn default() -> Self {
+        Self::new()
+    }
+}
