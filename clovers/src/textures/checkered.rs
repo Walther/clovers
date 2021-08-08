@@ -6,12 +6,14 @@ use serde::{Deserialize, Serialize};
 /// A standard checkered texture based on spatial 3D texturing.
 pub struct SpatialChecker {
     #[serde(default = "default_even")]
-    even: Color,
+    /// Uniform color for the even-numbered checkers of the texture.
+    pub even: Color,
     #[serde(default = "default_odd")]
-    odd: Color,
+    /// Uniform color for the odd-numbered checkers of the texture.
+    pub odd: Color,
     #[serde(default = "default_density_spatial")]
     /// Controls the density of the checkered pattern. Default value is 1.0, which corresponds to filling a 1.0 unit cube in the coordinate system with one color of the pattern. Even values preferred - odd values may create a visually thicker stripe due to two stripes with same color being next to each other.
-    density: Float,
+    pub density: Float,
 }
 
 fn default_even() -> Color {
@@ -33,6 +35,7 @@ fn default_density_surface() -> Float {
 }
 
 impl SpatialChecker {
+    /// Create a new SpatialChecker object with the specified colors and density.
     pub fn new(color1: Color, color2: Color, density: Float) -> Texture {
         Texture::SpatialChecker(SpatialChecker {
             even: color1,
@@ -41,6 +44,7 @@ impl SpatialChecker {
         })
     }
 
+    /// Evaluates the color at the given spatial position coordinate. Note that the SpatialChecker is spatial - surface coordinates are ignored.
     pub fn color(self, _u: Float, _v: Float, position: Vec3) -> Color {
         // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;
@@ -69,6 +73,7 @@ pub struct SurfaceChecker {
 }
 
 impl SurfaceChecker {
+    /// Create a new SurfaceChecker object with the specified colors and density.
     pub fn new(color1: Color, color2: Color, density: Float) -> Texture {
         Texture::SurfaceChecker(SurfaceChecker {
             even: color1,
@@ -77,6 +82,7 @@ impl SurfaceChecker {
         })
     }
 
+    /// Evaluates the color at the given surface position coordinates. Note that SurfaceChecker is surface-based, and thus ignores the spatial position coordinate.
     pub fn color(self, u: Float, v: Float, _position: Vec3) -> Color {
         // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;
