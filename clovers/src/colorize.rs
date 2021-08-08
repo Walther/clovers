@@ -17,10 +17,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
     }
 
     // Here, smoothing is used to avoid "shadow acne"
-    match scene
-        .objects
-        .hit(&ray, EPSILON_SHADOW_ACNE, Float::MAX, rng)
-    {
+    match scene.objects.hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng) {
         // If the ray hits nothing, return the background color.
         None => scene.background_color,
 
@@ -35,7 +32,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
             );
 
             // Do we scatter?
-            match hit_record.material.scatter(&ray, &hit_record, rng) {
+            match hit_record.material.scatter(ray, &hit_record, rng) {
                 // No scatter, emit only
                 None => emitted,
                 // Got a scatter
