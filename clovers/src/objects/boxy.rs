@@ -10,12 +10,15 @@ use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-/// Used for the scene files etc
+/// BoxyInit structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct BoxyInit {
+    /// First corner for the box
     pub corner_0: Vec3,
+    /// Second, opposing corner for the box
     pub corner_1: Vec3,
     #[serde(default)]
+    /// Material used for the box
     pub material: Material,
 }
 
@@ -25,6 +28,7 @@ pub struct Boxy {
     corner_0: Vec3,
     corner_1: Vec3,
     sides: Arc<HitableList>,
+    /// The material of the box
     pub material: Material,
 }
 
