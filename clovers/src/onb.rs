@@ -2,6 +2,7 @@
 
 use crate::Vec3;
 
+#[derive(Debug)]
 pub struct ONB {
     pub u: Vec3,
     pub v: Vec3,

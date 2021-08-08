@@ -14,6 +14,7 @@ pub use lambertian::*;
 pub use metal::*;
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
+
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 pub enum Material {
     Dielectric(Dielectric),
@@ -79,11 +80,13 @@ impl Material {
     }
 }
 
+#[derive(Debug)]
 pub enum MaterialType {
     Diffuse,
     Specular,
 }
 
+#[derive(Debug)]
 pub struct ScatterRecord<'a> {
     pub material_type: MaterialType,
     pub specular_ray: Option<Ray>,
