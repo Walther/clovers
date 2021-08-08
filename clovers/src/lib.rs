@@ -61,6 +61,7 @@
 // TODO:
 #![warn(missing_debug_implementations)]
 //#![warn(missing_docs)]
+#![allow(clippy::many_single_char_names)]
 
 // Externals
 use nalgebra::Vector3;

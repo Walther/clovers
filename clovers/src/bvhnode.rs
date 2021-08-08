@@ -78,16 +78,20 @@ impl BVHNode {
             let box_left = left.bounding_box(time_0, time_1);
             let box_right = right.bounding_box(time_0, time_1);
 
-            if box_left.is_none() || box_right.is_none() {
-                panic!("No bounding box in bvh_node constructor");
-            } else {
-                let bounding_box = AABB::surrounding_box(box_left.unwrap(), box_right.unwrap());
+            // Generate a bounding box and BVHNode if possible
+            if let (Some(box_left), Some(box_right)) = (box_left, box_right) {
+                let bounding_box = AABB::surrounding_box(box_left, box_right);
 
                 BVHNode {
                     left,
                     right,
                     bounding_box,
                 }
+            } else {
+                panic!(
+                    "No bounding box in bvh_node constructor. {:?} {:?}",
+                    box_left, box_right
+                );
             }
         }
     }
