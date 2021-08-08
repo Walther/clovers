@@ -22,6 +22,7 @@ impl NoiseTexture {
     // TODO: spatial vs surface noise alternatives?
     /// Evaluates the color at the given spatial coordinate.
     pub fn color(self, _u: Float, _v: Float, position: Vec3) -> Color {
+        // TODO: remove or explain magic constants
         let depth = 7;
         Color::new(1.0, 1.0, 1.0)
             * 0.5
