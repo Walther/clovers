@@ -34,18 +34,12 @@ impl FlipFace {
         distance_max: Float,
         rng: ThreadRng,
     ) -> Option<HitRecord> {
-        match self.object.hit(ray, distance_min, distance_max, rng) {
-            Some(hit_record) => Some(HitRecord {
-                distance: hit_record.distance,
-                position: hit_record.position,
-                normal: hit_record.normal,
-                u: hit_record.u,
-                v: hit_record.v,
-                material: hit_record.material,
+        self.object
+            .hit(ray, distance_min, distance_max, rng)
+            .map(|hit_record| HitRecord {
                 front_face: !hit_record.front_face,
-            }),
-            None => None,
-        }
+                ..hit_record
+            })
     }
 
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
