@@ -1,3 +1,5 @@
+//! A moving sphere object.
+
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},

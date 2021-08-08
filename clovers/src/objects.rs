@@ -25,15 +25,25 @@ pub use translate::*;
 // TODO: This is kind of an ugly hack, having to double-implement various structures to have an external representation vs internal representation. How could this be made cleaner?
 
 #[derive(Deserialize, Serialize, Debug)]
+/// An object enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 pub enum Object {
+    /// XZRect object initializer
     XZRect(XZRectInit),
+    /// XYRect object initializer
     XYRect(XYRectInit),
+    /// YZRect object initializer
     YZRect(YZRectInit),
+    /// Sphere object initializer
     Sphere(SphereInit),
+    /// Boxy object initializer
     Boxy(BoxyInit),
+    /// RotateY object initializer
     RotateY(RotateInit),
+    /// Translate object initializer
     Translate(TranslateInit),
+    /// FlipFace object initializer
     FlipFace(FlipFaceInit),
+    /// ConstantMedium object initializer
     ConstantMedium(ConstantMediumInit),
 }
 

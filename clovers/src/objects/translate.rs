@@ -1,3 +1,5 @@
+//! Utility object for translating i.e. moving another object.
+
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},

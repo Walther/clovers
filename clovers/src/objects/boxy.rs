@@ -1,3 +1,5 @@
+//! A box or a cuboid object: a parallelepiped with six rectangular faces. Named [Boxy] to avoid clashing with [Box].
+
 use super::{XYRect, XZRect, YZRect};
 use crate::{
     aabb::AABB,

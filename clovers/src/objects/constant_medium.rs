@@ -1,3 +1,5 @@
+//! ConstantMedium object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
+
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},

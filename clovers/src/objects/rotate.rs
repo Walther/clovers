@@ -1,3 +1,5 @@
+//! Utility object for rotating another object.
+
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},

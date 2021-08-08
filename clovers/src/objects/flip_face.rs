@@ -1,3 +1,5 @@
+//! An utility object that can be used to flip the face of the object. TODO: possibly deprecated?
+
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
