@@ -14,11 +14,15 @@ use std::sync::Arc;
 use super::Object;
 
 #[derive(Serialize, Deserialize, Debug)]
+/// ConstantMediumInit structure describes the necessary data for constructing a [ConstantMedium]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct ConstantMediumInit {
+    /// The boundary object for the constant medium. This determines the size and shape of the fog object.
     pub boundary: Box<Object>,
     #[serde(default = "default_density")]
+    /// Density of the fog. TODO: example good value range?
     pub density: Float,
     #[serde(default)]
+    /// [Texture] used for the colorization of the fog.
     pub texture: Texture,
 }
 
@@ -30,6 +34,7 @@ fn default_density() -> Float {
 }
 
 #[derive(Debug)]
+/// ConstantMedium object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 pub struct ConstantMedium {
     boundary: Arc<Hitable>,
     phase_function: Material,
@@ -37,6 +42,7 @@ pub struct ConstantMedium {
 }
 
 impl ConstantMedium {
+    /// Creates a new [ConstantMedium] with a known size, shape and density.
     pub fn new(boundary: Arc<Hitable>, density: Float, texture: Texture) -> Hitable {
         Hitable::ConstantMedium(ConstantMedium {
             boundary,
@@ -45,6 +51,7 @@ impl ConstantMedium {
         })
     }
 
+    /// Hit function for the [ConstantMedium] object. Returns a [HitRecord] if hit. TODO: explain the math for the fog
     pub fn hit(
         &self,
         ray: &Ray,
@@ -54,6 +61,8 @@ impl ConstantMedium {
     ) -> Option<HitRecord> {
         let mut rec1: HitRecord;
         let mut rec2: HitRecord;
+
+        // TODO: explain how the fog works.
 
         rec1 = match self
             .boundary
@@ -116,6 +125,7 @@ impl ConstantMedium {
         })
     }
 
+    /// Returns the axis-aligned bounding box [AABB] of the defining `boundary` object for the fog.
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         self.boundary.bounding_box(t0, t1)
     }
