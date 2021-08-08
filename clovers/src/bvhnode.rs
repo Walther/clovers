@@ -103,11 +103,11 @@ impl BVHNode {
         distance_max: Float,
         rng: ThreadRng,
     ) -> Option<HitRecord> {
-        match self.bounding_box.hit(&ray, distance_min, distance_max) {
+        match self.bounding_box.hit(ray, distance_min, distance_max) {
             false => None,
             true => {
-                let hit_left = self.left.hit(&ray, distance_min, distance_max, rng);
-                let hit_right = self.right.hit(&ray, distance_min, distance_max, rng);
+                let hit_left = self.left.hit(ray, distance_min, distance_max, rng);
+                let hit_right = self.right.hit(ray, distance_min, distance_max, rng);
 
                 match &hit_left {
                     Some(left) => {
@@ -143,13 +143,15 @@ fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
     let box_a: Option<AABB> = a.bounding_box(0.0, 0.0);
     let box_b: Option<AABB> = b.bounding_box(0.0, 0.0);
 
-    if box_a.is_none() || box_b.is_none() {
-        panic!("No bounding box in BVHNode constructor.")
-    } else if box_a.unwrap().min[axis] < box_b.unwrap().min[axis] {
-        Ordering::Less
+    if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
+        if box_a.min[axis] < box_b.min[axis] {
+            Ordering::Less
+        } else {
+            // Default to greater, even if equal
+            Ordering::Greater
+        }
     } else {
-        // Default to greater, even if equal
-        Ordering::Greater
+        panic!("No bounding box to compare with.")
     }
 }
 
