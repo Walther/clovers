@@ -16,11 +16,17 @@ use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+/// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 pub enum Material {
+    /// Dielectric material
     Dielectric(Dielectric),
+    /// Lambertian material
     Lambertian(Lambertian),
+    /// DiffuseLight material
     DiffuseLight(DiffuseLight),
+    /// Metal material
     Metal(Metal),
+    /// Isotropic material
     Isotropic(Isotropic),
 }
 
@@ -81,16 +87,25 @@ impl Material {
 }
 
 #[derive(Debug)]
+/// Enum for the types of materials: Diffuse and Specular (i.e., matte and shiny)
 pub enum MaterialType {
+    /// A matte material that does not reflect rays
     Diffuse,
+    /// A shiny material that reflects some rays
     Specular,
 }
 
 #[derive(Debug)]
+/// A record of an scattering event of a [Ray] on a [Material].
 pub struct ScatterRecord<'a> {
+    /// The material type that was scattered on
     pub material_type: MaterialType,
+    /// Direction of a generated specular ray
     pub specular_ray: Option<Ray>,
+    /// Current color to take into account when following the scattered ray for futher iterations
     pub attenuation: Color,
+    /// Probability density function to use with the [ScatterRecord].
+    // TODO: understand & explain
     pub pdf_ptr: PDF<'a>,
 }
 
