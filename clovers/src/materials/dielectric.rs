@@ -1,4 +1,4 @@
-use super::{reflect, refract, schlick, Material, MaterialType, ScatterRecord};
+use super::{reflect, refract, schlick, MaterialType, ScatterRecord};
 use crate::{color::Color, hitable::HitRecord, pdf::ZeroPDF, ray::Ray, Float, Vec3};
 use rand::prelude::*;
 
@@ -24,6 +24,7 @@ fn default_color() -> Color {
 }
 
 impl<'a> Dielectric {
+    /// Scatter method for the Dielectric material. Given a `ray` and a `hit_record`, evaluate a [ScatterRecord] based on possible reflection or refraction.
     pub fn scatter(
         self,
         ray: &Ray,
@@ -62,6 +63,7 @@ impl<'a> Dielectric {
         })
     }
 
+    /// Scattering probability density function for Dielectric material. NOTE: not implemented!
     pub fn scattering_pdf(
         self,
         _ray: &Ray,
@@ -72,10 +74,17 @@ impl<'a> Dielectric {
         todo!()
     }
 
-    pub fn new(refractive_index: Float, color: Color) -> Material {
-        Material::Dielectric(Dielectric {
+    /// Creates a new [Dielectric] material with the given refractive index and color.
+    pub fn new(refractive_index: Float, color: Color) -> Self {
+        Dielectric {
             refractive_index,
             color,
-        })
+        }
+    }
+}
+
+impl Default for Dielectric {
+    fn default() -> Self {
+        Dielectric::new(default_index(), default_color())
     }
 }
