@@ -1,3 +1,5 @@
+//! A noise texture utility.
+
 use super::Texture;
 use crate::{color::Color, perlin::Perlin, Float, Vec3};
 use serde::{Deserialize, Serialize};

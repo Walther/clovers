@@ -1,3 +1,5 @@
+//! Various checkered textures: spatial and surface variants.
+
 use super::Texture;
 use crate::{color::Color, Float, Vec3, PI};
 use serde::{Deserialize, Serialize};

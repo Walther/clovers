@@ -15,14 +15,20 @@ use crate::{color::Color, Float, Vec3};
 use noise_texture::NoiseTexture;
 
 #[derive(Copy, Clone, Deserialize, Serialize, Debug)]
+/// A texture enum.
 pub enum Texture {
+    /// SpatialChecker texture
     SpatialChecker(SpatialChecker),
+    /// SurfaceChecker texture
     SurfaceChecker(SurfaceChecker),
+    /// SolidColor texture
     SolidColor(SolidColor),
+    /// NoiseTexture texture
     NoiseTexture(NoiseTexture),
 }
 
 impl Texture {
+    /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match *self {
             Texture::SpatialChecker(c) => SpatialChecker::color(c, u, v, position),

@@ -1,3 +1,5 @@
+//! A solid color texture.
+
 use super::Texture;
 use crate::{color::Color, Float, Vec3};
 use serde::{Deserialize, Serialize};
