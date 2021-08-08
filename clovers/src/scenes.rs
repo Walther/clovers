@@ -27,6 +27,7 @@ use std::io::prelude::*;
 // pub mod simple_light_lambertian;
 // pub mod two_spheres;
 
+#[derive(Debug)]
 pub struct Scene {
     pub objects: Hitable, // BVHNode
     pub camera: Camera,

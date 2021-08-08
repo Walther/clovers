@@ -59,7 +59,7 @@
 #![deny(unused_lifetimes)]
 #![deny(unused_qualifications)]
 // TODO:
-//#![warn(missing_debug_implementations)]
+#![warn(missing_debug_implementations)]
 //#![warn(missing_docs)]
 
 // Externals
