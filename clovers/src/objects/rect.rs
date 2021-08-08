@@ -1,3 +1,12 @@
+//! Axis-aligned rectangle objects.
+//!
+//! TODO:
+//! - more generic rectangle to cut the repetition
+//! - support for non-axis-aligned rectangles maybe?
+//! - proper documentation for all the methods and structs and fields
+
+#![allow(missing_docs)] // TODO: Lots of undocumented things for now
+
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
