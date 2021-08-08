@@ -28,14 +28,20 @@ use std::io::prelude::*;
 // pub mod two_spheres;
 
 #[derive(Debug)]
+/// A representation of the scene that is being rendered.
 pub struct Scene {
-    pub objects: Hitable, // BVHNode
+    /// Bounding-volume hierarchy of [Hitable] objects in the scene. This could, as currently written, be any [Hitable] - in practice, we place the root of the [BVHNode](crate::bvhnode::BVHNode) tree here.
+    pub objects: Hitable,
+    /// The camera object used for rendering the scene.
     pub camera: Camera,
+    /// The background color to use when the rays do not hit anything in the scene.
     pub background_color: Color, // TODO: make into Texture or something?
+    /// A [BVHNode](crate::bvhnode::BVHNode) tree of prioritized objects - e.g. glass items or lights - that affect the biased sampling of the scene.
     pub priority_objects: Hitable,
 }
 
 impl Scene {
+    /// Creates a new [Scene] with the given parameters.
     pub fn new(
         time_0: Float,
         time_1: Float,
@@ -55,6 +61,7 @@ impl Scene {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+/// A serialized representation of a [Scene].
 pub struct SceneFile {
     time_0: Float,
     time_1: Float,
@@ -64,6 +71,7 @@ pub struct SceneFile {
     priority_objects: Vec<Object>,
 }
 
+/// Initializes a new [Scene] instance by first parsing the contents of a file into a [SceneFile] structure and then using those details to construct the [Scene].
 pub fn initialize(mut file: File, width: u32, height: u32) -> Result<Scene, std::io::Error> {
     let mut contents: String = String::new();
     file.read_to_string(&mut contents)?;
