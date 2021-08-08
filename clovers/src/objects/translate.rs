@@ -50,9 +50,6 @@ impl Translate {
 
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         let object_bounding_box = self.object.bounding_box(t0, t1);
-        match object_bounding_box {
-            Some(aabb) => Some(AABB::new(aabb.min + self.offset, aabb.max + self.offset)),
-            None => None,
-        }
+        object_bounding_box.map(|aabb| AABB::new(aabb.min + self.offset, aabb.max + self.offset))
     }
 }
