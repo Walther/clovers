@@ -1,5 +1,7 @@
 //! An abstraction for things that can be hit by [Rays](crate::ray::Ray).
 
+#![allow(missing_docs)] // TODO: Lots of undocumented things for now
+
 use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
