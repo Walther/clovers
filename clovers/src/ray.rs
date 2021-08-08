@@ -20,7 +20,8 @@ impl Ray {
         }
     }
 
-    pub fn point_at_parameter(&self, t: Float) -> Vec3 {
-        self.origin + t * self.direction
+    /// Evaluates the position (coordinate) at which the ray is at the given parameter, considering the origin and direction. Considering a default unit speed of 1 per unit time, this function can be given either a time or a distance.
+    pub fn evaluate(&self, parameter: Float) -> Vec3 {
+        self.origin + parameter * self.direction
     }
 }

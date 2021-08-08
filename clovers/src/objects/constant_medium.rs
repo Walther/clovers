@@ -96,7 +96,7 @@ impl ConstantMedium {
         }
 
         let distance = rec1.distance + hit_distance / ray_length;
-        let position = ray.point_at_parameter(distance);
+        let position = ray.evaluate(distance);
 
         let normal: Vec3 = Vec3::new(1.0, 0.0, 0.0); // tutorial says: arbitrary
         let front_face: bool = true; // tutorial says: also arbitrary

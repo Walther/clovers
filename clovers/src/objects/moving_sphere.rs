@@ -67,7 +67,7 @@ impl MovingSphere {
             let distance: Float = (-half_b - root) / a;
             // First possible root
             if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.point_at_parameter(distance);
+                let position: Vec3 = ray.evaluate(distance);
                 let outward_normal = (position - self.center(ray.time)) / self.radius;
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {
@@ -85,7 +85,7 @@ impl MovingSphere {
             // Second possible root
             let distance: Float = (-half_b + root) / a;
             if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.point_at_parameter(distance);
+                let position: Vec3 = ray.evaluate(distance);
                 let outward_normal = (position - self.center(ray.time)) / self.radius;
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {

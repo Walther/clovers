@@ -62,7 +62,7 @@ impl Sphere {
             // First possible root
             let distance: Float = (-half_b - root) / a;
             if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.point_at_parameter(distance);
+                let position: Vec3 = ray.evaluate(distance);
                 let outward_normal = (position - self.center) / self.radius;
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {
@@ -80,7 +80,7 @@ impl Sphere {
             // Second possible root
             let distance: Float = (-half_b + root) / a;
             if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.point_at_parameter(distance);
+                let position: Vec3 = ray.evaluate(distance);
                 let outward_normal = (position - self.center) / self.radius;
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {
