@@ -1,20 +1,24 @@
-use super::{Material, MaterialType, ScatterRecord};
+use super::{MaterialType, ScatterRecord};
 use crate::{
     color::Color, hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI,
 };
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
+
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, Default)]
+/// Isotropic material. Used in [ConstantMedium](crate::objects::constant_medium). TODO: understand this!
 pub struct Isotropic {
     #[serde(default)]
     albedo: Texture,
 }
 
 impl<'a> Isotropic {
-    pub fn new(emission: Texture) -> Material {
-        Material::Isotropic(Isotropic { albedo: emission })
+    /// Creates a new [Isotropic] material with an albedo of the given [Texture].
+    pub fn new(emission: Texture) -> Self {
+        Isotropic { albedo: emission }
     }
 
+    /// Returns a [ScatterRecord] based on the [HitRecord] coordinates and the given [Texture], or [None] if the ray did not hit the material. TODO: verify implementation, copied from [Lambertian](crate::materials::Lambertian)
     pub fn scatter(
         self,
         _ray: &Ray,
@@ -35,6 +39,7 @@ impl<'a> Isotropic {
         })
     }
 
+    /// Returns the scattering probability density function for the [Isotropic] material. TODO: verify implementation, copied from [Lambertian]
     pub fn scattering_pdf(
         self,
         _ray: &Ray,

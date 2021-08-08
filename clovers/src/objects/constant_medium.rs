@@ -40,7 +40,7 @@ impl ConstantMedium {
     pub fn new(boundary: Arc<Hitable>, density: Float, texture: Texture) -> Hitable {
         Hitable::ConstantMedium(ConstantMedium {
             boundary,
-            phase_function: Isotropic::new(texture),
+            phase_function: Material::Isotropic(Isotropic::new(texture)),
             neg_inv_density: -1.0 / density,
         })
     }
