@@ -225,9 +225,8 @@ impl HitableList {
         self.0.push(Arc::new(object));
     }
 
-    pub fn into_bvh(self, time_0: Float, time_1: Float, rng: ThreadRng) -> Hitable {
-        let bvh_node = BVHNode::from_list(self.0, time_0, time_1, rng);
-        Hitable::BVHNode(bvh_node)
+    pub fn into_bvh(self, time_0: Float, time_1: Float, rng: ThreadRng) -> BVHNode {
+        BVHNode::from_list(self.0, time_0, time_1, rng)
     }
 
     // TODO: fixme, silly

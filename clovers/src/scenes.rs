@@ -1,6 +1,7 @@
 //! A collection of objects, camera, and other things necessary to describe the environment you wish to render.
 
 use crate::{
+    bvhnode::BVHNode,
     camera::{Camera, CameraInit},
     color::Color,
     hitable::{Hitable, HitableList},
@@ -31,7 +32,7 @@ use std::io::prelude::*;
 /// A representation of the scene that is being rendered.
 pub struct Scene {
     /// Bounding-volume hierarchy of [Hitable] objects in the scene. This could, as currently written, be any [Hitable] - in practice, we place the root of the [BVHNode](crate::bvhnode::BVHNode) tree here.
-    pub objects: Hitable,
+    pub objects: BVHNode,
     /// The camera object used for rendering the scene.
     pub camera: Camera,
     /// The background color to use when the rays do not hit anything in the scene.
