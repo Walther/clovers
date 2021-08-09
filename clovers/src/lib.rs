@@ -58,8 +58,8 @@
 #![deny(unsafe_code)]
 #![deny(unused_lifetimes)]
 #![deny(unused_qualifications)]
-#![warn(missing_debug_implementations)]
-#![warn(missing_docs)]
+#![deny(missing_debug_implementations)]
+#![deny(missing_docs)]
 // TODO:
 #![allow(clippy::many_single_char_names)] // Lots of places with coordinates etc
 #![allow(clippy::new_ret_no_self)] // Material types return a Material instead of Self for now
