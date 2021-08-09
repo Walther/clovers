@@ -32,7 +32,7 @@ pub struct RotateY {
 
 impl RotateY {
     /// Creates a new `RotateY` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
-    pub fn new(object: Arc<Hitable>, angle: Float) -> Hitable {
+    pub fn new(object: Arc<Hitable>, angle: Float) -> Self {
         // TODO: add proper time support
         let time_0: Float = 0.0;
         let time_1: Float = 1.0;
@@ -43,12 +43,12 @@ impl RotateY {
 
         match bounding_box {
             // No bounding box for object
-            None => Hitable::RotateY(RotateY {
+            None => RotateY {
                 object,
                 sin_theta,
                 cos_theta,
                 bounding_box: None,
-            }),
+            },
             // Got a bounding box
             Some(bbox) => {
                 let mut min: Vec3 = Vec3::new(Float::INFINITY, Float::INFINITY, Float::INFINITY);
@@ -82,12 +82,12 @@ impl RotateY {
                     }
                 }
 
-                Hitable::RotateY(RotateY {
+                RotateY {
                     object,
                     sin_theta,
                     cos_theta,
                     bounding_box: Some(AABB::new(min, max)),
-                })
+                }
             }
         }
     }

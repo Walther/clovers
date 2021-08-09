@@ -50,30 +50,36 @@ pub enum Object {
 impl From<Object> for Hitable {
     fn from(obj: Object) -> Hitable {
         match obj {
-            Object::XZRect(x) => XZRect::new(x.x0, x.x1, x.z0, x.z1, x.k, x.material),
-            Object::XYRect(x) => XYRect::new(x.x0, x.x1, x.y0, x.y1, x.k, x.material),
-            Object::YZRect(x) => YZRect::new(x.y0, x.y1, x.z0, x.z1, x.k, x.material),
-            Object::Sphere(x) => Sphere::new(x.center, x.radius, x.material),
-            Object::Boxy(x) => Boxy::new(x.corner_0, x.corner_1, x.material),
+            Object::XZRect(x) => {
+                Hitable::XZRect(XZRect::new(x.x0, x.x1, x.z0, x.z1, x.k, x.material))
+            }
+            Object::XYRect(x) => {
+                Hitable::XYRect(XYRect::new(x.x0, x.x1, x.y0, x.y1, x.k, x.material))
+            }
+            Object::YZRect(x) => {
+                Hitable::YZRect(YZRect::new(x.y0, x.y1, x.z0, x.z1, x.k, x.material))
+            }
+            Object::Sphere(x) => Hitable::Sphere(Sphere::new(x.center, x.radius, x.material)),
+            Object::Boxy(x) => Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, x.material)),
             Object::RotateY(x) => {
                 let obj = *x.object;
                 let obj: Hitable = obj.into();
-                RotateY::new(Arc::new(obj), x.angle)
+                Hitable::RotateY(RotateY::new(Arc::new(obj), x.angle))
             }
             Object::Translate(x) => {
                 let obj = *x.object;
                 let obj: Hitable = obj.into();
-                Translate::new(Arc::new(obj), x.offset)
+                Hitable::Translate(Translate::new(Arc::new(obj), x.offset))
             }
             Object::FlipFace(x) => {
                 let obj = *x.object;
                 let obj: Hitable = obj.into();
-                FlipFace::new(obj)
+                Hitable::FlipFace(FlipFace::new(obj))
             }
             Object::ConstantMedium(x) => {
                 let obj = *x.boundary;
                 let obj: Hitable = obj.into();
-                ConstantMedium::new(Arc::new(obj), x.density, x.texture)
+                Hitable::ConstantMedium(ConstantMedium::new(Arc::new(obj), x.density, x.texture))
             }
         }
     }

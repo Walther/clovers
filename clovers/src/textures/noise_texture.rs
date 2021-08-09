@@ -1,6 +1,5 @@
 //! A noise texture utility.
 
-use super::Texture;
 use crate::{color::Color, perlin::Perlin, Float, Vec3};
 use serde::{Deserialize, Serialize};
 
@@ -16,8 +15,8 @@ pub struct NoiseTexture {
 
 impl NoiseTexture {
     /// Creates a new NoiseTexture object with the specified Perlin noise and scaling factor.
-    pub fn new(noise: Perlin, scale: Float) -> Texture {
-        Texture::NoiseTexture(NoiseTexture { noise, scale })
+    pub fn new(noise: Perlin, scale: Float) -> Self {
+        NoiseTexture { noise, scale }
     }
 
     // TODO: investigate why this does not swirl as well as the example marble in tutorial

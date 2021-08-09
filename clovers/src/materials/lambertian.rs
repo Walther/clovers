@@ -1,7 +1,13 @@
 //! Lambertian material. This is the default material with a smooth, matte surface.
 
 use super::{MaterialType, ScatterRecord};
-use crate::{hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI};
+use crate::{
+    hitable::HitRecord,
+    pdf::{CosinePDF, PDF},
+    ray::Ray,
+    textures::Texture,
+    Float, PI,
+};
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
 
@@ -26,7 +32,7 @@ impl<'a> Lambertian {
             attenuation: self
                 .albedo
                 .color(hit_record.u, hit_record.v, hit_record.position),
-            pdf_ptr: CosinePDF::new(hit_record.normal),
+            pdf_ptr: PDF::CosinePDF(CosinePDF::new(hit_record.normal)),
         })
     }
 

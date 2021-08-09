@@ -1,12 +1,6 @@
 //! A moving sphere object.
 
-use crate::{
-    aabb::AABB,
-    hitable::{HitRecord, Hitable},
-    materials::Material,
-    ray::Ray,
-    Float, Vec3, PI,
-};
+use crate::{aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3, PI};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Debug)]
@@ -29,15 +23,15 @@ impl MovingSphere {
         time_1: Float,
         radius: Float,
         material: Material,
-    ) -> Hitable {
-        Hitable::MovingSphere(MovingSphere {
+    ) -> Self {
+        MovingSphere {
             center_0,
             center_1,
             time_0,
             time_1,
             radius,
             material,
-        })
+        }
     }
 
     /// Returns the interpolated center of the moving sphere at the given time.

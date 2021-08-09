@@ -36,35 +36,35 @@ pub struct Boxy {
 
 impl Boxy {
     /// Initializes a new instance of a box, given two opposing [Vec3] corners `corner_0` and `corner_1`, and a [Material] `material`.
-    pub fn new(corner_0: Vec3, corner_1: Vec3, material: Material) -> Hitable {
+    pub fn new(corner_0: Vec3, corner_1: Vec3, material: Material) -> Self {
         let mut sides = HitableList::new();
-        sides.add(XYRect::new(
+        sides.add(Hitable::XYRect(XYRect::new(
             corner_0.x, corner_1.x, corner_0.y, corner_1.y, corner_1.z, material,
-        ));
-        sides.add(XYRect::new(
+        )));
+        sides.add(Hitable::XYRect(XYRect::new(
             corner_0.x, corner_1.x, corner_0.y, corner_1.y, corner_0.z, material,
-        ));
+        )));
 
-        sides.add(XZRect::new(
+        sides.add(Hitable::XZRect(XZRect::new(
             corner_0.x, corner_1.x, corner_0.z, corner_1.z, corner_1.y, material,
-        ));
-        sides.add(XZRect::new(
+        )));
+        sides.add(Hitable::XZRect(XZRect::new(
             corner_0.x, corner_1.x, corner_0.z, corner_1.z, corner_0.y, material,
-        ));
+        )));
 
-        sides.add(YZRect::new(
+        sides.add(Hitable::YZRect(YZRect::new(
             corner_0.y, corner_1.y, corner_0.z, corner_1.z, corner_1.x, material,
-        ));
-        sides.add(YZRect::new(
+        )));
+        sides.add(Hitable::YZRect(YZRect::new(
             corner_0.y, corner_1.y, corner_0.z, corner_1.z, corner_0.x, material,
-        ));
+        )));
 
-        Hitable::Boxy(Boxy {
+        Boxy {
             corner_0,
             corner_1,
             sides: Arc::new(sides),
             material,
-        })
+        }
     }
 
     /// The main `hit` function for a [Boxy]. Given a [Ray](crate::ray::Ray), and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the object during that interval.

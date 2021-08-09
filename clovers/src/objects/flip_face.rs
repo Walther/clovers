@@ -29,10 +29,10 @@ impl FlipFace {
     // TODO: possibly deprecate / remove?
 
     /// Creates a new instance of a [FlipFace]
-    pub fn new(object: Hitable) -> Hitable {
-        Hitable::FlipFace(FlipFace {
+    pub fn new(object: Hitable) -> Self {
+        FlipFace {
             object: Arc::new(object),
-        })
+        }
     }
 
     /// Hit function for the [FlipFace] object. Considering this is a utility object that wraps an internal `object`, it returns a [HitRecord] with the `front_face` property flipped, if the given [Ray] hits the object.

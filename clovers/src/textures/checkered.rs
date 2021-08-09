@@ -1,6 +1,5 @@
 //! Various checkered textures: spatial and surface variants.
 
-use super::Texture;
 use crate::{color::Color, Float, Vec3, PI};
 use serde::{Deserialize, Serialize};
 
@@ -38,12 +37,12 @@ fn default_density_surface() -> Float {
 
 impl SpatialChecker {
     /// Create a new SpatialChecker object with the specified colors and density.
-    pub fn new(color1: Color, color2: Color, density: Float) -> Texture {
-        Texture::SpatialChecker(SpatialChecker {
+    pub fn new(color1: Color, color2: Color, density: Float) -> Self {
+        SpatialChecker {
             even: color1,
             odd: color2,
             density,
-        })
+        }
     }
 
     /// Evaluates the color at the given spatial position coordinate. Note that the SpatialChecker is spatial - surface coordinates are ignored.
@@ -76,12 +75,12 @@ pub struct SurfaceChecker {
 
 impl SurfaceChecker {
     /// Create a new SurfaceChecker object with the specified colors and density.
-    pub fn new(color1: Color, color2: Color, density: Float) -> Texture {
-        Texture::SurfaceChecker(SurfaceChecker {
+    pub fn new(color1: Color, color2: Color, density: Float) -> Self {
+        SurfaceChecker {
             even: color1,
             odd: color2,
             density,
-        })
+        }
     }
 
     /// Evaluates the color at the given surface position coordinates. Note that SurfaceChecker is surface-based, and thus ignores the spatial position coordinate.
