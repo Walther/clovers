@@ -115,27 +115,16 @@ impl BVHNode {
                 let hit_left = self.left.hit(ray, distance_min, distance_max, rng);
                 let hit_right = self.right.hit(ray, distance_min, distance_max, rng);
 
-                match &hit_left {
-                    Some(left) => {
-                        match &hit_right {
-                            // Both hit
-                            Some(right) => {
-                                if left.distance < right.distance {
-                                    hit_left
-                                } else {
-                                    hit_right
-                                }
-                            }
-                            // Left hit
-                            None => hit_left,
+                match (&hit_left, &hit_right) {
+                    (None, None) => None,
+                    (None, Some(_)) => hit_right,
+                    (Some(_), None) => hit_left,
+                    (Some(left), Some(right)) => {
+                        if left.distance < right.distance {
+                            return hit_left;
                         }
+                        hit_right
                     }
-                    None => match &hit_right {
-                        // Right hit
-                        Some(_right) => hit_right,
-                        // Neither hit
-                        None => None,
-                    },
                 }
             }
         }
