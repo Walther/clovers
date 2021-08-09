@@ -1,11 +1,13 @@
-use super::{reflect, refract, schlick, Material, MaterialType, ScatterRecord};
+//! A dielectric material. This resembles glass and other transparent and reflective materials.
+
+use super::{reflect, refract, schlick, MaterialType, ScatterRecord};
 use crate::{color::Color, hitable::HitRecord, pdf::ZeroPDF, ray::Ray, Float, Vec3};
 use rand::prelude::*;
 
 use serde::{Deserialize, Serialize};
 
-/// A dielectric material. This resembless glass and other transparent and reflective materials.
 #[derive(Copy, Clone, Deserialize, Serialize, Debug)]
+/// A dielectric material. This resembles glass and other transparent and reflective materials.
 pub struct Dielectric {
     /// Refractive index of the material. Used for calculating the new direction of a ray when entering the material at an angle. Follows Snell's law of refraction. Default value: 1.5, based on typical window glass.
     #[serde(default = "default_index")]
@@ -24,6 +26,7 @@ fn default_color() -> Color {
 }
 
 impl<'a> Dielectric {
+    /// Scatter method for the Dielectric material. Given a `ray` and a `hit_record`, evaluate a [ScatterRecord] based on possible reflection or refraction.
     pub fn scatter(
         self,
         ray: &Ray,
@@ -44,36 +47,25 @@ impl<'a> Dielectric {
         if etai_over_etat * sin_theta > 1.0 {
             let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
             specular_ray = Ray::new(hit_record.position, reflected, ray.time);
-            Some(ScatterRecord {
-                material_type: MaterialType::Specular,
-                specular_ray: Some(specular_ray),
-                attenuation: albedo,
-                pdf_ptr: ZeroPDF::new(), //TODO: ugly hack due to nullptr in original tutorial
-            })
         } else {
             let reflect_probability: Float = schlick(cos_theta, etai_over_etat);
             if rng.gen::<Float>() < reflect_probability {
                 let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
                 specular_ray = Ray::new(hit_record.position, reflected, ray.time);
-                Some(ScatterRecord {
-                    material_type: MaterialType::Specular,
-                    specular_ray: Some(specular_ray),
-                    attenuation: albedo,
-                    pdf_ptr: ZeroPDF::new(), //TODO: ugly hack due to nullptr in original tutorial
-                })
             } else {
                 let refracted: Vec3 = refract(unit_direction, hit_record.normal, etai_over_etat);
                 specular_ray = Ray::new(hit_record.position, refracted, ray.time);
-                Some(ScatterRecord {
-                    material_type: MaterialType::Specular,
-                    specular_ray: Some(specular_ray),
-                    attenuation: albedo,
-                    pdf_ptr: ZeroPDF::new(), //TODO: ugly hack due to nullptr in original tutorial
-                })
             }
         }
+        Some(ScatterRecord {
+            material_type: MaterialType::Specular,
+            specular_ray: Some(specular_ray),
+            attenuation: albedo,
+            pdf_ptr: ZeroPDF::new(), //TODO: ugly hack due to nullptr in original tutorial
+        })
     }
 
+    /// Scattering probability density function for Dielectric material. NOTE: not implemented!
     pub fn scattering_pdf(
         self,
         _ray: &Ray,
@@ -84,10 +76,17 @@ impl<'a> Dielectric {
         todo!()
     }
 
-    pub fn new(refractive_index: Float, color: Color) -> Material {
-        Material::Dielectric(Dielectric {
+    /// Creates a new [Dielectric] material with the given refractive index and color.
+    pub fn new(refractive_index: Float, color: Color) -> Self {
+        Dielectric {
             refractive_index,
             color,
-        })
+        }
+    }
+}
+
+impl Default for Dielectric {
+    fn default() -> Self {
+        Dielectric::new(default_index(), default_color())
     }
 }

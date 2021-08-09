@@ -1,15 +1,20 @@
 //! Color utilities.
 
+// TODO: more flexible colors?
+
 use crate::{Float, Vec3};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 
-/// RGB color based on three [Floats](crate::Float)
+/// RGB color based on three [Floats](crate::Float) values.
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub struct Color {
+    /// The red component of the color, as a [Float]
     pub r: Float,
+    /// The green component of the color, as a [Float]
     pub g: Float,
+    /// The blue component of the color, as a [Float]
     pub b: Float,
 }
 
@@ -25,10 +30,12 @@ impl Default for Color {
 }
 
 impl Color {
+    /// Creates a new [Color] with the given parameters.
     pub fn new(r: Float, g: Float, b: Float) -> Color {
         Color { r, g, b }
     }
 
+    /// Creates a new [Color] with random parameters between `0.0..1.0`.
     pub fn random(mut rng: ThreadRng) -> Color {
         Color {
             r: rng.gen::<Float>(),
@@ -37,6 +44,7 @@ impl Color {
         }
     }
 
+    /// Component-wise multiplication of two [Colors](Color).
     pub fn component_mul(&self, other: &Color) -> Color {
         Color {
             r: self.r * other.r,
@@ -46,6 +54,7 @@ impl Color {
     }
 
     // TODO: why did this misbehave when attempted as a mutable self?
+    /// Returns the gamma-corrected [Color].
     pub fn gamma_correction(&self, gamma: Float) -> Color {
         // Raise to the power of inverse of gamma number given
         let power: Float = 1.0 / gamma;
@@ -56,6 +65,7 @@ impl Color {
         }
     }
 
+    /// Transforms the [Float] based [Color] into a 24-bit, 3 x u8 RGB color.
     pub fn to_rgb_u8(&self) -> [u8; 3] {
         // TODO: might be possible to optimize
         let mut r = self.r;

@@ -1,3 +1,12 @@
+//! Axis-aligned rectangle objects.
+//!
+//! TODO:
+//! - more generic rectangle to cut the repetition
+//! - support for non-axis-aligned rectangles maybe?
+//! - proper documentation for all the methods and structs and fields
+
+#![allow(missing_docs)] // TODO: Lots of undocumented things for now
+
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
@@ -69,7 +78,7 @@ impl XYRect {
         let u: Float = (x - self.x0) / (self.x1 - self.x0);
         let v: Float = (y - self.y0) / (self.y1 - self.y0);
         let outward_normal: Vec3 = Vec3::new(0.0, 0.0, 1.0);
-        let position = ray.point_at_parameter(t);
+        let position = ray.evaluate(t);
         let mut record = HitRecord {
             distance: t,
             position,
@@ -181,7 +190,7 @@ impl XZRect {
         let u: Float = (x - self.x0) / (self.x1 - self.x0);
         let v: Float = (z - self.z0) / (self.z1 - self.z0);
         let outward_normal: Vec3 = Vec3::new(0.0, 1.0, 0.0);
-        let position = ray.point_at_parameter(t);
+        let position = ray.evaluate(t);
         let mut record = HitRecord {
             distance: t,
             position,
@@ -293,7 +302,7 @@ impl YZRect {
         let u: Float = (y - self.y0) / (self.y1 - self.y0);
         let v: Float = (z - self.z0) / (self.z1 - self.z0);
         let outward_normal: Vec3 = Vec3::new(1.0, 0.0, 0.0);
-        let position = ray.point_at_parameter(t);
+        let position = ray.evaluate(t);
         let mut record = HitRecord {
             distance: t,
             position,

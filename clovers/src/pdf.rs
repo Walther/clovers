@@ -1,9 +1,12 @@
 //! Probability density functions
 
+#![allow(missing_docs)] // TODO: Lots of undocumented things for now
+
 use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Float, Vec3, PI};
 use rand::prelude::*;
 use std::sync::Arc;
 
+#[derive(Debug)]
 pub enum PDF<'a> {
     CosinePDF(CosinePDF),
     HitablePDF(HitablePDF<'a>),
@@ -30,6 +33,7 @@ impl<'a> PDF<'a> {
     }
 }
 
+#[derive(Debug)]
 pub struct CosinePDF {
     uvw: ONB,
 }
@@ -55,6 +59,7 @@ impl<'a> CosinePDF {
     }
 }
 
+#[derive(Debug)]
 pub struct HitablePDF<'a> {
     origin: Vec3,
     hitable: &'a Hitable,
@@ -74,6 +79,7 @@ impl<'a> HitablePDF<'a> {
     }
 }
 
+#[derive(Debug)]
 pub struct MixturePDF<'a> {
     // Arc to prevent infinite size
     pdf1: Arc<PDF<'a>>,
@@ -102,6 +108,7 @@ impl<'a> MixturePDF<'a> {
 }
 
 // TODO: this is an ugly hack due to tutorial saying `srec.pdf_ptr = 0;` in 12.2 Handling Specular for Metal
+#[derive(Debug)]
 pub struct ZeroPDF {}
 
 impl<'a> ZeroPDF {

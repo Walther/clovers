@@ -1,3 +1,5 @@
+//! Utility object for rotating another object.
+
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
@@ -11,11 +13,16 @@ use std::sync::Arc;
 use super::Object;
 
 #[derive(Serialize, Deserialize, Debug)]
+/// RotateInit structure describes the necessary data for constructing a [RotateY]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct RotateInit {
+    /// The encased [Object] to rotate
     pub object: Box<Object>,
+    /// Angle to rotate the object, in degrees
     pub angle: Float,
 }
 
+#[derive(Debug)]
+/// RotateY object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
 pub struct RotateY {
     object: Arc<Hitable>,
     sin_theta: Float,
@@ -24,6 +31,7 @@ pub struct RotateY {
 }
 
 impl RotateY {
+    /// Creates a new `RotateY` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
     pub fn new(object: Arc<Hitable>, angle: Float) -> Hitable {
         // TODO: add proper time support
         let time_0: Float = 0.0;
@@ -84,6 +92,7 @@ impl RotateY {
         }
     }
 
+    /// Hit method for the [RotateY] object. Finds the rotation-adjusted [HitRecord] for the possible intersection of the [Ray] with the encased [Object].
     pub fn hit(
         &self,
         ray: &Ray,
@@ -138,6 +147,7 @@ impl RotateY {
         }
     }
 
+    /// Bounding box method for the [RotateY] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for rotation.
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         self.bounding_box
     }

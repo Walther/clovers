@@ -5,9 +5,11 @@ use crate::{ray::Ray, Float, Vec3};
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
 /// This is useful for creating bounding volume hierarchies, which is an optimization for reducing the time spent on calculating ray-object intersections.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct AABB {
+    /// First corner of the axis-aligned bounding box.
     pub min: Vec3,
+    /// Second, opposing corner of the axis-aligned bounding box.
     pub max: Vec3,
 }
 
@@ -17,12 +19,12 @@ impl AABB {
         AABB { min, max }
     }
 
-    /// Given a [Ray](crate::ray::Ray), returns whether the ray hits the bounding box or not. Based on ["An Optimized AABB Hit Method"](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
+    /// Given a [Ray], returns whether the ray hits the bounding box or not. Based on ["An Optimized AABB Hit Method"](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
     pub fn hit(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
         for a in 0..3 {
             let invd = 1.0 / ray.direction[a];
-            let mut t0 = (self.min[a] - ray.origin[a]) * invd;
-            let mut t1 = (self.max[a] - ray.origin[a]) * invd;
+            let mut t0: Float = (self.min[a] - ray.origin[a]) * invd;
+            let mut t1: Float = (self.max[a] - ray.origin[a]) * invd;
             if invd < 0.0 {
                 std::mem::swap(&mut t0, &mut t1);
             }
@@ -35,7 +37,7 @@ impl AABB {
         true
     }
 
-    /// Given two axis-aligned bounding boxes, return a new AABB that contains both.
+    /// Given two axis-aligned bounding boxes, return a new [AABB] that contains both.
     pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
         let small: Vec3 = Vec3::new(
             (box0.min.x).min(box1.min.x),

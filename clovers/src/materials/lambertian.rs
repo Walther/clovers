@@ -1,9 +1,12 @@
+//! Lambertian material. This is the default material with a smooth, matte surface.
+
 use super::{MaterialType, ScatterRecord};
 use crate::{hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI};
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Deserialize, Serialize, Debug, Default)]
+/// Lambertian material. This is the default material with a smooth, matte surface.
 pub struct Lambertian {
     #[serde(default)]
     albedo: Texture,
@@ -27,6 +30,7 @@ impl<'a> Lambertian {
         })
     }
 
+    /// Returns the scattering probability density function for the [Lambertian] material. TODO: explain the math
     pub fn scattering_pdf(
         self,
         _ray: &Ray,
@@ -34,6 +38,7 @@ impl<'a> Lambertian {
         scattered: &Ray,
         _rng: ThreadRng,
     ) -> Float {
+        // TODO: explain the math
         let cosine = hit_record.normal.dot(&scattered.direction.normalize());
         if cosine < 0.0 {
             0.0
@@ -42,6 +47,7 @@ impl<'a> Lambertian {
         }
     }
 
+    /// Creates a new instance of the [Lambertian] material with an albedo of the given [Texture].
     pub fn new(albedo: impl Into<Texture>) -> Self {
         Lambertian {
             albedo: albedo.into(),

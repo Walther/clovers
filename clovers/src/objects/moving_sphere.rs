@@ -1,3 +1,5 @@
+//! A moving sphere object.
+
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
@@ -8,6 +10,7 @@ use crate::{
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Debug)]
+/// A moving sphere object. This is represented by one `radius`, two center points `center_0` `center_1`, two times `time_0` `time_1`, and a [Material]. Any [Rays](Ray) hitting the object will also have an internal `time` value, which will be used for determining the interpolated position of the sphere at that time. With lots of rays hitting every pixel but at randomized times, we get temporal multiplexing and an approximation of perceived motion blur.
 pub struct MovingSphere {
     center_0: Vec3,
     center_1: Vec3,
@@ -18,6 +21,7 @@ pub struct MovingSphere {
 }
 
 impl MovingSphere {
+    /// Creates a new `MovingSphere` object. See the struct documentation for more information: [MovingSphere].
     pub fn new(
         center_0: Vec3,
         center_1: Vec3,
@@ -35,12 +39,15 @@ impl MovingSphere {
             material,
         })
     }
+
+    /// Returns the interpolated center of the moving sphere at the given time.
     pub fn center(&self, time: Float) -> Vec3 {
         self.center_0
             + ((time - self.time_0) / (self.time_1 - self.time_0)) * (self.center_1 - self.center_0)
     }
 
-    // Returns the U,V surface coordinates of a hitpoint
+    /// Returns the U,V surface coordinates of a hitpoint
+    // TODO: verify this is up to date with the sphere get_uv methods and matches a surface coordinate instead of volumetric space cordinate
     pub fn get_uv(&self, hit_position: Vec3, time: Float) -> (Float, Float) {
         let translated: Vec3 = (hit_position - self.center(time)) / self.radius;
         let phi: Float = translated.z.atan2(translated.x);
@@ -50,6 +57,7 @@ impl MovingSphere {
         (u, v)
     }
 
+    /// Hit method for the [MovingSphere] object. First gets the interpolated center position at the given time, then follows the implementation of [Sphere](crate::objects::Sphere) object's hit method.
     pub fn hit(
         &self,
         ray: &Ray,
@@ -67,7 +75,7 @@ impl MovingSphere {
             let distance: Float = (-half_b - root) / a;
             // First possible root
             if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.point_at_parameter(distance);
+                let position: Vec3 = ray.evaluate(distance);
                 let outward_normal = (position - self.center(ray.time)) / self.radius;
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {
@@ -85,7 +93,7 @@ impl MovingSphere {
             // Second possible root
             let distance: Float = (-half_b + root) / a;
             if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.point_at_parameter(distance);
+                let position: Vec3 = ray.evaluate(distance);
                 let outward_normal = (position - self.center(ray.time)) / self.radius;
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {
@@ -104,6 +112,7 @@ impl MovingSphere {
         None
     }
 
+    /// Returns the axis-aligned bounding box of the [MovingSphere] object. This is the maximum possible bounding box of the entire span of the movement of the sphere, calculated from the two center positions and the radius.
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         let box0: AABB = AABB::new(
             self.center(t0) - Vec3::new(self.radius, self.radius, self.radius),

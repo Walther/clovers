@@ -102,7 +102,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             target = format!("renders/{}.png", timestamp);
         }
     };
-    img.save(format!("{}", target))?;
+    img.save(target.to_string())?;
     println!("output saved: {}", target);
 
     Ok(())

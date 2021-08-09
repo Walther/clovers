@@ -11,11 +11,17 @@ use crate::{
     Float,
 };
 
-/// Bounding Volume Hierarchy Node. A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also BVHNodes. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
+/// Bounding Volume Hierarchy Node.
+///
+/// A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also BVHNodes. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
+#[derive(Debug)]
 pub struct BVHNode {
-    left: Arc<Hitable>,
-    right: Arc<Hitable>,
-    bounding_box: AABB,
+    /// Left child of the BVHNode
+    pub left: Arc<Hitable>,
+    /// Right child of the BVHNode
+    pub right: Arc<Hitable>,
+    /// Bounding box containing both of the child nodes
+    pub bounding_box: AABB,
 }
 
 impl BVHNode {
@@ -77,20 +83,25 @@ impl BVHNode {
             let box_left = left.bounding_box(time_0, time_1);
             let box_right = right.bounding_box(time_0, time_1);
 
-            if box_left.is_none() || box_right.is_none() {
-                panic!("No bounding box in bvh_node constructor");
-            } else {
-                let bounding_box = AABB::surrounding_box(box_left.unwrap(), box_right.unwrap());
+            // Generate a bounding box and BVHNode if possible
+            if let (Some(box_left), Some(box_right)) = (box_left, box_right) {
+                let bounding_box = AABB::surrounding_box(box_left, box_right);
 
                 BVHNode {
                     left,
                     right,
                     bounding_box,
                 }
+            } else {
+                panic!(
+                    "No bounding box in bvh_node constructor. {:?} {:?}",
+                    box_left, box_right
+                );
             }
         }
     }
 
+    /// The main `hit` function for a [BVHNode]. Given a [Ray](crate::ray::Ray), and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the encased objects during that interval.
     pub fn hit(
         &self,
         ray: &Ray,
@@ -98,11 +109,11 @@ impl BVHNode {
         distance_max: Float,
         rng: ThreadRng,
     ) -> Option<HitRecord> {
-        match self.bounding_box.hit(&ray, distance_min, distance_max) {
+        match self.bounding_box.hit(ray, distance_min, distance_max) {
             false => None,
             true => {
-                let hit_left = self.left.hit(&ray, distance_min, distance_max, rng);
-                let hit_right = self.right.hit(&ray, distance_min, distance_max, rng);
+                let hit_left = self.left.hit(ray, distance_min, distance_max, rng);
+                let hit_right = self.right.hit(ray, distance_min, distance_max, rng);
 
                 match &hit_left {
                     Some(left) => {
@@ -129,6 +140,8 @@ impl BVHNode {
             }
         }
     }
+
+    /// Returns the axis-aligned bounding box [AABB] of the objects within this [BVHNode].
     pub fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
         Some(self.bounding_box)
     }
@@ -138,13 +151,15 @@ fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
     let box_a: Option<AABB> = a.bounding_box(0.0, 0.0);
     let box_b: Option<AABB> = b.bounding_box(0.0, 0.0);
 
-    if box_a.is_none() || box_b.is_none() {
-        panic!("No bounding box in BVHNode constructor.")
-    } else if box_a.unwrap().min[axis] < box_b.unwrap().min[axis] {
-        Ordering::Less
+    if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
+        if box_a.min[axis] < box_b.min[axis] {
+            Ordering::Less
+        } else {
+            // Default to greater, even if equal
+            Ordering::Greater
+        }
     } else {
-        // Default to greater, even if equal
-        Ordering::Greater
+        panic!("No bounding box to compare with.")
     }
 }
 

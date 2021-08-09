@@ -35,9 +35,8 @@ pub fn draw(
 
             // Multisampling for antialiasing
             for _sample in 0..samples {
-                match sample(&scene, x, y, width, height, rng, max_depth) {
-                    Some(s) => color += s,
-                    None => {}
+                if let Some(s) = sample(&scene, x, y, width, height, rng, max_depth) {
+                    color += s
                 }
             }
             color /= samples as Float;
@@ -64,7 +63,7 @@ fn sample(
     let u = (x as Float + rng.gen::<Float>()) / width as Float;
     let v = (y as Float + rng.gen::<Float>()) / height as Float;
     let ray: Ray = scene.camera.get_ray(u, v, rng);
-    let new_color = colorize(&ray, &scene, 0, max_depth, rng);
+    let new_color = colorize(&ray, scene, 0, max_depth, rng);
     // skip NaN and Infinity
     if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
         return Some(new_color);
