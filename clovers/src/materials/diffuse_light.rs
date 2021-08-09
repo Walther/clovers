@@ -22,7 +22,7 @@ impl Default for DiffuseLight {
     /// Creates a new [DiffuseLight] with white light at intensity `100.0`
     fn default() -> Self {
         DiffuseLight {
-            emit: SolidColor::new(Color::new(100.0, 100.0, 100.0)),
+            emit: Texture::SolidColor(SolidColor::new(Color::new(100.0, 100.0, 100.0))),
         }
     }
 }

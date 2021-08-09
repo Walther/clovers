@@ -1,7 +1,13 @@
 //! A dielectric material. This resembles glass and other transparent and reflective materials.
 
 use super::{reflect, refract, schlick, MaterialType, ScatterRecord};
-use crate::{color::Color, hitable::HitRecord, pdf::ZeroPDF, ray::Ray, Float, Vec3};
+use crate::{
+    color::Color,
+    hitable::HitRecord,
+    pdf::{ZeroPDF, PDF},
+    ray::Ray,
+    Float, Vec3,
+};
 use rand::prelude::*;
 
 use serde::{Deserialize, Serialize};
@@ -61,7 +67,7 @@ impl<'a> Dielectric {
             material_type: MaterialType::Specular,
             specular_ray: Some(specular_ray),
             attenuation: albedo,
-            pdf_ptr: ZeroPDF::new(), //TODO: ugly hack due to nullptr in original tutorial
+            pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()), //TODO: ugly hack due to nullptr in original tutorial
         })
     }
 

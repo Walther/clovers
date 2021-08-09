@@ -2,7 +2,12 @@
 
 use super::{MaterialType, ScatterRecord};
 use crate::{
-    color::Color, hitable::HitRecord, pdf::CosinePDF, ray::Ray, textures::Texture, Float, PI,
+    color::Color,
+    hitable::HitRecord,
+    pdf::{CosinePDF, PDF},
+    ray::Ray,
+    textures::Texture,
+    Float, PI,
 };
 use rand::prelude::ThreadRng;
 use serde::{Deserialize, Serialize};
@@ -37,7 +42,7 @@ impl<'a> Isotropic {
             material_type: MaterialType::Diffuse,
             specular_ray: None,
             attenuation: albedo,
-            pdf_ptr: CosinePDF::new(hit_record.normal),
+            pdf_ptr: PDF::CosinePDF(CosinePDF::new(hit_record.normal)),
         })
     }
 

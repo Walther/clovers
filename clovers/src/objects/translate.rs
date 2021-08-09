@@ -30,8 +30,8 @@ pub struct Translate {
 
 impl Translate {
     /// Creates a new `Translate` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `offset` given.
-    pub fn new(object: Arc<Hitable>, offset: Vec3) -> Hitable {
-        Hitable::Translate(Translate { object, offset })
+    pub fn new(object: Arc<Hitable>, offset: Vec3) -> Self {
+        Translate { object, offset }
     }
 
     /// Hit method for the [Translate] object. Finds the translation-adjusted [HitRecord] for the possible intersection of the [Ray] with the encased [Object].

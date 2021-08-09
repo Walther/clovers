@@ -62,7 +62,6 @@
 #![deny(missing_docs)]
 // TODO:
 #![allow(clippy::many_single_char_names)] // Lots of places with coordinates etc
-#![allow(clippy::new_ret_no_self)] // Material types return a Material instead of Self for now
 
 // Externals
 use nalgebra::Vector3;

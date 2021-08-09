@@ -8,11 +8,8 @@
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
 use crate::{
-    aabb::AABB,
-    hitable::{HitRecord, Hitable},
-    materials::Material,
-    ray::Ray,
-    Float, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
+    aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3,
+    EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -41,22 +38,15 @@ pub struct XYRect {
 }
 
 impl XYRect {
-    pub fn new(
-        x0: Float,
-        x1: Float,
-        y0: Float,
-        y1: Float,
-        k: Float,
-        material: Material,
-    ) -> Hitable {
-        Hitable::XYRect(XYRect {
+    pub fn new(x0: Float, x1: Float, y0: Float, y1: Float, k: Float, material: Material) -> Self {
+        XYRect {
             x0,
             x1,
             y0,
             y1,
             k,
             material,
-        })
+        }
     }
 
     pub fn hit(
@@ -153,22 +143,15 @@ pub struct XZRect {
 }
 
 impl XZRect {
-    pub fn new(
-        x0: Float,
-        x1: Float,
-        z0: Float,
-        z1: Float,
-        k: Float,
-        material: Material,
-    ) -> Hitable {
-        Hitable::XZRect(XZRect {
+    pub fn new(x0: Float, x1: Float, z0: Float, z1: Float, k: Float, material: Material) -> Self {
+        XZRect {
             x0,
             x1,
             z0,
             z1,
             k,
             material,
-        })
+        }
     }
 
     pub fn hit(
@@ -265,22 +248,15 @@ pub struct YZRect {
 }
 
 impl YZRect {
-    pub fn new(
-        y0: Float,
-        y1: Float,
-        z0: Float,
-        z1: Float,
-        k: Float,
-        material: Material,
-    ) -> Hitable {
-        Hitable::YZRect(YZRect {
+    pub fn new(y0: Float, y1: Float, z0: Float, z1: Float, k: Float, material: Material) -> Self {
+        YZRect {
             y0,
             y1,
             z0,
             z1,
             k,
             material,
-        })
+        }
     }
 
     pub fn hit(

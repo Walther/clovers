@@ -1,6 +1,5 @@
 //! A solid color texture.
 
-use super::Texture;
 use crate::{color::Color, Float, Vec3};
 use serde::{Deserialize, Serialize};
 
@@ -13,8 +12,8 @@ pub struct SolidColor {
 
 impl SolidColor {
     /// Creates a new solid color texture with the specified color.
-    pub fn new(color: Color) -> Texture {
-        Texture::SolidColor(SolidColor { color })
+    pub fn new(color: Color) -> Self {
+        SolidColor { color }
     }
 
     /// Evaluates the color ignoring the given surface coordinates and spatial position - always returns the solid color.

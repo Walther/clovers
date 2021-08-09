@@ -38,11 +38,11 @@ pub struct CosinePDF {
     uvw: ONB,
 }
 
-impl<'a> CosinePDF {
-    pub fn new(w: Vec3) -> PDF<'a> {
-        PDF::CosinePDF(CosinePDF {
+impl CosinePDF {
+    pub fn new(w: Vec3) -> Self {
+        CosinePDF {
             uvw: ONB::build_from_w(w),
-        })
+        }
     }
 
     pub fn value(&self, direction: Vec3, _time: Float, _rng: ThreadRng) -> Float {
@@ -66,8 +66,8 @@ pub struct HitablePDF<'a> {
 }
 
 impl<'a> HitablePDF<'a> {
-    pub fn new(hitable: &'a Hitable, origin: Vec3) -> PDF {
-        PDF::HitablePDF(HitablePDF { origin, hitable })
+    pub fn new(hitable: &'a Hitable, origin: Vec3) -> Self {
+        HitablePDF { origin, hitable }
     }
 
     pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
@@ -87,11 +87,11 @@ pub struct MixturePDF<'a> {
 }
 
 impl<'a> MixturePDF<'a> {
-    pub fn new(pdf1: PDF<'a>, pdf2: PDF<'a>) -> PDF<'a> {
-        PDF::MixturePDF(MixturePDF {
+    pub fn new(pdf1: PDF<'a>, pdf2: PDF<'a>) -> Self {
+        MixturePDF {
             pdf1: Arc::new(pdf1),
             pdf2: Arc::new(pdf2),
-        })
+        }
     }
 
     pub fn value(&self, direction: Vec3, time: Float, rng: ThreadRng) -> Float {
@@ -111,9 +111,9 @@ impl<'a> MixturePDF<'a> {
 #[derive(Debug)]
 pub struct ZeroPDF {}
 
-impl<'a> ZeroPDF {
-    pub fn new() -> PDF<'a> {
-        PDF::ZeroPDF(ZeroPDF {})
+impl ZeroPDF {
+    pub fn new() -> Self {
+        ZeroPDF {}
     }
 
     pub fn value(&self, _direction: Vec3, _time: Float, _rng: ThreadRng) -> Float {
@@ -122,5 +122,11 @@ impl<'a> ZeroPDF {
 
     pub fn generate(&self, _rng: ThreadRng) -> Vec3 {
         Vec3::new(1.0, 0.0, 0.0)
+    }
+}
+
+impl Default for ZeroPDF {
+    fn default() -> Self {
+        Self::new()
     }
 }

@@ -2,7 +2,11 @@
 
 use super::{reflect, MaterialType, ScatterRecord};
 use crate::{
-    hitable::HitRecord, pdf::ZeroPDF, random::random_in_unit_sphere, ray::Ray, textures::Texture,
+    hitable::HitRecord,
+    pdf::{ZeroPDF, PDF},
+    random::random_in_unit_sphere,
+    ray::Ray,
+    textures::Texture,
     Float, Vec3,
 };
 use rand::prelude::ThreadRng;
@@ -34,7 +38,7 @@ impl<'a> Metal {
             // TODO: fix coordinates. Currently metal only works for [SolidColor]
             attenuation: self.albedo.color(0.0, 0.0, hit_record.position),
             material_type: MaterialType::Specular,
-            pdf_ptr: ZeroPDF::new(),
+            pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()),
         })
     }
 

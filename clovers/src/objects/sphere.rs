@@ -1,13 +1,8 @@
 //! A sphere object.
 
 use crate::{
-    aabb::AABB,
-    hitable::{HitRecord, Hitable},
-    materials::Material,
-    onb::ONB,
-    random::random_to_sphere,
-    ray::Ray,
-    Float, Vec3, EPSILON_SHADOW_ACNE, PI,
+    aabb::AABB, hitable::HitRecord, materials::Material, onb::ONB, random::random_to_sphere,
+    ray::Ray, Float, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -34,12 +29,12 @@ pub struct Sphere {
 
 impl Sphere {
     /// Creates a new `Sphere` object with the given center, radius and material.
-    pub fn new(center: Vec3, radius: Float, material: Material) -> Hitable {
-        Hitable::Sphere(Sphere {
+    pub fn new(center: Vec3, radius: Float, material: Material) -> Self {
+        Sphere {
             center,
             radius,
             material,
-        })
+        }
     }
 
     /// Returns the U,V surface coordinates of a hitpoint

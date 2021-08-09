@@ -45,12 +45,12 @@ pub struct ConstantMedium {
 
 impl ConstantMedium {
     /// Creates a new [ConstantMedium] with a known size, shape and density.
-    pub fn new(boundary: Arc<Hitable>, density: Float, texture: Texture) -> Hitable {
-        Hitable::ConstantMedium(ConstantMedium {
+    pub fn new(boundary: Arc<Hitable>, density: Float, texture: Texture) -> Self {
+        ConstantMedium {
             boundary,
             phase_function: Material::Isotropic(Isotropic::new(texture)),
             neg_inv_density: -1.0 / density,
-        })
+        }
     }
 
     /// Hit function for the [ConstantMedium] object. Returns a [HitRecord] if hit. TODO: explain the math for the fog
