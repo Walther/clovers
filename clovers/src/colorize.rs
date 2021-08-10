@@ -2,6 +2,7 @@
 
 use crate::{
     color::Color,
+    materials::MaterialType,
     pdf::{HitablePDF, MixturePDF, PDF},
     ray::Ray,
     scenes::Scene,
@@ -39,7 +40,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
                 Some(scatter_record) => {
                     match scatter_record.material_type {
                         // If we hit a specular, return a specular ray
-                        crate::materials::MaterialType::Specular => {
+                        MaterialType::Specular => {
                             scatter_record.attenuation
                                 * colorize(
                                     &scatter_record.specular_ray.unwrap(), // should always have a ray at this point
@@ -49,7 +50,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
                                     rng,
                                 )
                         }
-                        crate::materials::MaterialType::Diffuse => {
+                        MaterialType::Diffuse => {
                             // Use a probability density function to figure out where to scatter a new ray
                             let light_ptr = PDF::HitablePDF(HitablePDF::new(
                                 &scene.priority_objects,
