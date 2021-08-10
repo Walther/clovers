@@ -81,8 +81,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Graphics assume origin at bottom left corner of the screen
     // Our buffer writes pixels from top left corner. Simple fix, just flip it!
     image::imageops::flip_vertical_in_place(&mut img);
-    // Our coordinate system is weird in general, try flipping this way too.
-    image::imageops::flip_horizontal_in_place(&mut img);
     // TODO: fix the coordinate system
 
     let duration = Instant::now() - start;
