@@ -10,76 +10,78 @@ use crate::{
 };
 use rand::prelude::*;
 
-/// The main coloring function
+/// The main coloring function. Sends a [Ray] to the [Scene], sees if it hits anything, and eventually returns a [Color]. Taking into account the [Material](crate::materials::Material) that is hit, the method recurses with various adjustments, with a new [Ray] started from the location that was hit.
 pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: ThreadRng) -> Color {
+    // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
-        // Ray bounce limit reached, return background_color
+        // Ray bounce limit reached, early return background_color
         return scene.background_color;
     }
 
-    // Here, smoothing is used to avoid "shadow acne"
-    match scene.objects.hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng) {
-        // If the ray hits nothing, return the background color.
-        None => scene.background_color,
+    // Send the ray to the scene, and see if it hits anything.
+    // distance_min is set to an epsilon to avoid "shadow acne" that can happen when set to zero
+    let hit_record = match scene.objects.hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng) {
+        // If the ray hits nothing, early return the background color.
+        None => return scene.background_color,
+        // Hit something, continue
+        Some(hit_record) => hit_record,
+    };
 
-        // Hit something
-        Some(hit_record) => {
-            let emitted: Color = hit_record.material.emit(
-                ray,
-                &hit_record,
-                hit_record.u,
-                hit_record.v,
+    // Get the emitted color from the surface that we just hit
+    let emitted: Color = hit_record.material.emit(
+        ray,
+        &hit_record,
+        hit_record.u,
+        hit_record.v,
+        hit_record.position,
+    );
+
+    // Do we scatter?
+    let scatter_record = match hit_record.material.scatter(ray, &hit_record, rng) {
+        // No scatter, early return the emitted color only
+        None => return emitted,
+        // Got a scatter, continue
+        Some(scatter_record) => scatter_record,
+    };
+
+    // We have scattered, check material type and recurse accordingly
+    match scatter_record.material_type {
+        MaterialType::Specular => {
+            // If we hit a specular material, generate a specular ray, and multiply it with the value of the scatter_record.
+            // Note that the `emitted` value from earlier is not used, as the scatter_record.attenuation has an appropriately adjusted color
+            scatter_record.attenuation
+                * colorize(
+                    // a scatter_record from a specular material should always have this ray
+                    &scatter_record.specular_ray.unwrap(),
+                    scene,
+                    depth + 1,
+                    max_depth,
+                    rng,
+                )
+        }
+        MaterialType::Diffuse => {
+            // Use a probability density function to figure out where to scatter a new ray
+            // TODO: this weighed priority sampling should be adjusted or removed - doesn't feel ideal.
+            let light_ptr = PDF::HitablePDF(HitablePDF::new(
+                &scene.priority_objects,
                 hit_record.position,
-            );
+            ));
+            let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
 
-            // Do we scatter?
-            match hit_record.material.scatter(ray, &hit_record, rng) {
-                // No scatter, emit only
-                None => emitted,
-                // Got a scatter
-                Some(scatter_record) => {
-                    match scatter_record.material_type {
-                        // If we hit a specular, return a specular ray
-                        MaterialType::Specular => {
-                            scatter_record.attenuation
-                                * colorize(
-                                    &scatter_record.specular_ray.unwrap(), // should always have a ray at this point
-                                    scene,
-                                    depth + 1,
-                                    max_depth,
-                                    rng,
-                                )
-                        }
-                        MaterialType::Diffuse => {
-                            // Use a probability density function to figure out where to scatter a new ray
-                            let light_ptr = PDF::HitablePDF(HitablePDF::new(
-                                &scene.priority_objects,
-                                hit_record.position,
-                            ));
-                            let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
+            let scattered = Ray::new(hit_record.position, mixture_pdf.generate(rng), ray.time);
+            let pdf_val = mixture_pdf.value(scattered.direction, ray.time, rng);
 
-                            let scattered =
-                                Ray::new(hit_record.position, mixture_pdf.generate(rng), ray.time);
-                            let pdf_val = mixture_pdf.value(scattered.direction, ray.time, rng);
+            // Recurse
+            let recurse = colorize(&scattered, scene, depth + 1, max_depth, rng);
 
-                            // recurse
-                            let recurse = colorize(&scattered, scene, depth + 1, max_depth, rng);
-
-                            // Blend it all together
-                            emitted
-                                + scatter_record.attenuation
-                                    * hit_record.material.scattering_pdf(
-                                        ray,
-                                        &hit_record,
-                                        &scattered,
-                                        rng,
-                                    )
-                                    * recurse
-                                    / pdf_val
-                        }
-                    }
-                }
-            }
+            // Blend it all together
+            emitted
+                + scatter_record.attenuation
+                    * hit_record
+                        .material
+                        .scattering_pdf(ray, &hit_record, &scattered, rng)
+                    * recurse
+                    / pdf_val
         }
     }
 }
