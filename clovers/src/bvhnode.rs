@@ -32,72 +32,77 @@ impl BVHNode {
         time_1: Float,
         mut rng: ThreadRng,
     ) -> BVHNode {
-        {
-            let axis: usize = rng.gen_range(0, 2);
-            let comparators = [box_x_compare, box_y_compare, box_z_compare];
-            let comparator = comparators[axis];
+        // Initialize two child nodes
+        let left: Arc<Hitable>;
+        let right: Arc<Hitable>;
 
-            let object_span = objects.len();
+        // Pick a random axis to create the split on
+        // TODO: smarter algorithm?
+        let axis: usize = rng.gen_range(0, 2);
+        let comparators = [box_x_compare, box_y_compare, box_z_compare];
+        let comparator = comparators[axis];
 
-            let left: Arc<Hitable>;
-            let right: Arc<Hitable>;
+        // How many objects do we have?
+        let object_span = objects.len();
 
-            if object_span == 1 {
-                // If we only have one object, return itself. Note: no explicit leaf type in our tree
-                left = objects[0].clone();
-                right = objects[0].clone();
-            } else if object_span == 2 {
-                // If we are comparing two objects, perform the comparison
-                match comparator(&objects[0], &objects[1]) {
-                    Ordering::Less => {
-                        left = objects[0].clone();
-                        right = objects[1].clone();
-                    }
-                    Ordering::Greater => {
-                        left = objects[1].clone();
-                        right = objects[0].clone();
-                    }
-                    Ordering::Equal => {
-                        // TODO: what should happen here?
-                        panic!("Equal objects in BVHNode from_list");
-                    }
+        if object_span == 1 {
+            // If we only have one object, create two child nodes with the same object.
+            // We do not have an explicit leaf node in our tree.
+            // TODO: this might not be smart, how to improve?
+            left = objects[0].clone();
+            right = objects[0].clone();
+        } else if object_span == 2 {
+            // If we are comparing two objects, perform the comparison
+            // Insert the child nodes in order
+            match comparator(&objects[0], &objects[1]) {
+                Ordering::Less => {
+                    left = objects[0].clone();
+                    right = objects[1].clone();
                 }
-            } else {
-                // Otherwise, recurse
-                objects.sort_by(|a, b| comparator(&*a, &*b));
-
-                // Split the vector; divide and conquer
-                let mid = object_span / 2;
-                let objects_right = objects.split_off(mid);
-                left = Arc::new(Hitable::BVHNode(BVHNode::from_list(
-                    objects, time_0, time_1, rng,
-                )));
-                right = Arc::new(Hitable::BVHNode(BVHNode::from_list(
-                    objects_right,
-                    time_0,
-                    time_1,
-                    rng,
-                )));
-            }
-
-            let box_left = left.bounding_box(time_0, time_1);
-            let box_right = right.bounding_box(time_0, time_1);
-
-            // Generate a bounding box and BVHNode if possible
-            if let (Some(box_left), Some(box_right)) = (box_left, box_right) {
-                let bounding_box = AABB::surrounding_box(box_left, box_right);
-
-                BVHNode {
-                    left,
-                    right,
-                    bounding_box,
+                Ordering::Greater => {
+                    left = objects[1].clone();
+                    right = objects[0].clone();
                 }
-            } else {
-                panic!(
-                    "No bounding box in bvh_node constructor. {:?} {:?}",
-                    box_left, box_right
-                );
+                Ordering::Equal => {
+                    // TODO: what should happen here?
+                    panic!("Equal objects in BVHNode from_list");
+                }
             }
+        } else {
+            // Otherwise, recurse
+            objects.sort_by(|a, b| comparator(&*a, &*b));
+
+            // Split the vector; divide and conquer
+            let mid = object_span / 2;
+            let objects_right = objects.split_off(mid);
+            left = Arc::new(Hitable::BVHNode(BVHNode::from_list(
+                objects, time_0, time_1, rng,
+            )));
+            right = Arc::new(Hitable::BVHNode(BVHNode::from_list(
+                objects_right,
+                time_0,
+                time_1,
+                rng,
+            )));
+        }
+
+        let box_left = left.bounding_box(time_0, time_1);
+        let box_right = right.bounding_box(time_0, time_1);
+
+        // Generate a bounding box and BVHNode if possible
+        if let (Some(box_left), Some(box_right)) = (box_left, box_right) {
+            let bounding_box = AABB::surrounding_box(box_left, box_right);
+
+            BVHNode {
+                left,
+                right,
+                bounding_box,
+            }
+        } else {
+            panic!(
+                "No bounding box in bvh_node constructor. {:?} {:?}",
+                box_left, box_right
+            );
         }
     }
 
