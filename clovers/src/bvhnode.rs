@@ -109,23 +109,26 @@ impl BVHNode {
         distance_max: Float,
         rng: ThreadRng,
     ) -> Option<HitRecord> {
-        match self.bounding_box.hit(ray, distance_min, distance_max) {
-            false => None,
-            true => {
-                let hit_left = self.left.hit(ray, distance_min, distance_max, rng);
-                let hit_right = self.right.hit(ray, distance_min, distance_max, rng);
+        // If we do not hit the bounding box of current node, early return None
+        if !self.bounding_box.hit(ray, distance_min, distance_max) {
+            return None;
+        }
 
-                match (&hit_left, &hit_right) {
-                    (None, None) => None,
-                    (None, Some(_)) => hit_right,
-                    (Some(_), None) => hit_left,
-                    (Some(left), Some(right)) => {
-                        if left.distance < right.distance {
-                            return hit_left;
-                        }
-                        hit_right
-                    }
+        // Otherwise we have hit the bounding box of this node, recurse to child nodes
+        let hit_left = self.left.hit(ray, distance_min, distance_max, rng);
+        let hit_right = self.right.hit(ray, distance_min, distance_max, rng);
+
+        // Did we hit neither of the child nodes, one of them, or both?
+        // Return the closest thing we hit
+        match (&hit_left, &hit_right) {
+            (None, None) => None, // In theory, this case should not be reachable
+            (None, Some(_)) => hit_right,
+            (Some(_), None) => hit_left,
+            (Some(left), Some(right)) => {
+                if left.distance < right.distance {
+                    return hit_left;
                 }
+                hit_right
             }
         }
     }
