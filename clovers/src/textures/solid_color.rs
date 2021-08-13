@@ -4,9 +4,9 @@ use crate::{color::Color, Float, Vec3};
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Deserialize, Serialize, Debug, Default)]
-/// A solid color texture. Simplest possible [Texture]: returns a solid color at any surface coordinate or spatial position.
+/// A solid color texture. Simplest possible [Texture](crate::textures::Texture): returns a solid color at any surface coordinate or spatial position.
 pub struct SolidColor {
-    /// The color of the [Texture].
+    /// The color of the [Texture](crate::textures::Texture).
     pub color: Color,
 }
 

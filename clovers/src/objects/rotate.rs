@@ -41,54 +41,61 @@ impl RotateY {
         let cos_theta: Float = radians.cos();
         let bounding_box: Option<AABB> = object.bounding_box(time_0, time_1);
 
-        match bounding_box {
-            // No bounding box for object
-            None => RotateY {
-                object,
-                sin_theta,
-                cos_theta,
-                bounding_box: None,
-            },
-            // Got a bounding box
-            Some(bbox) => {
-                let mut min: Vec3 = Vec3::new(Float::INFINITY, Float::INFINITY, Float::INFINITY);
-                let mut max: Vec3 = Vec3::new(
-                    Float::NEG_INFINITY,
-                    Float::NEG_INFINITY,
-                    Float::NEG_INFINITY,
-                );
-
-                for i in 0..2 {
-                    for j in 0..2 {
-                        for k in 0..2 {
-                            let i_f: Float = i as Float;
-                            let j_f: Float = j as Float;
-                            let k_f: Float = k as Float;
-
-                            let x: Float = i_f * bbox.max.x + (1.0 - i_f) * bbox.min.x;
-                            let y: Float = j_f * bbox.max.y + (1.0 - j_f) * bbox.min.y;
-                            let z: Float = k_f * bbox.max.z + (1.0 - k_f) * bbox.min.z;
-
-                            let newx: Float = cos_theta * x + sin_theta * z;
-                            let newz: Float = -sin_theta * x + cos_theta * z;
-
-                            let tester: Vec3 = Vec3::new(newx, y, newz);
-
-                            for c in 0..3 {
-                                min[c] = min[c].min(tester[c]);
-                                max[c] = max[c].max(tester[c]);
-                            }
-                        }
-                    }
-                }
-
-                RotateY {
+        // Does our object have a bounding box?
+        let bbox = match bounding_box {
+            // No bounding box for object, give up and return early
+            // TODO: is this even correct? How could it be?
+            None => {
+                return RotateY {
                     object,
                     sin_theta,
                     cos_theta,
-                    bounding_box: Some(AABB::new(min, max)),
+                    bounding_box: None,
                 }
             }
+            // Got a bounding box
+            Some(bbox) => bbox,
+        };
+
+        // Start with infinite bounds
+        let mut min: Vec3 = Vec3::new(Float::INFINITY, Float::INFINITY, Float::INFINITY);
+        let mut max: Vec3 = Vec3::new(
+            Float::NEG_INFINITY,
+            Float::NEG_INFINITY,
+            Float::NEG_INFINITY,
+        );
+
+        // Calculate new bounds
+        for i in 0..2 {
+            for j in 0..2 {
+                for k in 0..2 {
+                    let i_f: Float = i as Float;
+                    let j_f: Float = j as Float;
+                    let k_f: Float = k as Float;
+
+                    let x: Float = i_f * bbox.max.x + (1.0 - i_f) * bbox.min.x;
+                    let y: Float = j_f * bbox.max.y + (1.0 - j_f) * bbox.min.y;
+                    let z: Float = k_f * bbox.max.z + (1.0 - k_f) * bbox.min.z;
+
+                    let newx: Float = cos_theta * x + sin_theta * z;
+                    let newz: Float = -sin_theta * x + cos_theta * z;
+
+                    let tester: Vec3 = Vec3::new(newx, y, newz);
+
+                    for c in 0..3 {
+                        min[c] = min[c].min(tester[c]);
+                        max[c] = max[c].max(tester[c]);
+                    }
+                }
+            }
+        }
+
+        // Return a Rotate object with the new bounding box and pre-calculated rotation utilities
+        RotateY {
+            object,
+            sin_theta,
+            cos_theta,
+            bounding_box: Some(AABB::new(min, max)),
         }
     }
 
@@ -111,40 +118,39 @@ impl RotateY {
 
         let rotated_r: Ray = Ray::new(origin, direction, ray.time);
 
-        match self.object.hit(&rotated_r, distance_min, distance_max, rng) {
-            // Did not hit rotated object, return None
-            None => None,
-            // Hit the rotated object
-            Some(hit_record) => {
-                // Determine where the intersection is
-                let mut position: Vec3 = hit_record.position;
-                let mut normal: Vec3 = hit_record.normal;
-                let distance: Float = hit_record.distance;
+        let hit_record = match self.object.hit(&rotated_r, distance_min, distance_max, rng) {
+            // Did not hit rotated object, early return None
+            None => return None,
+            // Hit the rotated object, continue evaluating
+            Some(hit_record) => hit_record,
+        };
 
-                position[0] = self.cos_theta * hit_record.position[0]
-                    + self.sin_theta * hit_record.position[2];
-                position[2] = -self.sin_theta * hit_record.position[0]
-                    + self.cos_theta * hit_record.position[2];
+        // Determine where the intersection is
+        // TODO: understand and explain
+        let mut position: Vec3 = hit_record.position;
+        let mut normal: Vec3 = hit_record.normal;
+        let distance: Float = hit_record.distance;
 
-                normal[0] =
-                    self.cos_theta * hit_record.normal[0] + self.sin_theta * hit_record.normal[2];
-                normal[2] =
-                    -self.sin_theta * hit_record.normal[0] + self.cos_theta * hit_record.normal[2];
+        position[0] =
+            self.cos_theta * hit_record.position[0] + self.sin_theta * hit_record.position[2];
+        position[2] =
+            -self.sin_theta * hit_record.position[0] + self.cos_theta * hit_record.position[2];
 
-                // TODO: uv coords?
-                let mut record = HitRecord {
-                    distance,
-                    position,
-                    normal,
-                    u: 0.0,
-                    v: 0.0,
-                    material: &*hit_record.material,
-                    front_face: false, // TODO: fix having to declare it before calling face_normal
-                };
-                record.set_face_normal(&rotated_r, normal);
-                Some(record)
-            }
-        }
+        normal[0] = self.cos_theta * hit_record.normal[0] + self.sin_theta * hit_record.normal[2];
+        normal[2] = -self.sin_theta * hit_record.normal[0] + self.cos_theta * hit_record.normal[2];
+
+        // TODO: uv coords? This probably breaks surface textures completely
+        let mut record = HitRecord {
+            distance,
+            position,
+            normal,
+            u: 0.0,
+            v: 0.0,
+            material: &*hit_record.material,
+            front_face: false, // TODO: fix having to declare it before calling face_normal
+        };
+        record.set_face_normal(&rotated_r, normal);
+        Some(record)
     }
 
     /// Bounding box method for the [RotateY] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for rotation.

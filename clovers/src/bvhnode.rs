@@ -32,72 +32,77 @@ impl BVHNode {
         time_1: Float,
         mut rng: ThreadRng,
     ) -> BVHNode {
-        {
-            let axis: usize = rng.gen_range(0, 2);
-            let comparators = [box_x_compare, box_y_compare, box_z_compare];
-            let comparator = comparators[axis];
+        // Initialize two child nodes
+        let left: Arc<Hitable>;
+        let right: Arc<Hitable>;
 
-            let object_span = objects.len();
+        // Pick a random axis to create the split on
+        // TODO: smarter algorithm?
+        let axis: usize = rng.gen_range(0, 2);
+        let comparators = [box_x_compare, box_y_compare, box_z_compare];
+        let comparator = comparators[axis];
 
-            let left: Arc<Hitable>;
-            let right: Arc<Hitable>;
+        // How many objects do we have?
+        let object_span = objects.len();
 
-            if object_span == 1 {
-                // If we only have one object, return itself. Note: no explicit leaf type in our tree
-                left = objects[0].clone();
-                right = objects[0].clone();
-            } else if object_span == 2 {
-                // If we are comparing two objects, perform the comparison
-                match comparator(&objects[0], &objects[1]) {
-                    Ordering::Less => {
-                        left = objects[0].clone();
-                        right = objects[1].clone();
-                    }
-                    Ordering::Greater => {
-                        left = objects[1].clone();
-                        right = objects[0].clone();
-                    }
-                    Ordering::Equal => {
-                        // TODO: what should happen here?
-                        panic!("Equal objects in BVHNode from_list");
-                    }
+        if object_span == 1 {
+            // If we only have one object, create two child nodes with the same object.
+            // We do not have an explicit leaf node in our tree.
+            // TODO: this might not be smart, how to improve?
+            left = objects[0].clone();
+            right = objects[0].clone();
+        } else if object_span == 2 {
+            // If we are comparing two objects, perform the comparison
+            // Insert the child nodes in order
+            match comparator(&objects[0], &objects[1]) {
+                Ordering::Less => {
+                    left = objects[0].clone();
+                    right = objects[1].clone();
                 }
-            } else {
-                // Otherwise, recurse
-                objects.sort_by(|a, b| comparator(&*a, &*b));
-
-                // Split the vector; divide and conquer
-                let mid = object_span / 2;
-                let objects_right = objects.split_off(mid);
-                left = Arc::new(Hitable::BVHNode(BVHNode::from_list(
-                    objects, time_0, time_1, rng,
-                )));
-                right = Arc::new(Hitable::BVHNode(BVHNode::from_list(
-                    objects_right,
-                    time_0,
-                    time_1,
-                    rng,
-                )));
-            }
-
-            let box_left = left.bounding_box(time_0, time_1);
-            let box_right = right.bounding_box(time_0, time_1);
-
-            // Generate a bounding box and BVHNode if possible
-            if let (Some(box_left), Some(box_right)) = (box_left, box_right) {
-                let bounding_box = AABB::surrounding_box(box_left, box_right);
-
-                BVHNode {
-                    left,
-                    right,
-                    bounding_box,
+                Ordering::Greater => {
+                    left = objects[1].clone();
+                    right = objects[0].clone();
                 }
-            } else {
-                panic!(
-                    "No bounding box in bvh_node constructor. {:?} {:?}",
-                    box_left, box_right
-                );
+                Ordering::Equal => {
+                    // TODO: what should happen here?
+                    panic!("Equal objects in BVHNode from_list");
+                }
             }
+        } else {
+            // Otherwise, recurse
+            objects.sort_by(|a, b| comparator(&*a, &*b));
+
+            // Split the vector; divide and conquer
+            let mid = object_span / 2;
+            let objects_right = objects.split_off(mid);
+            left = Arc::new(Hitable::BVHNode(BVHNode::from_list(
+                objects, time_0, time_1, rng,
+            )));
+            right = Arc::new(Hitable::BVHNode(BVHNode::from_list(
+                objects_right,
+                time_0,
+                time_1,
+                rng,
+            )));
+        }
+
+        let box_left = left.bounding_box(time_0, time_1);
+        let box_right = right.bounding_box(time_0, time_1);
+
+        // Generate a bounding box and BVHNode if possible
+        if let (Some(box_left), Some(box_right)) = (box_left, box_right) {
+            let bounding_box = AABB::surrounding_box(box_left, box_right);
+
+            BVHNode {
+                left,
+                right,
+                bounding_box,
+            }
+        } else {
+            panic!(
+                "No bounding box in bvh_node constructor. {:?} {:?}",
+                box_left, box_right
+            );
         }
     }
 
@@ -109,23 +114,26 @@ impl BVHNode {
         distance_max: Float,
         rng: ThreadRng,
     ) -> Option<HitRecord> {
-        match self.bounding_box.hit(ray, distance_min, distance_max) {
-            false => None,
-            true => {
-                let hit_left = self.left.hit(ray, distance_min, distance_max, rng);
-                let hit_right = self.right.hit(ray, distance_min, distance_max, rng);
+        // If we do not hit the bounding box of current node, early return None
+        if !self.bounding_box.hit(ray, distance_min, distance_max) {
+            return None;
+        }
 
-                match (&hit_left, &hit_right) {
-                    (None, None) => None,
-                    (None, Some(_)) => hit_right,
-                    (Some(_), None) => hit_left,
-                    (Some(left), Some(right)) => {
-                        if left.distance < right.distance {
-                            return hit_left;
-                        }
-                        hit_right
-                    }
+        // Otherwise we have hit the bounding box of this node, recurse to child nodes
+        let hit_left = self.left.hit(ray, distance_min, distance_max, rng);
+        let hit_right = self.right.hit(ray, distance_min, distance_max, rng);
+
+        // Did we hit neither of the child nodes, one of them, or both?
+        // Return the closest thing we hit
+        match (&hit_left, &hit_right) {
+            (None, None) => None, // In theory, this case should not be reachable
+            (None, Some(_)) => hit_right,
+            (Some(_), None) => hit_left,
+            (Some(left), Some(right)) => {
+                if left.distance < right.distance {
+                    return hit_left;
                 }
+                hit_right
             }
         }
     }

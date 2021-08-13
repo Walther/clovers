@@ -46,7 +46,7 @@ impl<'a> Isotropic {
         })
     }
 
-    /// Returns the scattering probability density function for the [Isotropic] material. TODO: verify implementation, copied from [Lambertian]
+    /// Returns the scattering probability density function for the [Isotropic] material. TODO: verify implementation, copied from [Lambertian](crate::materials::Lambertian)
     pub fn scattering_pdf(
         self,
         _ray: &Ray,
