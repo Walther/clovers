@@ -173,32 +173,34 @@ impl HitableList {
             return None;
         }
 
+        // Mutable AABB that we grow from zero
         let mut output_box: Option<AABB> = None;
 
+        // Go through all the objects, and expand the AABB
         for object in self.0.iter() {
             // Check if the object has a box
-            match object.bounding_box(t0, t1) {
-                // No box found, early return.
-                // Having even one unbounded object in a list makes the entire list unbounded
+            let bounding = match object.bounding_box(t0, t1) {
+                // No box found for the object, early return.
+                // Having even one unbounded object in a list makes the entire list unbounded!
                 None => return None,
                 // Box found
-                Some(bounding) =>
-                // Do we have an output_box already saved?
-                {
-                    match output_box {
-                        // If we do, expand it & recurse
-                        Some(old_box) => {
-                            output_box = Some(AABB::surrounding_box(old_box, bounding));
-                        }
-                        // Otherwise, set output box to be the newly-found box
-                        None => {
-                            output_box = Some(bounding);
-                        }
-                    }
+                Some(bounding) => bounding,
+            };
+
+            // Do we have an output_box already saved?
+            match output_box {
+                // If we do, expand it & recurse
+                Some(old_box) => {
+                    output_box = Some(AABB::surrounding_box(old_box, bounding));
+                }
+                // Otherwise, set output box to be the newly-found box
+                None => {
+                    output_box = Some(bounding);
                 }
             }
         }
 
+        // Return the final combined output_box
         output_box
     }
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
