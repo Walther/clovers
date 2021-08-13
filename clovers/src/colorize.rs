@@ -15,6 +15,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
         // Ray bounce limit reached, early return background_color
+        // TODO: this weighs the colorization of any pixel with the background color quite heavily!
         return scene.background_color;
     }
 
