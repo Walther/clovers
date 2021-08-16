@@ -8,7 +8,6 @@ use crate::{
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 
 use super::Object;
 
@@ -21,16 +20,16 @@ pub struct TranslateInit {
     pub offset: Vec3,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Translate object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `offset` given.
 pub struct Translate {
-    object: Arc<Hitable>,
+    object: Box<Hitable>,
     offset: Vec3,
 }
 
 impl Translate {
     /// Creates a new `Translate` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `offset` given.
-    pub fn new(object: Arc<Hitable>, offset: Vec3) -> Self {
+    pub fn new(object: Box<Hitable>, offset: Vec3) -> Self {
         Translate { object, offset }
     }
 

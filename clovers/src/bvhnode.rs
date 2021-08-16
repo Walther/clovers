@@ -1,6 +1,6 @@
 //! Bounding Volume Hierarchy Node.
 
-use std::{cmp::Ordering, sync::Arc};
+use std::cmp::Ordering;
 
 use rand::prelude::*;
 
@@ -14,12 +14,12 @@ use crate::{
 /// Bounding Volume Hierarchy Node.
 ///
 /// A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also BVHNodes. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BVHNode {
     /// Left child of the BVHNode
-    pub left: Arc<Hitable>,
+    pub left: Box<Hitable>,
     /// Right child of the BVHNode
-    pub right: Arc<Hitable>,
+    pub right: Box<Hitable>,
     /// Bounding box containing both of the child nodes
     pub bounding_box: AABB,
 }
@@ -27,14 +27,14 @@ pub struct BVHNode {
 impl BVHNode {
     /// Create a new BVHNode tree from a given list of [Objects](crate::objects::Object)
     pub fn from_list(
-        mut objects: Vec<Arc<Hitable>>,
+        mut objects: Vec<Hitable>,
         time_0: Float,
         time_1: Float,
         mut rng: ThreadRng,
     ) -> BVHNode {
         // Initialize two child nodes
-        let left: Arc<Hitable>;
-        let right: Arc<Hitable>;
+        let left: Box<Hitable>;
+        let right: Box<Hitable>;
 
         // Pick a random axis to create the split on
         // TODO: smarter algorithm?
@@ -49,19 +49,19 @@ impl BVHNode {
             // If we only have one object, create two child nodes with the same object.
             // We do not have an explicit leaf node in our tree.
             // TODO: this might not be smart, how to improve?
-            left = objects[0].clone();
-            right = objects[0].clone();
+            left = Box::new(objects[0].clone());
+            right = Box::new(objects[0].clone());
         } else if object_span == 2 {
             // If we are comparing two objects, perform the comparison
             // Insert the child nodes in order
             match comparator(&objects[0], &objects[1]) {
                 Ordering::Less => {
-                    left = objects[0].clone();
-                    right = objects[1].clone();
+                    left = Box::new(objects[0].clone());
+                    right = Box::new(objects[1].clone());
                 }
                 Ordering::Greater => {
-                    left = objects[1].clone();
-                    right = objects[0].clone();
+                    left = Box::new(objects[1].clone());
+                    right = Box::new(objects[0].clone());
                 }
                 Ordering::Equal => {
                     // TODO: what should happen here?
@@ -75,10 +75,10 @@ impl BVHNode {
             // Split the vector; divide and conquer
             let mid = object_span / 2;
             let objects_right = objects.split_off(mid);
-            left = Arc::new(Hitable::BVHNode(BVHNode::from_list(
+            left = Box::new(Hitable::BVHNode(BVHNode::from_list(
                 objects, time_0, time_1, rng,
             )));
-            right = Arc::new(Hitable::BVHNode(BVHNode::from_list(
+            right = Box::new(Hitable::BVHNode(BVHNode::from_list(
                 objects_right,
                 time_0,
                 time_1,

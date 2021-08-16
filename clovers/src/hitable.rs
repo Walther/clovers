@@ -15,8 +15,6 @@ use crate::{
 };
 use rand::prelude::*;
 
-use std::sync::Arc;
-
 /// Represents a ray-object intersection, with plenty of data about the intersection.
 #[derive(Debug)]
 pub struct HitRecord<'a> {
@@ -51,7 +49,7 @@ impl<'a> HitRecord<'a> {
 /// An abstraction for things that can be hit by [Rays](crate::ray::Ray).
 ///
 /// TODO: ideally, for cleaner abstraction, this could be a Trait. However, the performance implications might need deeper investigation and consideration...
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Hitable {
     Boxy(Boxy),
     ConstantMedium(ConstantMedium),
@@ -139,11 +137,11 @@ impl Hitable {
 }
 
 /// Helper struct for storing multiple `Hitable` objects. This list has a `Hitable` implementation too, returning the closest possible hit
-#[derive(Debug)]
-pub struct HitableList(pub Vec<Arc<Hitable>>);
+#[derive(Debug, Clone)]
+pub struct HitableList(pub Vec<Hitable>);
 
-impl From<Vec<Arc<Hitable>>> for HitableList {
-    fn from(v: Vec<Arc<Hitable>>) -> Self {
+impl From<Vec<Hitable>> for HitableList {
+    fn from(v: Vec<Hitable>) -> Self {
         HitableList(v)
     }
 }
@@ -224,7 +222,7 @@ impl HitableList {
     }
 
     pub fn add(&mut self, object: Hitable) {
-        self.0.push(Arc::new(object));
+        self.0.push(object);
     }
 
     pub fn into_bvh(self, time_0: Float, time_1: Float, rng: ThreadRng) -> BVHNode {

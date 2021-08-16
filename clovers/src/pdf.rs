@@ -4,7 +4,6 @@
 
 use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Float, Vec3, PI};
 use rand::prelude::*;
-use std::sync::Arc;
 
 #[derive(Debug)]
 pub enum PDF<'a> {
@@ -81,16 +80,16 @@ impl<'a> HitablePDF<'a> {
 
 #[derive(Debug)]
 pub struct MixturePDF<'a> {
-    // Arc to prevent infinite size
-    pdf1: Arc<PDF<'a>>,
-    pdf2: Arc<PDF<'a>>,
+    // Box to prevent infinite size
+    pdf1: Box<PDF<'a>>,
+    pdf2: Box<PDF<'a>>,
 }
 
 impl<'a> MixturePDF<'a> {
     pub fn new(pdf1: PDF<'a>, pdf2: PDF<'a>) -> Self {
         MixturePDF {
-            pdf1: Arc::new(pdf1),
-            pdf2: Arc::new(pdf2),
+            pdf1: Box::new(pdf1),
+            pdf2: Box::new(pdf2),
         }
     }
 

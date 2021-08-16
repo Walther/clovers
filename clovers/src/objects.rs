@@ -2,7 +2,6 @@
 
 use crate::hitable::Hitable;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 
 pub mod boxy; // avoid keyword
 pub mod constant_medium;
@@ -64,12 +63,12 @@ impl From<Object> for Hitable {
             Object::RotateY(x) => {
                 let obj = *x.object;
                 let obj: Hitable = obj.into();
-                Hitable::RotateY(RotateY::new(Arc::new(obj), x.angle))
+                Hitable::RotateY(RotateY::new(Box::new(obj), x.angle))
             }
             Object::Translate(x) => {
                 let obj = *x.object;
                 let obj: Hitable = obj.into();
-                Hitable::Translate(Translate::new(Arc::new(obj), x.offset))
+                Hitable::Translate(Translate::new(Box::new(obj), x.offset))
             }
             Object::FlipFace(x) => {
                 let obj = *x.object;
@@ -79,7 +78,7 @@ impl From<Object> for Hitable {
             Object::ConstantMedium(x) => {
                 let obj = *x.boundary;
                 let obj: Hitable = obj.into();
-                Hitable::ConstantMedium(ConstantMedium::new(Arc::new(obj), x.density, x.texture))
+                Hitable::ConstantMedium(ConstantMedium::new(Box::new(obj), x.density, x.texture))
             }
         }
     }

@@ -10,7 +10,6 @@ use crate::{
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 
 /// BoxyInit structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
@@ -25,11 +24,11 @@ pub struct BoxyInit {
 }
 
 /// A box or a cuboid object: a parallelepiped with six rectangular faces. Named [Boxy] to avoid clashing with [Box].
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Boxy {
     corner_0: Vec3,
     corner_1: Vec3,
-    sides: Arc<HitableList>,
+    sides: Box<HitableList>,
     /// The material of the box
     pub material: Material,
 }
@@ -62,7 +61,7 @@ impl Boxy {
         Boxy {
             corner_0,
             corner_1,
-            sides: Arc::new(sides),
+            sides: Box::new(sides),
             material,
         }
     }

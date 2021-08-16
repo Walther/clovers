@@ -10,7 +10,7 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::*;
-use std::sync::Arc;
+use std::sync::Box;
 
 pub fn load<'a>(width: u32, height: u32, rng: ThreadRng) -> Scene<'a> {
     let time_0: Float = 0.0;
@@ -24,18 +24,18 @@ pub fn load<'a>(width: u32, height: u32, rng: ThreadRng) -> Scene<'a> {
         (Sphere::new(
             Vec3::new(0.0, -1000.0, 0.0),
             1000.0,
-            Arc::new(Lambertian::new(Arc::new(NoiseTexture::new(perlin, 4.0)))),
+            Box::new(Lambertian::new(Box::new(NoiseTexture::new(perlin, 4.0)))),
         )),
     );
     world.add(
         (Sphere::new(
             Vec3::new(0.0, 2.0, 0.0),
             2.0,
-            Arc::new(Lambertian::new(Arc::new(NoiseTexture::new(perlin2, 4.0)))),
+            Box::new(Lambertian::new(Box::new(NoiseTexture::new(perlin2, 4.0)))),
         )),
     );
 
-    let difflight: Arc<dyn Material> = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(
+    let difflight: Box<dyn Material> = Box::new(DiffuseLight::new(Box::new(SolidColor::new(
         Color::new(4.0, 4.0, 4.0),
     ))));
     world
