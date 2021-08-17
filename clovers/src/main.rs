@@ -39,20 +39,26 @@ struct Opts {
     /// Gamma correction value
     #[clap(short, long, default_value = "2.0")]
     gamma: Float,
+    /// Suppress most of the text output
+    #[clap(short, long)]
+    quiet: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
     let opts: Opts = Opts::parse();
 
-    println!("clovers 🍀    ray tracing in rust 🦀");
-    println!("width:        {}", opts.width);
-    println!("height:       {}", opts.height);
-    println!("samples:      {}", opts.samples);
-    println!("max depth:    {}", opts.max_depth);
-    let rays: u64 =
-        opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
-    println!("approx. rays: {}", rays);
-    println!(); // Empty line before progress bar
+    // Pretty printing output, unless in quiet mode
+    if !opts.quiet {
+        println!("clovers 🍀    ray tracing in rust 🦀");
+        println!("width:        {}", opts.width);
+        println!("height:       {}", opts.height);
+        println!("samples:      {}", opts.samples);
+        println!("max depth:    {}", opts.max_depth);
+        let rays: u64 =
+            opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
+        println!("approx. rays: {}", rays);
+        println!(); // Empty line before progress bar
+    }
 
     // Read the given scene file
     let file = File::open(opts.input)?;
@@ -66,6 +72,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         opts.samples,
         opts.max_depth,
         opts.gamma,
+        opts.quiet,
         scene,
     );
 
@@ -84,8 +91,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     // TODO: fix the coordinate system
 
     let duration = Instant::now() - start;
-    println!(); // Empty line after progress bar
-    println!("finished render in {}", format_duration(duration));
+
+    if !opts.quiet {
+        println!(); // Empty line after progress bar
+        println!("finished render in {}", format_duration(duration));
+    }
 
     // Write
     let target: String;

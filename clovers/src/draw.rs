@@ -1,5 +1,5 @@
 use crate::{color::Color, colorize::colorize, ray::Ray, scenes, Float};
-use indicatif::{ProgressBar, ProgressStyle};
+use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use rand::prelude::*;
 use rayon::prelude::*;
 use scenes::Scene;
@@ -11,15 +11,21 @@ pub fn draw(
     samples: u32,
     max_depth: u32,
     gamma: Float,
+    quiet: bool,
     scene: Scene,
 ) -> Vec<Color> {
     // Progress bar
     let pixels = (width * height) as u64;
     let bar = ProgressBar::new(pixels);
     bar.set_draw_delta(pixels / 1000);
-    bar.set_style(ProgressStyle::default_bar().template(
-        "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
-    ));
+
+    if quiet {
+        bar.set_draw_target(ProgressDrawTarget::hidden())
+    } else {
+        bar.set_style(ProgressStyle::default_bar().template(
+            "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
+        ));
+    }
 
     let black = Color::new(0.0, 0.0, 0.0);
     let mut pixelbuffer = vec![black; pixels as usize];
