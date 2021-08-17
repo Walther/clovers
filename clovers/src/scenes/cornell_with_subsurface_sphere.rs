@@ -10,7 +10,6 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::*;
-use std::sync::Arc;
 pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
@@ -35,7 +34,7 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     // blue subsurface reflection
     let blue_smoke = Sphere::new(Vec3::new(278.0, 278.0, 278.0), 120.0, Dielectric::new(1.5));
     let sphere2 = ConstantMedium::new(
-        Arc::new(blue_smoke),
+        Box::new(blue_smoke),
         0.2,
         SolidColor::new(Color::new(0.2, 0.4, 0.9)),
     );

@@ -8,7 +8,6 @@ use crate::{
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 
 use super::Object;
 
@@ -19,10 +18,10 @@ pub struct FlipFaceInit {
     pub object: Box<Object>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// An utility object that can be used to flip the face of the object. TODO: possibly deprecated?
 pub struct FlipFace {
-    object: Arc<Hitable>,
+    object: Box<Hitable>,
 }
 
 impl FlipFace {
@@ -31,7 +30,7 @@ impl FlipFace {
     /// Creates a new instance of a [FlipFace]
     pub fn new(object: Hitable) -> Self {
         FlipFace {
-            object: Arc::new(object),
+            object: Box::new(object),
         }
     }
 

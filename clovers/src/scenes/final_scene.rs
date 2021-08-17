@@ -16,7 +16,6 @@ use crate::{
     Vec3,
 };
 use rand::prelude::*;
-use std::sync::Arc;
 
 pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     let time_0: Float = 0.0;
@@ -83,14 +82,14 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     world.add(glass_sphere);
     let blue_smoke = Sphere::new(Vec3::new(360.0, 150.0, 145.0), 70.0, Dielectric::new(1.5));
     world.add(ConstantMedium::new(
-        Arc::new(blue_smoke),
+        Box::new(blue_smoke),
         0.2,
         SolidColor::new(Color::new(0.2, 0.4, 0.9)),
     ));
     // overall boundary sphere, big and misty inside
     let boundary2 = Sphere::new(Vec3::new(0.0, 0.0, 0.0), 5000.0, Dielectric::new(1.5));
     world.add(ConstantMedium::new(
-        Arc::new(boundary2),
+        Box::new(boundary2),
         0.0001,
         SolidColor::new(Color::new(1.0, 1.0, 1.0)),
     ));
@@ -120,8 +119,8 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     }
 
     world.add(Translate::new(
-        Arc::new(RotateY::new(
-            Arc::new(boxes2.into_bvh(time_0, time_1, rng)),
+        Box::new(RotateY::new(
+            Box::new(boxes2.into_bvh(time_0, time_1, rng)),
             15.0,
         )),
         Vec3::new(-100.0, 270.0, 395.0),

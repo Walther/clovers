@@ -11,8 +11,6 @@ use crate::{
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use std::sync::Arc;
-
 use super::Object;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -35,17 +33,17 @@ fn default_density() -> Float {
     // 1e9
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// ConstantMedium object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 pub struct ConstantMedium {
-    boundary: Arc<Hitable>,
+    boundary: Box<Hitable>,
     phase_function: Material,
     neg_inv_density: Float,
 }
 
 impl ConstantMedium {
     /// Creates a new [ConstantMedium] with a known size, shape and density.
-    pub fn new(boundary: Arc<Hitable>, density: Float, texture: Texture) -> Self {
+    pub fn new(boundary: Box<Hitable>, density: Float, texture: Texture) -> Self {
         ConstantMedium {
             boundary,
             phase_function: Material::Isotropic(Isotropic::new(texture)),

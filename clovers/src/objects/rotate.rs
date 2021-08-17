@@ -8,7 +8,6 @@ use crate::{
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 
 use super::Object;
 
@@ -21,10 +20,10 @@ pub struct RotateInit {
     pub angle: Float,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// RotateY object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
 pub struct RotateY {
-    object: Arc<Hitable>,
+    object: Box<Hitable>,
     sin_theta: Float,
     cos_theta: Float,
     bounding_box: Option<AABB>,
@@ -32,7 +31,7 @@ pub struct RotateY {
 
 impl RotateY {
     /// Creates a new `RotateY` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
-    pub fn new(object: Arc<Hitable>, angle: Float) -> Self {
+    pub fn new(object: Box<Hitable>, angle: Float) -> Self {
         // TODO: add proper time support
         let time_0: Float = 0.0;
         let time_1: Float = 1.0;
