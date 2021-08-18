@@ -42,6 +42,9 @@ pub fn draw(
             let (chunk_index, chunk) = chunks.next().unwrap();
             let scene_clone = scene.clone();
             let handle = s.spawn(move |_| {
+                // Initialize a thread-local random number generator
+                let rng = rand::thread_rng();
+
                 for pixel in 0..chunk_size {
                     let index = pixel + chunk_index * chunk_size;
                     // Enumerate gives us an usize, width and height are u32. perform conversions
@@ -53,9 +56,6 @@ pub fn draw(
                     let y = y as Float;
                     let width = width as Float;
                     let height = height as Float;
-
-                    // Initialize a thread-local random number generator
-                    let rng = rand::thread_rng();
 
                     // Initialize a mutable base color for the pixel
                     let mut color: Color = Color::new(0.0, 0.0, 0.0);
