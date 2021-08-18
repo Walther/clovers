@@ -16,7 +16,7 @@ path = "src/main.rs"
 [dependencies]
 # Required for everything
 nalgebra = { version = "0.23.1", features = ["serde-serialize"] }
-rayon = "1.5.0"
+crossbeam-utils = "0.8.5"
 rand = "0.7.3"
 serde = { version = "1.0.118", features = ["derive", "rc"] }
 serde_json = "1.0.60"

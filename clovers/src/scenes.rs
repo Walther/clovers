@@ -28,7 +28,7 @@ use std::io::prelude::*;
 // pub mod simple_light_lambertian;
 // pub mod two_spheres;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// A representation of the scene that is being rendered.
 pub struct Scene {
     /// Bounding-volume hierarchy of [Hitable] objects in the scene. This could, as currently written, be any [Hitable] - in practice, we place the root of the [BVHNode](crate::bvhnode::BVHNode) tree here.

@@ -1,7 +1,7 @@
 use crate::{color::Color, colorize::colorize, ray::Ray, scenes, Float};
+use crossbeam_utils::thread;
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use rand::prelude::*;
-use rayon::prelude::*;
 use scenes::Scene;
 
 /// The main drawing function, returns a Vec<Color> as a pixelbuffer.
@@ -28,42 +28,62 @@ pub fn draw(
     }
 
     let black = Color::new(0.0, 0.0, 0.0);
-    let mut pixelbuffer = vec![black; pixels as usize];
 
-    pixelbuffer
-        .par_iter_mut()
-        .enumerate()
-        .for_each(|(index, pixel)| {
-            // Enumerate gives us an usize, width and height are u32. perform conversions
-            let x = index % (width as usize);
-            let y = index / (width as usize);
+    // crossbeam attempt
+    // TODO: this is ugly, make it prettier
+    let num_threads = 16;
+    let mut pixelbuffer: Vec<Color> = vec![black; pixels as usize];
+    let chunk_size = pixelbuffer.len() / num_threads; // note be careful if it doesn't divide evenly
+    let mut chunks = pixelbuffer.chunks_mut(chunk_size).enumerate();
 
-            // Convert most of these to Floats
-            let x = x as Float;
-            let y = y as Float;
-            let width = width as Float;
-            let height = height as Float;
+    thread::scope(move |s| {
+        let mut handles = vec![];
+        for _ in 0..num_threads {
+            let (chunk_index, chunk) = chunks.next().unwrap();
+            let scene_clone = scene.clone();
+            let handle = s.spawn(move |_| {
+                for pixel in 0..chunk_size {
+                    let index = pixel + chunk_index * chunk_size;
+                    // Enumerate gives us an usize, width and height are u32. perform conversions
+                    let x = index % (width as usize);
+                    let y = index / (width as usize);
 
-            // Initialize a thread-local random number generator
-            let rng = rand::thread_rng();
+                    // Convert most of these to Floats
+                    let x = x as Float;
+                    let y = y as Float;
+                    let width = width as Float;
+                    let height = height as Float;
 
-            // Initialize a mutable base color for the pixel
-            let mut color: Color = Color::new(0.0, 0.0, 0.0);
+                    // Initialize a thread-local random number generator
+                    let rng = rand::thread_rng();
 
-            // Multisampling for antialiasing
-            for _sample in 0..samples {
-                if let Some(s) = sample(&scene, x, y, width, height, rng, max_depth) {
-                    color += s
+                    // Initialize a mutable base color for the pixel
+                    let mut color: Color = Color::new(0.0, 0.0, 0.0);
+
+                    // Multisampling for antialiasing
+                    for _sample in 0..samples {
+                        if let Some(s) = sample(&scene_clone, x, y, width, height, rng, max_depth) {
+                            color += s
+                        }
+                    }
+                    color /= samples as Float;
+
+                    // After multisampling, perform gamma correction and store final color into the pixel
+                    color = color.gamma_correction(gamma);
+                    chunk[pixel] = color;
+
+                    // can't increment progress bar; closures and moves again
+                    // bar.inc(1);
                 }
-            }
-            color /= samples as Float;
+            });
+            handles.push(handle);
+        }
 
-            // After multisampling, perform gamma correction and store final color into the pixel
-            color = color.gamma_correction(gamma);
-            *pixel = color;
-
-            bar.inc(1);
-        });
+        for handle in handles {
+            handle.join().expect("Thread panicked!");
+        }
+    })
+    .unwrap();
 
     pixelbuffer
 }
