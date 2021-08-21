@@ -31,6 +31,6 @@ indicatif = { version = "0.15.0", features = ["rayon"] }
 clap = { version = "3.0.0-beta.2" }
 toml = { version = "0.5.7" }
 spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu", features = ["glam"] }
-glam = { version = "0.17.0", default-features = false, features = ["libm"], optional = true }
+syn = "1.0.75"
 
 [dev-dependencies]

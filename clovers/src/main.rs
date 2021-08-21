@@ -71,28 +71,24 @@ fn main() -> Result<(), Box<dyn Error>> {
     let start = Instant::now();
 
     let pixelbuffer = match opts.gpu {
-        false => {
-            draw_cpu::draw(
-                opts.width,
-                opts.height,
-                opts.samples,
-                opts.max_depth,
-                opts.gamma,
-                opts.quiet,
-                scene,
-            );
-        }
-        true => {
-            draw_gpu::draw(
-                opts.width,
-                opts.height,
-                opts.samples,
-                opts.max_depth,
-                opts.gamma,
-                opts.quiet,
-                scene,
-            );
-        }
+        false => draw_cpu::draw(
+            opts.width,
+            opts.height,
+            opts.samples,
+            opts.max_depth,
+            opts.gamma,
+            opts.quiet,
+            scene,
+        ),
+        true => draw_gpu::draw(
+            opts.width,
+            opts.height,
+            opts.samples,
+            opts.max_depth,
+            opts.gamma,
+            opts.quiet,
+            scene,
+        ),
     };
 
     // Translate our internal pixelbuffer into an Image buffer
