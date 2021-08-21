@@ -10,8 +10,8 @@ use std::{error::Error, fs, time::Instant};
 
 // Internal imports
 use clovers::*;
-mod draw;
-use draw::draw;
+mod draw_cpu;
+mod draw_gpu;
 use scenes::Scene;
 
 // Configure CLI parameters
@@ -42,6 +42,9 @@ struct Opts {
     /// Suppress most of the text output
     #[clap(short, long)]
     quiet: bool,
+    /// Use the GPU draw process instead of CPU
+    #[clap(short, long)]
+    gpu: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -64,17 +67,33 @@ fn main() -> Result<(), Box<dyn Error>> {
     let file = File::open(opts.input)?;
     let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
 
-    // Note: live progress bar printed within draw
+    // Note: live progress bar printed within draw_cpu::draw
     let start = Instant::now();
-    let pixelbuffer = draw(
-        opts.width,
-        opts.height,
-        opts.samples,
-        opts.max_depth,
-        opts.gamma,
-        opts.quiet,
-        scene,
-    );
+
+    let pixelbuffer = match opts.gpu {
+        false => {
+            draw_cpu::draw(
+                opts.width,
+                opts.height,
+                opts.samples,
+                opts.max_depth,
+                opts.gamma,
+                opts.quiet,
+                scene,
+            );
+        }
+        true => {
+            draw_gpu::draw(
+                opts.width,
+                opts.height,
+                opts.samples,
+                opts.max_depth,
+                opts.gamma,
+                opts.quiet,
+                scene,
+            );
+        }
+    };
 
     // Translate our internal pixelbuffer into an Image buffer
     let width = opts.width;
