@@ -32,5 +32,8 @@ clap = { version = "3.0.0-beta.2" }
 toml = { version = "0.5.7" }
 spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu", features = ["glam"] }
 syn = "1.0.75"
+wgpu = "0.9.0"
+bytemuck = "1.7.2"
+futures = "0.3.16"
 
 [dev-dependencies]

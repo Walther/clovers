@@ -80,7 +80,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             opts.quiet,
             scene,
         ),
-        true => draw_gpu::draw(
+        true => futures::executor::block_on(draw_gpu::draw(
             opts.width,
             opts.height,
             opts.samples,
@@ -88,7 +88,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             opts.gamma,
             opts.quiet,
             scene,
-        ),
+        )),
     };
 
     // Translate our internal pixelbuffer into an Image buffer
