@@ -9,7 +9,7 @@
 // TODO: temporary during development
 #![allow(dead_code)]
 
-use std::{borrow::Cow, path::PathBuf};
+use std::{borrow::Cow, num::NonZeroU32, path::PathBuf};
 
 use clovers::{color::Color, scenes::Scene, Float};
 use spirv_std::glam::{vec4, Vec4};
@@ -89,6 +89,7 @@ fn create_pipeline(
 // END borrowed from rust-gpu
 
 use bytemuck::{Pod, Zeroable};
+use wgpu::{Extent3d, TextureAspect, TextureViewDescriptor};
 #[derive(Copy, Clone, Pod, Zeroable)]
 #[repr(C)]
 struct ShaderConstants {
@@ -125,7 +126,7 @@ pub async fn draw(
         ..Default::default()
     };
     // Create the logical device and command queue
-    let (device, queue) = adapter
+    let (device, _queue) = adapter
         .request_device(
             &wgpu::DeviceDescriptor {
                 label: None,
@@ -152,6 +153,7 @@ pub async fn draw(
     // TODO: this build step seems fairly messy, clean up?
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
     let crate_path = [manifest_dir, "src"].iter().copied().collect::<PathBuf>();
+    dbg!(&crate_path);
     let builder = SpirvBuilder::new(crate_path, "spirv-unknown-vulkan1.1")
         .print_metadata(MetadataPrintout::None);
 
@@ -179,28 +181,41 @@ pub async fn draw(
     let shader_binary = handle_compile_result(initial_result);
 
     // TODO: what do we need for actually running the shader?
-    let mut render_pipeline =
+    let render_pipeline =
         create_pipeline(&device, &pipeline_layout, swapchain_format, shader_binary);
-    let mut sc_desc = wgpu::SwapChainDescriptor {
-        usage: wgpu::TextureUsage::RENDER_ATTACHMENT,
-        format: swapchain_format,
-        width: width,
-        height: height,
-        present_mode: wgpu::PresentMode::Mailbox,
-    };
     let mut encoder =
         device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-    // TODO: i do not have a window and don't want one here
-    let mut surface = unsafe { instance.create_surface(&window) };
-    let swap_chain = device.create_swap_chain(&surface, &sc_desc);
-    let frame = swap_chain
-        .get_current_frame()
-        .expect("Failed to acquire next swap chain texture")
-        .output;
+    // TODO: copypasted from docs https://docs.rs/wgpu-types/0.10.0/wgpu_types/struct.TextureDescriptor.html
+    let texture_desc = wgpu::TextureDescriptor {
+        label: None,
+        size: Extent3d {
+            width: 100,
+            height: 60,
+            depth_or_array_layers: 2,
+        },
+        mip_level_count: 7,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D3,
+        format: wgpu::TextureFormat::Rgba8Sint,
+        usage: wgpu::TextureUsage::empty(),
+    };
+    let texture = device.create_texture(&texture_desc);
+    // TODO: complete guesses based on above?
+    let texture_view_desc = TextureViewDescriptor {
+        label: None,
+        format: Some(wgpu::TextureFormat::Rgba8Sint),
+        dimension: Some(wgpu::TextureViewDimension::D3),
+        aspect: TextureAspect::All,
+        base_mip_level: 1,
+        mip_level_count: NonZeroU32::new(7),
+        base_array_layer: 1,
+        array_layer_count: NonZeroU32::new(2),
+    };
+    let texture_view = texture.create_view(&texture_view_desc);
     let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
         label: None,
         color_attachments: &[wgpu::RenderPassColorAttachment {
-            view: &frame.view,
+            view: &texture_view,
             resolve_target: None,
             ops: wgpu::Operations {
                 load: wgpu::LoadOp::Clear(wgpu::Color::GREEN),
