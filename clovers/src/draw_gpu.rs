@@ -146,6 +146,9 @@ pub async fn draw(
     });
 
     // TODO:
+    let swapchain_format = wgpu::TextureFormat::Rgba32Float; // or other format?
+    let mut render_pipeline =
+        create_pipeline(&device, &pipeline_layout, swapchain_format, shader_binary);
 
     let pixels = (width * height) as u64;
     let black = Color::new(0.0, 0.0, 0.0);
