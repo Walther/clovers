@@ -1,42 +1,10 @@
-#![cfg_attr(
-    target_arch = "spirv",
-    no_std,
-    feature(register_attr),
-    register_attr(spirv)
-)]
-// spirv errors
-#![deny(warnings)]
-// TODO: temporary during development
-#![allow(dead_code)]
-
 use std::{borrow::Cow, num::NonZeroU32, path::PathBuf};
 
-use clovers::{color::Color, scenes::Scene, Float};
-use spirv_std::glam::{vec4, Vec4};
+// use crate::shaders::simple;
 
-#[cfg(not(target_arch = "spirv"))]
-use spirv_std::macros::spirv;
-
-#[spirv(fragment)]
-pub fn main_fs(output: &mut Vec4) {
-    *output = vec4(1.0, 0.0, 0.0, 1.0);
-}
-
-#[spirv(vertex)]
-pub fn main_vs(
-    #[spirv(vertex_index)] vert_id: i32,
-    #[spirv(position, invariant)] out_pos: &mut Vec4,
-) {
-    *out_pos = vec4(
-        (vert_id - 1) as f32,
-        ((vert_id & 1) * 2 - 1) as f32,
-        0.0,
-        1.0,
-    );
-}
-
+// renamed to prevent conflict
 #[cfg(not(any(target_os = "android", target_arch = "wasm32")))]
-mod shaders {
+mod loaded_shaders {
     #[allow(non_upper_case_globals)]
     pub const main_fs: &str = "main_fs";
     #[allow(non_upper_case_globals)]
@@ -56,7 +24,7 @@ fn create_pipeline(
         layout: Some(pipeline_layout),
         vertex: wgpu::VertexState {
             module: &module,
-            entry_point: shaders::main_vs,
+            entry_point: loaded_shaders::main_vs,
             buffers: &[],
         },
         primitive: wgpu::PrimitiveState {
@@ -76,7 +44,7 @@ fn create_pipeline(
         },
         fragment: Some(wgpu::FragmentState {
             module: &module,
-            entry_point: shaders::main_fs,
+            entry_point: loaded_shaders::main_fs,
             targets: &[wgpu::ColorTargetState {
                 format: swapchain_format,
                 blend: None,
@@ -89,6 +57,7 @@ fn create_pipeline(
 // END borrowed from rust-gpu
 
 use bytemuck::{Pod, Zeroable};
+use clovers::{color::Color, scenes::Scene, Float};
 use wgpu::{Extent3d, TextureAspect, TextureViewDescriptor};
 #[derive(Copy, Clone, Pod, Zeroable)]
 #[repr(C)]
@@ -152,7 +121,10 @@ pub async fn draw(
 
     // TODO: this build step seems fairly messy, clean up?
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let crate_path = [manifest_dir, "src"].iter().copied().collect::<PathBuf>();
+    let crate_path = [manifest_dir, "src", "shaders"]
+        .iter()
+        .copied()
+        .collect::<PathBuf>();
     dbg!(&crate_path);
     let builder = SpirvBuilder::new(crate_path, "spirv-unknown-vulkan1.1")
         .print_metadata(MetadataPrintout::None);

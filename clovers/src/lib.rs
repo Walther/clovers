@@ -81,6 +81,7 @@ pub mod perlin;
 pub mod random;
 pub mod ray;
 pub mod scenes;
+pub mod shaders;
 pub mod textures;
 
 // Handy aliases for internal use
