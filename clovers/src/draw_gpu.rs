@@ -44,6 +44,48 @@ mod shaders {
     pub const main_vs: &str = "main_vs";
 }
 
+fn create_pipeline(
+    device: &wgpu::Device,
+    pipeline_layout: &wgpu::PipelineLayout,
+    swapchain_format: wgpu::TextureFormat,
+    shader_binary: wgpu::ShaderModuleDescriptor<'_>,
+) -> wgpu::RenderPipeline {
+    let module = device.create_shader_module(&shader_binary);
+    device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        label: None,
+        layout: Some(pipeline_layout),
+        vertex: wgpu::VertexState {
+            module: &module,
+            entry_point: shaders::main_vs,
+            buffers: &[],
+        },
+        primitive: wgpu::PrimitiveState {
+            topology: wgpu::PrimitiveTopology::TriangleList,
+            strip_index_format: None,
+            front_face: wgpu::FrontFace::Ccw,
+            cull_mode: None,
+            clamp_depth: false,
+            polygon_mode: wgpu::PolygonMode::Fill,
+            conservative: false,
+        },
+        depth_stencil: None,
+        multisample: wgpu::MultisampleState {
+            count: 1,
+            mask: !0,
+            alpha_to_coverage_enabled: false,
+        },
+        fragment: Some(wgpu::FragmentState {
+            module: &module,
+            entry_point: shaders::main_fs,
+            targets: &[wgpu::ColorTargetState {
+                format: swapchain_format,
+                blend: None,
+                write_mask: wgpu::ColorWrite::ALL,
+            }],
+        }),
+    })
+}
+
 // use bytemuck::{Pod, Zeroable};
 // #[derive(Copy, Clone, Pod, Zeroable)]
 #[derive(Copy, Clone)]
@@ -66,11 +108,44 @@ pub async fn draw(
     _quiet: bool,
     _scene: Scene,
 ) -> Vec<Color> {
-    // TODO: implement this function!
-    // this needs to call the main_fs somehow?
-    // probably need to initialize a gpu context first too
+    // Initialize the GPU instance
+    let instance = wgpu::Instance::new(wgpu::BackendBit::VULKAN | wgpu::BackendBit::METAL);
+    let adapter = instance
+        .request_adapter(&wgpu::RequestAdapterOptions {
+            power_preference: wgpu::PowerPreference::default(),
+            // Do not request a drawing surface; headless mode
+            compatible_surface: None,
+        })
+        .await
+        .expect("Failed to find an appropriate adapter");
+    let features = wgpu::Features::PUSH_CONSTANTS;
+    let limits = wgpu::Limits {
+        max_push_constant_size: 256,
+        ..Default::default()
+    };
+    // Create the logical device and command queue
+    let (device, queue) = adapter
+        .request_device(
+            &wgpu::DeviceDescriptor {
+                label: None,
+                features,
+                limits,
+            },
+            None,
+        )
+        .await
+        .expect("Failed to create device");
+    // Load the shaders from disk
+    let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+        label: None,
+        bind_group_layouts: &[],
+        push_constant_ranges: &[wgpu::PushConstantRange {
+            stages: wgpu::ShaderStage::all(),
+            range: 0..std::mem::size_of::<ShaderConstants>() as u32,
+        }],
+    });
 
-    let _instance = wgpu::Instance::new(wgpu::BackendBit::VULKAN | wgpu::BackendBit::METAL);
+    // TODO:
 
     let pixels = (width * height) as u64;
     let black = Color::new(0.0, 0.0, 0.0);
