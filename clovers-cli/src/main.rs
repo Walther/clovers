@@ -18,7 +18,7 @@ use scenes::Scene;
 
 // Configure CLI parameters
 #[derive(Clap)]
-#[clap(version = "0.1.0", author = "Walther")]
+#[clap(version = "0.1.0", author = "Walther", name = "clovers")]
 struct Opts {
     /// Input filename / location
     #[clap(short, long)]

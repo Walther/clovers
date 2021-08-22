@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2018"
 publish = false
 
+[[bin]]
+name = "clovers"
+path = "src/main.rs"
+
 [dependencies]
 # Internal
 clovers = { path = "../clovers" }
