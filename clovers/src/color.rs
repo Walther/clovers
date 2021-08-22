@@ -3,9 +3,9 @@
 // TODO: more flexible colors?
 
 use crate::{Float, Vec3};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 
 /// RGB color based on three [Floats](crate::Float) values.
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]

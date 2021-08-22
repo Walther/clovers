@@ -26,7 +26,7 @@ impl AABB {
             let mut t0: Float = (self.min[a] - ray.origin[a]) * invd;
             let mut t1: Float = (self.max[a] - ray.origin[a]) * invd;
             if invd < 0.0 {
-                std::mem::swap(&mut t0, &mut t1);
+                core::mem::swap(&mut t0, &mut t1);
             }
             tmin = if t0 > tmin { t0 } else { tmin };
             tmax = if t1 < tmax { t1 } else { tmax };

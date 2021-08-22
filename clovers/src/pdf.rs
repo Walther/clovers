@@ -2,7 +2,7 @@
 
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
-use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Float, Vec3, PI};
+use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Box, Float, Vec3, PI};
 use rand::prelude::*;
 
 #[derive(Debug)]
