@@ -6,6 +6,7 @@
 use crate::{Float, Vec3};
 use rand::prelude::*;
 
+#[cfg(not(target_arch = "spirv"))]
 use core::fmt::Debug;
 
 // TODO: This might be currently oddly broken and resulting in overflowy surfaces
@@ -19,6 +20,7 @@ pub struct Perlin {
     perm_z: [usize; 256],
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl Debug for Perlin {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("perlin object")
