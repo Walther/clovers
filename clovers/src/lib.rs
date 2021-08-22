@@ -64,9 +64,10 @@
 #![allow(clippy::many_single_char_names)] // Lots of places with coordinates etc
 
 // no_std required for gpu accelerated rendering
-// #![no_std]
+#![no_std]
 extern crate alloc;
 pub use alloc::boxed::Box;
+pub use alloc::vec::Vec;
 
 // Externals
 use nalgebra::Vector3;

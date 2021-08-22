@@ -8,7 +8,7 @@ use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
     ray::Ray,
-    Box, Float,
+    Box, Float, Vec,
 };
 
 /// Bounding Volume Hierarchy Node.

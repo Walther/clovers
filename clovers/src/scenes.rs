@@ -6,7 +6,7 @@ use crate::{
     color::Color,
     hitable::{Hitable, HitableList},
     objects::Object,
-    Float,
+    Float, Vec,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
