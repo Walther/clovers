@@ -33,7 +33,8 @@ pub fn main_fs(
     let height = constants.height as f32;
     let a = x / width;
     let b = y / height;
-    *output = vec4(a, b, 0.0, 1.0);
+    let c = (x as u32 | y as u32) as f32;
+    *output = vec4(a, b, c, 1.0);
 }
 
 #[spirv(vertex)]
