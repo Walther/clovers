@@ -133,19 +133,21 @@ pub async fn draw(
         device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
     debug!("Encoder created");
 
+    let texture_size = Extent3d {
+        width,
+        height,
+        depth_or_array_layers: 1,
+    };
+
     // TODO: is this valid? mostly copypasted from docs https://docs.rs/wgpu-types/0.10.0/wgpu_types/struct.TextureDescriptor.html
     let texture_desc = wgpu::TextureDescriptor {
         label: None,
-        size: Extent3d {
-            width,
-            height,
-            depth_or_array_layers: 1,
-        },
+        size: texture_size,
         mip_level_count: 1,
         sample_count: 1,
         dimension: wgpu::TextureDimension::D3,
         format: wgpu::TextureFormat::Rgba8Sint, // TODO: rgbaf32 probably?
-        usage: wgpu::TextureUsage::RENDER_ATTACHMENT,
+        usage: wgpu::TextureUsage::RENDER_ATTACHMENT | wgpu::TextureUsage::COPY_SRC,
     };
     let texture = device.create_texture(&texture_desc);
     debug!("Texture created");
@@ -203,23 +205,6 @@ pub async fn draw(
         mapped_at_creation: false,
     });
 
-    let texture_extent = wgpu::Extent3d {
-        width: buffer_dimensions.width as u32,
-        height: buffer_dimensions.height as u32,
-        depth_or_array_layers: 1,
-    };
-
-    // The render pipeline renders data into this texture
-    let texture = device.create_texture(&wgpu::TextureDescriptor {
-        size: texture_extent,
-        mip_level_count: 1,
-        sample_count: 1,
-        dimension: wgpu::TextureDimension::D2,
-        format: wgpu::TextureFormat::Rgba8UnormSrgb, // TODO: rgbaf32 probably?
-        usage: wgpu::TextureUsage::RENDER_ATTACHMENT | wgpu::TextureUsage::COPY_SRC,
-        label: None,
-    });
-
     // Drop the render pass to prevent double mutable borrow on encoder
     drop(rpass);
 
@@ -241,7 +226,7 @@ pub async fn draw(
                 rows_per_image: None,
             },
         },
-        texture_extent,
+        texture_size,
     );
 
     // Note that we're not calling `.await` here.
