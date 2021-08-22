@@ -6,7 +6,7 @@ use clap::Clap;
 use env_logger::Env;
 use humantime::format_duration;
 use image::{ImageBuffer, Rgb, RgbImage};
-use log::debug;
+use log::{debug, info};
 use std::fs::File;
 use std::io::Read;
 use std::{error::Error, fs, time::Instant};
@@ -56,6 +56,13 @@ struct Opts {
 fn main() -> Result<(), Box<dyn Error>> {
     let opts: Opts = Opts::parse();
 
+    if opts.debug {
+        env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
+        debug!("Debug logging enabled");
+    } else {
+        env_logger::Builder::from_env(Env::default().default_filter_or("error")).init();
+    }
+
     // Pretty printing output, unless in quiet mode
     if !opts.quiet {
         println!("clovers 🍀    ray tracing in rust 🦀");
@@ -69,22 +76,19 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!(); // Empty line before progress bar
     }
 
-    if opts.debug {
-        env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
-        debug!("Debug logging enabled");
-    }
-
-    // Read the given scene file
+    info!("Reading the scene file");
     let mut file = File::open(opts.input)?;
     let mut contents: String = String::new();
     file.read_to_string(&mut contents)?;
+    info!("Parsing the scene file");
     let scene_file: SceneFile = serde_json::from_str(&contents)?;
+    info!("Initializing the scene");
     let scene: Scene = scenes::initialize(scene_file, opts.width, opts.height);
 
-    // Note: live progress bar printed within draw_cpu::draw
+    info!("Calling draw()");
     let start = Instant::now();
-
     let pixelbuffer = match opts.gpu {
+        // Note: live progress bar printed within draw_cpu::draw
         false => draw_cpu::draw(
             opts.width,
             opts.height,
@@ -104,8 +108,9 @@ fn main() -> Result<(), Box<dyn Error>> {
             scene,
         )),
     };
+    info!("Drawing a pixelbuffer finished");
 
-    // Translate our internal pixelbuffer into an Image buffer
+    info!("Converting pixelbuffer to an image");
     let width = opts.width;
     let height = opts.height;
     let mut img: RgbImage = ImageBuffer::new(width, height);
@@ -123,10 +128,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     if !opts.quiet {
         println!(); // Empty line after progress bar
-        println!("finished render in {}", format_duration(duration));
+        info!("finished render in {}", format_duration(duration));
     }
 
-    // Write
+    info!("Writing an image file");
     let target: String;
     match opts.output {
         Some(filename) => {
@@ -140,7 +145,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     };
     img.save(target.to_string())?;
-    println!("output saved: {}", target);
+    info!("Image saved to {}", target);
+    println!("Image saved to: {}", target);
 
     Ok(())
 }
