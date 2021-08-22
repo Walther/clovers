@@ -1,10 +1,12 @@
-use std::{borrow::Cow, num::NonZeroU32, path::PathBuf};
+use bytemuck::{Pod, Zeroable};
+use clovers::{color::Color, scenes::Scene, Float};
+use log::debug;
+use spirv_builder::{Capability, MetadataPrintout, SpirvBuilder};
+use std::{borrow::Cow, mem::size_of, path::PathBuf};
+use wgpu::{Extent3d, TextureAspect, TextureViewDescriptor};
 
-// use crate::shaders::simple;
-
-// renamed to prevent conflict
 #[cfg(not(any(target_os = "android", target_arch = "wasm32")))]
-mod loaded_shaders {
+mod shaders {
     #[allow(non_upper_case_globals)]
     pub const main_fs: &str = "main_fs";
     #[allow(non_upper_case_globals)]
@@ -12,6 +14,7 @@ mod loaded_shaders {
 }
 
 // TODO: borrowed from rust-gpu
+// TODO: is this needed? could this be improved?
 fn create_pipeline(
     device: &wgpu::Device,
     pipeline_layout: &wgpu::PipelineLayout,
@@ -24,7 +27,7 @@ fn create_pipeline(
         layout: Some(pipeline_layout),
         vertex: wgpu::VertexState {
             module: &module,
-            entry_point: loaded_shaders::main_vs,
+            entry_point: shaders::main_vs,
             buffers: &[],
         },
         primitive: wgpu::PrimitiveState {
@@ -44,7 +47,7 @@ fn create_pipeline(
         },
         fragment: Some(wgpu::FragmentState {
             module: &module,
-            entry_point: loaded_shaders::main_fs,
+            entry_point: shaders::main_fs,
             targets: &[wgpu::ColorTargetState {
                 format: swapchain_format,
                 blend: None,
@@ -53,28 +56,25 @@ fn create_pipeline(
         }),
     })
 }
-
 // END borrowed from rust-gpu
 
-use bytemuck::{Pod, Zeroable};
-use clovers::{color::Color, scenes::Scene, Float};
-use wgpu::{Extent3d, TextureAspect, TextureViewDescriptor};
 #[derive(Copy, Clone, Pod, Zeroable)]
 #[repr(C)]
 struct ShaderConstants {
-    pub width: u32,
-    pub height: u32,
-    pub samples: u32,
-    pub max_depth: u32,
-    pub time: f32,
+    // TODO: actual shader constants
+// pub width: u32,
+// pub height: u32,
+// pub samples: u32,
+// pub max_depth: u32,
+// pub time: f32,
 }
 
 /// The main drawing function, returns a Vec<Color> as a pixelbuffer.
 pub async fn draw(
     width: u32,
     height: u32,
-    samples: u32,
-    max_depth: u32,
+    _samples: u32,
+    _max_depth: u32,
     _gamma: Float,
     _quiet: bool,
     _scene: Scene,
@@ -117,78 +117,56 @@ pub async fn draw(
     });
 
     // TODO: which format to use?
-    let swapchain_format = wgpu::TextureFormat::Rgba32Float;
+    let swapchain_format = wgpu::TextureFormat::Rgba8Sint; // TODO: rgbaf32 probably?
 
-    // TODO: this build step seems fairly messy, clean up?
-    let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let crate_path = [manifest_dir, "src", "shaders"]
-        .iter()
-        .copied()
-        .collect::<PathBuf>();
-    dbg!(&crate_path);
-    let builder = SpirvBuilder::new(crate_path, "spirv-unknown-vulkan1.1")
-        .print_metadata(MetadataPrintout::None);
-
-    use spirv_builder::{CompileResult, MetadataPrintout, SpirvBuilder};
-    let initial_result = builder.build().unwrap();
-
-    fn handle_compile_result(
-        compile_result: CompileResult,
-    ) -> wgpu::ShaderModuleDescriptor<'static> {
-        let module_path = compile_result.module.unwrap_single();
-        let data = std::fs::read(module_path).unwrap();
-        let spirv = wgpu::util::make_spirv(&data);
-        let spirv = match spirv {
-            wgpu::ShaderSource::Wgsl(cow) => wgpu::ShaderSource::Wgsl(Cow::Owned(cow.into_owned())),
-            wgpu::ShaderSource::SpirV(cow) => {
-                wgpu::ShaderSource::SpirV(Cow::Owned(cow.into_owned()))
-            }
-        };
-        wgpu::ShaderModuleDescriptor {
-            label: None,
-            source: spirv,
-            flags: wgpu::ShaderFlags::default(),
-        }
-    }
-    let shader_binary = handle_compile_result(initial_result);
+    // TODO: build shaders at build time, not at runtime
+    let shader_mod_desc = load_shader_module_desc();
+    debug!("Shader loaded");
+    let _shader_mod = device.create_shader_module(&shader_mod_desc);
+    debug!("Shader module created");
 
     // TODO: what do we need for actually running the shader?
     let render_pipeline =
-        create_pipeline(&device, &pipeline_layout, swapchain_format, shader_binary);
+        create_pipeline(&device, &pipeline_layout, swapchain_format, shader_mod_desc);
+    debug!("Pipeline created");
     let mut encoder =
         device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-    // TODO: copypasted from docs https://docs.rs/wgpu-types/0.10.0/wgpu_types/struct.TextureDescriptor.html
+    debug!("Encoder created");
+
+    // TODO: is this valid? mostly copypasted from docs https://docs.rs/wgpu-types/0.10.0/wgpu_types/struct.TextureDescriptor.html
     let texture_desc = wgpu::TextureDescriptor {
         label: None,
         size: Extent3d {
-            width: 100,
-            height: 60,
-            depth_or_array_layers: 2,
+            width,
+            height,
+            depth_or_array_layers: 1,
         },
-        mip_level_count: 7,
+        mip_level_count: 1,
         sample_count: 1,
         dimension: wgpu::TextureDimension::D3,
-        format: wgpu::TextureFormat::Rgba8Sint,
-        usage: wgpu::TextureUsage::empty(),
+        format: wgpu::TextureFormat::Rgba8Sint, // TODO: rgbaf32 probably?
+        usage: wgpu::TextureUsage::RENDER_ATTACHMENT,
     };
     let texture = device.create_texture(&texture_desc);
-    // TODO: complete guesses based on above?
+    debug!("Texture created");
+    // TODO: is this valid? these are complete guesses based on above
     let texture_view_desc = TextureViewDescriptor {
         label: None,
-        format: Some(wgpu::TextureFormat::Rgba8Sint),
+        format: Some(wgpu::TextureFormat::Rgba8Sint), // TODO: rgbaf32 probably?
         dimension: Some(wgpu::TextureViewDimension::D3),
         aspect: TextureAspect::All,
-        base_mip_level: 1,
-        mip_level_count: NonZeroU32::new(7),
-        base_array_layer: 1,
-        array_layer_count: NonZeroU32::new(2),
+        base_mip_level: Default::default(),
+        mip_level_count: Default::default(),
+        base_array_layer: Default::default(),
+        array_layer_count: Default::default(),
     };
     let texture_view = texture.create_view(&texture_view_desc);
+    debug!("Texture view created");
     let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
         label: None,
         color_attachments: &[wgpu::RenderPassColorAttachment {
             view: &texture_view,
-            resolve_target: None,
+            resolve_target: Default::default(),
             ops: wgpu::Operations {
                 load: wgpu::LoadOp::Clear(wgpu::Color::GREEN),
                 store: true,
@@ -196,29 +174,175 @@ pub async fn draw(
         }],
         depth_stencil_attachment: None,
     });
+    debug!("Render pass created");
 
-    // TODO: placeholder constants
-    let time = 0.0;
-    let push_constants = ShaderConstants {
-        width,
-        height,
-        samples,
-        max_depth,
-        time,
-    };
+    // TODO: use actual shader constants
+    let push_constants = ShaderConstants {};
 
     rpass.set_pipeline(&render_pipeline);
+    debug!("Render pipeline set");
     rpass.set_push_constants(
         wgpu::ShaderStage::all(),
         0,
         bytemuck::bytes_of(&push_constants),
     );
+    debug!("Shader constants pushed");
     rpass.draw(0..3, 0..1);
-    // TODO: return the actual results
+    debug!("Draw called");
+
+    // Start getting the results from the draw
+    // Heavily based on https://github.com/gfx-rs/wgpu/blob/v0.9/wgpu/examples/capture/main.rs
+    // TODO: simplify where possible
+
+    let buffer_dimensions = BufferDimensions::new(width as usize, height as usize);
+    // The output buffer lets us retrieve the data as an array
+    let output_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+        label: None,
+        size: (buffer_dimensions.padded_bytes_per_row * buffer_dimensions.height) as u64,
+        usage: wgpu::BufferUsage::MAP_READ | wgpu::BufferUsage::COPY_DST,
+        mapped_at_creation: false,
+    });
+
+    let texture_extent = wgpu::Extent3d {
+        width: buffer_dimensions.width as u32,
+        height: buffer_dimensions.height as u32,
+        depth_or_array_layers: 1,
+    };
+
+    // The render pipeline renders data into this texture
+    let texture = device.create_texture(&wgpu::TextureDescriptor {
+        size: texture_extent,
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
+        format: wgpu::TextureFormat::Rgba8UnormSrgb, // TODO: rgbaf32 probably?
+        usage: wgpu::TextureUsage::RENDER_ATTACHMENT | wgpu::TextureUsage::COPY_SRC,
+        label: None,
+    });
+
+    // Drop the render pass to prevent double mutable borrow on encoder
+    drop(rpass);
+
+    // Copy the texture into a buffer, as they are separate concepts in wgpu
+    encoder.copy_texture_to_buffer(
+        wgpu::ImageCopyTexture {
+            texture: &texture,
+            mip_level: 0,
+            origin: wgpu::Origin3d::ZERO,
+        },
+        wgpu::ImageCopyBuffer {
+            buffer: &output_buffer,
+            layout: wgpu::ImageDataLayout {
+                offset: 0,
+                bytes_per_row: Some(
+                    std::num::NonZeroU32::new(buffer_dimensions.padded_bytes_per_row as u32)
+                        .unwrap(),
+                ),
+                rows_per_image: None,
+            },
+        },
+        texture_extent,
+    );
+
+    // Note that we're not calling `.await` here.
+    let buffer_slice = output_buffer.slice(..);
+    let buffer_future = buffer_slice.map_async(wgpu::MapMode::Read);
+
+    // Poll the device in a blocking manner so that our future resolves.
+    // In an actual application, `device.poll(...)` should
+    // be called in an event loop or on another thread.
+    device.poll(wgpu::Maintain::Wait);
+
+    let mut pixelbuffer: Vec<Color> = vec![];
+
+    if let Ok(()) = buffer_future.await {
+        debug!("Writing the pixelbuffer");
+        let padded_buffer = buffer_slice.get_mapped_range();
+        // from the padded_buffer we write just the unpadded bytes into the image
+        for chunk in padded_buffer.chunks(buffer_dimensions.padded_bytes_per_row) {
+            let row = &chunk[..buffer_dimensions.unpadded_bytes_per_row];
+            // currently rgba8, we care about rgb only
+            // TODO: use a f32 format instead so no need for conversions
+            for pixel in row.chunks(4) {
+                let r = u8_to_float(pixel[0]);
+                let g = u8_to_float(pixel[1]);
+                let b = u8_to_float(pixel[2]);
+                let _a = u8_to_float(pixel[3]);
+                let color = Color::new(r, g, b);
+                pixelbuffer.push(color);
+            }
+        }
+    }
+
+    // Drop the GPU instance
+    drop(instance);
 
     // TODO: placeholder return
-    let pixels = (width * height) as u64;
-    let black = Color::new(0.0, 0.0, 0.0);
-    let pixelbuffer: Vec<Color> = vec![black; pixels as usize];
+    // let pixels = (width * height) as u64;
+    // let black = Color::new(0.0, 0.0, 0.0);
+    // let pixelbuffer: Vec<Color> = vec![black; pixels as usize];
+    debug!("Returning pixelbuffer");
     pixelbuffer
+}
+
+fn u8_to_float(byte: u8) -> Float {
+    // byte is 0-255
+    // make it into a float 0.0-1.0
+    let float = byte as Float / 255.0;
+    float
+}
+
+// TODO: adapted from https://github.com/mitchmindtree/nannou-rustgpu-raytracer
+// TODO: figure out if needed / could be simplified / etc
+// TODO: compile shaders at build time, not at run time
+fn load_shader_module_desc() -> wgpu::ShaderModuleDescriptor<'static> {
+    let manifest_dir = env!("CARGO_MANIFEST_DIR");
+    let crate_path = [manifest_dir, "..", "clovers-gpu", "shaders"]
+        .iter()
+        .copied()
+        .collect::<PathBuf>();
+    let compile_result = SpirvBuilder::new(crate_path, "spirv-unknown-vulkan1.1")
+        .print_metadata(MetadataPrintout::None)
+        // Seems to be needed to handle conditions within functions?
+        // Error was confusing but adding this worked.
+        .capability(Capability::Int8)
+        .build()
+        .unwrap();
+    let module_path = compile_result.module.unwrap_single();
+    let data = std::fs::read(module_path).unwrap();
+    let spirv = wgpu::util::make_spirv(&data);
+    let spirv = match spirv {
+        wgpu::ShaderSource::Wgsl(cow) => wgpu::ShaderSource::Wgsl(Cow::Owned(cow.into_owned())),
+        wgpu::ShaderSource::SpirV(cow) => wgpu::ShaderSource::SpirV(Cow::Owned(cow.into_owned())),
+    };
+    wgpu::ShaderModuleDescriptor {
+        label: Some("clovers-shader"),
+        source: spirv,
+        flags: wgpu::ShaderFlags::default(),
+    }
+}
+
+// TODO: adapted from https://github.com/gfx-rs/wgpu/blob/v0.9/wgpu/examples/capture/main.rs
+// TODO: figure out if needed etc
+struct BufferDimensions {
+    width: usize,
+    height: usize,
+    unpadded_bytes_per_row: usize,
+    padded_bytes_per_row: usize,
+}
+
+impl BufferDimensions {
+    fn new(width: usize, height: usize) -> Self {
+        let bytes_per_pixel = size_of::<u32>();
+        let unpadded_bytes_per_row = width * bytes_per_pixel;
+        let align = wgpu::COPY_BYTES_PER_ROW_ALIGNMENT as usize;
+        let padded_bytes_per_row_padding = (align - unpadded_bytes_per_row % align) % align;
+        let padded_bytes_per_row = unpadded_bytes_per_row + padded_bytes_per_row_padding;
+        Self {
+            width,
+            height,
+            unpadded_bytes_per_row,
+            padded_bytes_per_row,
+        }
+    }
 }

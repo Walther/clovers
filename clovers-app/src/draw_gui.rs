@@ -67,7 +67,7 @@ pub fn draw_gui(
 
             // Resize the window
             if let Some(size) = input.window_resized() {
-                pixels.resize(size.width, size.height);
+                pixels.resize_surface(size.width, size.height);
             }
 
             // Update internal state and request a redraw

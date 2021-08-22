@@ -3,8 +3,10 @@
 // External imports
 use chrono::Utc;
 use clap::Clap;
+use env_logger::Env;
 use humantime::format_duration;
 use image::{ImageBuffer, Rgb, RgbImage};
+use log::debug;
 use std::fs::File;
 use std::{error::Error, fs, time::Instant};
 
@@ -43,8 +45,11 @@ struct Opts {
     #[clap(short, long)]
     quiet: bool,
     /// Use the GPU draw process instead of CPU
-    #[clap(short, long)]
+    #[clap(long)]
     gpu: bool,
+    /// Enable some debug logging
+    #[clap(long)]
+    debug: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -61,6 +66,11 @@ fn main() -> Result<(), Box<dyn Error>> {
             opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
         println!("approx. rays: {}", rays);
         println!(); // Empty line before progress bar
+    }
+
+    if opts.debug {
+        env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
+        debug!("Debug logging enabled");
     }
 
     // Read the given scene file
