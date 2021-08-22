@@ -60,24 +60,23 @@ fn create_pipeline(
 
 #[derive(Copy, Clone, Pod, Zeroable)]
 #[repr(C)]
-struct ShaderConstants {
-    // TODO: actual shader constants
-// pub width: u32,
-// pub height: u32,
-// pub samples: u32,
-// pub max_depth: u32,
-// pub time: f32,
+pub struct ShaderConstants {
+    pub width: u32,
+    pub height: u32,
+    pub samples: u32,
+    pub max_depth: u32,
+    pub time: f32,
 }
 
 /// The main drawing function, returns a Vec<Color> as a pixelbuffer.
 pub async fn draw(
     width: u32,
     height: u32,
-    _samples: u32,
-    _max_depth: u32,
-    _gamma: Float,
-    _quiet: bool,
-    _scene: Scene,
+    samples: u32,
+    max_depth: u32,
+    gamma: Float,
+    quiet: bool,
+    scene: Scene,
 ) -> Vec<Color> {
     // Initialize the GPU instance
     let instance = wgpu::Instance::new(wgpu::BackendBit::VULKAN | wgpu::BackendBit::METAL);
@@ -117,7 +116,7 @@ pub async fn draw(
     });
 
     // TODO: which format to use?
-    let swapchain_format = wgpu::TextureFormat::Rgba8Sint; // TODO: rgbaf32 probably?
+    let swapchain_format = wgpu::TextureFormat::Rgba32Float;
 
     // TODO: build shaders at build time, not at runtime
     let shader_mod_desc = load_shader_module_desc();
@@ -146,7 +145,7 @@ pub async fn draw(
         mip_level_count: 1,
         sample_count: 1,
         dimension: wgpu::TextureDimension::D3,
-        format: wgpu::TextureFormat::Rgba8Sint, // TODO: rgbaf32 probably?
+        format: wgpu::TextureFormat::Rgba32Float,
         usage: wgpu::TextureUsage::RENDER_ATTACHMENT | wgpu::TextureUsage::COPY_SRC,
     };
     let texture = device.create_texture(&texture_desc);
@@ -154,7 +153,7 @@ pub async fn draw(
     // TODO: is this valid? these are complete guesses based on above
     let texture_view_desc = TextureViewDescriptor {
         label: None,
-        format: Some(wgpu::TextureFormat::Rgba8Sint), // TODO: rgbaf32 probably?
+        format: Some(wgpu::TextureFormat::Rgba32Float),
         dimension: Some(wgpu::TextureViewDimension::D3),
         aspect: TextureAspect::All,
         base_mip_level: Default::default(),
@@ -178,8 +177,14 @@ pub async fn draw(
     });
     debug!("Render pass created");
 
-    // TODO: use actual shader constants
-    let push_constants = ShaderConstants {};
+    let time = 0.0;
+    let push_constants = ShaderConstants {
+        width,
+        height,
+        samples,
+        max_depth,
+        time,
+    };
 
     rpass.set_pipeline(&render_pipeline);
     debug!("Render pipeline set");
@@ -248,13 +253,12 @@ pub async fn draw(
         // from the padded_buffer we write just the unpadded bytes into the image
         for chunk in padded_buffer.chunks(buffer_dimensions.padded_bytes_per_row) {
             let row = &chunk[..buffer_dimensions.unpadded_bytes_per_row];
-            // currently rgba8, we care about rgb only
-            // TODO: use a f32 format instead so no need for conversions
-            for pixel in row.chunks(4) {
-                let r = u8_to_float(pixel[0]);
-                let g = u8_to_float(pixel[1]);
-                let b = u8_to_float(pixel[2]);
-                let _a = u8_to_float(pixel[3]);
+            // TODO: infomercial voice: "there has to be a better way"
+            for pixel in row.chunks(4 * 4) {
+                let r = Float::from_ne_bytes([pixel[0], pixel[1], pixel[2], pixel[3]]);
+                let g = Float::from_ne_bytes([pixel[4], pixel[5], pixel[6], pixel[7]]);
+                let b = Float::from_ne_bytes([pixel[8], pixel[9], pixel[10], pixel[11]]);
+                let _a = Float::from_ne_bytes([pixel[12], pixel[13], pixel[14], pixel[15]]);
                 let color = Color::new(r, g, b);
                 pixelbuffer.push(color);
             }
@@ -270,13 +274,6 @@ pub async fn draw(
     // let pixelbuffer: Vec<Color> = vec![black; pixels as usize];
     debug!("Returning pixelbuffer");
     pixelbuffer
-}
-
-fn u8_to_float(byte: u8) -> Float {
-    // byte is 0-255
-    // make it into a float 0.0-1.0
-    let float = byte as Float / 255.0;
-    float
 }
 
 // TODO: adapted from https://github.com/mitchmindtree/nannou-rustgpu-raytracer
@@ -320,7 +317,7 @@ struct BufferDimensions {
 
 impl BufferDimensions {
     fn new(width: usize, height: usize) -> Self {
-        let bytes_per_pixel = size_of::<u32>();
+        let bytes_per_pixel = 4 * size_of::<Float>();
         let unpadded_bytes_per_row = width * bytes_per_pixel;
         let align = wgpu::COPY_BYTES_PER_ROW_ALIGNMENT as usize;
         let padded_bytes_per_row_padding = (align - unpadded_bytes_per_row % align) % align;
