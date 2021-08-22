@@ -309,6 +309,7 @@ fn load_shader_module_desc() -> wgpu::ShaderModuleDescriptor<'static> {
 // TODO: adapted from https://github.com/gfx-rs/wgpu/blob/v0.9/wgpu/examples/capture/main.rs
 // TODO: figure out if needed etc
 struct BufferDimensions {
+    #[allow(dead_code)] // TODO: remove, use the field?
     width: usize,
     height: usize,
     unpadded_bytes_per_row: usize,
