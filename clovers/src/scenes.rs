@@ -10,8 +10,6 @@ use crate::{
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::fs::File;
-use std::io::prelude::*;
 
 // TODO: convert these to json or other
 // pub mod cornell;
@@ -61,6 +59,7 @@ impl Scene {
     }
 }
 
+// TODO: better naming
 #[derive(Serialize, Deserialize, Debug)]
 /// A serialized representation of a [Scene].
 pub struct SceneFile {
@@ -72,11 +71,8 @@ pub struct SceneFile {
     priority_objects: Vec<Object>,
 }
 
-/// Initializes a new [Scene] instance by first parsing the contents of a file into a [SceneFile] structure and then using those details to construct the [Scene].
-pub fn initialize(mut file: File, width: u32, height: u32) -> Result<Scene, std::io::Error> {
-    let mut contents: String = String::new();
-    file.read_to_string(&mut contents)?;
-    let scene_file: SceneFile = serde_json::from_str(&contents)?;
+/// Initializes a new [Scene] instance by parsing the contents of a [SceneFile] structure and then using those details to construct the [Scene].
+pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     let time_0 = scene_file.time_0;
     let time_1 = scene_file.time_1;
     let rng = thread_rng();
@@ -102,7 +98,7 @@ pub fn initialize(mut file: File, width: u32, height: u32) -> Result<Scene, std:
         priority_objects.add(obj.into());
     }
 
-    Ok(Scene::new(
+    Scene::new(
         time_0,
         time_1,
         camera,
@@ -110,5 +106,5 @@ pub fn initialize(mut file: File, width: u32, height: u32) -> Result<Scene, std:
         priority_objects,
         background_color,
         rng,
-    ))
+    )
 }

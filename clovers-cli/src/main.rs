@@ -8,13 +8,14 @@ use humantime::format_duration;
 use image::{ImageBuffer, Rgb, RgbImage};
 use log::debug;
 use std::fs::File;
+use std::io::Read;
 use std::{error::Error, fs, time::Instant};
 
 // Internal imports
 use clovers::*;
 mod draw_cpu;
 mod draw_gpu;
-use scenes::Scene;
+use scenes::*;
 
 // Configure CLI parameters
 #[derive(Clap)]
@@ -74,8 +75,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     // Read the given scene file
-    let file = File::open(opts.input)?;
-    let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
+    let mut file = File::open(opts.input)?;
+    let mut contents: String = String::new();
+    file.read_to_string(&mut contents)?;
+    let scene_file: SceneFile = serde_json::from_str(&contents)?;
+    let scene: Scene = scenes::initialize(scene_file, opts.width, opts.height);
 
     // Note: live progress bar printed within draw_cpu::draw
     let start = Instant::now();
