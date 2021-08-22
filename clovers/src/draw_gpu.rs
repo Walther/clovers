@@ -95,7 +95,7 @@ pub async fn draw(
         ..Default::default()
     };
     // Create the logical device and command queue
-    let (device, _queue) = adapter
+    let (device, queue) = adapter
         .request_device(
             &wgpu::DeviceDescriptor {
                 label: None,
@@ -228,6 +228,8 @@ pub async fn draw(
         },
         texture_size,
     );
+
+    queue.submit(Some(encoder.finish()));
 
     // Note that we're not calling `.await` here.
     let buffer_slice = output_buffer.slice(..);
