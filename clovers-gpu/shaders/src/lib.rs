@@ -5,7 +5,6 @@
     feature(register_attr),
     register_attr(spirv)
 )]
-// spirv errors
 #![deny(warnings)]
 // TODO: temporary during development
 #![allow(clippy::all)]
@@ -29,7 +28,7 @@ pub fn main_fs(
 ) {
     let x = in_frag_coord.x;
     let y = in_frag_coord.y;
-    let width = constants.width as f32; // default: 1024
+    let width = constants.width as f32;
     let height = constants.height as f32;
     let a = x / width;
     let b = y / height;
