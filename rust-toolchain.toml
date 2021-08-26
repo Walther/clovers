@@ -1,4 +1,5 @@
 # Required for rust-gpu
+# TODO: would be nice if this wasn't required at root level, only where the gpu is used
 [toolchain]
 channel = "nightly-2021-08-10"
 components = ["rust-src", "rustc-dev", "llvm-tools-preview"]
