@@ -6,7 +6,8 @@
 use crate::{Float, Vec3};
 use rand::prelude::*;
 
-use std::fmt::Debug;
+#[cfg(not(target_arch = "spirv"))]
+use core::fmt::Debug;
 
 // TODO: This might be currently oddly broken and resulting in overflowy surfaces
 
@@ -19,8 +20,9 @@ pub struct Perlin {
     perm_z: [usize; 256],
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl Debug for Perlin {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("perlin object")
             .field("random_vectors", &"[]")
             .field("perm_y", &"[]")
@@ -72,10 +74,10 @@ fn perlin_interp(c: [[[Vec3; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Float 
 }
 
 impl Perlin {
-    pub fn new(mut rng: ThreadRng) -> Self {
+    pub fn new(rng: ThreadRng) -> Self {
         let mut random_vectors: [Vec3; 256] = [Vec3::new(0.0, 0.0, 0.0); 256];
         for i in 0..256 {
-            random_vectors[i] = rng.gen::<Vec3>();
+            random_vectors[i] = Vec3::new_random();
         }
 
         let perm_x = perlin_generate_perm(rng);

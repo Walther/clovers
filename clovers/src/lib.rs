@@ -63,8 +63,14 @@
 // TODO:
 #![allow(clippy::many_single_char_names)] // Lots of places with coordinates etc
 
+// no_std required for gpu accelerated rendering
+#![no_std]
+extern crate alloc;
+pub use alloc::boxed::Box;
+pub use alloc::vec::Vec;
+
 // Externals
-use nalgebra::Vector3;
+use nalgebra::base::Vector3;
 
 // Internals
 pub mod aabb;
@@ -88,7 +94,7 @@ pub mod textures;
 /// Internal type alias: this allows the crate to easily switch between float precision without modifying a lot of files.
 pub type Float = f32;
 /// Internal helper: re-exports the pi constant as our internal [Float] type. TODO: selectable at run time instead of build time?
-pub const PI: Float = std::f32::consts::PI;
+pub const PI: Float = core::f32::consts::PI;
 /// Internal type alias: a nalgebra [Vector3](nalgebra::Vector3) which is a vector with three dimensions, containing three of our internal [Float] types
 pub type Vec3 = Vector3<Float>;
 /// Internal const: epsilon used for avoiding "shadow acne". See e.g. [Raytracing In One Weekend](https://raytracing.github.io/)

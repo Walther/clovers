@@ -3,20 +3,23 @@
 // External imports
 use chrono::Utc;
 use clap::Clap;
+use env_logger::Env;
 use humantime::format_duration;
 use image::{ImageBuffer, Rgb, RgbImage};
+use log::{debug, info};
 use std::fs::File;
+use std::io::Read;
 use std::{error::Error, fs, time::Instant};
 
 // Internal imports
 use clovers::*;
-mod draw;
-use draw::draw;
-use scenes::Scene;
+mod draw_cpu;
+mod draw_gpu;
+use scenes::*;
 
 // Configure CLI parameters
 #[derive(Clap)]
-#[clap(version = "0.1.0", author = "Walther")]
+#[clap(version = "0.1.0", author = "Walther", name = "clovers")]
 struct Opts {
     /// Input filename / location
     #[clap(short, long)]
@@ -42,10 +45,23 @@ struct Opts {
     /// Suppress most of the text output
     #[clap(short, long)]
     quiet: bool,
+    /// Use the GPU draw process instead of CPU
+    #[clap(long)]
+    gpu: bool,
+    /// Enable some debug logging
+    #[clap(long)]
+    debug: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
     let opts: Opts = Opts::parse();
+
+    if opts.debug {
+        env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
+        debug!("Debug logging enabled");
+    } else {
+        env_logger::Builder::from_env(Env::default().default_filter_or("error")).init();
+    }
 
     // Pretty printing output, unless in quiet mode
     if !opts.quiet {
@@ -60,23 +76,41 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!(); // Empty line before progress bar
     }
 
-    // Read the given scene file
-    let file = File::open(opts.input)?;
-    let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
+    info!("Reading the scene file");
+    let mut file = File::open(opts.input)?;
+    let mut contents: String = String::new();
+    file.read_to_string(&mut contents)?;
+    info!("Parsing the scene file");
+    let scene_file: SceneFile = serde_json::from_str(&contents)?;
+    info!("Initializing the scene");
+    let scene: Scene = scenes::initialize(scene_file, opts.width, opts.height);
 
-    // Note: live progress bar printed within draw
+    info!("Calling draw()");
     let start = Instant::now();
-    let pixelbuffer = draw(
-        opts.width,
-        opts.height,
-        opts.samples,
-        opts.max_depth,
-        opts.gamma,
-        opts.quiet,
-        scene,
-    );
+    let pixelbuffer = match opts.gpu {
+        // Note: live progress bar printed within draw_cpu::draw
+        false => draw_cpu::draw(
+            opts.width,
+            opts.height,
+            opts.samples,
+            opts.max_depth,
+            opts.gamma,
+            opts.quiet,
+            scene,
+        ),
+        true => futures::executor::block_on(draw_gpu::draw(
+            opts.width,
+            opts.height,
+            opts.samples,
+            opts.max_depth,
+            opts.gamma,
+            opts.quiet,
+            scene,
+        )),
+    };
+    info!("Drawing a pixelbuffer finished");
 
-    // Translate our internal pixelbuffer into an Image buffer
+    info!("Converting pixelbuffer to an image");
     let width = opts.width;
     let height = opts.height;
     let mut img: RgbImage = ImageBuffer::new(width, height);
@@ -94,10 +128,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     if !opts.quiet {
         println!(); // Empty line after progress bar
-        println!("finished render in {}", format_duration(duration));
+        info!("Finished render in {}", format_duration(duration));
+        println!("Finished render in {}", format_duration(duration));
     }
 
-    // Write
+    info!("Writing an image file");
     let target: String;
     match opts.output {
         Some(filename) => {
@@ -111,7 +146,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     };
     img.save(target.to_string())?;
-    println!("output saved: {}", target);
+    info!("Image saved to {}", target);
+    println!("Image saved to: {}", target);
 
     Ok(())
 }

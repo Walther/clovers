@@ -6,7 +6,7 @@ use crate::{
     materials::{isotropic::Isotropic, Material},
     ray::Ray,
     textures::Texture,
-    Float, Vec3, EPSILON_CONSTANT_MEDIUM,
+    Box, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};

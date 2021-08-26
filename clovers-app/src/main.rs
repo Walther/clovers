@@ -7,12 +7,13 @@
 use clap::Clap;
 use std::error::Error;
 use std::fs::File;
+use std::io::Read;
 
 // Internal imports
 use clovers::*;
 mod draw_gui;
 use draw_gui::draw_gui;
-use scenes::Scene;
+use scenes::*;
 
 // Configure CLI parameters
 #[derive(Clap)]
@@ -55,8 +56,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!(); // Empty line before progress bar
 
     // Read the given scene file
-    let file = File::open(opts.input)?;
-    let scene: Scene = scenes::initialize(file, opts.width, opts.height)?;
+    let mut file = File::open(opts.input)?;
+    let mut contents: String = String::new();
+    file.read_to_string(&mut contents)?;
+    let scene_file: SceneFile = serde_json::from_str(&contents)?;
+    let scene: Scene = scenes::initialize(scene_file, opts.width, opts.height);
 
     // gui version
     let _result = draw_gui(

@@ -4,7 +4,7 @@ use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
     ray::Ray,
-    Float, Vec3,
+    Box, Float, Vec3,
 };
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};

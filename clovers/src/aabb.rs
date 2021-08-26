@@ -1,11 +1,12 @@
 //! Axis-aligned bounding box.
 
 use crate::{ray::Ray, Float, Vec3};
+use serde::{Deserialize, Serialize};
 
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
 /// This is useful for creating bounding volume hierarchies, which is an optimization for reducing the time spent on calculating ray-object intersections.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct AABB {
     /// First corner of the axis-aligned bounding box.
     pub min: Vec3,
@@ -26,7 +27,7 @@ impl AABB {
             let mut t0: Float = (self.min[a] - ray.origin[a]) * invd;
             let mut t1: Float = (self.max[a] - ray.origin[a]) * invd;
             if invd < 0.0 {
-                std::mem::swap(&mut t0, &mut t1);
+                core::mem::swap(&mut t0, &mut t1);
             }
             tmin = if t0 > tmin { t0 } else { tmin };
             tmax = if t1 < tmax { t1 } else { tmax };

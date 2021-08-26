@@ -11,7 +11,7 @@ use crate::{
         YZRect,
     },
     ray::Ray,
-    Float, Vec3,
+    Float, Vec, Vec3,
 };
 use rand::prelude::*;
 

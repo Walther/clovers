@@ -1,6 +1,6 @@
 //! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
 
-use crate::hitable::Hitable;
+use crate::{hitable::Hitable, Box};
 use serde::{Deserialize, Serialize};
 
 pub mod boxy; // avoid keyword

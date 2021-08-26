@@ -1,6 +1,6 @@
 //! Bounding Volume Hierarchy Node.
 
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 use rand::prelude::*;
 
@@ -8,7 +8,7 @@ use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
     ray::Ray,
-    Float,
+    Box, Float, Vec,
 };
 
 /// Bounding Volume Hierarchy Node.
