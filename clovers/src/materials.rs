@@ -12,7 +12,7 @@ pub use diffuse_light::*;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
-use rand::prelude::ThreadRng;
+use rand::rngs::SmallRng;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
@@ -42,7 +42,7 @@ impl Material {
         &self,
         ray: &Ray,
         hit_record: &HitRecord,
-        rng: ThreadRng,
+        rng: SmallRng,
     ) -> Option<ScatterRecord> {
         match *self {
             Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),
@@ -59,7 +59,7 @@ impl Material {
         ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
-        rng: ThreadRng,
+        rng: SmallRng,
     ) -> Float {
         match *self {
             Material::Dielectric(m) => m.scattering_pdf(ray, hit_record, scattered, rng),

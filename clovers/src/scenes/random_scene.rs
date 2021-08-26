@@ -8,9 +8,10 @@ use crate::{
     textures::{Checkered, SolidColor},
     Float, Vec3,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 
-pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
+pub fn load(width: u32, height: u32, mut rng: SmallRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
     let mut world = HitableList::new();
@@ -37,7 +38,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
                     let color = Color::random(rng);
                     let texture = SolidColor::new(color);
                     let sphere_material = Lambertian::new(texture);
-                    let center2 = center + Vec3::new(0.0, rng.gen_range(0.0, 0.5), 0.0);
+                    let center2 = center + Vec3::new(0.0, rng.gen_range(0.0..0.5), 0.0);
                     world.add(MovingSphere::new(
                         center,
                         center2,
@@ -50,7 +51,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
                     // metal
                     let color = Color::random(rng);
                     let texture = SolidColor::new(color);
-                    let fuzz = rng.gen_range(0.0, 0.5);
+                    let fuzz = rng.gen_range(0.0..0.5);
                     let sphere_material = Metal::new(texture, fuzz);
                     world.add(Sphere::new(center, 0.2, sphere_material));
                 } else {

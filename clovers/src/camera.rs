@@ -3,7 +3,8 @@
 #![allow(clippy::too_many_arguments)] // TODO: Camera::new() has a lot of arguments.
 
 use crate::{random::random_in_unit_disk, ray::Ray, Float, Vec3, PI};
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
@@ -96,12 +97,12 @@ impl Camera {
 
     // TODO: fix the mysterious (u,v) vs (s,t) change that came from the tutorial
     /// Generates a new [Ray] from the camera, at a random location of the aperture, at a random time interval between `time_0`, `time_1` of the camera.
-    pub fn get_ray(self, s: Float, t: Float, mut rng: ThreadRng) -> Ray {
+    pub fn get_ray(self, s: Float, t: Float, mut rng: SmallRng) -> Ray {
         // TODO: add a better defocus blur / depth of field implementation
         let rd: Vec3 = self.lens_radius * random_in_unit_disk(&mut rng);
         let offset: Vec3 = self.u * rd.x + self.v * rd.y;
         // Randomized time used for motion blur
-        let time: Float = rng.gen_range(self.time_0, self.time_1);
+        let time: Float = rng.gen_range(self.time_0..self.time_1);
         Ray::new(
             self.origin + offset,
             self.lower_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset,

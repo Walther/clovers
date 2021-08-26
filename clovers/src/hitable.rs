@@ -13,7 +13,8 @@ use crate::{
     ray::Ray,
     Float, Vec, Vec3,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::Rng;
 
 /// Represents a ray-object intersection, with plenty of data about the intersection.
 #[derive(Debug)]
@@ -71,7 +72,7 @@ impl Hitable {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: ThreadRng,
+        rng: SmallRng,
     ) -> Option<HitRecord> {
         match self {
             Hitable::Boxy(h) => h.hit(ray, distance_min, distance_max, rng),
@@ -106,7 +107,7 @@ impl Hitable {
         }
     }
 
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: SmallRng) -> Float {
         match self {
             Hitable::XZRect(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::XYRect(h) => h.pdf_value(origin, vector, time, rng),
@@ -117,7 +118,7 @@ impl Hitable {
         }
     }
 
-    pub fn random(&self, origin: Vec3, rng: ThreadRng) -> Vec3 {
+    pub fn random(&self, origin: Vec3, rng: SmallRng) -> Vec3 {
         match self {
             Hitable::XZRect(h) => h.random(origin, rng),
             Hitable::XYRect(h) => h.random(origin, rng),
@@ -152,13 +153,13 @@ impl HitableList {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: ThreadRng,
+        rng: SmallRng,
     ) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest = distance_max;
         // TODO: with more objects, this may become a significant bottleneck?
         for hitable in self.0.iter() {
-            if let Some(record) = hitable.hit(ray, distance_min, closest, rng) {
+            if let Some(record) = hitable.hit(ray, distance_min, closest, rng.clone()) {
                 closest = record.distance;
                 hit_record = Some(record);
             }
@@ -201,20 +202,20 @@ impl HitableList {
         // Return the final combined output_box
         output_box
     }
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: ThreadRng) -> Float {
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: SmallRng) -> Float {
         let weight = 1.0 / self.0.len() as Float;
         let mut sum = 0.0;
 
         self.0.iter().for_each(|object| {
-            sum += weight * object.pdf_value(origin, vector, time, rng);
+            sum += weight * object.pdf_value(origin, vector, time, rng.clone());
         });
 
         sum
     }
 
-    pub fn random(&self, origin: Vec3, mut rng: ThreadRng) -> Vec3 {
+    pub fn random(&self, origin: Vec3, mut rng: SmallRng) -> Vec3 {
         let int_size = self.0.len();
-        self.0[rng.gen_range(0, int_size)].random(origin, rng)
+        self.0[rng.gen_range(0..int_size)].random(origin, rng)
     }
 
     pub fn new() -> HitableList {
@@ -225,7 +226,7 @@ impl HitableList {
         self.0.push(object);
     }
 
-    pub fn into_bvh(self, time_0: Float, time_1: Float, rng: ThreadRng) -> BVHNode {
+    pub fn into_bvh(self, time_0: Float, time_1: Float, rng: SmallRng) -> BVHNode {
         BVHNode::from_list(self.0, time_0, time_1, rng)
     }
 

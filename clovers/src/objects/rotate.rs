@@ -6,7 +6,7 @@ use crate::{
     ray::Ray,
     Box, Float, Vec3,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
 use serde::{Deserialize, Serialize};
 
 use super::Object;
@@ -104,7 +104,7 @@ impl RotateY {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: ThreadRng,
+        rng: SmallRng,
     ) -> Option<HitRecord> {
         let mut origin: Vec3 = ray.origin;
         let mut direction: Vec3 = ray.direction;

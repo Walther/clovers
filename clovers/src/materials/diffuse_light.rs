@@ -8,7 +8,8 @@ use crate::{
     textures::{SolidColor, Texture},
     Float, Vec3,
 };
-use rand::prelude::ThreadRng;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 
 use serde::{Deserialize, Serialize};
 
@@ -33,7 +34,7 @@ impl<'a> DiffuseLight {
         self,
         _ray: &Ray,
         _hit_record: &HitRecord,
-        _rng: ThreadRng,
+        _rng: SmallRng,
     ) -> Option<ScatterRecord<'a>> {
         None
     }
@@ -44,7 +45,7 @@ impl<'a> DiffuseLight {
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
-        _rng: ThreadRng,
+        _rng: SmallRng,
     ) -> Float {
         0.0 // TODO: cleanup
     }

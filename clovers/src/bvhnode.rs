@@ -2,7 +2,8 @@
 
 use core::cmp::Ordering;
 
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::Rng;
 
 use crate::{
     aabb::AABB,
@@ -30,7 +31,7 @@ impl BVHNode {
         mut objects: Vec<Hitable>,
         time_0: Float,
         time_1: Float,
-        mut rng: ThreadRng,
+        mut rng: SmallRng,
     ) -> BVHNode {
         // Initialize two child nodes
         let left: Box<Hitable>;
@@ -38,7 +39,7 @@ impl BVHNode {
 
         // Pick a random axis to create the split on
         // TODO: smarter algorithm?
-        let axis: usize = rng.gen_range(0, 2);
+        let axis: usize = rng.gen_range(0..2);
         let comparators = [box_x_compare, box_y_compare, box_z_compare];
         let comparator = comparators[axis];
 
@@ -76,13 +77,16 @@ impl BVHNode {
             let mid = object_span / 2;
             let objects_right = objects.split_off(mid);
             left = Box::new(Hitable::BVHNode(BVHNode::from_list(
-                objects, time_0, time_1, rng,
+                objects,
+                time_0,
+                time_1,
+                rng.clone(),
             )));
             right = Box::new(Hitable::BVHNode(BVHNode::from_list(
                 objects_right,
                 time_0,
                 time_1,
-                rng,
+                rng.clone(),
             )));
         }
 
@@ -112,7 +116,7 @@ impl BVHNode {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: ThreadRng,
+        rng: SmallRng,
     ) -> Option<HitRecord> {
         // If we do not hit the bounding box of current node, early return None
         if !self.bounding_box.hit(ray, distance_min, distance_max) {
@@ -120,8 +124,8 @@ impl BVHNode {
         }
 
         // Otherwise we have hit the bounding box of this node, recurse to child nodes
-        let hit_left = self.left.hit(ray, distance_min, distance_max, rng);
-        let hit_right = self.right.hit(ray, distance_min, distance_max, rng);
+        let hit_left = self.left.hit(ray, distance_min, distance_max, rng.clone());
+        let hit_right = self.right.hit(ray, distance_min, distance_max, rng.clone());
 
         // Did we hit neither of the child nodes, one of them, or both?
         // Return the closest thing we hit

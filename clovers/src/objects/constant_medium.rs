@@ -8,7 +8,8 @@ use crate::{
     textures::Texture,
     Box, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 
 use super::Object;
@@ -57,7 +58,7 @@ impl ConstantMedium {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        mut rng: ThreadRng,
+        mut rng: SmallRng,
     ) -> Option<HitRecord> {
         let mut rec1: HitRecord;
         let mut rec2: HitRecord;
@@ -66,7 +67,7 @@ impl ConstantMedium {
 
         rec1 = match self
             .boundary
-            .hit(ray, Float::NEG_INFINITY, Float::INFINITY, rng)
+            .hit(ray, Float::NEG_INFINITY, Float::INFINITY, rng.clone())
         {
             Some(record) => record,
             None => return None,
@@ -76,7 +77,7 @@ impl ConstantMedium {
             ray,
             rec1.distance + EPSILON_CONSTANT_MEDIUM,
             Float::INFINITY,
-            rng,
+            rng.clone(),
         ) {
             Some(record) => record,
             None => return None,

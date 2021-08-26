@@ -15,9 +15,10 @@ use crate::{
     Float,
     Vec3,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 
-pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
+pub fn load(width: u32, height: u32, mut rng: SmallRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
 
@@ -33,7 +34,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
             let z0: Float = -1000.0 + j as Float * w;
             let y0: Float = 0.0;
             let x1: Float = x0 + w;
-            let y1: Float = rng.gen_range(1.0, 101.0);
+            let y1: Float = rng.gen_range(1.0..101.0);
             let z1: Float = z0 + w;
 
             boxes1.add(Boxy::new(
@@ -109,9 +110,9 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     for _j in 0..num_spheres {
         boxes2.add(Sphere::new(
             Vec3::new(
-                rng.gen_range(0.0, 165.0),
-                rng.gen_range(0.0, 165.0),
-                rng.gen_range(0.0, 165.0),
+                rng.gen_range(0.0..165.0),
+                rng.gen_range(0.0..165.0),
+                rng.gen_range(0.0..165.0),
             ),
             10.0,
             white,

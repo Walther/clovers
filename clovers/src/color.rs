@@ -4,7 +4,8 @@
 
 use crate::{Float, Vec3};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 
 /// RGB color based on three [Floats](crate::Float) values.
@@ -36,7 +37,7 @@ impl Color {
     }
 
     /// Creates a new [Color] with random parameters between `0.0..1.0`.
-    pub fn random(mut rng: ThreadRng) -> Color {
+    pub fn random(mut rng: SmallRng) -> Color {
         Color {
             r: rng.gen::<Float>(),
             g: rng.gen::<Float>(),

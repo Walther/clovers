@@ -8,10 +8,10 @@ use crate::{
     scenes::Scene,
     Float, EPSILON_SHADOW_ACNE,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
 
 /// The main coloring function. Sends a [Ray] to the [Scene], sees if it hits anything, and eventually returns a [Color]. Taking into account the [Material](crate::materials::Material) that is hit, the method recurses with various adjustments, with a new [Ray] started from the location that was hit.
-pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: ThreadRng) -> Color {
+pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut SmallRng) -> Color {
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
         // Ray bounce limit reached, early return background_color
@@ -21,7 +21,10 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
 
     // Send the ray to the scene, and see if it hits anything.
     // distance_min is set to an epsilon to avoid "shadow acne" that can happen when set to zero
-    let hit_record = match scene.objects.hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng) {
+    let hit_record = match scene
+        .objects
+        .hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng.clone())
+    {
         // If the ray hits nothing, early return the background color.
         None => return scene.background_color,
         // Hit something, continue
@@ -38,7 +41,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
     );
 
     // Do we scatter?
-    let scatter_record = match hit_record.material.scatter(ray, &hit_record, rng) {
+    let scatter_record = match hit_record.material.scatter(ray, &hit_record, rng.clone()) {
         // No scatter, early return the emitted color only
         None => return emitted,
         // Got a scatter, continue
@@ -69,8 +72,12 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
             ));
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
 
-            let scattered = Ray::new(hit_record.position, mixture_pdf.generate(rng), ray.time);
-            let pdf_val = mixture_pdf.value(scattered.direction, ray.time, rng);
+            let scattered = Ray::new(
+                hit_record.position,
+                mixture_pdf.generate(rng.clone()),
+                ray.time,
+            );
+            let pdf_val = mixture_pdf.value(scattered.direction, ray.time, rng.clone());
 
             // Recurse
             let recurse = colorize(&scattered, scene, depth + 1, max_depth, rng);
@@ -80,7 +87,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: Threa
                 + scatter_record.attenuation
                     * hit_record
                         .material
-                        .scattering_pdf(ray, &hit_record, &scattered, rng)
+                        .scattering_pdf(ray, &hit_record, &scattered, rng.clone())
                     * recurse
                     / pdf_val
         }

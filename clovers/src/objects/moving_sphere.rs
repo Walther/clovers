@@ -1,7 +1,8 @@
 //! A moving sphere object.
 
 use crate::{aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3, PI};
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -58,7 +59,7 @@ impl MovingSphere {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        _rng: ThreadRng,
+        _rng: SmallRng,
     ) -> Option<HitRecord> {
         let oc = ray.origin - self.center(ray.time);
         let a: Float = ray.direction.norm_squared();

@@ -1,6 +1,7 @@
 use crate::{color::Color, colorize::colorize, ray::Ray, scenes, Float};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{thread_rng, Rng, SeedableRng};
 use rayon::prelude::*;
 use scenes::Scene;
 
@@ -44,14 +45,15 @@ pub fn draw(
             let width = width as Float;
             let height = height as Float;
 
-            // Initialize a thread-local random number generator
-            let rng = rand::thread_rng();
+            // Initialize a random number generator
+            let mut thread_rng = thread_rng();
 
             // Initialize a mutable base color for the pixel
             let mut color: Color = Color::new(0.0, 0.0, 0.0);
 
             // Multisampling for antialiasing
             for _sample in 0..samples {
+                let rng = SmallRng::from_rng(&mut thread_rng).unwrap();
                 if let Some(s) = sample(&scene, x, y, width, height, rng, max_depth) {
                     color += s
                 }
@@ -75,13 +77,13 @@ fn sample(
     y: Float,
     width: Float,
     height: Float,
-    mut rng: ThreadRng,
+    mut rng: SmallRng,
     max_depth: u32,
 ) -> Option<Color> {
     let u = (x + rng.gen::<Float>()) / width;
     let v = (y + rng.gen::<Float>()) / height;
-    let ray: Ray = scene.camera.get_ray(u, v, rng);
-    let new_color = colorize(&ray, scene, 0, max_depth, rng);
+    let ray: Ray = scene.camera.get_ray(u, v, rng.clone());
+    let new_color = colorize(&ray, scene, 0, max_depth, &mut rng);
     // skip NaN and Infinity
     if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
         return Some(new_color);

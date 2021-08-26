@@ -1,7 +1,8 @@
 use crate::{color::Color, colorize::colorize, scenes::Scene, Float};
 
 use indicatif::{ProgressBar, ProgressStyle};
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
 use pixels::{Error, Pixels, SurfaceTexture};
@@ -135,13 +136,13 @@ impl World {
                 let x = (i % width) as i16;
                 let y = height as i16 - (i / width) as i16; // flip y-axis
 
-                let mut rng = rand::thread_rng();
+                let mut rng = SmallRng::from_entropy();
                 let mut color: Color = Color::new(0.0, 0.0, 0.0);
 
                 let u = (x as Float + rng.gen::<Float>()) / width as Float;
                 let v = (y as Float + rng.gen::<Float>()) / height as Float;
-                let ray = camera.get_ray(u, v, rng);
-                let new_color = colorize(&ray, scene, 0, max_depth, rng);
+                let ray = camera.get_ray(u, v, rng.clone());
+                let new_color = colorize(&ray, scene, 0, max_depth, &mut rng.clone());
                 // skip NaN and Infinity
                 if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
                     color += new_color;

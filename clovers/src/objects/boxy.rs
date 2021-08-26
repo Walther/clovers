@@ -8,7 +8,7 @@ use crate::{
     ray::Ray,
     Box, Float, Vec3,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
 use serde::{Deserialize, Serialize};
 
 /// BoxyInit structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
@@ -72,7 +72,7 @@ impl Boxy {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: ThreadRng,
+        rng: SmallRng,
     ) -> Option<HitRecord> {
         self.sides.hit(ray, distance_min, distance_max, rng)
     }

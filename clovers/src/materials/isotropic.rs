@@ -9,7 +9,7 @@ use crate::{
     textures::Texture,
     Float, PI,
 };
-use rand::prelude::ThreadRng;
+use rand::rngs::SmallRng;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, Default)]
@@ -30,7 +30,7 @@ impl<'a> Isotropic {
         self,
         _ray: &Ray,
         hit_record: &HitRecord,
-        _rng: ThreadRng,
+        _rng: SmallRng,
     ) -> Option<ScatterRecord<'a>> {
         // TODO: fix / verify correctness!
         // this is just copied from lambertian as an experiment
@@ -52,7 +52,7 @@ impl<'a> Isotropic {
         _ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
-        _rng: ThreadRng,
+        _rng: SmallRng,
     ) -> Float {
         // TODO: fix / verify correctness!
         // this is just copied from lambertian as an experiment

@@ -9,9 +9,10 @@ use crate::{
     textures::{SolidColor, Texture},
     Float, Vec3,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 
-pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
+pub fn load(width: u32, height: u32, rng: SmallRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
     let mut world = HitableList::new();
