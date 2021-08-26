@@ -128,7 +128,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     if !opts.quiet {
         println!(); // Empty line after progress bar
-        info!("finished render in {}", format_duration(duration));
+        info!("Finished render in {}", format_duration(duration));
+        println!("Finished render in {}", format_duration(duration));
     }
 
     info!("Writing an image file");
