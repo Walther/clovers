@@ -1,7 +1,7 @@
 use bytemuck::{Pod, Zeroable};
 use clovers::{color::Color, scenes::Scene, Float};
 use log::debug;
-use spirv_builder::{Capability, MetadataPrintout, SpirvBuilder};
+use spirv_builder::{MetadataPrintout, SpirvBuilder};
 use std::{borrow::Cow, mem::size_of, path::PathBuf};
 use wgpu::{Extent3d, TextureAspect, TextureViewDescriptor};
 
@@ -56,7 +56,6 @@ fn create_pipeline(
         }),
     })
 }
-// END borrowed from rust-gpu
 
 #[derive(Copy, Clone, Pod, Zeroable)]
 #[repr(C)]
@@ -68,6 +67,7 @@ pub struct ShaderConstants {
     pub time: f32,
 }
 
+// TODO: split into multiple functions, simplify, etc
 /// The main drawing function, returns a Vec<Color> as a pixelbuffer.
 pub async fn draw(
     width: u32,
@@ -119,7 +119,7 @@ pub async fn draw(
     let swapchain_format = wgpu::TextureFormat::Rgba32Float;
 
     // TODO: build shaders at build time, not at runtime
-    let shader_mod_desc = load_shader_module_desc();
+    let shader_mod_desc = load_shader();
     debug!("Shader loaded");
     let _shader_mod = device.create_shader_module(&shader_mod_desc);
     debug!("Shader module created");
@@ -268,18 +268,13 @@ pub async fn draw(
     // Drop the GPU instance
     drop(instance);
 
-    // TODO: placeholder return
-    // let pixels = (width * height) as u64;
-    // let black = Color::new(0.0, 0.0, 0.0);
-    // let pixelbuffer: Vec<Color> = vec![black; pixels as usize];
     debug!("Returning pixelbuffer");
     pixelbuffer
 }
 
-// TODO: adapted from https://github.com/mitchmindtree/nannou-rustgpu-raytracer
-// TODO: figure out if needed / could be simplified / etc
 // TODO: compile shaders at build time, not at run time
-fn load_shader_module_desc() -> wgpu::ShaderModuleDescriptor<'static> {
+// TODO: no unwraps, polite error handling
+fn load_shader() -> wgpu::ShaderModuleDescriptor<'static> {
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
     let crate_path = [manifest_dir, "..", "clovers-gpu", "shaders"]
         .iter()
@@ -287,9 +282,6 @@ fn load_shader_module_desc() -> wgpu::ShaderModuleDescriptor<'static> {
         .collect::<PathBuf>();
     let compile_result = SpirvBuilder::new(crate_path, "spirv-unknown-vulkan1.1")
         .print_metadata(MetadataPrintout::None)
-        // Seems to be needed to handle conditions within functions?
-        // Error was confusing but adding this worked.
-        .capability(Capability::Int8)
         .build()
         .unwrap();
     let module_path = compile_result.module.unwrap_single();
@@ -302,7 +294,7 @@ fn load_shader_module_desc() -> wgpu::ShaderModuleDescriptor<'static> {
     wgpu::ShaderModuleDescriptor {
         label: Some("clovers-shader"),
         source: spirv,
-        flags: wgpu::ShaderFlags::default(),
+        flags: Default::default(),
     }
 }
 
