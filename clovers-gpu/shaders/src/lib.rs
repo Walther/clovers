@@ -26,6 +26,8 @@ pub fn main_fs(
     #[spirv(push_constant)] constants: &ShaderConstants,
     output: &mut Vec4,
 ) {
+    // TODO: actual shader for the raytracing
+    // currently only renders a simple color gradient
     let x = in_frag_coord.x;
     let y = in_frag_coord.y;
     let width = constants.width as f32;
