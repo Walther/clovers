@@ -45,7 +45,7 @@ fn perlin_generate_perm(rng: ThreadRng) -> [usize; 256] {
 fn permute(p: &mut [usize; 256], mut rng: ThreadRng) {
     // For some reason the tutorial wants the reverse loop
     for i in (1..256).rev() {
-        let target: usize = rng.gen_range(0, i);
+        let target: usize = rng.gen_range(0..i);
         p.swap(i, target);
     }
 }

@@ -38,7 +38,7 @@ impl BVHNode {
 
         // Pick a random axis to create the split on
         // TODO: smarter algorithm?
-        let axis: usize = rng.gen_range(0, 2);
+        let axis: usize = rng.gen_range(0..2);
         let comparators = [box_x_compare, box_y_compare, box_z_compare];
         let comparator = comparators[axis];
 

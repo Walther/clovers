@@ -101,7 +101,7 @@ impl Camera {
         let rd: Vec3 = self.lens_radius * random_in_unit_disk(&mut rng);
         let offset: Vec3 = self.u * rd.x + self.v * rd.y;
         // Randomized time used for motion blur
-        let time: Float = rng.gen_range(self.time_0, self.time_1);
+        let time: Float = rng.gen_range(self.time_0..self.time_1);
         Ray::new(
             self.origin + offset,
             self.lower_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset,

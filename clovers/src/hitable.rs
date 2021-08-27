@@ -214,7 +214,7 @@ impl HitableList {
 
     pub fn random(&self, origin: Vec3, mut rng: ThreadRng) -> Vec3 {
         let int_size = self.0.len();
-        self.0[rng.gen_range(0, int_size)].random(origin, rng)
+        self.0[rng.gen_range(0..int_size)].random(origin, rng)
     }
 
     pub fn new() -> HitableList {

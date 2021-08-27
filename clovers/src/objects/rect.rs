@@ -111,8 +111,8 @@ impl XYRect {
 
     pub fn random(&self, origin: Vec3, mut rng: ThreadRng) -> Vec3 {
         let random_point = Vec3::new(
-            rng.gen_range(self.x0, self.x1),
-            rng.gen_range(self.y0, self.y1),
+            rng.gen_range(self.x0..self.x1),
+            rng.gen_range(self.y0..self.y1),
             self.k,
         );
         random_point - origin
@@ -216,9 +216,9 @@ impl XZRect {
 
     pub fn random(&self, origin: Vec3, mut rng: ThreadRng) -> Vec3 {
         let random_point = Vec3::new(
-            rng.gen_range(self.x0, self.x1),
+            rng.gen_range(self.x0..self.x1),
             self.k,
-            rng.gen_range(self.z0, self.z1),
+            rng.gen_range(self.z0..self.z1),
         );
         random_point - origin
     }
@@ -322,8 +322,8 @@ impl YZRect {
     pub fn random(&self, origin: Vec3, mut rng: ThreadRng) -> Vec3 {
         let random_point = Vec3::new(
             self.k,
-            rng.gen_range(self.y0, self.y1),
-            rng.gen_range(self.z0, self.z1),
+            rng.gen_range(self.y0..self.y1),
+            rng.gen_range(self.z0..self.z1),
         );
         random_point - origin
     }
