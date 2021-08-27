@@ -12,7 +12,6 @@ path = "src/main.rs"
 # Internal
 clovers = { path = "../clovers" }
 # External
-nalgebra = { version = "0.23.1", features = ["serde-serialize"] }
 rayon = "1.5.0"
 rand = "0.8.4"
 serde = { version = "1.0.118", features = ["derive", "rc"] }
@@ -22,10 +21,7 @@ chrono = { version = "0.4.19" }
 humantime = { version = "2.0.1" }
 indicatif = { version = "0.15.0", features = ["rayon"] }
 clap = { version = "3.0.0-beta.2" }
-toml = { version = "0.5.7" }
-spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu", features = ["glam"] }
 spirv-builder = { git = "https://github.com/EmbarkStudios/rust-gpu" }
-syn = "1.0.75"
 wgpu = "0.9.0"
 bytemuck = {version = "1.7.2", features = ["derive"]}
 futures = "0.3.16"
