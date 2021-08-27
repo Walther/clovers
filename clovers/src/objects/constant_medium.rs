@@ -8,7 +8,8 @@ use crate::{
     textures::Texture,
     Box, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 
 use super::Object;
@@ -57,7 +58,7 @@ impl ConstantMedium {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: &mut ThreadRng,
+        rng: &mut SmallRng,
     ) -> Option<HitRecord> {
         let mut rec1: HitRecord;
         let mut rec2: HitRecord;

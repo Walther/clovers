@@ -1,6 +1,7 @@
 use crate::{color::Color, colorize::colorize, ray::Ray, scenes, Float};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 use scenes::Scene;
 
@@ -45,7 +46,7 @@ pub fn draw(
             let height = height as Float;
 
             // Initialize a thread-local random number generator
-            let mut rng = rand::thread_rng();
+            let mut rng = SmallRng::from_entropy();
 
             // Initialize a mutable base color for the pixel
             let mut color: Color = Color::new(0.0, 0.0, 0.0);
@@ -75,7 +76,7 @@ fn sample(
     y: Float,
     width: Float,
     height: Float,
-    rng: &mut ThreadRng,
+    rng: &mut SmallRng,
     max_depth: u32,
 ) -> Option<Color> {
     let u = (x + rng.gen::<Float>()) / width;

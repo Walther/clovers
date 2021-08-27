@@ -8,7 +8,7 @@ use crate::{
     textures::Texture,
     Float, PI,
 };
-use rand::prelude::ThreadRng;
+use rand::prelude::SmallRng;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Deserialize, Serialize, Debug, Default)]
@@ -24,7 +24,7 @@ impl<'a> Lambertian {
         self,
         _ray: &Ray,
         hit_record: &HitRecord,
-        _rng: &mut ThreadRng,
+        _rng: &mut SmallRng,
     ) -> Option<ScatterRecord<'a>> {
         Some(ScatterRecord {
             material_type: MaterialType::Diffuse,
@@ -42,7 +42,7 @@ impl<'a> Lambertian {
         _ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
-        _rng: &mut ThreadRng,
+        _rng: &mut SmallRng,
     ) -> Float {
         // TODO: explain the math
         let cosine = hit_record.normal.dot(&scattered.direction.normalize());

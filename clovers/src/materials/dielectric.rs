@@ -8,7 +8,8 @@ use crate::{
     ray::Ray,
     Float, Vec3,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 
 use serde::{Deserialize, Serialize};
 
@@ -37,7 +38,7 @@ impl<'a> Dielectric {
         self,
         ray: &Ray,
         hit_record: &HitRecord,
-        rng: &mut ThreadRng,
+        rng: &mut SmallRng,
     ) -> Option<ScatterRecord<'a>> {
         let albedo = self.color;
         let specular_ray: Ray;
@@ -77,7 +78,7 @@ impl<'a> Dielectric {
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
-        _rng: &mut ThreadRng,
+        _rng: &mut SmallRng,
     ) -> Float {
         todo!()
     }

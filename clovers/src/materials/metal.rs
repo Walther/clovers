@@ -9,7 +9,7 @@ use crate::{
     textures::Texture,
     Float, Vec3,
 };
-use rand::prelude::ThreadRng;
+use rand::prelude::SmallRng;
 use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 /// A metal material. The amount of reflection can be adjusted with the `fuzz` parameter.
@@ -26,7 +26,7 @@ impl<'a> Metal {
         self,
         ray: &Ray,
         hit_record: &HitRecord,
-        rng: &mut ThreadRng,
+        rng: &mut SmallRng,
     ) -> Option<ScatterRecord<'a>> {
         let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
         Some(ScatterRecord {
@@ -48,7 +48,7 @@ impl<'a> Metal {
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
-        _rng: &mut ThreadRng,
+        _rng: &mut SmallRng,
     ) -> Float {
         0.0 // TODO: why does metal scatter 0? No mention in tutorial afaiu
     }
