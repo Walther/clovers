@@ -72,7 +72,7 @@ impl Boxy {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> Option<HitRecord> {
         self.sides.hit(ray, distance_min, distance_max, rng)
     }

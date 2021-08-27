@@ -48,7 +48,7 @@ impl Scene {
         objects: HitableList,
         priority_objects: HitableList,
         background_color: Color,
-        rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> Scene {
         Scene {
             objects: objects.into_bvh(time_0, time_1, rng),
@@ -75,7 +75,7 @@ pub struct SceneFile {
 pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     let time_0 = scene_file.time_0;
     let time_1 = scene_file.time_1;
-    let rng = thread_rng();
+    let mut rng = thread_rng();
     let background_color = scene_file.background_color;
     let camera = Camera::new(
         scene_file.camera.look_from,
@@ -105,6 +105,6 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
         hitables,
         priority_objects,
         background_color,
-        rng,
+        &mut rng,
     )
 }

@@ -40,7 +40,7 @@ impl FlipFace {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> Option<HitRecord> {
         self.object
             .hit(ray, distance_min, distance_max, rng)

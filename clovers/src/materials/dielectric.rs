@@ -37,7 +37,7 @@ impl<'a> Dielectric {
         self,
         ray: &Ray,
         hit_record: &HitRecord,
-        mut rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> Option<ScatterRecord<'a>> {
         let albedo = self.color;
         let specular_ray: Ray;
@@ -77,7 +77,7 @@ impl<'a> Dielectric {
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
-        _rng: ThreadRng,
+        _rng: &mut ThreadRng,
     ) -> Float {
         todo!()
     }

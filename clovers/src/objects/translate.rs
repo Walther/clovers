@@ -39,7 +39,7 @@ impl Translate {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> Option<HitRecord> {
         let moved_ray: Ray = Ray::new(ray.origin - self.offset, ray.direction, ray.time);
 

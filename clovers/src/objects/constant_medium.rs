@@ -57,7 +57,7 @@ impl ConstantMedium {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        mut rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> Option<HitRecord> {
         let mut rec1: HitRecord;
         let mut rec2: HitRecord;

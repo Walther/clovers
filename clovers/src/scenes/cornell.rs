@@ -10,7 +10,7 @@ use crate::{
 };
 use rand::prelude::*;
 
-pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
+pub fn load(width: u32, height: u32, rng: &mut ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
     let mut world = HitableList::new();
@@ -49,5 +49,5 @@ pub fn load(width: u32, height: u32, rng: ThreadRng) -> Scene {
     );
 
     let background: Color = Color::new(0.0, 0.0, 0.0); // Black background = only lit by the light, no ambient
-    Scene::new(world, camera, time_0, time_1, background, rng)
+    Scene::new(world, camera, time_0, time_1, background, &mut rng)
 }

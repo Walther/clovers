@@ -104,7 +104,7 @@ impl RotateY {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> Option<HitRecord> {
         let mut origin: Vec3 = ray.origin;
         let mut direction: Vec3 = ray.direction;

@@ -45,14 +45,14 @@ pub fn draw(
             let height = height as Float;
 
             // Initialize a thread-local random number generator
-            let rng = rand::thread_rng();
+            let mut rng = rand::thread_rng();
 
             // Initialize a mutable base color for the pixel
             let mut color: Color = Color::new(0.0, 0.0, 0.0);
 
             // Multisampling for antialiasing
             for _sample in 0..samples {
-                if let Some(s) = sample(&scene, x, y, width, height, rng, max_depth) {
+                if let Some(s) = sample(&scene, x, y, width, height, &mut rng, max_depth) {
                     color += s
                 }
             }
@@ -75,7 +75,7 @@ fn sample(
     y: Float,
     width: Float,
     height: Float,
-    mut rng: ThreadRng,
+    rng: &mut ThreadRng,
     max_depth: u32,
 ) -> Option<Color> {
     let u = (x + rng.gen::<Float>()) / width;

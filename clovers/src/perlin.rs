@@ -31,7 +31,7 @@ impl Debug for Perlin {
     }
 }
 
-fn perlin_generate_perm(rng: ThreadRng) -> [usize; 256] {
+fn perlin_generate_perm(rng: &mut ThreadRng) -> [usize; 256] {
     let mut perm: [usize; 256] = [0; 256];
 
     for i in 0..256 {
@@ -42,10 +42,10 @@ fn perlin_generate_perm(rng: ThreadRng) -> [usize; 256] {
     perm
 }
 
-fn permute(p: &mut [usize; 256], mut rng: ThreadRng) {
+fn permute(p: &mut [usize; 256], rng: &mut ThreadRng) {
     // For some reason the tutorial wants the reverse loop
     for i in (1..256).rev() {
-        let target: usize = rng.gen_range(0, i);
+        let target: usize = rng.gen_range(0..i);
         p.swap(i, target);
     }
 }
@@ -74,7 +74,7 @@ fn perlin_interp(c: [[[Vec3; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Float 
 }
 
 impl Perlin {
-    pub fn new(rng: ThreadRng) -> Self {
+    pub fn new(rng: &mut ThreadRng) -> Self {
         let mut random_vectors: [Vec3; 256] = [Vec3::new(0.0, 0.0, 0.0); 256];
         for i in 0..256 {
             random_vectors[i] = Vec3::new_random();
@@ -145,7 +145,7 @@ impl Perlin {
 
 impl Default for Perlin {
     fn default() -> Self {
-        let rng = thread_rng();
-        Perlin::new(rng)
+        let mut rng = thread_rng();
+        Perlin::new(&mut rng)
     }
 }

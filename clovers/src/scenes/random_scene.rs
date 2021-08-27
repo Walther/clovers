@@ -10,7 +10,7 @@ use crate::{
 };
 use rand::prelude::*;
 
-pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
+pub fn load(width: u32, height: u32, rng: &mut ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
     let mut world = HitableList::new();
@@ -37,7 +37,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
                     let color = Color::random(rng);
                     let texture = SolidColor::new(color);
                     let sphere_material = Lambertian::new(texture);
-                    let center2 = center + Vec3::new(0.0, rng.gen_range(0.0, 0.5), 0.0);
+                    let center2 = center + Vec3::new(0.0, &mut rng.gen_range(0.0..0.5), 0.0);
                     world.add(MovingSphere::new(
                         center,
                         center2,
@@ -50,7 +50,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
                     // metal
                     let color = Color::random(rng);
                     let texture = SolidColor::new(color);
-                    let fuzz = rng.gen_range(0.0, 0.5);
+                    let fuzz = rng.gen_range(0.0..0.5);
                     let sphere_material = Metal::new(texture, fuzz);
                     world.add(Sphere::new(center, 0.2, sphere_material));
                 } else {
@@ -93,5 +93,5 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
 
     let background: Color = Color::new(0.7, 0.7, 0.7); // TODO: gradient from first book
 
-    Scene::new(world, camera, time_0, time_1, background, rng)
+    Scene::new(world, camera, time_0, time_1, background, &mut rng)
 }

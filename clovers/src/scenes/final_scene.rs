@@ -17,7 +17,7 @@ use crate::{
 };
 use rand::prelude::*;
 
-pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
+pub fn load(width: u32, height: u32, rng: &mut ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
 
@@ -33,7 +33,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
             let z0: Float = -1000.0 + j as Float * w;
             let y0: Float = 0.0;
             let x1: Float = x0 + w;
-            let y1: Float = rng.gen_range(1.0, 101.0);
+            let y1: Float = rng.gen_range(1.0..101.0);
             let z1: Float = z0 + w;
 
             boxes1.add(Boxy::new(
@@ -46,7 +46,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
 
     let mut world = HitableList::new();
 
-    world.add(boxes1.into_bvh(time_0, time_1, rng));
+    world.add(boxes1.into_bvh(time_0, time_1, &mut rng));
 
     let light = DiffuseLight::new(SolidColor::new(Color::new(7.0, 7.0, 7.0)));
     world.add(XZRect::new(123.0, 423.0, 147.0, 412.0, 554.0, light));
@@ -109,9 +109,9 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     for _j in 0..num_spheres {
         boxes2.add(Sphere::new(
             Vec3::new(
-                rng.gen_range(0.0, 165.0),
-                rng.gen_range(0.0, 165.0),
-                rng.gen_range(0.0, 165.0),
+                rng.gen_range(0.0..165.0),
+                rng.gen_range(0.0..165.0),
+                rng.gen_range(0.0..165.0),
             ),
             10.0,
             white,
@@ -120,7 +120,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
 
     world.add(Translate::new(
         Box::new(RotateY::new(
-            Box::new(boxes2.into_bvh(time_0, time_1, rng)),
+            Box::new(boxes2.into_bvh(time_0, time_1, &mut rng)),
             15.0,
         )),
         Vec3::new(-100.0, 270.0, 395.0),
@@ -147,5 +147,5 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     );
 
     let background: Color = Color::new(0.0, 0.0, 0.0); // Black background = only lit by the light, no ambient
-    Scene::new(world, camera, time_0, time_1, background, rng)
+    Scene::new(world, camera, time_0, time_1, background, &mut rng)
 }

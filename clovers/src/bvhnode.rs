@@ -30,7 +30,7 @@ impl BVHNode {
         mut objects: Vec<Hitable>,
         time_0: Float,
         time_1: Float,
-        mut rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> BVHNode {
         // Initialize two child nodes
         let left: Box<Hitable>;
@@ -38,7 +38,7 @@ impl BVHNode {
 
         // Pick a random axis to create the split on
         // TODO: smarter algorithm?
-        let axis: usize = rng.gen_range(0, 2);
+        let axis: usize = rng.gen_range(0..2);
         let comparators = [box_x_compare, box_y_compare, box_z_compare];
         let comparator = comparators[axis];
 
@@ -112,7 +112,7 @@ impl BVHNode {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> Option<HitRecord> {
         // If we do not hit the bounding box of current node, early return None
         if !self.bounding_box.hit(ray, distance_min, distance_max) {
