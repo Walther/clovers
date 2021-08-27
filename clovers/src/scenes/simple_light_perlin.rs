@@ -12,13 +12,13 @@ use crate::{
 use rand::prelude::*;
 use std::sync::Box;
 
-pub fn load<'a>(width: u32, height: u32, rng: ThreadRng) -> Scene<'a> {
+pub fn load<'a>(width: u32, height: u32, rng: &mut ThreadRng) -> Scene<'a> {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
     let mut world = HitableList::new();
 
-    let perlin = Perlin::new(256, rng);
-    let perlin2 = Perlin::new(256, rng);
+    let perlin = Perlin::new(256, &mut rng);
+    let perlin2 = Perlin::new(256, &mut rng);
 
     world.add(
         (Sphere::new(
@@ -67,5 +67,5 @@ pub fn load<'a>(width: u32, height: u32, rng: ThreadRng) -> Scene<'a> {
 
     let background: Color = Color::new(0.0, 0.0, 0.0); // Black background = only lit by the light, no ambient
 
-    Scene::new(world, camera, time_0, time_1, background, rng)
+    Scene::new(world, camera, time_0, time_1, background, &mut rng)
 }

@@ -33,7 +33,7 @@ impl<'a> DiffuseLight {
         self,
         _ray: &Ray,
         _hit_record: &HitRecord,
-        _rng: ThreadRng,
+        _rng: &mut ThreadRng,
     ) -> Option<ScatterRecord<'a>> {
         None
     }
@@ -44,7 +44,7 @@ impl<'a> DiffuseLight {
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
-        _rng: ThreadRng,
+        _rng: &mut ThreadRng,
     ) -> Float {
         0.0 // TODO: cleanup
     }

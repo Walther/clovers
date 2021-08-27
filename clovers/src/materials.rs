@@ -42,7 +42,7 @@ impl Material {
         &self,
         ray: &Ray,
         hit_record: &HitRecord,
-        rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> Option<ScatterRecord> {
         match *self {
             Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),
@@ -59,7 +59,7 @@ impl Material {
         ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
-        rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> Float {
         match *self {
             Material::Dielectric(m) => m.scattering_pdf(ray, hit_record, scattered, rng),

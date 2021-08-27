@@ -58,7 +58,7 @@ impl MovingSphere {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        _rng: ThreadRng,
+        _rng: &mut ThreadRng,
     ) -> Option<HitRecord> {
         let oc = ray.origin - self.center(ray.time);
         let a: Float = ray.direction.norm_squared();

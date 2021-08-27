@@ -17,7 +17,7 @@ use crate::{
 };
 use rand::prelude::*;
 
-pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
+pub fn load(width: u32, height: u32, rng: &mut ThreadRng) -> Scene {
     let time_0: Float = 0.0;
     let time_1: Float = 1.0;
 
@@ -46,7 +46,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
 
     let mut world = HitableList::new();
 
-    world.add(boxes1.into_bvh(time_0, time_1, rng));
+    world.add(boxes1.into_bvh(time_0, time_1, &mut rng));
 
     let light = DiffuseLight::new(SolidColor::new(Color::new(7.0, 7.0, 7.0)));
     world.add(XZRect::new(123.0, 423.0, 147.0, 412.0, 554.0, light));
@@ -120,7 +120,7 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
 
     world.add(Translate::new(
         Box::new(RotateY::new(
-            Box::new(boxes2.into_bvh(time_0, time_1, rng)),
+            Box::new(boxes2.into_bvh(time_0, time_1, &mut rng)),
             15.0,
         )),
         Vec3::new(-100.0, 270.0, 395.0),
@@ -147,5 +147,5 @@ pub fn load(width: u32, height: u32, mut rng: ThreadRng) -> Scene {
     );
 
     let background: Color = Color::new(0.0, 0.0, 0.0); // Black background = only lit by the light, no ambient
-    Scene::new(world, camera, time_0, time_1, background, rng)
+    Scene::new(world, camera, time_0, time_1, background, &mut rng)
 }

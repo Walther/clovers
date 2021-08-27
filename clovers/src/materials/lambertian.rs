@@ -24,7 +24,7 @@ impl<'a> Lambertian {
         self,
         _ray: &Ray,
         hit_record: &HitRecord,
-        _rng: ThreadRng,
+        _rng: &mut ThreadRng,
     ) -> Option<ScatterRecord<'a>> {
         Some(ScatterRecord {
             material_type: MaterialType::Diffuse,
@@ -42,7 +42,7 @@ impl<'a> Lambertian {
         _ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
-        _rng: ThreadRng,
+        _rng: &mut ThreadRng,
     ) -> Float {
         // TODO: explain the math
         let cosine = hit_record.normal.dot(&scattered.direction.normalize());

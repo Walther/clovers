@@ -30,7 +30,7 @@ impl BVHNode {
         mut objects: Vec<Hitable>,
         time_0: Float,
         time_1: Float,
-        mut rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> BVHNode {
         // Initialize two child nodes
         let left: Box<Hitable>;
@@ -112,7 +112,7 @@ impl BVHNode {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: ThreadRng,
+        rng: &mut ThreadRng,
     ) -> Option<HitRecord> {
         // If we do not hit the bounding box of current node, early return None
         if !self.bounding_box.hit(ray, distance_min, distance_max) {

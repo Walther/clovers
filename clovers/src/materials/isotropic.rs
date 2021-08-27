@@ -30,7 +30,7 @@ impl<'a> Isotropic {
         self,
         _ray: &Ray,
         hit_record: &HitRecord,
-        _rng: ThreadRng,
+        _rng: &mut ThreadRng,
     ) -> Option<ScatterRecord<'a>> {
         // TODO: fix / verify correctness!
         // this is just copied from lambertian as an experiment
@@ -52,7 +52,7 @@ impl<'a> Isotropic {
         _ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
-        _rng: ThreadRng,
+        _rng: &mut ThreadRng,
     ) -> Float {
         // TODO: fix / verify correctness!
         // this is just copied from lambertian as an experiment
