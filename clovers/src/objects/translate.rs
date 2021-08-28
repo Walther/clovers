@@ -6,7 +6,8 @@ use crate::{
     ray::Ray,
     Box, Float, Vec3,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 
 use super::Object;
@@ -39,7 +40,7 @@ impl Translate {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: &mut ThreadRng,
+        rng: &mut SmallRng,
     ) -> Option<HitRecord> {
         let moved_ray: Ray = Ray::new(ray.origin - self.offset, ray.direction, ray.time);
 

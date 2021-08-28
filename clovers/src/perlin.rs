@@ -4,7 +4,8 @@
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
 use crate::{Float, Vec3};
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 
 #[cfg(not(target_arch = "spirv"))]
 use core::fmt::Debug;
@@ -31,7 +32,7 @@ impl Debug for Perlin {
     }
 }
 
-fn perlin_generate_perm(rng: &mut ThreadRng) -> [usize; 256] {
+fn perlin_generate_perm(rng: &mut SmallRng) -> [usize; 256] {
     let mut perm: [usize; 256] = [0; 256];
 
     for i in 0..256 {
@@ -42,7 +43,7 @@ fn perlin_generate_perm(rng: &mut ThreadRng) -> [usize; 256] {
     perm
 }
 
-fn permute(p: &mut [usize; 256], rng: &mut ThreadRng) {
+fn permute(p: &mut [usize; 256], rng: &mut SmallRng) {
     // For some reason the tutorial wants the reverse loop
     for i in (1..256).rev() {
         let target: usize = rng.gen_range(0..i);
@@ -74,7 +75,7 @@ fn perlin_interp(c: [[[Vec3; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Float 
 }
 
 impl Perlin {
-    pub fn new(rng: &mut ThreadRng) -> Self {
+    pub fn new(rng: &mut SmallRng) -> Self {
         let mut random_vectors: [Vec3; 256] = [Vec3::new(0.0, 0.0, 0.0); 256];
         for i in 0..256 {
             random_vectors[i] = Vec3::new_random();
@@ -145,7 +146,7 @@ impl Perlin {
 
 impl Default for Perlin {
     fn default() -> Self {
-        let mut rng = thread_rng();
+        let mut rng = SmallRng::from_entropy();
         Perlin::new(&mut rng)
     }
 }

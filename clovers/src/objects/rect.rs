@@ -11,7 +11,8 @@ use crate::{
     aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3,
     EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 
 // XY
@@ -54,7 +55,7 @@ impl XYRect {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        _rng: &mut ThreadRng,
+        _rng: &mut SmallRng,
     ) -> Option<HitRecord> {
         let t = (self.k - ray.origin.z) / ray.direction.z;
         if t < distance_min || t > distance_max {
@@ -90,7 +91,7 @@ impl XYRect {
         Some(output_box)
     }
 
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut ThreadRng) -> Float {
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
             EPSILON_SHADOW_ACNE,
@@ -109,7 +110,7 @@ impl XYRect {
         }
     }
 
-    pub fn random(&self, origin: Vec3, rng: &mut ThreadRng) -> Vec3 {
+    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         let random_point = Vec3::new(
             rng.gen_range(self.x0..self.x1),
             rng.gen_range(self.y0..self.y1),
@@ -159,7 +160,7 @@ impl XZRect {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        _rng: &mut ThreadRng,
+        _rng: &mut SmallRng,
     ) -> Option<HitRecord> {
         let t = (self.k - ray.origin.y) / ray.direction.y;
         if t < distance_min || t > distance_max {
@@ -195,7 +196,7 @@ impl XZRect {
         Some(output_box)
     }
 
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut ThreadRng) -> Float {
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
             EPSILON_SHADOW_ACNE,
@@ -214,7 +215,7 @@ impl XZRect {
         }
     }
 
-    pub fn random(&self, origin: Vec3, rng: &mut ThreadRng) -> Vec3 {
+    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         let random_point = Vec3::new(
             rng.gen_range(self.x0..self.x1),
             self.k,
@@ -264,7 +265,7 @@ impl YZRect {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        _rng: &mut ThreadRng,
+        _rng: &mut SmallRng,
     ) -> Option<HitRecord> {
         let t = (self.k - ray.origin.x) / ray.direction.x;
         if t < distance_min || t > distance_max {
@@ -300,7 +301,7 @@ impl YZRect {
         Some(output_box)
     }
 
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut ThreadRng) -> Float {
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
             EPSILON_SHADOW_ACNE,
@@ -319,7 +320,7 @@ impl YZRect {
         }
     }
 
-    pub fn random(&self, origin: Vec3, rng: &mut ThreadRng) -> Vec3 {
+    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         let random_point = Vec3::new(
             self.k,
             rng.gen_range(self.y0..self.y1),

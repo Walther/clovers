@@ -2,7 +2,8 @@
 
 use core::cmp::Ordering;
 
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 
 use crate::{
     aabb::AABB,
@@ -30,7 +31,7 @@ impl BVHNode {
         mut objects: Vec<Hitable>,
         time_0: Float,
         time_1: Float,
-        rng: &mut ThreadRng,
+        rng: &mut SmallRng,
     ) -> BVHNode {
         // Initialize two child nodes
         let left: Box<Hitable>;
@@ -112,7 +113,7 @@ impl BVHNode {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: &mut ThreadRng,
+        rng: &mut SmallRng,
     ) -> Option<HitRecord> {
         // If we do not hit the bounding box of current node, early return None
         if !self.bounding_box.hit(ray, distance_min, distance_max) {

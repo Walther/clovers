@@ -1,7 +1,8 @@
 use crate::{color::Color, colorize::colorize, scenes::Scene, Float};
 
 use indicatif::{ProgressBar, ProgressStyle};
-use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
 use pixels::{Error, Pixels, SurfaceTexture};
@@ -135,7 +136,7 @@ impl World {
                 let x = (i % width) as i16;
                 let y = height as i16 - (i / width) as i16; // flip y-axis
 
-                let mut rng = rand::thread_rng();
+                let mut rng = SmallRng::from_entropy();
                 let mut color: Color = Color::new(0.0, 0.0, 0.0);
 
                 let u = (x as Float + rng.gen::<Float>()) / width as Float;
