@@ -3,38 +3,38 @@
 use crate::{color::Color, Float, Vec3, PI};
 
 #[derive(Copy, Clone, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A standard checkered texture based on spatial 3D texturing.
 pub struct SpatialChecker {
-    #[cfg_attr(feature = "serde", serde(default = "default_even"))]
+    #[cfg_attr(feature = "serde-derive", serde(default = "default_even"))]
     /// Uniform color for the even-numbered checkers of the texture.
     pub even: Color,
-    #[cfg_attr(feature = "serde", serde(default = "default_odd"))]
+    #[cfg_attr(feature = "serde-derive", serde(default = "default_odd"))]
     /// Uniform color for the odd-numbered checkers of the texture.
     pub odd: Color,
-    #[cfg_attr(feature = "serde", serde(default = "default_density_spatial"))]
+    #[cfg_attr(feature = "serde-derive", serde(default = "default_density_spatial"))]
     /// Controls the density of the checkered pattern. Default value is 1.0, which corresponds to filling a 1.0 unit cube in the coordinate system with one color of the pattern. Even values preferred - odd values may create a visually thicker stripe due to two stripes with same color being next to each other.
     pub density: Float,
 }
 
-#[cfg(feature = "serde")]
+#[cfg(feature = "serde-derive")]
 fn default_even() -> Color {
     // White minus middle gray 18%
     Color::new(0.82, 0.82, 0.82)
 }
 
-#[cfg(feature = "serde")]
+#[cfg(feature = "serde-derive")]
 fn default_odd() -> Color {
     // Middle gray 18%
     Color::new(0.18, 0.18, 0.18)
 }
 
-#[cfg(feature = "serde")]
+#[cfg(feature = "serde-derive")]
 fn default_density_spatial() -> Float {
     1.0
 }
 
-#[cfg(feature = "serde")]
+#[cfg(feature = "serde-derive")]
 fn default_density_surface() -> Float {
     10.0
 }
@@ -66,14 +66,14 @@ impl SpatialChecker {
 }
 
 #[derive(Copy, Clone, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A standard checkered texture based on 2D surface UV coordinates.
 pub struct SurfaceChecker {
-    #[cfg_attr(feature = "serde", serde(default = "default_even"))]
+    #[cfg_attr(feature = "serde-derive", serde(default = "default_even"))]
     even: Color,
-    #[cfg_attr(feature = "serde", serde(default = "default_odd"))]
+    #[cfg_attr(feature = "serde-derive", serde(default = "default_odd"))]
     odd: Color,
-    #[cfg_attr(feature = "serde", serde(default = "default_density_surface"))]
+    #[cfg_attr(feature = "serde-derive", serde(default = "default_density_surface"))]
     /// Controls the density of the checkered pattern. Default value is 10, which corresponds to using 10 tiles over the width of the object. On spheres, this means 10 tiles around the sphere.
     density: Float,
 }

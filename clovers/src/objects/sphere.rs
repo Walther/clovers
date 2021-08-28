@@ -7,20 +7,20 @@ use crate::{
 use rand::rngs::SmallRng;
 
 #[derive(Clone, Copy, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// SphereInit structure describes the necessary data for constructing a [Sphere]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct SphereInit {
     /// Center of the sphere.
     pub center: Vec3,
     /// Radius of the sphere.
     pub radius: Float,
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde-derive", serde(default))]
     /// Material of the sphere.
     pub material: Material,
 }
 
 #[derive(Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A sphere object.
 pub struct Sphere {
     center: Vec3,

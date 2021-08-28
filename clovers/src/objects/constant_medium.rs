@@ -14,20 +14,20 @@ use rand::Rng;
 use super::Object;
 
 #[derive(Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// ConstantMediumInit structure describes the necessary data for constructing a [ConstantMedium]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct ConstantMediumInit {
     /// The boundary object for the constant medium. This determines the size and shape of the fog object.
     pub boundary: Box<Object>,
-    #[cfg_attr(feature = "serde", serde(default = "default_density"))]
+    #[cfg_attr(feature = "serde-derive", serde(default = "default_density"))]
     /// Density of the fog. TODO: example good value range?
     pub density: Float,
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde-derive", serde(default))]
     /// [Texture] used for the colorization of the fog.
     pub texture: Texture,
 }
 
-#[cfg(feature = "serde")]
+#[cfg(feature = "serde-derive")]
 // TODO: does this density setting even work?
 fn default_density() -> Float {
     0.1

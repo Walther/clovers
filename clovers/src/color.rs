@@ -9,7 +9,7 @@ use rand::Rng;
 
 /// RGB color based on three [Floats](crate::Float) values.
 #[derive(Copy, Clone, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct Color {
     /// The red component of the color, as a [Float]
     pub r: Float,

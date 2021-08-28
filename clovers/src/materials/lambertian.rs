@@ -11,10 +11,10 @@ use crate::{
 use rand::prelude::SmallRng;
 
 #[derive(Copy, Clone, Debug, Default)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// Lambertian material. This is the default material with a smooth, matte surface.
 pub struct Lambertian {
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde-derive", serde(default))]
     albedo: Texture,
 }
 

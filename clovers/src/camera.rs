@@ -7,7 +7,7 @@ use rand::rngs::SmallRng;
 use rand::Rng;
 
 #[derive(Copy, Clone, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// The main [Camera] object used in the ray tracing.
 pub struct Camera {
     /// Coordinate of the lower left corner of the camera.
@@ -34,7 +34,7 @@ pub struct Camera {
 }
 
 #[derive(Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// Represents the fields that can be described in a Scene file. Some other fields the main Camera struct requires (such as aspect_ratio) are derived from other info (such as width, height)
 pub struct CameraInit {
     /// Describes where the camera is

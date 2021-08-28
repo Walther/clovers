@@ -10,9 +10,12 @@ name = "clovers"
 path = "src/lib.rs"
 crate-type = ["lib"]
 
+[features]
+serde-derive = ["serde/derive", "nalgebra/serde-serialize"]
+
 [dependencies]
 # Required for everything
-nalgebra = { version = "0.29.0", features = ["serde-serialize", "libm"], default-features = false  }
+nalgebra = { version = "0.29.0", features = ["libm"], default-features = false  }
 rand = { version = "0.8.4", features = ["small_rng"], default-features = false }
 serde = { version = "1.0.129", features = ["derive"], default-features = false, optional = true  }
 

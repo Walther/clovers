@@ -24,7 +24,7 @@ pub use translate::*;
 
 #[derive(Debug)]
 /// An object enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub enum Object {
     /// XZRect object initializer
     XZRect(XZRectInit),
