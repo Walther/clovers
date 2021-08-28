@@ -136,7 +136,7 @@ impl World {
                 let x = (i % width) as i16;
                 let y = height as i16 - (i / width) as i16; // flip y-axis
 
-                let mut rng = SmallRng::from_entropy();
+                let mut rng = SmallRng::seed_from_u64(RANDOM_SEED);
                 let mut color: Color = Color::new(0.0, 0.0, 0.0);
 
                 let u = (x as Float + rng.gen::<Float>()) / width as Float;

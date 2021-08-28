@@ -103,3 +103,5 @@ pub const EPSILON_SHADOW_ACNE: Float = 0.001;
 pub const EPSILON_RECT_THICKNESS: Float = 0.0001;
 /// Internal const: epsilon used in the hit calculation of a [ConstantMedium](objects::constant_medium::ConstantMedium)
 pub const EPSILON_CONSTANT_MEDIUM: Float = 0.0001;
+/// Internal const: random seed used for no_std compatible [SmallRng](rand::rngs::SmallRng). Value is a hex representation of string "odd biases? bad seed", borrowed from [rand docs](https://docs.rs/rand/0.8.4/rand/trait.SeedableRng.html#method.seed_from_u64)
+pub const RANDOM_SEED: u64 = 0x0DDB1A5E5BAD5EEDu64;

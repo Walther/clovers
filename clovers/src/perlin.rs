@@ -3,7 +3,7 @@
 #![allow(clippy::needless_range_loop)] // TODO: figure out what clippy wants here
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
-use crate::{Float, Vec3};
+use crate::{Float, Vec3, RANDOM_SEED};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 
@@ -78,7 +78,8 @@ impl Perlin {
     pub fn new(rng: &mut SmallRng) -> Self {
         let mut random_vectors: [Vec3; 256] = [Vec3::new(0.0, 0.0, 0.0); 256];
         for i in 0..256 {
-            random_vectors[i] = Vec3::new_random();
+            random_vectors[i] =
+                Vec3::new(rng.gen::<Float>(), rng.gen::<Float>(), rng.gen::<Float>())
         }
 
         let perm_x = perlin_generate_perm(rng);
@@ -146,7 +147,7 @@ impl Perlin {
 
 impl Default for Perlin {
     fn default() -> Self {
-        let mut rng = SmallRng::from_entropy();
+        let mut rng = SmallRng::seed_from_u64(RANDOM_SEED);
         Perlin::new(&mut rng)
     }
 }

@@ -12,7 +12,7 @@ crate-type = ["lib"]
 
 [dependencies]
 # Required for everything
-nalgebra = { version = "0.29.0", features = ["serde-serialize", "libm", "rand"], default-features = false  }
+nalgebra = { version = "0.29.0", features = ["serde-serialize", "libm"], default-features = false  }
 rand = { version = "0.8.4", features = ["small_rng"], default-features = false }
 serde = { version = "1.0.127", features = ["derive"] }
 
