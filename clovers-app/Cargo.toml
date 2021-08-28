@@ -8,11 +8,11 @@ publish = false
 
 [dependencies]
 # clovers itself
-clovers = { path = "../clovers" }
+clovers = { path = "../clovers", features = ["serde-derive"]}
 # Required for everything
 rayon = "1.5.0"
 rand = { version = "0.8.4", features = ["small_rng"], default-features = false }
-serde = { version = "1.0.118", features = ["derive", "rc"] }
+serde = { version = "1.0.129", features = ["derive"], default-features = false }
 serde_json = "1.0.60"
 indicatif = { version = "0.16.0", features = ["rayon"] }
 clap = { version = "3.0.0-beta.2" }

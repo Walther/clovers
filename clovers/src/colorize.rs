@@ -9,7 +9,6 @@ use crate::{
     Float, EPSILON_SHADOW_ACNE,
 };
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
 
 /// The main coloring function. Sends a [Ray] to the [Scene], sees if it hits anything, and eventually returns a [Color]. Taking into account the [Material](crate::materials::Material) that is hit, the method recurses with various adjustments, with a new [Ray] started from the location that was hit.
 pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut SmallRng) -> Color {

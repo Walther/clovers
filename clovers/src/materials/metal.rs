@@ -10,13 +10,14 @@ use crate::{
     Float, Vec3,
 };
 use rand::prelude::SmallRng;
-use serde::{Deserialize, Serialize};
-#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A metal material. The amount of reflection can be adjusted with the `fuzz` parameter.
 pub struct Metal {
-    #[serde(default)]
+    #[cfg_attr(feature = "serde-derive", serde(default))]
     albedo: Texture,
-    #[serde(default)]
+    #[cfg_attr(feature = "serde-derive", serde(default))]
     fuzz: Float,
 }
 

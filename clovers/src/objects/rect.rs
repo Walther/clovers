@@ -12,23 +12,24 @@ use crate::{
     EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
-use serde::{Deserialize, Serialize};
+use rand::Rng;
 
 // XY
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct XYRectInit {
     pub x0: Float,
     pub x1: Float,
     pub y0: Float,
     pub y1: Float,
     pub k: Float,
-    #[serde(default)]
+    #[cfg_attr(feature = "serde-derive", serde(default))]
     pub material: Material,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct XYRect {
     x0: Float,
     x1: Float,
@@ -122,18 +123,20 @@ impl XYRect {
 
 // XZ
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct XZRectInit {
     pub x0: Float,
     pub x1: Float,
     pub z0: Float,
     pub z1: Float,
     pub k: Float,
-    #[serde(default)]
+    #[cfg_attr(feature = "serde-derive", serde(default))]
     pub material: Material,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct XZRect {
     x0: Float,
     x1: Float,
@@ -227,18 +230,20 @@ impl XZRect {
 
 // YZ
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct YZRectInit {
     pub y0: Float,
     pub y1: Float,
     pub z0: Float,
     pub z1: Float,
     pub k: Float,
-    #[serde(default)]
+    #[cfg_attr(feature = "serde-derive", serde(default))]
     pub material: Material,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct YZRect {
     y0: Float,
     y1: Float,

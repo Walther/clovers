@@ -5,22 +5,22 @@ use crate::{
     ray::Ray, Float, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
-use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// SphereInit structure describes the necessary data for constructing a [Sphere]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct SphereInit {
     /// Center of the sphere.
     pub center: Vec3,
     /// Radius of the sphere.
     pub radius: Float,
-    #[serde(default)]
+    #[cfg_attr(feature = "serde-derive", serde(default))]
     /// Material of the sphere.
     pub material: Material,
 }
 
-#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A sphere object.
 pub struct Sphere {
     center: Vec3,

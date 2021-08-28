@@ -5,11 +5,11 @@
 use crate::{Float, Vec3};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
-use serde::{Deserialize, Serialize};
+use rand::Rng;
 
 /// RGB color based on three [Floats](crate::Float) values.
-#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct Color {
     /// The red component of the color, as a [Float]
     pub r: Float,

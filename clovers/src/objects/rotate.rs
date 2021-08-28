@@ -7,12 +7,11 @@ use crate::{
     Box, Float, Vec3,
 };
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
-use serde::{Deserialize, Serialize};
 
 use super::Object;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// RotateInit structure describes the necessary data for constructing a [RotateY]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct RotateInit {
     /// The encased [Object] to rotate
