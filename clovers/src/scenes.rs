@@ -10,7 +10,6 @@ use crate::{
 };
 use rand::rngs::SmallRng;
 use rand::SeedableRng;
-use serde::{Deserialize, Serialize};
 
 // TODO: convert these to json or other
 // pub mod cornell;
@@ -61,7 +60,8 @@ impl Scene {
 }
 
 // TODO: better naming
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// A serialized representation of a [Scene].
 pub struct SceneFile {
     time_0: Float,

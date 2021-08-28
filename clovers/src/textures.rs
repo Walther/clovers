@@ -5,7 +5,6 @@
 pub mod checkered;
 pub mod noise_texture;
 pub mod solid_color;
-use serde::{Deserialize, Serialize};
 
 pub use checkered::*;
 // pub use noise_texture::*;
@@ -14,7 +13,8 @@ pub use solid_color::*;
 use crate::{color::Color, Float, Vec3};
 use noise_texture::NoiseTexture;
 
-#[derive(Copy, Clone, Deserialize, Serialize, Debug)]
+#[derive(Copy, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// A texture enum.
 pub enum Texture {
     /// SpatialChecker texture

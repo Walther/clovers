@@ -10,16 +10,15 @@ use crate::{
 };
 use rand::rngs::SmallRng;
 
-use serde::{Deserialize, Serialize};
-
 /// BoxyInit structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
-#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BoxyInit {
     /// First corner for the box
     pub corner_0: Vec3,
     /// Second, opposing corner for the box
     pub corner_1: Vec3,
-    #[serde(default)]
+    #[cfg_attr(feature = "serde", serde(default))]
     /// Material used for the box
     pub material: Material,
 }

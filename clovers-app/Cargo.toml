@@ -8,7 +8,7 @@ publish = false
 
 [dependencies]
 # clovers itself
-clovers = { path = "../clovers" }
+clovers = { path = "../clovers", features = ["serde"]}
 # Required for everything
 rayon = "1.5.0"
 rand = { version = "0.8.4", features = ["small_rng"], default-features = false }

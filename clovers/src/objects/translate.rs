@@ -8,11 +8,10 @@ use crate::{
 };
 use rand::rngs::SmallRng;
 
-use serde::{Deserialize, Serialize};
-
 use super::Object;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// TranslateInit structure describes the necessary data for constructing a [Translate] object. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct TranslateInit {
     /// The encased [Object] to translate i.e. move

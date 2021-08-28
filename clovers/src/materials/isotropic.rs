@@ -10,12 +10,12 @@ use crate::{
     Float, PI,
 };
 use rand::prelude::SmallRng;
-use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Debug, Copy, Clone, Default)]
+#[derive(Debug, Copy, Clone, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Isotropic material. Used in [ConstantMedium](crate::objects::constant_medium). TODO: understand this!
 pub struct Isotropic {
-    #[serde(default)]
+    #[cfg_attr(feature = "serde", serde(default))]
     albedo: Texture,
 }
 

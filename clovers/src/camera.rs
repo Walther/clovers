@@ -5,9 +5,9 @@
 use crate::{random::random_in_unit_disk, ray::Ray, Float, Vec3, PI};
 use rand::rngs::SmallRng;
 use rand::Rng;
-use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// The main [Camera] object used in the ray tracing.
 pub struct Camera {
     /// Coordinate of the lower left corner of the camera.
@@ -33,7 +33,8 @@ pub struct Camera {
     pub w: Vec3,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Represents the fields that can be described in a Scene file. Some other fields the main Camera struct requires (such as aspect_ratio) are derived from other info (such as width, height)
 pub struct CameraInit {
     /// Describes where the camera is
