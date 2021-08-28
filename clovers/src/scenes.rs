@@ -6,7 +6,7 @@ use crate::{
     color::Color,
     hitable::{Hitable, HitableList},
     objects::Object,
-    Float, Vec, RANDOM_SEED,
+    Float, Vec,
 };
 use rand::rngs::SmallRng;
 use rand::SeedableRng;
@@ -76,7 +76,7 @@ pub struct SceneFile {
 pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     let time_0 = scene_file.time_0;
     let time_1 = scene_file.time_1;
-    let mut rng = SmallRng::seed_from_u64(RANDOM_SEED);
+    let mut rng = SmallRng::from_entropy();
     let background_color = scene_file.background_color;
     let camera = Camera::new(
         scene_file.camera.look_from,
