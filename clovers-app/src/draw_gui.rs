@@ -1,4 +1,4 @@
-use crate::{color::Color, colorize::colorize, scenes::Scene, Float};
+use crate::{color::Color, colorize::colorize, scenes::Scene, Float, RANDOM_SEED};
 
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::rngs::SmallRng;
