@@ -9,7 +9,7 @@ use crate::{
     Box, Float, Vec3,
 };
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+
 use serde::{Deserialize, Serialize};
 
 /// BoxyInit structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).

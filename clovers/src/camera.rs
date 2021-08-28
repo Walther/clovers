@@ -4,7 +4,7 @@
 
 use crate::{random::random_in_unit_disk, ray::Ray, Float, Vec3, PI};
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]

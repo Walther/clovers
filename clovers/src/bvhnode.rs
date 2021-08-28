@@ -3,7 +3,7 @@
 use core::cmp::Ordering;
 
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use rand::Rng;
 
 use crate::{
     aabb::AABB,

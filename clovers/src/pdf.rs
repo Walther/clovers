@@ -4,7 +4,7 @@
 
 use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Box, Float, Vec3, PI};
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use rand::Rng;
 
 #[derive(Debug)]
 pub enum PDF<'a> {

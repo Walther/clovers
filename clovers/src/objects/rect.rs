@@ -12,7 +12,7 @@ use crate::{
     EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 
 // XY

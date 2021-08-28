@@ -2,7 +2,7 @@
 
 use crate::{aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3, PI};
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]

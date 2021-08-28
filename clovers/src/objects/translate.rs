@@ -7,7 +7,7 @@ use crate::{
     Box, Float, Vec3,
 };
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+
 use serde::{Deserialize, Serialize};
 
 use super::Object;

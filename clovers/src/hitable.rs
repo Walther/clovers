@@ -14,7 +14,7 @@ use crate::{
     Float, Vec, Vec3,
 };
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use rand::Rng;
 
 /// Represents a ray-object intersection, with plenty of data about the intersection.
 #[derive(Debug)]

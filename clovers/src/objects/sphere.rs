@@ -5,7 +5,7 @@ use crate::{
     ray::Ray, Float, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]

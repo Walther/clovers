@@ -2,7 +2,7 @@
 
 use crate::{Float, Vec3, PI};
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use rand::Rng;
 
 /// Internal helper. Originally used for lambertian reflection with flaws
 pub fn random_in_unit_sphere(rng: &mut SmallRng) -> Vec3 {

@@ -9,7 +9,7 @@ use crate::{
     Box, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
 };
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 
 use super::Object;

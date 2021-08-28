@@ -9,7 +9,7 @@ use crate::{
     Float, Vec,
 };
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use rand::SeedableRng;
 use serde::{Deserialize, Serialize};
 
 // TODO: convert these to json or other

@@ -5,7 +5,7 @@
 use crate::{Float, Vec3};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 
 /// RGB color based on three [Floats](crate::Float) values.
