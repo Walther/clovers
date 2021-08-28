@@ -1,6 +1,6 @@
 //! A box or a cuboid object: a parallelepiped with six rectangular faces. Named [Boxy] to avoid clashing with [Box].
 
-use super::{XYRect, XZRect, YZRect};
+use super::Quad;
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable, HitableList},
@@ -37,25 +37,69 @@ impl Boxy {
     /// Initializes a new instance of a box, given two opposing [Vec3] corners `corner_0` and `corner_1`, and a [Material] `material`.
     pub fn new(corner_0: Vec3, corner_1: Vec3, material: Material) -> Self {
         let mut sides = HitableList::new();
-        sides.add(Hitable::XYRect(XYRect::new(
-            corner_0.x, corner_1.x, corner_0.y, corner_1.y, corner_1.z, material,
-        )));
-        sides.add(Hitable::XYRect(XYRect::new(
-            corner_0.x, corner_1.x, corner_0.y, corner_1.y, corner_0.z, material,
+
+        // Construct the two opposite vertices with the minimum and maximum coordinates.
+        let min: Vec3 = Vec3::new(
+            corner_0.x.min(corner_1.x),
+            corner_0.y.min(corner_1.y),
+            corner_0.z.min(corner_1.z),
+        );
+        let max: Vec3 = Vec3::new(
+            corner_0.x.max(corner_1.x),
+            corner_0.y.max(corner_1.y),
+            corner_0.z.max(corner_1.z),
+        );
+
+        let dx: Vec3 = Vec3::new(max.x - min.x, 0.0, 0.0);
+        let dy: Vec3 = Vec3::new(0.0, max.y - min.y, 0.0);
+        let dz: Vec3 = Vec3::new(0.0, 0.0, max.z - min.z);
+
+        // front
+        sides.add(Hitable::Quad(Quad::new(
+            Vec3::new(min.x, min.y, max.z),
+            dx,
+            dy,
+            material,
         )));
 
-        sides.add(Hitable::XZRect(XZRect::new(
-            corner_0.x, corner_1.x, corner_0.z, corner_1.z, corner_1.y, material,
-        )));
-        sides.add(Hitable::XZRect(XZRect::new(
-            corner_0.x, corner_1.x, corner_0.z, corner_1.z, corner_0.y, material,
+        // right
+        sides.add(Hitable::Quad(Quad::new(
+            Vec3::new(max.x, min.y, max.z),
+            -dz,
+            dy,
+            material,
         )));
 
-        sides.add(Hitable::YZRect(YZRect::new(
-            corner_0.y, corner_1.y, corner_0.z, corner_1.z, corner_1.x, material,
+        // back
+        sides.add(Hitable::Quad(Quad::new(
+            Vec3::new(max.x, min.y, min.z),
+            -dx,
+            dy,
+            material,
         )));
-        sides.add(Hitable::YZRect(YZRect::new(
-            corner_0.y, corner_1.y, corner_0.z, corner_1.z, corner_0.x, material,
+
+        // left
+        sides.add(Hitable::Quad(Quad::new(
+            Vec3::new(min.x, min.y, min.z),
+            dz,
+            dy,
+            material,
+        )));
+
+        // top
+        sides.add(Hitable::Quad(Quad::new(
+            Vec3::new(min.x, max.y, max.z),
+            dx,
+            -dz,
+            material,
+        )));
+
+        // bottom
+        sides.add(Hitable::Quad(Quad::new(
+            Vec3::new(min.x, min.y, min.z),
+            dx,
+            dz,
+            material,
         )));
 
         Boxy {

@@ -7,8 +7,8 @@ use crate::{
     bvhnode::BVHNode,
     materials::Material,
     objects::{
-        Boxy, ConstantMedium, FlipFace, MovingSphere, RotateY, Sphere, Translate, XYRect, XZRect,
-        YZRect,
+        Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, XYRect,
+        XZRect, YZRect,
     },
     ray::Ray,
     Float, Vec, Vec3,
@@ -64,6 +64,7 @@ pub enum Hitable {
     BVHNode(BVHNode),
     HitableList(HitableList),
     FlipFace(FlipFace),
+    Quad(Quad),
 }
 
 impl Hitable {
@@ -87,6 +88,7 @@ impl Hitable {
             Hitable::BVHNode(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::HitableList(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::FlipFace(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::Quad(h) => h.hit(ray, distance_min, distance_max, rng),
         }
     }
 
@@ -104,6 +106,7 @@ impl Hitable {
             Hitable::BVHNode(h) => h.bounding_box(t0, t1),
             Hitable::HitableList(h) => h.bounding_box(t0, t1),
             Hitable::FlipFace(h) => h.bounding_box(t0, t1),
+            Hitable::Quad(h) => h.bounding_box(t0, t1),
         }
     }
 
@@ -114,6 +117,7 @@ impl Hitable {
             Hitable::YZRect(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
             _ => 0.0,
         }
     }
@@ -125,6 +129,7 @@ impl Hitable {
             Hitable::YZRect(h) => h.random(origin, rng),
             Hitable::HitableList(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
+            Hitable::Quad(h) => h.random(origin, rng),
             _ => Vec3::new(1.0, 0.0, 0.0),
         }
     }
