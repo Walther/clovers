@@ -246,3 +246,15 @@ impl Default for HitableList {
         Self::new()
     }
 }
+
+/// Returns a tuple of `(front_face, normal)`. Used in lieu of `set_face_normal` in the Ray Tracing for the Rest Of Your Life book.
+pub fn get_orientation(ray: &Ray, outward_normal: Vec3) -> (bool, Vec3) {
+    let front_face = ray.direction.dot(&outward_normal) < 0.0;
+    let normal = if front_face {
+        outward_normal
+    } else {
+        -outward_normal
+    };
+
+    (front_face, normal)
+}

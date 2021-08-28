@@ -3,11 +3,26 @@
 
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
-    aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3,
-    EPSILON_RECT_THICKNESS,
+    aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
+    Vec3, EPSILON_RECT_THICKNESS,
 };
 use rand::rngs::SmallRng;
 use rand::Rng;
+
+/// Initialization structure for a Quad object.
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+pub struct QuadInit {
+    /// Corner point
+    pub q: Vec3,
+    /// Vector describing the u side
+    pub u: Vec3,
+    /// Vector describing the v side
+    pub v: Vec3,
+    /// Material of the surface
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub material: Material,
+}
 
 /// Quadrilateral shape. This can be an arbitrary parallelogram, not just a rectangle.
 #[derive(Clone, Copy, Debug)]
@@ -94,14 +109,16 @@ impl Quad {
 
         // Ray hits the 2D shape; set the rest of the hit record and return
 
+        let (front_face, normal) = get_orientation(ray, self.normal);
+
         Some(HitRecord {
             distance: t,
             position: intersection,
-            normal: self.normal,
+            normal,
             u: alpha,
             v: beta,
             material: &self.material,
-            front_face: true, // TODO: yes or no?
+            front_face,
         })
     }
 

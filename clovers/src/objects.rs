@@ -34,6 +34,8 @@ pub enum Object {
     XYRect(XYRectInit),
     /// YZRect object initializer
     YZRect(YZRectInit),
+    /// Quad object initializer
+    Quad(QuadInit),
     /// Sphere object initializer
     Sphere(SphereInit),
     /// Boxy object initializer
@@ -60,6 +62,7 @@ impl From<Object> for Hitable {
             Object::YZRect(x) => {
                 Hitable::YZRect(YZRect::new(x.y0, x.y1, x.z0, x.z1, x.k, x.material))
             }
+            Object::Quad(x) => Hitable::Quad(Quad::new(x.q, x.u, x.v, x.material)),
             Object::Sphere(x) => Hitable::Sphere(Sphere::new(x.center, x.radius, x.material)),
             Object::Boxy(x) => Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, x.material)),
             Object::RotateY(x) => {
