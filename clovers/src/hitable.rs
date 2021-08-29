@@ -6,7 +6,9 @@ use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
     materials::Material,
-    objects::{Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate},
+    objects::{
+        Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
+    },
     ray::Ray,
     Float, Vec, Vec3,
 };
@@ -59,6 +61,7 @@ pub enum Hitable {
     RotateY(RotateY),
     Sphere(Sphere),
     Translate(Translate),
+    Triangle(Triangle),
 }
 
 impl Hitable {
@@ -80,6 +83,7 @@ impl Hitable {
             Hitable::RotateY(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Sphere(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Translate(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::Triangle(h) => h.hit(ray, distance_min, distance_max, rng),
         }
     }
 
@@ -95,6 +99,7 @@ impl Hitable {
             Hitable::RotateY(h) => h.bounding_box(t0, t1),
             Hitable::Sphere(h) => h.bounding_box(t0, t1),
             Hitable::Translate(h) => h.bounding_box(t0, t1),
+            Hitable::Triangle(h) => h.bounding_box(t0, t1),
         }
     }
 
@@ -105,6 +110,7 @@ impl Hitable {
             Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::Triangle(h) => h.pdf_value(origin, vector, time, rng),
             _ => 0.0,
         }
     }
@@ -116,6 +122,7 @@ impl Hitable {
             Hitable::HitableList(h) => h.random(origin, rng),
             Hitable::Quad(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
+            Hitable::Triangle(h) => h.random(origin, rng),
             _ => Vec3::new(1.0, 0.0, 0.0), // TODO: fix bad default
         }
     }

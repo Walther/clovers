@@ -1,6 +1,6 @@
 //! Axis-aligned bounding box.
 
-use crate::{ray::Ray, Float, Vec3};
+use crate::{ray::Ray, Float, Vec3, EPSILON_RECT_THICKNESS};
 
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
@@ -53,5 +53,21 @@ impl AABB {
         );
 
         AABB::new(small, big)
+    }
+
+    /// Slightly increases the AABB size to make sure we don't have a zero-thickness one
+    pub fn pad(&mut self) {
+        // TODO: improved padding function
+        self.min = Vec3::new(
+            self.min.x - EPSILON_RECT_THICKNESS,
+            self.min.y - EPSILON_RECT_THICKNESS,
+            self.min.z - EPSILON_RECT_THICKNESS,
+        );
+
+        self.max = Vec3::new(
+            self.max.x + EPSILON_RECT_THICKNESS,
+            self.max.y + EPSILON_RECT_THICKNESS,
+            self.max.z + EPSILON_RECT_THICKNESS,
+        );
     }
 }
