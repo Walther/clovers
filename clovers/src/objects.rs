@@ -1,6 +1,9 @@
 //! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
 
-use crate::{hitable::Hitable, Box};
+use crate::{
+    hitable::{Hitable, HitableList},
+    Box,
+};
 
 pub mod boxy; // avoid keyword
 pub mod constant_medium;
@@ -11,6 +14,7 @@ pub mod rotate;
 pub mod sphere;
 pub mod translate;
 
+use alloc::vec::Vec;
 pub use boxy::*; // avoid keyword
 pub use constant_medium::*;
 pub use flip_face::*;
@@ -22,6 +26,9 @@ pub use translate::*;
 
 // TODO: This is kind of an ugly hack, having to double-implement various structures to have an external representation vs internal representation. How could this be made cleaner?
 
+/// A list of objects. Allows multiple objects to be used e.g. in a Rotate or Translate object as the target.
+pub type ObjectList = Vec<Object>;
+
 #[derive(Debug)]
 /// An object enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -32,6 +39,8 @@ pub enum Object {
     ConstantMedium(ConstantMediumInit),
     /// FlipFace object initializer
     FlipFace(FlipFaceInit),
+    /// ObjectList object initializer
+    ObjectList(ObjectList),
     /// MovingSphere object initializer
     MovingSphere(MovingSphere),
     /// Quad object initializer
@@ -57,6 +66,13 @@ impl From<Object> for Hitable {
                 let obj = *x.object;
                 let obj: Hitable = obj.into();
                 Hitable::FlipFace(FlipFace::new(obj))
+            }
+            Object::ObjectList(x) => {
+                let mut hitable_list = HitableList::new();
+                for obj in x {
+                    hitable_list.add(obj.into())
+                }
+                Hitable::HitableList(hitable_list)
             }
             Object::MovingSphere(x) => Hitable::MovingSphere(MovingSphere::new(
                 x.center_0, x.center_1, x.time_0, x.time_1, x.radius, x.material,

@@ -196,10 +196,9 @@ let marble = {
 scene.objects.push(marble);
 
 // Sphere-rasterized pseudo box
-// TODO: scene initialization cannot currently import an object that contains a list
-// NOTE: the rotatey object would contain the spherebox, which is a list in this generated scene
-/*
-let spherebox = [];
+let spherebox = {
+  ObjectList: [],
+};
 let num_spheres = 1000;
 let white = {
   Lambertian: {
@@ -222,7 +221,7 @@ for (let i = 0; i < num_spheres; i++) {
       material: white,
     },
   };
-  spherebox.push(sphere);
+  spherebox.ObjectList.push(sphere);
 }
 let rotated_spherebox = {
   RotateY: {
@@ -237,7 +236,6 @@ let translated_spherebox = {
   },
 };
 scene.objects.push(translated_spherebox);
-*/
 
 let json = JSON.stringify(scene, null, 2);
 fs.writeFileSync(path.join(__dirname, "the_next_week.json"), json);
