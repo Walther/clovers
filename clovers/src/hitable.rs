@@ -101,6 +101,7 @@ impl Hitable {
     // TODO: does this actually handle all objects?
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
+            Hitable::Boxy(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
@@ -111,6 +112,7 @@ impl Hitable {
     // TODO: does this actually handle all objects?
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         match self {
+            Hitable::Boxy(h) => h.random(origin, rng),
             Hitable::HitableList(h) => h.random(origin, rng),
             Hitable::Quad(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),

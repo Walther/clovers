@@ -125,4 +125,14 @@ impl Boxy {
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         Some(AABB::new(self.corner_0, self.corner_1))
     }
+
+    /// Returns a probability density function value? // TODO: understand & explain
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+        self.sides.pdf_value(origin, vector, time, rng)
+    }
+
+    /// Returns a random point on the box
+    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+        self.sides.random(origin, rng)
+    }
 }
