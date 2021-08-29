@@ -13,6 +13,7 @@ pub mod quad;
 pub mod rotate;
 pub mod sphere;
 pub mod translate;
+pub mod triangle;
 
 use alloc::vec::Vec;
 pub use boxy::*; // avoid keyword
@@ -23,6 +24,7 @@ pub use quad::*;
 pub use rotate::*;
 pub use sphere::*;
 pub use translate::*;
+pub use triangle::*;
 
 // TODO: This is kind of an ugly hack, having to double-implement various structures to have an external representation vs internal representation. How could this be made cleaner?
 
@@ -51,6 +53,8 @@ pub enum Object {
     Sphere(SphereInit),
     /// Translate object initializer
     Translate(TranslateInit),
+    /// Triangle object initializer
+    Triangle(TriangleInit),
 }
 
 impl From<Object> for Hitable {
@@ -89,6 +93,7 @@ impl From<Object> for Hitable {
                 let obj: Hitable = obj.into();
                 Hitable::Translate(Translate::new(Box::new(obj), x.offset))
             }
+            Object::Triangle(x) => Hitable::Triangle(Triangle::new(x.q, x.u, x.v, x.material)),
         }
     }
 }

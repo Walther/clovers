@@ -1,4 +1,4 @@
-//! A quadrilateral object.
+//! A triangle object. Almost exact copy of [Quad], with an adjusted `hit_ab` method.
 // TODO: better docs
 
 use crate::EPSILON_SHADOW_ACNE;
@@ -9,10 +9,10 @@ use crate::{
 use rand::rngs::SmallRng;
 use rand::Rng;
 
-/// Initialization structure for a Quad object.
-#[derive(Clone, Copy, Debug)]
+/// Initialization structure for a triangle primitive
+#[derive(Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct QuadInit {
+pub struct TriangleInit {
     /// Corner point
     pub q: Vec3,
     /// Vector describing the u side
@@ -27,7 +27,7 @@ pub struct QuadInit {
 /// Quadrilateral shape. This can be an arbitrary parallelogram, not just a rectangle.
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct Quad {
+pub struct Triangle {
     /// Corner point
     pub q: Vec3,
     /// Vector describing the u side
@@ -49,20 +49,20 @@ pub struct Quad {
     pub aabb: AABB,
 }
 
-impl Quad {
-    /// Creates a new quad
-    pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Quad {
+impl Triangle {
+    /// Creates a new triangle
+    pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Triangle {
         let n: Vec3 = u.cross(&v);
         let normal: Vec3 = n.normalize();
         // TODO: what is this?
         let d = -(normal.dot(&q));
         // TODO: what is this?
         let w: Vec3 = n / n.dot(&n);
-        let area = n.magnitude();
-        let mut aabb = AABB::new(q, q + u + v);
+        let area = n.magnitude() / 2.0;
+        let mut aabb: AABB = AABB::new(q, q + u + v);
         aabb.pad();
 
-        Quad {
+        Triangle {
             q,
             u,
             v,
@@ -75,7 +75,7 @@ impl Quad {
         }
     }
 
-    /// Hit method for the quad rectangle
+    /// Hit method for the triangle
     pub fn hit(
         &self,
         ray: &Ray,
@@ -122,13 +122,16 @@ impl Quad {
         })
     }
 
-    /// Returns the bounding box of the quad
+    /// Returns the bounding box of the triangle
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+        // TODO: this is from quad and not updated!
+        // although i guess a triangle's aabb is the same as the quad's aabb in worst case
         Some(self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+        // TODO: this is from quad and not updated!
         match self.hit(
             &Ray::new(origin, vector, time),
             EPSILON_SHADOW_ACNE,
@@ -146,9 +149,17 @@ impl Quad {
         }
     }
 
-    /// Returns a random point on the quadrilateral surface
+    /// Returns a random point on the triangle surface
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        let point: Vec3 = self.q + (rng.gen::<Float>() * self.u) + (rng.gen::<Float>() * self.v);
+        let mut a = rng.gen::<Float>();
+        let mut b = rng.gen::<Float>();
+        if a + b > 1.0 {
+            a = 1.0 - a;
+            b = 1.0 - b;
+        }
+
+        let point: Vec3 = self.q + (a * self.u) + (b * self.v);
+
         point - origin
     }
 }
@@ -156,5 +167,6 @@ impl Quad {
 fn hit_ab(a: Float, b: Float) -> bool {
     // Given the hit point in plane coordinates, return false if it is outside the
     // primitive, otherwise return true.
-    (0.0..=1.0).contains(&a) && (0.0..=1.0).contains(&b)
+    // Triangle: a+b must be <=1.0
+    (0.0..=1.0).contains(&a) && (0.0..=1.0).contains(&b) && (a + b <= 1.0)
 }
