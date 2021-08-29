@@ -11,21 +11,6 @@ use crate::{
 use rand::rngs::SmallRng;
 use rand::SeedableRng;
 
-// TODO: convert these to json or other
-// pub mod cornell;
-// pub mod cornell_book3_final;
-// pub mod cornell_with_boxes;
-// pub mod cornell_with_glass_cube;
-// pub mod cornell_with_smoke;
-// pub mod cornell_with_sphere;
-// pub mod cornell_with_subsurface_sphere;
-// pub mod final_scene;
-// pub mod glass_spheres;
-// pub mod metal_spheres;
-// pub mod random_scene;
-// pub mod simple_light_lambertian;
-// pub mod two_spheres;
-
 #[derive(Debug)]
 /// A representation of the scene that is being rendered.
 pub struct Scene {
