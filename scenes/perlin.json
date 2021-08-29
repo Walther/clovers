@@ -12,21 +12,15 @@
   "background_color": [0, 0, 0],
   "objects": [
     {
-      "FlipFace": {
-        "object": {
-          "XZRect": {
-            "x0": -100,
-            "x1": 100,
-            "z0": -100,
-            "z1": 0,
-            "k": 80,
-            "material": {
-              "DiffuseLight": {
-                "emit": {
-                  "SolidColor": {
-                    "color": [2.5, 2.5, 2.5]
-                  }
-                }
+      "Quad": {
+        "q": [-100.0, 80.0, -100.0],
+        "u": [200.0, 0.0, 0.0],
+        "v": [0.0, 0.0, 100.0],
+        "material": {
+          "DiffuseLight": {
+            "emit": {
+              "SolidColor": {
+                "color": [2.5, 2.5, 2.5]
               }
             }
           }
@@ -51,21 +45,15 @@
   ],
   "priority_objects": [
     {
-      "FlipFace": {
-        "object": {
-          "XZRect": {
-            "x0": -100,
-            "x1": 100,
-            "z0": -100,
-            "z1": 0,
-            "k": 80,
-            "material": {
-              "DiffuseLight": {
-                "emit": {
-                  "SolidColor": {
-                    "color": [2.5, 2.5, 2.5]
-                  }
-                }
+      "Quad": {
+        "q": [-100.0, 80.0, -100.0],
+        "u": [200.0, 0.0, 0.0],
+        "v": [0.0, 0.0, 100.0],
+        "material": {
+          "DiffuseLight": {
+            "emit": {
+              "SolidColor": {
+                "color": [2.5, 2.5, 2.5]
               }
             }
           }
