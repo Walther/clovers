@@ -45,11 +45,11 @@ impl Material {
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
         match *self {
-            Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),
-            Material::DiffuseLight(d) => DiffuseLight::scatter(d, ray, hit_record, rng),
-            Material::Metal(m) => Metal::scatter(m, ray, hit_record, rng),
             Material::Dielectric(d) => Dielectric::scatter(d, ray, hit_record, rng),
+            Material::DiffuseLight(d) => DiffuseLight::scatter(d, ray, hit_record, rng),
             Material::Isotropic(i) => Isotropic::scatter(i, ray, hit_record, rng),
+            Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),
+            Material::Metal(m) => Metal::scatter(m, ray, hit_record, rng),
         }
     }
 
@@ -63,10 +63,10 @@ impl Material {
     ) -> Float {
         match *self {
             Material::Dielectric(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
-            Material::Lambertian(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
             Material::DiffuseLight(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
-            Material::Metal(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
             Material::Isotropic(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
+            Material::Lambertian(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
+            Material::Metal(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
         }
     }
 
