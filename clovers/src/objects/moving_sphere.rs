@@ -7,12 +7,19 @@ use rand::rngs::SmallRng;
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A moving sphere object. This is represented by one `radius`, two center points `center_0` `center_1`, two times `time_0` `time_1`, and a [Material]. Any [Rays](Ray) hitting the object will also have an internal `time` value, which will be used for determining the interpolated position of the sphere at that time. With lots of rays hitting every pixel but at randomized times, we get temporal multiplexing and an approximation of perceived motion blur.
 pub struct MovingSphere {
-    center_0: Vec3,
-    center_1: Vec3,
-    time_0: Float,
-    time_1: Float,
-    radius: Float,
-    material: Material,
+    /// Center point of the sphere at time_0
+    pub center_0: Vec3,
+    /// Center point of the sphere at time_1
+    pub center_1: Vec3,
+    /// Time 0
+    pub time_0: Float,
+    /// Time 1
+    pub time_1: Float,
+    /// Radius of the sphere
+    pub radius: Float,
+    /// Material of the sphere
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub material: Material,
 }
 
 impl MovingSphere {
