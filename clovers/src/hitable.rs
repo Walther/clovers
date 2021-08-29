@@ -6,10 +6,7 @@ use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
     materials::Material,
-    objects::{
-        Boxy, ConstantMedium, FlipFace, MovingSphere, RotateY, Sphere, Translate, XYRect, XZRect,
-        YZRect,
-    },
+    objects::{Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate},
     ray::Ray,
     Float, Vec, Vec3,
 };
@@ -53,17 +50,15 @@ impl<'a> HitRecord<'a> {
 #[derive(Debug, Clone)]
 pub enum Hitable {
     Boxy(Boxy),
+    BVHNode(BVHNode),
     ConstantMedium(ConstantMedium),
+    FlipFace(FlipFace),
+    HitableList(HitableList),
     MovingSphere(MovingSphere),
-    XZRect(XZRect),
-    XYRect(XYRect),
-    YZRect(YZRect),
+    Quad(Quad),
     RotateY(RotateY),
     Sphere(Sphere),
     Translate(Translate),
-    BVHNode(BVHNode),
-    HitableList(HitableList),
-    FlipFace(FlipFace),
 }
 
 impl Hitable {
@@ -76,56 +71,52 @@ impl Hitable {
     ) -> Option<HitRecord> {
         match self {
             Hitable::Boxy(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::BVHNode(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::ConstantMedium(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::FlipFace(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::HitableList(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::MovingSphere(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::XZRect(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::XYRect(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::YZRect(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::Quad(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::RotateY(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Sphere(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Translate(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::BVHNode(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::HitableList(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::FlipFace(h) => h.hit(ray, distance_min, distance_max, rng),
         }
     }
 
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         match self {
             Hitable::Boxy(h) => h.bounding_box(t0, t1),
+            Hitable::BVHNode(h) => h.bounding_box(t0, t1),
             Hitable::ConstantMedium(h) => h.bounding_box(t0, t1),
+            Hitable::FlipFace(h) => h.bounding_box(t0, t1),
+            Hitable::HitableList(h) => h.bounding_box(t0, t1),
             Hitable::MovingSphere(h) => h.bounding_box(t0, t1),
-            Hitable::XZRect(h) => h.bounding_box(t0, t1),
-            Hitable::XYRect(h) => h.bounding_box(t0, t1),
-            Hitable::YZRect(h) => h.bounding_box(t0, t1),
+            Hitable::Quad(h) => h.bounding_box(t0, t1),
             Hitable::RotateY(h) => h.bounding_box(t0, t1),
             Hitable::Sphere(h) => h.bounding_box(t0, t1),
             Hitable::Translate(h) => h.bounding_box(t0, t1),
-            Hitable::BVHNode(h) => h.bounding_box(t0, t1),
-            Hitable::HitableList(h) => h.bounding_box(t0, t1),
-            Hitable::FlipFace(h) => h.bounding_box(t0, t1),
         }
     }
 
+    // TODO: does this actually handle all objects?
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
-            Hitable::XZRect(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::XYRect(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::YZRect(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::Boxy(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
             _ => 0.0,
         }
     }
 
+    // TODO: does this actually handle all objects?
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         match self {
-            Hitable::XZRect(h) => h.random(origin, rng),
-            Hitable::XYRect(h) => h.random(origin, rng),
-            Hitable::YZRect(h) => h.random(origin, rng),
+            Hitable::Boxy(h) => h.random(origin, rng),
             Hitable::HitableList(h) => h.random(origin, rng),
+            Hitable::Quad(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
-            _ => Vec3::new(1.0, 0.0, 0.0),
+            _ => Vec3::new(1.0, 0.0, 0.0), // TODO: fix bad default
         }
     }
 
@@ -240,4 +231,16 @@ impl Default for HitableList {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// Returns a tuple of `(front_face, normal)`. Used in lieu of `set_face_normal` in the Ray Tracing for the Rest Of Your Life book.
+pub fn get_orientation(ray: &Ray, outward_normal: Vec3) -> (bool, Vec3) {
+    let front_face = ray.direction.dot(&outward_normal) < 0.0;
+    let normal = if front_face {
+        outward_normal
+    } else {
+        -outward_normal
+    };
+
+    (front_face, normal)
 }

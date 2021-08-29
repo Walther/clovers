@@ -17,24 +17,24 @@ use noise_texture::NoiseTexture;
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A texture enum.
 pub enum Texture {
+    /// NoiseTexture texture
+    NoiseTexture(NoiseTexture),
+    /// SolidColor texture
+    SolidColor(SolidColor),
     /// SpatialChecker texture
     SpatialChecker(SpatialChecker),
     /// SurfaceChecker texture
     SurfaceChecker(SurfaceChecker),
-    /// SolidColor texture
-    SolidColor(SolidColor),
-    /// NoiseTexture texture
-    NoiseTexture(NoiseTexture),
 }
 
 impl Texture {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match *self {
+            Texture::NoiseTexture(n) => NoiseTexture::color(n, u, v, position),
+            Texture::SolidColor(s) => SolidColor::color(s, u, v, position),
             Texture::SpatialChecker(c) => SpatialChecker::color(c, u, v, position),
             Texture::SurfaceChecker(c) => SurfaceChecker::color(c, u, v, position),
-            Texture::SolidColor(s) => SolidColor::color(s, u, v, position),
-            Texture::NoiseTexture(n) => NoiseTexture::color(n, u, v, position),
         }
     }
 }
