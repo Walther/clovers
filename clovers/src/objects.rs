@@ -32,6 +32,8 @@ pub enum Object {
     ConstantMedium(ConstantMediumInit),
     /// FlipFace object initializer
     FlipFace(FlipFaceInit),
+    /// MovingSphere object initializer
+    MovingSphere(MovingSphere),
     /// Quad object initializer
     Quad(QuadInit),
     /// RotateY object initializer
@@ -56,6 +58,9 @@ impl From<Object> for Hitable {
                 let obj: Hitable = obj.into();
                 Hitable::FlipFace(FlipFace::new(obj))
             }
+            Object::MovingSphere(x) => Hitable::MovingSphere(MovingSphere::new(
+                x.center_0, x.center_1, x.time_0, x.time_1, x.radius, x.material,
+            )),
             Object::Quad(x) => Hitable::Quad(Quad::new(x.q, x.u, x.v, x.material)),
             Object::RotateY(x) => {
                 let obj = *x.object;
