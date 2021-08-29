@@ -7,7 +7,6 @@ pub mod constant_medium;
 pub mod flip_face;
 pub mod moving_sphere;
 pub mod quad;
-pub mod rect;
 pub mod rotate;
 pub mod sphere;
 pub mod translate;
@@ -17,7 +16,6 @@ pub use constant_medium::*;
 pub use flip_face::*;
 pub use moving_sphere::*;
 pub use quad::*;
-pub use rect::*;
 pub use rotate::*;
 pub use sphere::*;
 pub use translate::*;
@@ -28,12 +26,6 @@ pub use translate::*;
 /// An object enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub enum Object {
-    /// XZRect object initializer
-    XZRect(XZRectInit),
-    /// XYRect object initializer
-    XYRect(XYRectInit),
-    /// YZRect object initializer
-    YZRect(YZRectInit),
     /// Quad object initializer
     Quad(QuadInit),
     /// Sphere object initializer
@@ -53,15 +45,6 @@ pub enum Object {
 impl From<Object> for Hitable {
     fn from(obj: Object) -> Hitable {
         match obj {
-            Object::XZRect(x) => {
-                Hitable::XZRect(XZRect::new(x.x0, x.x1, x.z0, x.z1, x.k, x.material))
-            }
-            Object::XYRect(x) => {
-                Hitable::XYRect(XYRect::new(x.x0, x.x1, x.y0, x.y1, x.k, x.material))
-            }
-            Object::YZRect(x) => {
-                Hitable::YZRect(YZRect::new(x.y0, x.y1, x.z0, x.z1, x.k, x.material))
-            }
             Object::Quad(x) => Hitable::Quad(Quad::new(x.q, x.u, x.v, x.material)),
             Object::Sphere(x) => Hitable::Sphere(Sphere::new(x.center, x.radius, x.material)),
             Object::Boxy(x) => Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, x.material)),

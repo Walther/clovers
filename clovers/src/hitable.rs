@@ -6,10 +6,7 @@ use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
     materials::Material,
-    objects::{
-        Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, XYRect,
-        XZRect, YZRect,
-    },
+    objects::{Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate},
     ray::Ray,
     Float, Vec, Vec3,
 };
@@ -55,9 +52,6 @@ pub enum Hitable {
     Boxy(Boxy),
     ConstantMedium(ConstantMedium),
     MovingSphere(MovingSphere),
-    XZRect(XZRect),
-    XYRect(XYRect),
-    YZRect(YZRect),
     RotateY(RotateY),
     Sphere(Sphere),
     Translate(Translate),
@@ -79,9 +73,6 @@ impl Hitable {
             Hitable::Boxy(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::ConstantMedium(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::MovingSphere(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::XZRect(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::XYRect(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::YZRect(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::RotateY(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Sphere(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Translate(h) => h.hit(ray, distance_min, distance_max, rng),
@@ -97,9 +88,6 @@ impl Hitable {
             Hitable::Boxy(h) => h.bounding_box(t0, t1),
             Hitable::ConstantMedium(h) => h.bounding_box(t0, t1),
             Hitable::MovingSphere(h) => h.bounding_box(t0, t1),
-            Hitable::XZRect(h) => h.bounding_box(t0, t1),
-            Hitable::XYRect(h) => h.bounding_box(t0, t1),
-            Hitable::YZRect(h) => h.bounding_box(t0, t1),
             Hitable::RotateY(h) => h.bounding_box(t0, t1),
             Hitable::Sphere(h) => h.bounding_box(t0, t1),
             Hitable::Translate(h) => h.bounding_box(t0, t1),
@@ -110,11 +98,9 @@ impl Hitable {
         }
     }
 
+    // TODO: does this actually handle all objects?
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
-            Hitable::XZRect(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::XYRect(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::YZRect(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
@@ -122,15 +108,13 @@ impl Hitable {
         }
     }
 
+    // TODO: does this actually handle all objects?
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         match self {
-            Hitable::XZRect(h) => h.random(origin, rng),
-            Hitable::XYRect(h) => h.random(origin, rng),
-            Hitable::YZRect(h) => h.random(origin, rng),
             Hitable::HitableList(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
             Hitable::Quad(h) => h.random(origin, rng),
-            _ => Vec3::new(1.0, 0.0, 0.0),
+            _ => Vec3::new(1.0, 0.0, 0.0), // TODO: fix bad default
         }
     }
 
