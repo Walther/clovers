@@ -2,200 +2,134 @@
   "time_0": 0.0,
   "time_1": 1.0,
   "camera": {
-    "look_from": [
-      278.0,
-      278.0,
-      -800.0
-    ],
-    "look_at": [
-      278.0,
-      278.0,
-      0.0
-    ],
-    "up": [
-      0.0,
-      1.0,
-      0.0
-    ],
+    "look_from": [278.0, 278.0, -800.0],
+    "look_at": [278.0, 278.0, 0.0],
+    "up": [0.0, 1.0, 0.0],
     "vertical_fov": 40.0,
     "aperture": 0.0,
     "focus_distance": 10.0
   },
-  "background_color": [
-    0.0,
-    0.0,
-    0.0
-  ],
+  "background_color": [0.0, 0.0, 0.0],
   "objects": [
     {
-      "YZRect": {
-        "y0": 0.0,
-        "y1": 555.0,
-        "z0": 0.0,
-        "z1": 555.0,
-        "k": 555.0,
+      "Quad": {
+        "q": [555.0, 0.0, 0.0],
+        "u": [0.0, 0.0, 555.0],
+        "v": [0.0, 555.0, 0.0],
         "material": {
           "Lambertian": {
             "albedo": {
               "SolidColor": {
-                "color": [
-                  0.12,
-                  0.45,
-                  0.15
-                ]
+                "color": [0.12, 0.45, 0.15]
               }
             }
           }
-        }
+        },
+        "comment": "green wall, left"
       }
     },
     {
-      "YZRect": {
-        "y0": 0.0,
-        "y1": 555.0,
-        "z0": 0.0,
-        "z1": 555.0,
-        "k": 0.0,
+      "Quad": {
+        "q": [0.0, 0.0, 555.0],
+        "u": [0.0, 0.0, -555.0],
+        "v": [0.0, 555.0, 0.0],
         "material": {
           "Lambertian": {
             "albedo": {
               "SolidColor": {
-                "color": [
-                  0.65,
-                  0.05,
-                  0.05
-                ]
+                "color": [0.65, 0.05, 0.05]
               }
             }
           }
-        }
+        },
+        "comment": "red wall, right"
       }
     },
     {
-      "XZRect": {
-        "x0": 0.0,
-        "x1": 555.0,
-        "z0": 0.0,
-        "z1": 555.0,
-        "k": 0.0,
+      "Quad": {
+        "q": [0.0, 0.0, 0.0],
+        "u": [555.0, 0.0, 0.0],
+        "v": [0.0, 0.0, 555.0],
         "material": {
           "Lambertian": {
             "albedo": {
               "SolidColor": {
-                "color": [
-                  0.73,
-                  0.73,
-                  0.73
-                ]
+                "color": [0.73, 0.73, 0.73]
               }
             }
           }
-        }
+        },
+        "comment": "floor"
       }
     },
     {
-      "XZRect": {
-        "x0": 0.0,
-        "x1": 555.0,
-        "z0": 0.0,
-        "z1": 555.0,
-        "k": 555.0,
+      "Quad": {
+        "q": [0.0, 555.0, 0.0],
+        "u": [555.0, 0.0, 0.0],
+        "v": [0.0, 0.0, 555.0],
         "material": {
           "Lambertian": {
             "albedo": {
               "SolidColor": {
-                "color": [
-                  0.73,
-                  0.73,
-                  0.73
-                ]
+                "color": [0.73, 0.73, 0.73]
               }
             }
           }
-        }
+        },
+        "comment": "ceiling"
       }
     },
     {
-      "XYRect": {
-        "x0": 0.0,
-        "x1": 555.0,
-        "y0": 0.0,
-        "y1": 555.0,
-        "k": 555.0,
+      "Quad": {
+        "q": [0.0, 0.0, 555.0],
+        "u": [555.0, 0.0, 0.0],
+        "v": [0.0, 555.0, 0.0],
         "material": {
           "Lambertian": {
             "albedo": {
               "SolidColor": {
-                "color": [
-                  0.73,
-                  0.73,
-                  0.73
-                ]
+                "color": [0.73, 0.73, 0.73]
               }
             }
           }
-        }
+        },
+        "comment": "back wall"
       }
     },
     {
-      "FlipFace": {
-        "object": {
-          "XZRect": {
-            "x0": 213.0,
-            "x1": 343.0,
-            "z0": 227.0,
-            "z1": 332.0,
-            "k": 554.0,
-            "material": {
-              "DiffuseLight": {
-                "emit": {
-                  "SolidColor": {
-                    "color": [
-                      15.0,
-                      15.0,
-                      15.0
-                    ]
-                  }
-                }
+      "Quad": {
+        "q": [113.0, 554.0, 127.0],
+        "u": [330.0, 0.0, 0.0],
+        "v": [0.0, 0.0, 305.0],
+        "material": {
+          "DiffuseLight": {
+            "emit": {
+              "SolidColor": {
+                "color": [7.0, 7.0, 7.0]
               }
             }
           }
-        }
+        },
+        "comment": "big ceiling light"
       }
     },
     {
       "ConstantMedium": {
         "boundary": {
           "Translate": {
-            "offset": [
-              265.0,
-              0.0,
-              295.0
-            ],
+            "offset": [265.0, 0.0, 295.0],
             "object": {
               "RotateY": {
                 "angle": 15.0,
                 "object": {
                   "Boxy": {
-                    "corner_0": [
-                      0.0,
-                      0.0,
-                      0.0
-                    ],
-                    "corner_1": [
-                      165.0,
-                      330.0,
-                      165.0
-                    ],
+                    "corner_0": [0.0, 0.0, 0.0],
+                    "corner_1": [165.0, 330.0, 165.0],
                     "material": {
                       "Lambertian": {
                         "albedo": {
                           "SolidColor": {
-                            "color": [
-                              0.73,
-                              0.73,
-                              0.73
-                            ]
+                            "color": [0.73, 0.73, 0.73]
                           }
                         }
                       }
@@ -209,11 +143,7 @@
         "density": 0.01,
         "texture": {
           "SolidColor": {
-            "color": [
-              0.0,
-              0.0,
-              0.0
-            ]
+            "color": [0.0, 0.0, 0.0]
           }
         }
       }
@@ -222,35 +152,19 @@
       "ConstantMedium": {
         "boundary": {
           "Translate": {
-            "offset": [
-              130.0,
-              0.0,
-              65.0
-            ],
+            "offset": [130.0, 0.0, 65.0],
             "object": {
               "RotateY": {
                 "angle": -18.0,
                 "object": {
                   "Boxy": {
-                    "corner_0": [
-                      0.0,
-                      0.0,
-                      0.0
-                    ],
-                    "corner_1": [
-                      165.0,
-                      165.0,
-                      165.0
-                    ],
+                    "corner_0": [0.0, 0.0, 0.0],
+                    "corner_1": [165.0, 165.0, 165.0],
                     "material": {
                       "Lambertian": {
                         "albedo": {
                           "SolidColor": {
-                            "color": [
-                              0.73,
-                              0.73,
-                              0.73
-                            ]
+                            "color": [0.73, 0.73, 0.73]
                           }
                         }
                       }
@@ -264,11 +178,7 @@
         "density": 0.01,
         "texture": {
           "SolidColor": {
-            "color": [
-              1.0,
-              1.0,
-              1.0
-            ]
+            "color": [1.0, 1.0, 1.0]
           }
         }
       }
@@ -276,25 +186,20 @@
   ],
   "priority_objects": [
     {
-      "XZRect": {
-        "x0": 213.0,
-        "x1": 343.0,
-        "z0": 227.0,
-        "z1": 332.0,
-        "k": 554.0,
+      "Quad": {
+        "q": [113.0, 554.0, 127.0],
+        "u": [330.0, 0.0, 0.0],
+        "v": [0.0, 0.0, 305.0],
         "material": {
           "DiffuseLight": {
             "emit": {
               "SolidColor": {
-                "color": [
-                  15.0,
-                  15.0,
-                  15.0
-                ]
+                "color": [7.0, 7.0, 7.0]
               }
             }
           }
-        }
+        },
+        "comment": "big ceiling light"
       }
     }
   ]
