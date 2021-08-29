@@ -1,4 +1,4 @@
-//! A triangle object. Almost exact copy of [Quad], with an adjusted `hit_ab` method.
+//! A triangle object. Almost exact copy of [Quad](crate::objects::Quad), with an adjusted `hit_ab` method.
 // TODO: better docs
 
 use crate::EPSILON_SHADOW_ACNE;
@@ -24,7 +24,7 @@ pub struct TriangleInit {
     pub material: Material,
 }
 
-/// Quadrilateral shape. This can be an arbitrary parallelogram, not just a rectangle.
+/// Triangle shape. Heavily based on [Quad](crate::objects::Quad) and may contain inaccuracies
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct Triangle {
@@ -58,6 +58,7 @@ impl Triangle {
         let d = -(normal.dot(&q));
         // TODO: what is this?
         let w: Vec3 = n / n.dot(&n);
+        // Compared to quad, triangle has half the area
         let area = n.magnitude() / 2.0;
         let mut aabb: AABB = AABB::new(q, q + u + v);
         aabb.pad();
