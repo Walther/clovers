@@ -28,25 +28,31 @@
   ],
   "objects": [
     {
-      "FlipFace": {
-        "object": {
-          "XZRect": {
-            "x0": -100,
-            "x1": 100,
-            "z0": -100,
-            "z1": 100,
-            "k": 100,
-            "material": {
-              "DiffuseLight": {
-                "emit": {
-                  "SolidColor": {
-                    "color": [
-                      3,
-                      3,
-                      3
-                    ]
-                  }
-                }
+      "Quad": {
+        "q": [
+          -100,
+          80,
+          -100
+        ],
+        "u": [
+          200,
+          0,
+          0
+        ],
+        "v": [
+          0,
+          0,
+          200
+        ],
+        "material": {
+          "DiffuseLight": {
+            "emit": {
+              "SolidColor": {
+                "color": [
+                  3,
+                  3,
+                  3
+                ]
               }
             }
           }
@@ -54,12 +60,22 @@
       }
     },
     {
-      "XZRect": {
-        "x0": -10,
-        "x1": 10,
-        "z0": -10,
-        "z1": 10,
-        "k": 0.001,
+      "Quad": {
+        "q": [
+          -10,
+          0.001,
+          -10
+        ],
+        "u": [
+          20,
+          0,
+          0
+        ],
+        "v": [
+          0,
+          0,
+          20
+        ],
         "material": {
           "Lambertian": {
             "albedo": {
@@ -667,25 +683,31 @@
   ],
   "priority_objects": [
     {
-      "FlipFace": {
-        "object": {
-          "XZRect": {
-            "x0": -100,
-            "x1": 100,
-            "z0": -100,
-            "z1": 100,
-            "k": 100,
-            "material": {
-              "DiffuseLight": {
-                "emit": {
-                  "SolidColor": {
-                    "color": [
-                      3,
-                      3,
-                      3
-                    ]
-                  }
-                }
+      "Quad": {
+        "q": [
+          -100,
+          80,
+          -100
+        ],
+        "u": [
+          200,
+          0,
+          0
+        ],
+        "v": [
+          0,
+          0,
+          200
+        ],
+        "material": {
+          "DiffuseLight": {
+            "emit": {
+              "SolidColor": {
+                "color": [
+                  3,
+                  3,
+                  3
+                ]
               }
             }
           }
