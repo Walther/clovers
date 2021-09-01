@@ -50,7 +50,7 @@ pub struct Triangle {
 }
 
 impl Triangle {
-    /// Creates a new triangle
+    /// Creates a new triangle from a coordinate point and two side vectors relative to the point
     pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Triangle {
         let n: Vec3 = u.cross(&v);
         let normal: Vec3 = n.normalize();
@@ -74,6 +74,15 @@ impl Triangle {
             w,
             aabb,
         }
+    }
+
+    /// Creates a new triangle from three Cartesian space coordinates
+    pub fn from_coordinates(a: Vec3, b: Vec3, c: Vec3, material: Material) -> Triangle {
+        // Coordinate transform: from absolute coordinates to relative coordinates
+        let q: Vec3 = a;
+        let u: Vec3 = b - q;
+        let v: Vec3 = c - q;
+        Triangle::new(q, u, v, material)
     }
 
     /// Hit method for the triangle
