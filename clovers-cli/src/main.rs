@@ -51,6 +51,9 @@ struct Opts {
     /// Enable some debug logging
     #[clap(long)]
     debug: bool,
+    /// Render a normal map only. Experimental feature.
+    #[clap(long)]
+    normalmap: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -76,6 +79,16 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!(); // Empty line before progress bar
     }
 
+    let renderopts: RenderOpts = RenderOpts {
+        width: opts.width,
+        height: opts.height,
+        samples: opts.samples,
+        max_depth: opts.max_depth,
+        gamma: opts.gamma,
+        quiet: opts.quiet,
+        normalmap: opts.normalmap,
+    };
+
     info!("Reading the scene file");
     let mut file = File::open(opts.input)?;
     let mut contents: String = String::new();
@@ -89,24 +102,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let start = Instant::now();
     let pixelbuffer = match opts.gpu {
         // Note: live progress bar printed within draw_cpu::draw
-        false => draw_cpu::draw(
-            opts.width,
-            opts.height,
-            opts.samples,
-            opts.max_depth,
-            opts.gamma,
-            opts.quiet,
-            scene,
-        ),
-        true => futures::executor::block_on(draw_gpu::draw(
-            opts.width,
-            opts.height,
-            opts.samples,
-            opts.max_depth,
-            opts.gamma,
-            opts.quiet,
-            scene,
-        )),
+        false => draw_cpu::draw(renderopts, scene),
+        true => futures::executor::block_on(draw_gpu::draw(renderopts, scene)),
     };
     info!("Drawing a pixelbuffer finished");
 

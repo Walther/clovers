@@ -80,6 +80,7 @@ pub mod color;
 pub mod colorize;
 pub mod hitable;
 pub mod materials;
+pub mod normals;
 pub mod objects;
 pub mod onb;
 pub mod pdf;
@@ -88,6 +89,25 @@ pub mod random;
 pub mod ray;
 pub mod scenes;
 pub mod textures;
+
+/// Rendering options struct
+#[derive(Debug)]
+pub struct RenderOpts {
+    /// Width of the render in pixels
+    pub width: u32,
+    /// Height of the render in pixels
+    pub height: u32,
+    /// Samples per pixel to render for multisampling. Higher number implies higher quality.
+    pub samples: u32,
+    /// Maximum ray bounce depth. Higher number implies higher quality.
+    pub max_depth: u32,
+    /// Gamma correction value
+    pub gamma: Float,
+    /// Optionally, suppress CLI output
+    pub quiet: bool,
+    /// Experimental render mode: return a normal map only instead of doing a full path trace render.
+    pub normalmap: bool,
+}
 
 // Handy aliases for internal use
 
