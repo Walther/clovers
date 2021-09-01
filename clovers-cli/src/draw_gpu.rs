@@ -1,5 +1,5 @@
 use bytemuck::{Pod, Zeroable};
-use clovers::{color::Color, scenes::Scene, Float};
+use clovers::{color::Color, scenes::Scene, Float, RenderOpts};
 use log::debug;
 use spirv_builder::{MetadataPrintout, SpirvBuilder};
 use std::{borrow::Cow, mem::size_of, path::PathBuf};
@@ -69,15 +69,7 @@ pub struct ShaderConstants {
 
 // TODO: split into multiple functions, simplify, etc
 /// The main drawing function, returns a Vec<Color> as a pixelbuffer.
-pub async fn draw(
-    width: u32,
-    height: u32,
-    samples: u32,
-    max_depth: u32,
-    _gamma: Float,
-    _quiet: bool,
-    _scene: Scene,
-) -> Vec<Color> {
+pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     // Initialize the GPU instance
     let instance = wgpu::Instance::new(wgpu::BackendBit::VULKAN | wgpu::BackendBit::METAL);
     let adapter = instance
@@ -133,8 +125,8 @@ pub async fn draw(
     debug!("Encoder created");
 
     let texture_size = Extent3d {
-        width,
-        height,
+        width: opts.width,
+        height: opts.height,
         depth_or_array_layers: 1,
     };
 
@@ -179,10 +171,10 @@ pub async fn draw(
 
     let time = 0.0;
     let push_constants = ShaderConstants {
-        width,
-        height,
-        samples,
-        max_depth,
+        width: opts.width,
+        height: opts.height,
+        samples: opts.samples,
+        max_depth: opts.max_depth,
         time,
     };
 
@@ -201,7 +193,7 @@ pub async fn draw(
     // Heavily based on https://github.com/gfx-rs/wgpu/blob/v0.9/wgpu/examples/capture/main.rs
     // TODO: simplify where possible
 
-    let buffer_dimensions = BufferDimensions::new(width as usize, height as usize);
+    let buffer_dimensions = BufferDimensions::new(opts.width as usize, opts.height as usize);
     // The output buffer lets us retrieve the data as an array
     let output_buffer = device.create_buffer(&wgpu::BufferDescriptor {
         label: None,
