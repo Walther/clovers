@@ -40,6 +40,18 @@ struct Opts {
     /// Gamma correction value
     #[clap(short, long, default_value = "2.0")]
     gamma: Float,
+    /// Suppress most of the text output
+    #[clap(short, long)]
+    quiet: bool,
+    /// Use the GPU draw process instead of CPU
+    // #[clap(long)]
+    // gpu: bool,
+    /// Enable some debug logging
+    // #[clap(long)]
+    // debug: bool,
+    /// Render a normal map only. Experimental feature.
+    #[clap(long)]
+    normalmap: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -62,15 +74,19 @@ fn main() -> Result<(), Box<dyn Error>> {
     let scene_file: SceneFile = serde_json::from_str(&contents)?;
     let scene: Scene = scenes::initialize(scene_file, opts.width, opts.height);
 
-    // gui version
-    let _result = draw_gui(
-        opts.width,
-        opts.height,
-        opts.samples,
-        opts.max_depth,
-        opts.gamma,
-        scene,
-    );
+    let renderopts: RenderOpts = RenderOpts {
+        width: opts.width,
+        height: opts.height,
+        samples: opts.samples,
+        max_depth: opts.max_depth,
+        gamma: opts.gamma,
+        quiet: opts.quiet,
+        normalmap: opts.normalmap,
+    };
+
+    // TODO: write result to file
+    // TODO: have an actual UI for things
+    let _result = draw_gui(renderopts, scene);
 
     Ok(())
 }

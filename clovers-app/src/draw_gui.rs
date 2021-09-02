@@ -1,5 +1,6 @@
 use crate::{color::Color, colorize::colorize, scenes::Scene, Float};
 
+use clovers::RenderOpts;
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
@@ -16,18 +17,12 @@ use winit::{
 
 use winit_input_helper::WinitInputHelper;
 
-pub fn draw_gui(
-    width: u32,
-    height: u32,
-    samples: u32,
-    max_depth: u32,
-    gamma: Float,
-    scene: Scene,
-) -> Result<(), Error> {
+// TODO: complete rewrite of this function
+pub fn draw_gui(opts: RenderOpts, scene: Scene) -> Result<(), Error> {
     let event_loop = EventLoop::new();
     let mut input = WinitInputHelper::new();
     let window = {
-        let size = PhysicalSize::new(width as f64, height as f64);
+        let size = PhysicalSize::new(opts.width as f64, opts.height as f64);
         WindowBuilder::new()
             .with_title("clovers 🍀 ray tracing in rust 🦀")
             .with_inner_size(size)
@@ -36,11 +31,18 @@ pub fn draw_gui(
             .unwrap()
     };
     let mut pixels = {
-        let surface_texture = SurfaceTexture::new(width, height, &window);
-        Pixels::new(width, height, surface_texture)?
+        let surface_texture = SurfaceTexture::new(opts.width, opts.height, &window);
+        Pixels::new(opts.width, opts.height, surface_texture)?
     };
 
-    let mut world = World::new(width, height, samples, max_depth, gamma, scene);
+    let mut world = World::new(
+        opts.width,
+        opts.height,
+        opts.samples,
+        opts.max_depth,
+        opts.gamma,
+        scene,
+    );
     let mut frame_num = 0;
 
     event_loop.run(move |event, _, control_flow| {

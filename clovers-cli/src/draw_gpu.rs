@@ -51,7 +51,7 @@ fn create_pipeline(
             targets: &[wgpu::ColorTargetState {
                 format: swapchain_format,
                 blend: None,
-                write_mask: wgpu::ColorWrite::ALL,
+                write_mask: wgpu::ColorWrites::ALL,
             }],
         }),
     })
@@ -71,7 +71,7 @@ pub struct ShaderConstants {
 /// The main drawing function, returns a Vec<Color> as a pixelbuffer.
 pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     // Initialize the GPU instance
-    let instance = wgpu::Instance::new(wgpu::BackendBit::VULKAN | wgpu::BackendBit::METAL);
+    let instance = wgpu::Instance::new(wgpu::Backends::VULKAN | wgpu::Backends::METAL);
     let adapter = instance
         .request_adapter(&wgpu::RequestAdapterOptions {
             power_preference: wgpu::PowerPreference::default(),
@@ -102,7 +102,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
         label: None,
         bind_group_layouts: &[],
         push_constant_ranges: &[wgpu::PushConstantRange {
-            stages: wgpu::ShaderStage::all(),
+            stages: wgpu::ShaderStages::all(),
             range: 0..std::mem::size_of::<ShaderConstants>() as u32,
         }],
     });
@@ -138,7 +138,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
         sample_count: 1,
         dimension: wgpu::TextureDimension::D3,
         format: wgpu::TextureFormat::Rgba32Float,
-        usage: wgpu::TextureUsage::RENDER_ATTACHMENT | wgpu::TextureUsage::COPY_SRC,
+        usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
     };
     let texture = device.create_texture(&texture_desc);
     debug!("Texture created");
@@ -181,7 +181,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     rpass.set_pipeline(&render_pipeline);
     debug!("Render pipeline set");
     rpass.set_push_constants(
-        wgpu::ShaderStage::all(),
+        wgpu::ShaderStages::all(),
         0,
         bytemuck::bytes_of(&push_constants),
     );
@@ -198,7 +198,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     let output_buffer = device.create_buffer(&wgpu::BufferDescriptor {
         label: None,
         size: (buffer_dimensions.padded_bytes_per_row * buffer_dimensions.height) as u64,
-        usage: wgpu::BufferUsage::MAP_READ | wgpu::BufferUsage::COPY_DST,
+        usage: wgpu::BufferUsages::MAP_READ | wgpu::BufferUsages::COPY_DST,
         mapped_at_creation: false,
     });
 
@@ -211,6 +211,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
             texture: &texture,
             mip_level: 0,
             origin: wgpu::Origin3d::ZERO,
+            aspect: Default::default(),
         },
         wgpu::ImageCopyBuffer {
             buffer: &output_buffer,
@@ -286,7 +287,6 @@ fn load_shader() -> wgpu::ShaderModuleDescriptor<'static> {
     wgpu::ShaderModuleDescriptor {
         label: Some("clovers-shader"),
         source: spirv,
-        flags: Default::default(),
     }
 }
 
