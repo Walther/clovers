@@ -10,6 +10,7 @@ pub mod constant_medium;
 pub mod flip_face;
 pub mod moving_sphere;
 pub mod quad;
+pub mod rect;
 pub mod rotate;
 pub mod sphere;
 #[cfg(feature = "stl")]
@@ -23,6 +24,7 @@ pub use constant_medium::*;
 pub use flip_face::*;
 pub use moving_sphere::*;
 pub use quad::*;
+pub use rect::*;
 pub use rotate::*;
 pub use sphere::*;
 #[cfg(feature = "stl")]
@@ -62,6 +64,12 @@ pub enum Object {
     Translate(TranslateInit),
     /// Triangle object initializer
     Triangle(TriangleInit),
+    /// XYRect object initializer
+    XYRect(XYRectInit),
+    /// XZRect object initializer
+    XZRect(XZRectInit),
+    /// YZRect object initializer
+    YZRect(YZRectInit),
 }
 
 impl From<Object> for Hitable {
@@ -108,6 +116,15 @@ impl From<Object> for Hitable {
                 Hitable::Translate(Translate::new(Box::new(obj), x.offset))
             }
             Object::Triangle(x) => Hitable::Triangle(Triangle::new(x.q, x.u, x.v, x.material)),
+            Object::XYRect(x) => {
+                Hitable::XYRect(XYRect::new(x.x0, x.x1, x.y0, x.y1, x.k, x.material))
+            }
+            Object::XZRect(x) => {
+                Hitable::XZRect(XZRect::new(x.x0, x.x1, x.z0, x.z1, x.k, x.material))
+            }
+            Object::YZRect(x) => {
+                Hitable::YZRect(YZRect::new(x.y0, x.y1, x.z0, x.z1, x.k, x.material))
+            }
         }
     }
 }

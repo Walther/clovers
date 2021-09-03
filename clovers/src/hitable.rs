@@ -8,6 +8,7 @@ use crate::{
     materials::Material,
     objects::{
         Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
+        XYRect, XZRect, YZRect,
     },
     ray::Ray,
     Float, Vec, Vec3,
@@ -62,6 +63,9 @@ pub enum Hitable {
     Sphere(Sphere),
     Translate(Translate),
     Triangle(Triangle),
+    XYRect(XYRect),
+    XZRect(XZRect),
+    YZRect(YZRect),
 }
 
 impl Hitable {
@@ -84,6 +88,9 @@ impl Hitable {
             Hitable::Sphere(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Translate(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Triangle(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::XYRect(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::XZRect(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::YZRect(h) => h.hit(ray, distance_min, distance_max, rng),
         }
     }
 
@@ -100,10 +107,12 @@ impl Hitable {
             Hitable::Sphere(h) => h.bounding_box(t0, t1),
             Hitable::Translate(h) => h.bounding_box(t0, t1),
             Hitable::Triangle(h) => h.bounding_box(t0, t1),
+            Hitable::XYRect(h) => h.bounding_box(t0, t1),
+            Hitable::XZRect(h) => h.bounding_box(t0, t1),
+            Hitable::YZRect(h) => h.bounding_box(t0, t1),
         }
     }
 
-    // TODO: does this actually handle all objects?
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
             Hitable::Boxy(h) => h.pdf_value(origin, vector, time, rng),
@@ -111,11 +120,13 @@ impl Hitable {
             Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Triangle(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::XYRect(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::XZRect(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::YZRect(h) => h.pdf_value(origin, vector, time, rng),
             _ => 0.0,
         }
     }
 
-    // TODO: does this actually handle all objects?
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         match self {
             Hitable::Boxy(h) => h.random(origin, rng),
@@ -123,6 +134,9 @@ impl Hitable {
             Hitable::Quad(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
             Hitable::Triangle(h) => h.random(origin, rng),
+            Hitable::XYRect(h) => h.random(origin, rng),
+            Hitable::XZRect(h) => h.random(origin, rng),
+            Hitable::YZRect(h) => h.random(origin, rng),
             _ => Vec3::new(1.0, 0.0, 0.0), // TODO: fix bad default
         }
     }
