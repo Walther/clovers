@@ -130,3 +130,38 @@ impl Add<AABB> for AABB {
         AABB::surrounding_box(self, rhs)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        bihnode::Axis,
+        hitable::{Hitable, HitableList},
+        materials::{Lambertian, Material},
+        objects::Sphere,
+        Vec3,
+    };
+
+    #[test]
+    fn min_max_mid() {
+        let time_0 = 0.0;
+        let time_1 = 1.0;
+        let mut hlist = HitableList::new();
+        let sphere1 = Hitable::Sphere(Sphere::new(
+            Vec3::new(11.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere1.clone());
+        let sphere2 = Hitable::Sphere(Sphere::new(
+            Vec3::new(19.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere2.clone());
+        let aabb = hlist.bounding_box(time_0, time_1).unwrap();
+        let (min, max, mid) = aabb.min_max_mid(Axis::YZ);
+        assert_eq!(min, 10.0);
+        assert_eq!(max, 20.0);
+        assert_eq!(mid, 15.0);
+    }
+}
