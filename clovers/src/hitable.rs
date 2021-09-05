@@ -2,13 +2,16 @@
 
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
+use core::cmp::Ordering;
+
 use crate::{
     aabb::AABB,
+    bihnode::{Axis, BIHNode},
     bvhnode::BVHNode,
     materials::Material,
     objects::{
-        Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
-        XYRect, XZRect, YZRect,
+        Boxy, ConstantMedium, Empty, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate,
+        Triangle, XYRect, XZRect, YZRect,
     },
     ray::Ray,
     Float, Vec, Vec3,
@@ -52,9 +55,11 @@ impl<'a> HitRecord<'a> {
 /// TODO: ideally, for cleaner abstraction, this could be a Trait. However, the performance implications might need deeper investigation and consideration...
 #[derive(Debug, Clone)]
 pub enum Hitable {
+    BIHNode(BIHNode),
     Boxy(Boxy),
     BVHNode(BVHNode),
     ConstantMedium(ConstantMedium),
+    Empty(Empty),
     FlipFace(FlipFace),
     HitableList(HitableList),
     MovingSphere(MovingSphere),
@@ -77,9 +82,11 @@ impl Hitable {
         rng: &mut SmallRng,
     ) -> Option<HitRecord> {
         match self {
+            Hitable::BIHNode(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Boxy(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::BVHNode(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::ConstantMedium(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::Empty(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::FlipFace(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::HitableList(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::MovingSphere(h) => h.hit(ray, distance_min, distance_max, rng),
@@ -96,9 +103,11 @@ impl Hitable {
 
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         match self {
+            Hitable::BIHNode(h) => h.bounding_box(t0, t1),
             Hitable::Boxy(h) => h.bounding_box(t0, t1),
             Hitable::BVHNode(h) => h.bounding_box(t0, t1),
             Hitable::ConstantMedium(h) => h.bounding_box(t0, t1),
+            Hitable::Empty(h) => h.bounding_box(t0, t1),
             Hitable::FlipFace(h) => h.bounding_box(t0, t1),
             Hitable::HitableList(h) => h.bounding_box(t0, t1),
             Hitable::MovingSphere(h) => h.bounding_box(t0, t1),
@@ -115,7 +124,11 @@ impl Hitable {
 
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
+            // TODO: should BIHNode and BVHNode have pdf_value methods?
+            // Hitable::BIHNode(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Boxy(h) => h.pdf_value(origin, vector, time, rng),
+            // Hitable::BVHNode(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::Empty(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
@@ -129,7 +142,11 @@ impl Hitable {
 
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         match self {
+            // TODO: should BIHNode and BVHNode have random methods?
+            // Hitable::BIHNode(h) => h.random(origin, rng),
             Hitable::Boxy(h) => h.random(origin, rng),
+            // Hitable::BVHNode(h) => h.random(origin, rng),
+            Hitable::Empty(h) => h.random(origin, rng),
             Hitable::HitableList(h) => h.random(origin, rng),
             Hitable::Quad(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
@@ -137,7 +154,12 @@ impl Hitable {
             Hitable::XYRect(h) => h.random(origin, rng),
             Hitable::XZRect(h) => h.random(origin, rng),
             Hitable::YZRect(h) => h.random(origin, rng),
-            _ => Vec3::new(1.0, 0.0, 0.0), // TODO: fix bad default
+            _ => {
+                // TODO: what would be a good default?
+                let random: Vec3 =
+                    Vec3::new(rng.gen::<Float>(), rng.gen::<Float>(), rng.gen::<Float>());
+                random.normalize()
+            }
         }
     }
 
@@ -242,9 +264,80 @@ impl HitableList {
         BVHNode::from_list(self.0, time_0, time_1, rng)
     }
 
+    pub fn into_bih(self, time_0: f32, time_1: f32, rng: &mut SmallRng) -> BIHNode {
+        BIHNode::from_list(self.0, time_0, time_1, rng)
+    }
+
     // TODO: fixme, silly
     pub fn into_hitable(self) -> Hitable {
         Hitable::HitableList(self)
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    /// Split along the given axis, giving two lists of hitables
+    // TODO: consider better split heuristics
+    pub fn split(
+        &self,
+        axis: Axis,
+        mid: f32,
+        time_0: Float,
+        time_1: Float,
+    ) -> (Vec<Hitable>, Vec<Hitable>) {
+        let mut left = Vec::new();
+        let mut right = Vec::new();
+        if self.is_empty() {
+            panic!("HitableList was empty, cannot split")
+        }
+        if self.len() == 1 {
+            // TODO: what should we do in case of a single-unit list?
+            panic!("HitableList had only one object, cannot split")
+        }
+        if self.len() == 2 {
+            let l = self
+                .0
+                .iter()
+                .min_by(|a, b| box_compare(a, b, axis.into()))
+                .unwrap();
+            let r = self
+                .0
+                .iter()
+                .max_by(|a, b| box_compare(a, b, axis.into()))
+                .unwrap();
+
+            left.push(l.clone());
+            right.push(r.clone());
+        } else {
+            // Generic part
+            // TODO: no unwraps!
+            for hitable in &self.0 {
+                // Get the midpoint of the current hitable
+                let (_min, _max, h_mid) = hitable
+                    .bounding_box(time_0, time_1)
+                    .unwrap()
+                    .min_max_mid(axis);
+
+                dbg!(axis);
+                dbg!(h_mid, mid);
+                // Compare the hitable midpoint to the given midpoint
+                // Minimum coordinates on right side, maximum coordinates on left side
+                // TODO: coordinate system choices?
+                if h_mid < mid {
+                    right.push(hitable.clone())
+                } else {
+                    left.push(hitable.clone())
+                }
+            }
+        }
+        dbg!(left.len(), right.len());
+
+        (left, right)
     }
 }
 
@@ -264,4 +357,33 @@ pub fn get_orientation(ray: &Ray, outward_normal: Vec3) -> (bool, Vec3) {
     };
 
     (front_face, normal)
+}
+
+/// TODO: do these make sense? Unify with the [Axis](crate::bihnode::Axis) struct
+pub(crate) fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
+    let box_a: Option<AABB> = a.bounding_box(0.0, 0.0);
+    let box_b: Option<AABB> = b.bounding_box(0.0, 0.0);
+
+    if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
+        if box_a.min[axis] < box_b.min[axis] {
+            Ordering::Less
+        } else {
+            // Default to greater, even if equal
+            Ordering::Greater
+        }
+    } else {
+        panic!("No bounding box to compare with.")
+    }
+}
+
+pub(crate) fn box_x_compare(a: &Hitable, b: &Hitable) -> Ordering {
+    box_compare(a, b, 0)
+}
+
+pub(crate) fn box_y_compare(a: &Hitable, b: &Hitable) -> Ordering {
+    box_compare(a, b, 1)
+}
+
+pub(crate) fn box_z_compare(a: &Hitable, b: &Hitable) -> Ordering {
+    box_compare(a, b, 2)
 }

@@ -7,6 +7,7 @@ use crate::{
 
 pub mod boxy; // avoid keyword
 pub mod constant_medium;
+pub mod empty;
 pub mod flip_face;
 pub mod moving_sphere;
 pub mod quad;
@@ -21,6 +22,7 @@ pub mod triangle;
 use alloc::vec::Vec;
 pub use boxy::*; // avoid keyword
 pub use constant_medium::*;
+pub use empty::*;
 pub use flip_face::*;
 pub use moving_sphere::*;
 pub use quad::*;
@@ -45,6 +47,8 @@ pub enum Object {
     Boxy(BoxyInit),
     /// ConstantMedium object initializer
     ConstantMedium(ConstantMediumInit),
+    /// Empty object initializer
+    Empty(Empty),
     /// FlipFace object initializer
     FlipFace(FlipFaceInit),
     /// MovingSphere object initializer
@@ -81,6 +85,7 @@ impl From<Object> for Hitable {
                 let obj: Hitable = obj.into();
                 Hitable::ConstantMedium(ConstantMedium::new(Box::new(obj), x.density, x.texture))
             }
+            Object::Empty(x) => Hitable::Empty(x),
             Object::FlipFace(x) => {
                 let obj = *x.object;
                 let obj: Hitable = obj.into();

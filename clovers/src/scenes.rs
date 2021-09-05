@@ -1,12 +1,14 @@
 //! A collection of objects, camera, and other things necessary to describe the environment you wish to render.
 
 use crate::{
-    bvhnode::BVHNode,
+    bihnode::BIHNode,
+    // bvhnode::BVHNode,
     camera::{Camera, CameraInit},
     color::Color,
     hitable::{Hitable, HitableList},
     objects::Object,
-    Float, Vec,
+    Float,
+    Vec,
 };
 use rand::rngs::SmallRng;
 use rand::SeedableRng;
@@ -14,8 +16,8 @@ use rand::SeedableRng;
 #[derive(Debug)]
 /// A representation of the scene that is being rendered.
 pub struct Scene {
-    /// Bounding-volume hierarchy of [Hitable] objects in the scene. This could, as currently written, be any [Hitable] - in practice, we place the root of the [BVHNode](crate::bvhnode::BVHNode) tree here.
-    pub objects: BVHNode,
+    /// Bounding Interval Hierarchy node
+    pub objects: BIHNode,
     /// The camera object used for rendering the scene.
     pub camera: Camera,
     /// The background color to use when the rays do not hit anything in the scene.
@@ -36,9 +38,10 @@ impl Scene {
         rng: &mut SmallRng,
     ) -> Scene {
         Scene {
-            objects: objects.into_bvh(time_0, time_1, rng),
+            objects: objects.into_bih(time_0, time_1, rng),
             camera,
             background_color,
+            // TODO: bvhnode for priority objects too?
             priority_objects: priority_objects.into_hitable(),
         }
     }

@@ -1,6 +1,10 @@
 //! Axis-aligned bounding box.
 
-use crate::{ray::Ray, Float, Vec3, EPSILON_RECT_THICKNESS};
+use core::ops::Add;
+
+use crate::{bihnode::Axis, ray::Ray, Float, Vec3, EPSILON_RECT_THICKNESS};
+
+use rand::{rngs::SmallRng, Rng};
 
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
@@ -69,5 +73,61 @@ impl AABB {
             self.max.y + EPSILON_RECT_THICKNESS,
             self.max.z + EPSILON_RECT_THICKNESS,
         );
+    }
+
+    /// Helper method: which axis has the longest span?. Returns the [Axis] plane perpendicular to the line
+    pub fn longest_axis(&self, rng: &mut SmallRng) -> Axis {
+        let x_width = (self.max.x - self.min.x).abs();
+        let y_width = (self.max.y - self.min.y).abs();
+        let z_width = (self.max.z - self.min.z).abs();
+        dbg!(x_width, y_width, z_width);
+
+        // TODO: can this be made cleaner?
+        if x_width > y_width && x_width > z_width {
+            return Axis::YZ;
+        }
+
+        if y_width > x_width && y_width > z_width {
+            return Axis::XZ;
+        }
+
+        if z_width > x_width && z_width > y_width {
+            return Axis::XY;
+        }
+
+        // Everything was the same width. What's a good solution here?
+        // TODO: better solutions?
+        rng.gen::<Axis>()
+    }
+
+    /// Helper method: get the minimum, maximum, and midpoint of the AABB on a given axis to split by. Note that the given [Axis] is a plane perpendicular to the line we are interested in.
+    pub fn min_max_mid(&self, axis: Axis) -> (Float, Float, Float) {
+        let (min, max, mid): (Float, Float, Float);
+        match axis {
+            Axis::XY => {
+                min = self.min.z;
+                max = self.max.z;
+                mid = (max - min) / 2.0;
+            }
+            Axis::XZ => {
+                min = self.min.y;
+                max = self.max.y;
+                mid = (max - min) / 2.0;
+            }
+            Axis::YZ => {
+                min = self.min.x;
+                max = self.max.x;
+                mid = (max - min) / 2.0;
+            }
+        }
+        (min, max, mid)
+    }
+}
+
+impl Add<AABB> for AABB {
+    type Output = AABB;
+
+    fn add(self, rhs: AABB) -> Self::Output {
+        AABB::surrounding_box(self, rhs)
     }
 }

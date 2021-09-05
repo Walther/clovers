@@ -7,7 +7,7 @@ use rand::Rng;
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable},
+    hitable::{box_x_compare, box_y_compare, box_z_compare, HitRecord, Hitable},
     ray::Ray,
     Box, Float, Vec,
 };
@@ -38,8 +38,8 @@ impl BVHNode {
         let right: Box<Hitable>;
 
         // Pick a random axis to create the split on
-        // TODO: smarter algorithm?
         let axis: usize = rng.gen_range(0..2);
+        // TODO: improved ergonomics & readability
         let comparators = [box_x_compare, box_y_compare, box_z_compare];
         let comparator = comparators[axis];
 
@@ -143,32 +143,4 @@ impl BVHNode {
     pub fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
         Some(self.bounding_box)
     }
-}
-
-fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
-    let box_a: Option<AABB> = a.bounding_box(0.0, 0.0);
-    let box_b: Option<AABB> = b.bounding_box(0.0, 0.0);
-
-    if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
-        if box_a.min[axis] < box_b.min[axis] {
-            Ordering::Less
-        } else {
-            // Default to greater, even if equal
-            Ordering::Greater
-        }
-    } else {
-        panic!("No bounding box to compare with.")
-    }
-}
-
-fn box_x_compare(a: &Hitable, b: &Hitable) -> Ordering {
-    box_compare(a, b, 0)
-}
-
-fn box_y_compare(a: &Hitable, b: &Hitable) -> Ordering {
-    box_compare(a, b, 1)
-}
-
-fn box_z_compare(a: &Hitable, b: &Hitable) -> Ordering {
-    box_compare(a, b, 2)
 }

@@ -74,6 +74,7 @@ use nalgebra::base::Vector3;
 
 // Internals
 pub mod aabb;
+pub mod bihnode;
 pub mod bvhnode;
 pub mod camera;
 pub mod color;
