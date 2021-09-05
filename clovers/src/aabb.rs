@@ -137,9 +137,11 @@ mod tests {
         bihnode::Axis,
         hitable::{Hitable, HitableList},
         materials::{Lambertian, Material},
-        objects::Sphere,
+        objects::{Boxy, Sphere},
         Vec3,
     };
+    use rand::prelude::SmallRng;
+    use rand::SeedableRng;
 
     #[test]
     fn min_max_mid_x_axis() {
@@ -211,5 +213,50 @@ mod tests {
         assert_eq!(min, 10.0);
         assert_eq!(max, 20.0);
         assert_eq!(mid, 15.0);
+    }
+
+    #[test]
+    fn longest_axis_x() {
+        let mut rng = SmallRng::from_entropy();
+        let time_0 = 0.0;
+        let time_1 = 1.0;
+        let boxy = Boxy::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(4.0, 1.0, 1.0),
+            Material::default(),
+        );
+        let aabb = boxy.bounding_box(time_0, time_1).unwrap();
+        let axis = aabb.longest_axis(&mut rng);
+        assert_eq!(axis, Axis::YZ);
+    }
+
+    #[test]
+    fn longest_axis_y() {
+        let mut rng = SmallRng::from_entropy();
+        let time_0 = 0.0;
+        let time_1 = 1.0;
+        let boxy = Boxy::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(1.0, 4.0, 1.0),
+            Material::default(),
+        );
+        let aabb = boxy.bounding_box(time_0, time_1).unwrap();
+        let axis = aabb.longest_axis(&mut rng);
+        assert_eq!(axis, Axis::XZ);
+    }
+
+    #[test]
+    fn longest_axis_z() {
+        let mut rng = SmallRng::from_entropy();
+        let time_0 = 0.0;
+        let time_1 = 1.0;
+        let boxy = Boxy::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(1.0, 1.0, 4.0),
+            Material::default(),
+        );
+        let aabb = boxy.bounding_box(time_0, time_1).unwrap();
+        let axis = aabb.longest_axis(&mut rng);
+        assert_eq!(axis, Axis::XY);
     }
 }
