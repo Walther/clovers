@@ -95,7 +95,7 @@ impl BIHNode {
         };
 
         // Figure out the longest axis
-        let axis = aabb.longest_axis(rng);
+        let axis = aabb.longest_axis();
         dbg!(&axis);
         // Get the span
         let (min, max, mid) = aabb.min_max_mid(axis);

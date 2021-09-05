@@ -341,6 +341,7 @@ impl HitableList {
         // TODO: this shouldn't be necessary?
         left.sort_by(|a, b| box_compare(a, b, axis.into()));
         right.sort_by(|a, b| box_compare(a, b, axis.into()));
+        dbg!(left.len(), right.len());
 
         (left, right)
     }
@@ -440,5 +441,43 @@ mod tests {
         assert!(r[1] == sphere2);
         assert!(l[0] == sphere3);
         assert!(l[1] == sphere4);
+    }
+
+    #[test]
+    fn split_4_negatives() {
+        let time_0 = 0.0;
+        let time_1 = 1.0;
+        let mut hlist = HitableList::new();
+        let sphere1 = Hitable::Sphere(Sphere::new(
+            Vec3::new(-11.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere1.clone());
+        let sphere2 = Hitable::Sphere(Sphere::new(
+            Vec3::new(-22.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere2.clone());
+        let sphere3 = Hitable::Sphere(Sphere::new(
+            Vec3::new(-33.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere3.clone());
+        let sphere4 = Hitable::Sphere(Sphere::new(
+            Vec3::new(-44.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere4.clone());
+
+        let (l, r) = hlist.split(Axis::X, -30.0, time_0, time_1);
+        // reversed order from the previous test
+        assert!(r[0] == sphere4);
+        assert!(r[1] == sphere3);
+        assert!(l[0] == sphere2);
+        assert!(l[1] == sphere1);
     }
 }

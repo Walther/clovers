@@ -4,8 +4,6 @@ use core::ops::Add;
 
 use crate::{bihnode::Axis, ray::Ray, Float, Vec3, EPSILON_RECT_THICKNESS};
 
-use rand::{rngs::SmallRng, Rng};
-
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
 /// This is useful for creating bounding volume hierarchies, which is an optimization for reducing the time spent on calculating ray-object intersections.
@@ -76,7 +74,7 @@ impl AABB {
     }
 
     /// Helper method: which axis has the longest span?. Returns the [Axis] plane perpendicular to the line
-    pub fn longest_axis(&self, rng: &mut SmallRng) -> Axis {
+    pub fn longest_axis(&self) -> Axis {
         let x_width = (self.max.x - self.min.x).abs();
         let y_width = (self.max.y - self.min.y).abs();
         let z_width = (self.max.z - self.min.z).abs();
@@ -96,7 +94,7 @@ impl AABB {
 
         // Everything was the same width. What's a good solution here?
         // TODO: better solutions?
-        rng.gen::<Axis>()
+        return Axis::X;
     }
 
     /// Helper method: get the minimum, maximum, and midpoint of the AABB on a given axis to split by. Note that the given [Axis] is a plane perpendicular to the line we are interested in.
@@ -140,8 +138,6 @@ mod tests {
         objects::{Boxy, Sphere},
         Float, Vec3,
     };
-    use rand::prelude::SmallRng;
-    use rand::SeedableRng;
 
     #[test]
     fn min_max_mid_x_axis() {
@@ -216,8 +212,31 @@ mod tests {
     }
 
     #[test]
+    fn min_max_mid_negatives() {
+        let time_0: Float = 0.0;
+        let time_1: Float = 1.0;
+        let mut hlist = HitableList::new();
+        let sphere1 = Hitable::Sphere(Sphere::new(
+            Vec3::new(-11.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere1);
+        let sphere2 = Hitable::Sphere(Sphere::new(
+            Vec3::new(-19.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere2);
+        let aabb = hlist.bounding_box(time_0, time_1).unwrap();
+        let (min, max, mid) = aabb.min_max_mid(Axis::X);
+        assert_eq!(min, -20.0);
+        assert_eq!(max, -10.0);
+        assert_eq!(mid, -15.0);
+    }
+
+    #[test]
     fn longest_axis_x() {
-        let mut rng = SmallRng::from_entropy();
         let time_0 = 0.0;
         let time_1 = 1.0;
         let boxy = Boxy::new(
@@ -226,13 +245,12 @@ mod tests {
             Material::default(),
         );
         let aabb = boxy.bounding_box(time_0, time_1).unwrap();
-        let axis = aabb.longest_axis(&mut rng);
+        let axis = aabb.longest_axis();
         assert_eq!(axis, Axis::X);
     }
 
     #[test]
     fn longest_axis_y() {
-        let mut rng = SmallRng::from_entropy();
         let time_0 = 0.0;
         let time_1 = 1.0;
         let boxy = Boxy::new(
@@ -241,13 +259,12 @@ mod tests {
             Material::default(),
         );
         let aabb = boxy.bounding_box(time_0, time_1).unwrap();
-        let axis = aabb.longest_axis(&mut rng);
+        let axis = aabb.longest_axis();
         assert_eq!(axis, Axis::Y);
     }
 
     #[test]
     fn longest_axis_z() {
-        let mut rng = SmallRng::from_entropy();
         let time_0 = 0.0;
         let time_1 = 1.0;
         let boxy = Boxy::new(
@@ -256,7 +273,21 @@ mod tests {
             Material::default(),
         );
         let aabb = boxy.bounding_box(time_0, time_1).unwrap();
-        let axis = aabb.longest_axis(&mut rng);
+        let axis = aabb.longest_axis();
         assert_eq!(axis, Axis::Z);
+    }
+
+    #[test]
+    fn longest_axis_negatives() {
+        let time_0 = 0.0;
+        let time_1 = 1.0;
+        let boxy = Boxy::new(
+            Vec3::new(-4.0, -2.0, -2.0),
+            Vec3::new(-1.0, -1.0, -1.0),
+            Material::default(),
+        );
+        let aabb = boxy.bounding_box(time_0, time_1).unwrap();
+        let axis = aabb.longest_axis();
+        assert_eq!(axis, Axis::X);
     }
 }
