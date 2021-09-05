@@ -17,21 +17,21 @@ use crate::{
 #[derive(Clone, Copy, Debug, PartialEq)]
 /// Axis-aligned infinite planes.
 pub enum Axis {
-    /// The plane along the XY axis
-    XY,
-    /// The plane along the XZ axis
-    XZ,
-    /// The plane along the YZ axis
-    YZ,
+    /// Line on the X axis, normal to the plane along the YZ axis
+    X,
+    /// Line on the Y axis, normal to the plane along the XZ axis
+    Y,
+    /// Line on the Z axis, normal to the plane along the XY axis
+    Z,
 }
 
 // Helper method for going from a plane axis into an index of a Vec3
 impl From<Axis> for usize {
     fn from(a: Axis) -> Self {
         match a {
-            Axis::XY => 2,
-            Axis::XZ => 1,
-            Axis::YZ => 0,
+            Axis::X => 0,
+            Axis::Y => 1,
+            Axis::Z => 2,
         }
     }
 }
@@ -40,9 +40,9 @@ impl From<Axis> for usize {
 impl Distribution<Axis> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Axis {
         match rng.gen_range(0..=2) {
-            0 => Axis::XY,
-            1 => Axis::XZ,
-            _ => Axis::YZ,
+            0 => Axis::X,
+            1 => Axis::Y,
+            _ => Axis::Z,
         }
     }
 }
@@ -86,7 +86,7 @@ impl BIHNode {
                 return BIHNode {
                     left: empty.clone(),
                     right: empty,
-                    axis: Axis::XY,
+                    axis: Axis::Z,
                     max: Float::MIN,
                     min: Float::MAX,
                 };

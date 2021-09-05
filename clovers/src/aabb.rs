@@ -83,15 +83,15 @@ impl AABB {
 
         // TODO: can this be made cleaner?
         if x_width > y_width && x_width > z_width {
-            return Axis::YZ;
+            return Axis::X;
         }
 
         if y_width > x_width && y_width > z_width {
-            return Axis::XZ;
+            return Axis::Y;
         }
 
         if z_width > x_width && z_width > y_width {
-            return Axis::XY;
+            return Axis::Z;
         }
 
         // Everything was the same width. What's a good solution here?
@@ -103,17 +103,17 @@ impl AABB {
     pub fn min_max_mid(&self, axis: Axis) -> (Float, Float, Float) {
         let (min, max, mid): (Float, Float, Float);
         match axis {
-            Axis::XY => {
+            Axis::Z => {
                 min = self.min.z;
                 max = self.max.z;
                 mid = (max + min) / 2.0;
             }
-            Axis::XZ => {
+            Axis::Y => {
                 min = self.min.y;
                 max = self.max.y;
                 mid = (max + min) / 2.0;
             }
-            Axis::YZ => {
+            Axis::X => {
                 min = self.min.x;
                 max = self.max.x;
                 mid = (max + min) / 2.0;
@@ -138,30 +138,30 @@ mod tests {
         hitable::{Hitable, HitableList},
         materials::{Lambertian, Material},
         objects::{Boxy, Sphere},
-        Vec3,
+        Float, Vec3,
     };
     use rand::prelude::SmallRng;
     use rand::SeedableRng;
 
     #[test]
     fn min_max_mid_x_axis() {
-        let time_0 = 0.0;
-        let time_1 = 1.0;
+        let time_0: Float = 0.0;
+        let time_1: Float = 1.0;
         let mut hlist = HitableList::new();
         let sphere1 = Hitable::Sphere(Sphere::new(
             Vec3::new(11.0, 0.0, 0.0),
             1.0,
             Material::Lambertian(Lambertian::default()),
         ));
-        hlist.0.push(sphere1.clone());
+        hlist.0.push(sphere1);
         let sphere2 = Hitable::Sphere(Sphere::new(
             Vec3::new(19.0, 0.0, 0.0),
             1.0,
             Material::Lambertian(Lambertian::default()),
         ));
-        hlist.0.push(sphere2.clone());
+        hlist.0.push(sphere2);
         let aabb = hlist.bounding_box(time_0, time_1).unwrap();
-        let (min, max, mid) = aabb.min_max_mid(Axis::YZ);
+        let (min, max, mid) = aabb.min_max_mid(Axis::X);
         assert_eq!(min, 10.0);
         assert_eq!(max, 20.0);
         assert_eq!(mid, 15.0);
@@ -169,8 +169,8 @@ mod tests {
 
     #[test]
     fn min_max_mid_y_axis() {
-        let time_0 = 0.0;
-        let time_1 = 1.0;
+        let time_0: Float = 0.0;
+        let time_1: Float = 1.0;
         let mut hlist = HitableList::new();
         let sphere1 = Hitable::Sphere(Sphere::new(
             Vec3::new(0.0, 11.0, 0.0),
@@ -185,7 +185,7 @@ mod tests {
         ));
         hlist.0.push(sphere2.clone());
         let aabb = hlist.bounding_box(time_0, time_1).unwrap();
-        let (min, max, mid) = aabb.min_max_mid(Axis::XZ);
+        let (min, max, mid) = aabb.min_max_mid(Axis::Y);
         assert_eq!(min, 10.0);
         assert_eq!(max, 20.0);
         assert_eq!(mid, 15.0);
@@ -193,8 +193,8 @@ mod tests {
 
     #[test]
     fn min_max_mid_z_axis() {
-        let time_0 = 0.0;
-        let time_1 = 1.0;
+        let time_0: Float = 0.0;
+        let time_1: Float = 1.0;
         let mut hlist = HitableList::new();
         let sphere1 = Hitable::Sphere(Sphere::new(
             Vec3::new(0.0, 0.0, 11.0),
@@ -209,7 +209,7 @@ mod tests {
         ));
         hlist.0.push(sphere2.clone());
         let aabb = hlist.bounding_box(time_0, time_1).unwrap();
-        let (min, max, mid) = aabb.min_max_mid(Axis::XY);
+        let (min, max, mid) = aabb.min_max_mid(Axis::Z);
         assert_eq!(min, 10.0);
         assert_eq!(max, 20.0);
         assert_eq!(mid, 15.0);
@@ -227,7 +227,7 @@ mod tests {
         );
         let aabb = boxy.bounding_box(time_0, time_1).unwrap();
         let axis = aabb.longest_axis(&mut rng);
-        assert_eq!(axis, Axis::YZ);
+        assert_eq!(axis, Axis::X);
     }
 
     #[test]
@@ -242,7 +242,7 @@ mod tests {
         );
         let aabb = boxy.bounding_box(time_0, time_1).unwrap();
         let axis = aabb.longest_axis(&mut rng);
-        assert_eq!(axis, Axis::XZ);
+        assert_eq!(axis, Axis::Y);
     }
 
     #[test]
@@ -257,6 +257,6 @@ mod tests {
         );
         let aabb = boxy.bounding_box(time_0, time_1).unwrap();
         let axis = aabb.longest_axis(&mut rng);
-        assert_eq!(axis, Axis::XY);
+        assert_eq!(axis, Axis::Z);
     }
 }

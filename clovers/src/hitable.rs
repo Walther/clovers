@@ -435,7 +435,7 @@ mod tests {
         ));
         hlist.0.push(sphere4.clone());
 
-        let (l, r) = hlist.split(Axis::YZ, 30.0, time_0, time_1);
+        let (l, r) = hlist.split(Axis::X, 30.0, time_0, time_1);
         assert!(r[0] == sphere1);
         assert!(r[1] == sphere2);
         assert!(l[0] == sphere3);
