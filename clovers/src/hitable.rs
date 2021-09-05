@@ -53,7 +53,7 @@ impl<'a> HitRecord<'a> {
 /// An abstraction for things that can be hit by [Rays](crate::ray::Ray).
 ///
 /// TODO: ideally, for cleaner abstraction, this could be a Trait. However, the performance implications might need deeper investigation and consideration...
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Hitable {
     BIHNode(BIHNode),
     Boxy(Boxy),
