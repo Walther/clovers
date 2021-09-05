@@ -106,17 +106,17 @@ impl AABB {
             Axis::XY => {
                 min = self.min.z;
                 max = self.max.z;
-                mid = (max - min) / 2.0;
+                mid = (max + min) / 2.0;
             }
             Axis::XZ => {
                 min = self.min.y;
                 max = self.max.y;
-                mid = (max - min) / 2.0;
+                mid = (max + min) / 2.0;
             }
             Axis::YZ => {
                 min = self.min.x;
                 max = self.max.x;
-                mid = (max - min) / 2.0;
+                mid = (max + min) / 2.0;
             }
         }
         (min, max, mid)
