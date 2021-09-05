@@ -97,7 +97,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let scene_file: SceneFile = serde_json::from_str(&contents)?;
     info!("Initializing the scene");
     let scene: Scene = scenes::initialize(scene_file, opts.width, opts.height);
-    dbg!(&scene);
 
     info!("Calling draw()");
     let start = Instant::now();

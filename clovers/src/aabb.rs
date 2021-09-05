@@ -80,7 +80,6 @@ impl AABB {
         let x_width = (self.max.x - self.min.x).abs();
         let y_width = (self.max.y - self.min.y).abs();
         let z_width = (self.max.z - self.min.z).abs();
-        dbg!(x_width, y_width, z_width);
 
         // TODO: can this be made cleaner?
         if x_width > y_width && x_width > z_width {

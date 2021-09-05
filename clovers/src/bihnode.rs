@@ -71,15 +71,13 @@ impl BIHNode {
         time_1: Float,
         rng: &mut SmallRng,
     ) -> BIHNode {
-        dbg!(&objects.len());
-
         // Initialize two child nodes
         let left: Box<Hitable>;
         let right: Box<Hitable>;
 
         // TODO: fix temporary hack
         // Temporary: go via HitableList for convenience as methods have been implemented
-        let hlist: HitableList = objects.clone().into();
+        let mut hlist: HitableList = objects.clone().into();
         // Calculate an AABB of the current list
         let aabb = match hlist.bounding_box(time_0, time_1) {
             None => {

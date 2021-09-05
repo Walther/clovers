@@ -284,38 +284,42 @@ impl HitableList {
     /// Split along the given axis, giving two lists of hitables
     // TODO: consider better split heuristics
     pub fn split(
-        &self,
+        &mut self,
         axis: Axis,
         mid: f32,
         time_0: Float,
         time_1: Float,
     ) -> (Vec<Hitable>, Vec<Hitable>) {
+        // Allocate Vecs for the split
         let mut left = Vec::new();
         let mut right = Vec::new();
+        // Sort objects by the current axis
+        self.0.sort_by(|a, b| box_compare(a, b, axis.into()));
+
         if self.is_empty() {
             panic!("HitableList was empty, cannot split")
         }
+
         if self.len() == 1 {
             // TODO: what should we do in case of a single-unit list?
             panic!("HitableList had only one object, cannot split")
         }
-        if self.len() == 2 {
-            let l = self
-                .0
-                .iter()
-                .min_by(|a, b| box_compare(a, b, axis.into()))
-                .unwrap();
-            let r = self
-                .0
-                .iter()
-                .max_by(|a, b| box_compare(a, b, axis.into()))
-                .unwrap();
 
-            left.push(l.clone());
-            right.push(r.clone());
+        if self.len() == 2 {
+            // Two items, simple split. Right-handed coordinates, lower coordinate goes to right side.
+            right.push(self.0[0].clone());
+            left.push(self.0[1].clone());
         } else {
             // Generic part
-            // TODO: no unwraps!
+            // TODO: clean up!
+
+            // First, let's put at least one object in each list
+            let first = self.0.remove(0);
+            let last = self.0.pop().unwrap();
+            right.push(first);
+            left.push(last);
+
+            // Then, split the rest
             for hitable in &self.0 {
                 // Get the midpoint of the current hitable
                 let (_min, _max, h_mid) = hitable
@@ -323,8 +327,6 @@ impl HitableList {
                     .unwrap()
                     .min_max_mid(axis);
 
-                dbg!(axis);
-                dbg!(h_mid, mid);
                 // Compare the hitable midpoint to the given midpoint
                 // Minimum coordinates on right side, maximum coordinates on left side
                 // TODO: coordinate system choices?
@@ -335,6 +337,7 @@ impl HitableList {
                 }
             }
         }
+        dbg!(axis);
         dbg!(left.len(), right.len());
 
         (left, right)
