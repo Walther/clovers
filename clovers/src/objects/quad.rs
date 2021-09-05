@@ -10,7 +10,7 @@ use rand::rngs::SmallRng;
 use rand::Rng;
 
 /// Initialization structure for a Quad object.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct QuadInit {
     /// Corner point
@@ -25,7 +25,7 @@ pub struct QuadInit {
 }
 
 /// Quadrilateral shape. This can be an arbitrary parallelogram, not just a rectangle.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct Quad {
     /// Corner point

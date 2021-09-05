@@ -3,7 +3,7 @@
 use crate::{aabb::AABB, hitable::HitRecord, ray::Ray, Float, Vec3};
 use rand::{rngs::SmallRng, Rng};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// Empty object.
 pub struct Empty {}

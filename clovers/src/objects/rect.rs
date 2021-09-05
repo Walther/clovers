@@ -16,7 +16,7 @@ use rand::Rng;
 
 // XY
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct XYRectInit {
     pub x0: Float,
@@ -28,7 +28,7 @@ pub struct XYRectInit {
     pub material: Material,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct XYRect {
     x0: Float,
@@ -123,7 +123,7 @@ impl XYRect {
 
 // XZ
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct XZRectInit {
     pub x0: Float,
@@ -135,7 +135,7 @@ pub struct XZRectInit {
     pub material: Material,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct XZRect {
     x0: Float,
@@ -230,7 +230,7 @@ impl XZRect {
 
 // YZ
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct YZRectInit {
     pub y0: Float,
@@ -242,7 +242,7 @@ pub struct YZRectInit {
     pub material: Material,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct YZRect {
     y0: Float,

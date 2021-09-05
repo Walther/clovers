@@ -2,7 +2,7 @@
 
 use crate::{color::Color, Float, Vec3, PI};
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A standard checkered texture based on spatial 3D texturing.
 pub struct SpatialChecker {
@@ -65,7 +65,7 @@ impl SpatialChecker {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A standard checkered texture based on 2D surface UV coordinates.
 pub struct SurfaceChecker {

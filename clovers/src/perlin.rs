@@ -13,7 +13,7 @@ use core::fmt::Debug;
 // TODO: This might be currently oddly broken and resulting in overflowy surfaces
 
 // TODO: number of points hardcoded to 256 now
-#[derive(Copy, Clone)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct Perlin {
     random_vectors: [Vec3; 256],
     perm_x: [usize; 256],

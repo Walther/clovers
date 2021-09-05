@@ -14,7 +14,7 @@ use crate::{
     Box, Float, Vec,
 };
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 /// Axis-aligned infinite planes.
 pub enum Axis {
     /// The plane along the XY axis
@@ -47,7 +47,7 @@ impl Distribution<Axis> for Standard {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, PartialEq)]
 /// Bounding Interval Hierarchy node.
 pub struct BIHNode {
     /// Left child of the BIHNode
@@ -96,6 +96,7 @@ impl BIHNode {
 
         // Figure out the longest axis
         let axis = aabb.longest_axis(rng);
+        dbg!(&axis);
         // Get the span
         let (min, max, mid) = aabb.min_max_mid(axis);
 

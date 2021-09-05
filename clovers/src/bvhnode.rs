@@ -15,7 +15,7 @@ use crate::{
 /// Bounding Volume Hierarchy Node.
 ///
 /// A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also BVHNodes. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct BVHNode {
     /// Left child of the BVHNode
     pub left: Box<Hitable>,

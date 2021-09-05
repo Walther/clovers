@@ -13,7 +13,7 @@ pub use solid_color::*;
 use crate::{color::Color, Float, Vec3};
 use noise_texture::NoiseTexture;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A texture enum.
 pub enum Texture {

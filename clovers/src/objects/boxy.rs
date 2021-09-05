@@ -11,7 +11,7 @@ use crate::{
 use rand::rngs::SmallRng;
 
 /// BoxyInit structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
-#[derive(Debug, Copy, Clone)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct BoxyInit {
     /// First corner for the box
@@ -24,7 +24,7 @@ pub struct BoxyInit {
 }
 
 /// A box or a cuboid object: a parallelepiped with six rectangular faces. Named [Boxy] to avoid clashing with [Box].
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Boxy {
     corner_0: Vec3,
     corner_1: Vec3,

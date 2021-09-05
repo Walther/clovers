@@ -53,7 +53,7 @@ impl<'a> HitRecord<'a> {
 /// An abstraction for things that can be hit by [Rays](crate::ray::Ray).
 ///
 /// TODO: ideally, for cleaner abstraction, this could be a Trait. However, the performance implications might need deeper investigation and consideration...
-#[derive(Debug, Clone)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum Hitable {
     BIHNode(BIHNode),
     Boxy(Boxy),
@@ -172,7 +172,7 @@ impl Hitable {
 }
 
 /// Helper struct for storing multiple `Hitable` objects. This list has a `Hitable` implementation too, returning the closest possible hit
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct HitableList(pub Vec<Hitable>);
 
 impl From<Vec<Hitable>> for HitableList {
@@ -337,8 +337,10 @@ impl HitableList {
                 }
             }
         }
-        dbg!(axis);
-        dbg!(left.len(), right.len());
+
+        // TODO: this shouldn't be necessary?
+        left.sort_by(|a, b| box_compare(a, b, axis.into()));
+        right.sort_by(|a, b| box_compare(a, b, axis.into()));
 
         (left, right)
     }
@@ -389,4 +391,54 @@ pub(crate) fn box_y_compare(a: &Hitable, b: &Hitable) -> Ordering {
 
 pub(crate) fn box_z_compare(a: &Hitable, b: &Hitable) -> Ordering {
     box_compare(a, b, 2)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        bihnode::Axis,
+        hitable::Hitable,
+        materials::{Lambertian, Material},
+        objects::Sphere,
+        Vec3,
+    };
+
+    use super::HitableList;
+
+    #[test]
+    fn split_4() {
+        let time_0 = 0.0;
+        let time_1 = 1.0;
+        let mut hlist = HitableList::new();
+        let sphere1 = Hitable::Sphere(Sphere::new(
+            Vec3::new(11.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere1.clone());
+        let sphere2 = Hitable::Sphere(Sphere::new(
+            Vec3::new(22.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere2.clone());
+        let sphere3 = Hitable::Sphere(Sphere::new(
+            Vec3::new(33.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere3.clone());
+        let sphere4 = Hitable::Sphere(Sphere::new(
+            Vec3::new(44.0, 0.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere4.clone());
+
+        let (l, r) = hlist.split(Axis::YZ, 30.0, time_0, time_1);
+        assert!(r[0] == sphere1);
+        assert!(r[1] == sphere2);
+        assert!(l[0] == sphere3);
+        assert!(l[1] == sphere4);
+    }
 }

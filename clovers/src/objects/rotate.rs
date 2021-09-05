@@ -10,7 +10,7 @@ use rand::rngs::SmallRng;
 
 use super::Object;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// RotateInit structure describes the necessary data for constructing a [RotateY]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct RotateInit {
@@ -20,7 +20,7 @@ pub struct RotateInit {
     pub angle: Float,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 /// RotateY object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
 pub struct RotateY {
     object: Box<Hitable>,

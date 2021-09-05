@@ -10,7 +10,7 @@ use rand::rngs::SmallRng;
 
 use super::Object;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// FlipFaceInit structure describes the necessary data for constructing a [FlipFace]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct FlipFaceInit {
@@ -18,7 +18,7 @@ pub struct FlipFaceInit {
     pub object: Box<Object>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 /// An utility object that can be used to flip the face of the object. TODO: possibly deprecated?
 pub struct FlipFace {
     object: Box<Hitable>,
