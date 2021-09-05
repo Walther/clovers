@@ -142,7 +142,7 @@ mod tests {
     };
 
     #[test]
-    fn min_max_mid() {
+    fn min_max_mid_x_axis() {
         let time_0 = 0.0;
         let time_1 = 1.0;
         let mut hlist = HitableList::new();
@@ -160,6 +160,54 @@ mod tests {
         hlist.0.push(sphere2.clone());
         let aabb = hlist.bounding_box(time_0, time_1).unwrap();
         let (min, max, mid) = aabb.min_max_mid(Axis::YZ);
+        assert_eq!(min, 10.0);
+        assert_eq!(max, 20.0);
+        assert_eq!(mid, 15.0);
+    }
+
+    #[test]
+    fn min_max_mid_y_axis() {
+        let time_0 = 0.0;
+        let time_1 = 1.0;
+        let mut hlist = HitableList::new();
+        let sphere1 = Hitable::Sphere(Sphere::new(
+            Vec3::new(0.0, 11.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere1.clone());
+        let sphere2 = Hitable::Sphere(Sphere::new(
+            Vec3::new(0.0, 19.0, 0.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere2.clone());
+        let aabb = hlist.bounding_box(time_0, time_1).unwrap();
+        let (min, max, mid) = aabb.min_max_mid(Axis::XZ);
+        assert_eq!(min, 10.0);
+        assert_eq!(max, 20.0);
+        assert_eq!(mid, 15.0);
+    }
+
+    #[test]
+    fn min_max_mid_z_axis() {
+        let time_0 = 0.0;
+        let time_1 = 1.0;
+        let mut hlist = HitableList::new();
+        let sphere1 = Hitable::Sphere(Sphere::new(
+            Vec3::new(0.0, 0.0, 11.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere1.clone());
+        let sphere2 = Hitable::Sphere(Sphere::new(
+            Vec3::new(0.0, 0.0, 19.0),
+            1.0,
+            Material::Lambertian(Lambertian::default()),
+        ));
+        hlist.0.push(sphere2.clone());
+        let aabb = hlist.bounding_box(time_0, time_1).unwrap();
+        let (min, max, mid) = aabb.min_max_mid(Axis::XY);
         assert_eq!(min, 10.0);
         assert_eq!(max, 20.0);
         assert_eq!(mid, 15.0);
