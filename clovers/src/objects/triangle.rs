@@ -60,6 +60,7 @@ impl Triangle {
         let w: Vec3 = n / n.dot(&n);
         // Compared to quad, triangle has half the area
         let area = n.magnitude() / 2.0;
+        // TODO: more accurate AABB for triangle; this is from quad
         let mut aabb: AABB = AABB::new(q, q + u + v);
         aabb.pad();
 
@@ -179,4 +180,67 @@ fn hit_ab(a: Float, b: Float) -> bool {
     // primitive, otherwise return true.
     // Triangle: a+b must be <=1.0
     (0.0..=1.0).contains(&a) && (0.0..=1.0).contains(&b) && (a + b <= 1.0)
+}
+
+#[cfg(test)]
+mod tests {
+    use rand::SeedableRng;
+
+    use super::*;
+
+    #[test]
+    fn triangle() {
+        let time_0 = 0.0;
+        let time_1 = 1.0;
+
+        // Unit triangle at origin
+        let xy_unit_triangle = Triangle::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+            Default::default(),
+        );
+
+        let ray = Ray::new(
+            Vec3::new(0.0, 0.0, -1.0).normalize(),
+            Vec3::new(0.0, 0.0, 1.0).normalize(),
+            time_0,
+        );
+
+        let mut rng = SmallRng::from_entropy();
+
+        let aabb = xy_unit_triangle
+            .bounding_box(time_0, time_1)
+            .expect("No AABB for the triangle");
+
+        assert_eq!(
+            aabb.min,
+            Vec3::new(
+                -EPSILON_RECT_THICKNESS,
+                -EPSILON_RECT_THICKNESS,
+                -EPSILON_RECT_THICKNESS
+            )
+        );
+
+        // TODO: fix triangle aabb
+        assert_eq!(
+            aabb.max,
+            Vec3::new(
+                1.0 + EPSILON_RECT_THICKNESS,
+                1.0 + EPSILON_RECT_THICKNESS,
+                EPSILON_RECT_THICKNESS,
+            )
+        );
+
+        let boxhit = aabb.hit(&ray, time_0, time_1);
+        assert!(boxhit);
+
+        let hit_record = xy_unit_triangle
+            .hit(&ray, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
+            .expect("No hit record for triangle and ray");
+
+        assert_eq!(hit_record.distance, 1.0);
+        assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
+        assert_eq!(hit_record.normal, Vec3::new(0.0, 0.0, -1.0));
+    }
 }

@@ -76,7 +76,14 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
         time_1,
     );
 
-    let hitables = objects_to_flat_hitablelist(scene_file.objects);
+    // TODO: enable optimization when the bug has been fixed
+    // NOTE: currently breaks the rendering; lots of triangles will be missing from the teapot
+    // let hitables = objects_to_flat_hitablelist(scene_file.objects);
+
+    let mut hitables = HitableList::new();
+    for obj in scene_file.objects {
+        hitables.add(obj.into());
+    }
 
     let mut priority_objects = HitableList::new();
     for obj in scene_file.priority_objects {
@@ -94,7 +101,7 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     )
 }
 
-fn objects_to_flat_hitablelist(objects: Vec<Object>) -> HitableList {
+fn _objects_to_flat_hitablelist(objects: Vec<Object>) -> HitableList {
     let mut hitables = HitableList::new();
     for obj in objects {
         match obj {
@@ -108,12 +115,11 @@ fn objects_to_flat_hitablelist(objects: Vec<Object>) -> HitableList {
             Object::STL(s) => {
                 let list: HitableList = s.into();
                 for nested in list.0 {
-                    hitables.add(nested.into());
+                    hitables.add(nested);
                 }
             }
             // Plain objects, just add them directly
             _ => {
-                dbg!(&obj);
                 hitables.add(obj.into());
             }
         };
