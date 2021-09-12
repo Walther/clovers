@@ -60,6 +60,7 @@ impl Triangle {
         let w: Vec3 = n / n.dot(&n);
         // Compared to quad, triangle has half the area
         let area = n.magnitude() / 2.0;
+        // TODO: optimized aabb for triangle? currently from quad, which works but can be too large
         let mut aabb: AABB = AABB::new(q, q + u + v);
         aabb.pad();
 

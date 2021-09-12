@@ -94,7 +94,7 @@ impl AABB {
 
         // Everything was the same width. What's a good solution here?
         // TODO: better solutions?
-        return Axis::X;
+        Axis::X
     }
 
     /// Helper method: get the minimum, maximum, and midpoint of the AABB on a given axis to split by. Note that the given [Axis] is a plane perpendicular to the line we are interested in.
