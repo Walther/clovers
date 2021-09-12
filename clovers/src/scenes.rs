@@ -39,6 +39,7 @@ impl Scene {
             objects: objects.into_bvh(time_0, time_1, rng),
             camera,
             background_color,
+            // TODO: bvhnode for priority objects too?
             priority_objects: priority_objects.into_hitable(),
         }
     }
@@ -74,10 +75,8 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
         time_0,
         time_1,
     );
-    let mut hitables = HitableList::new();
-    for obj in scene_file.objects {
-        hitables.add(obj.into());
-    }
+
+    let hitables = objects_to_flat_hitablelist(scene_file.objects);
 
     let mut priority_objects = HitableList::new();
     for obj in scene_file.priority_objects {
@@ -93,4 +92,32 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
         background_color,
         &mut rng,
     )
+}
+
+fn objects_to_flat_hitablelist(objects: Vec<Object>) -> HitableList {
+    let mut hitables = HitableList::new();
+    for obj in objects {
+        match obj {
+            // For "list-like" objects, unwrap them to a flat list
+            Object::ObjectList(list) => {
+                for nested in list {
+                    hitables.add(nested.into());
+                }
+            }
+            #[cfg(feature = "stl")]
+            Object::STL(s) => {
+                let list: HitableList = s.into();
+                for nested in list.0 {
+                    hitables.add(nested.into());
+                }
+            }
+            // Plain objects, just add them directly
+            _ => {
+                dbg!(&obj);
+                hitables.add(obj.into());
+            }
+        };
+    }
+
+    hitables
 }
