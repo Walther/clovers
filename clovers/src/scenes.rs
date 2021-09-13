@@ -76,13 +76,18 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
         time_1,
     );
 
-    // TODO: enable optimization when the bug has been fixed
-    // NOTE: currently breaks the rendering; lots of triangles will be missing from the teapot
-    // let hitables = objects_to_flat_hitablelist(scene_file.objects);
-
     let mut hitables = HitableList::new();
-    for obj in scene_file.objects {
-        hitables.add(obj.into());
+
+    // TODO: verify fixes
+    const FLATTENED_OBJLIST: bool = false;
+    if FLATTENED_OBJLIST {
+        // NOTE: this optimization can surface some implementation flaws; e.g. some triangles may end up missing. However, the speedup is massive
+        hitables = objects_to_flat_hitablelist(scene_file.objects);
+    } else {
+        // NOTE: original, non-flattened implementation. Correct, but O(n) to object amount, nearly unusably slow with imported objects with triangles, e.g. teapot scene
+        for obj in scene_file.objects {
+            hitables.add(obj.into());
+        }
     }
 
     let mut priority_objects = HitableList::new();
@@ -101,7 +106,7 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     )
 }
 
-fn _objects_to_flat_hitablelist(objects: Vec<Object>) -> HitableList {
+fn objects_to_flat_hitablelist(objects: Vec<Object>) -> HitableList {
     let mut hitables = HitableList::new();
     for obj in objects {
         match obj {

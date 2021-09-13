@@ -1,31 +1,48 @@
 //! Axis-aligned bounding box.
 
-use crate::{ray::Ray, Float, Vec3, EPSILON_RECT_THICKNESS};
+use core::ops::Add;
+
+use crate::{interval::Interval, ray::Ray, Float, Vec3, EPSILON_RECT_THICKNESS};
 
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
 /// This is useful for creating bounding volume hierarchies, which is an optimization for reducing the time spent on calculating ray-object intersections.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct AABB {
-    /// First corner of the axis-aligned bounding box.
-    pub min: Vec3,
-    /// Second, opposing corner of the axis-aligned bounding box.
-    pub max: Vec3,
+    /// The bounding interval on the X axis
+    pub x: Interval,
+    /// The bounding interval on the Y axis
+    pub y: Interval,
+    /// The bounding interval on the Z axis
+    pub z: Interval,
 }
 
 impl AABB {
-    /// Creates a new axis-aligned bounding box from two coordinates.
-    pub fn new(min: Vec3, max: Vec3) -> AABB {
-        AABB { min, max }
+    /// Creates a new axis-aligned bounding box from three intervals
+    pub fn new(interval_x: Interval, interval_y: Interval, interval_z: Interval) -> AABB {
+        AABB {
+            x: interval_x,
+            y: interval_y,
+            z: interval_z,
+        }
+    }
+
+    /// Creates a new axis-aligned bounding box from two coordinates. Treats the two points a and b as extrema for the bounding box, so we don't require a particular minimum/maximum coordinate order.
+    pub fn new_from_coords(a: Vec3, b: Vec3) -> AABB {
+        AABB {
+            x: Interval::new(a[0].min(b[0]), a[0].max(b[0])),
+            y: Interval::new(a[1].min(b[1]), a[1].max(b[1])),
+            z: Interval::new(a[2].min(b[2]), a[2].max(b[2])),
+        }
     }
 
     /// Given a [Ray], returns whether the ray hits the bounding box or not. Based on ["An Optimized AABB Hit Method"](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
     pub fn hit(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
         for a in 0..3 {
             let invd = 1.0 / ray.direction[a];
-            let mut t0: Float = (self.min[a] - ray.origin[a]) * invd;
-            let mut t1: Float = (self.max[a] - ray.origin[a]) * invd;
+            let mut t0: Float = (self.axis(a).min - ray.origin[a]) * invd;
+            let mut t1: Float = (self.axis(a).max - ray.origin[a]) * invd;
             if invd < 0.0 {
                 core::mem::swap(&mut t0, &mut t1);
             }
@@ -40,34 +57,52 @@ impl AABB {
 
     /// Given two axis-aligned bounding boxes, return a new [AABB] that contains both.
     pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
-        let small: Vec3 = Vec3::new(
-            (box0.min.x).min(box1.min.x),
-            (box0.min.y).min(box1.min.y),
-            (box0.min.z).min(box1.min.z),
-        );
-
-        let big: Vec3 = Vec3::new(
-            (box0.max.x).max(box1.max.x),
-            (box0.max.y).max(box1.max.y),
-            (box0.max.z).max(box1.max.z),
-        );
-
-        AABB::new(small, big)
+        AABB {
+            x: Interval::new_from_intervals(box0.x, box1.x),
+            y: Interval::new_from_intervals(box0.y, box1.y),
+            z: Interval::new_from_intervals(box0.z, box1.z),
+        }
     }
 
-    /// Slightly increases the AABB size to make sure we don't have a zero-thickness one
+    /// Make sure we don't have a zero-thickness AABB, padding if necessary.
     pub fn pad(&mut self) {
-        // TODO: improved padding function
-        self.min = Vec3::new(
-            self.min.x - EPSILON_RECT_THICKNESS,
-            self.min.y - EPSILON_RECT_THICKNESS,
-            self.min.z - EPSILON_RECT_THICKNESS,
-        );
+        // TODO: refactor
+        let delta = EPSILON_RECT_THICKNESS;
+        let new_x: Interval = if self.x.size() >= delta {
+            self.x
+        } else {
+            self.x.expand(delta)
+        };
+        let new_y: Interval = if self.y.size() >= delta {
+            self.y
+        } else {
+            self.y.expand(delta)
+        };
+        let new_z: Interval = if self.z.size() >= delta {
+            self.z
+        } else {
+            self.z.expand(delta)
+        };
 
-        self.max = Vec3::new(
-            self.max.x + EPSILON_RECT_THICKNESS,
-            self.max.y + EPSILON_RECT_THICKNESS,
-            self.max.z + EPSILON_RECT_THICKNESS,
-        );
+        *self = AABB::new(new_x, new_y, new_z);
+    }
+
+    /// Returns the interval of the given axis.
+    // TODO: this api is kind of annoying
+    pub fn axis(self, n: usize) -> Interval {
+        match n {
+            0 => self.x,
+            1 => self.y,
+            2 => self.z,
+            _ => panic!("AABB::axis called with invalid parameter: {:?}", n),
+        }
+    }
+}
+
+impl Add<Vec3> for AABB {
+    type Output = AABB;
+
+    fn add(self, offset: Vec3) -> Self::Output {
+        AABB::new(self.x + offset.x, self.y + offset.y, self.z + offset.z)
     }
 }

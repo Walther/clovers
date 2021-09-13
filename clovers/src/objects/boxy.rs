@@ -123,7 +123,7 @@ impl Boxy {
 
     /// Returns the axis-aligned bounding box [AABB] of the object.
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        Some(AABB::new(self.corner_0, self.corner_1))
+        Some(AABB::new_from_coords(self.corner_0, self.corner_1))
     }
 
     /// Returns a probability density function value? // TODO: understand & explain

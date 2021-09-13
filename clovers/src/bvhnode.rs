@@ -160,7 +160,7 @@ fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
     let box_b: Option<AABB> = b.bounding_box(0.0, 0.0);
 
     if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
-        if box_a.min[axis] < box_b.min[axis] {
+        if box_a.axis(axis).min < box_b.axis(axis).min {
             Ordering::Less
         } else {
             // Default to greater, even if equal

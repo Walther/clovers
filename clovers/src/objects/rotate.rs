@@ -72,9 +72,9 @@ impl RotateY {
                     let j_f: Float = j as Float;
                     let k_f: Float = k as Float;
 
-                    let x: Float = i_f * bbox.max.x + (1.0 - i_f) * bbox.min.x;
-                    let y: Float = j_f * bbox.max.y + (1.0 - j_f) * bbox.min.y;
-                    let z: Float = k_f * bbox.max.z + (1.0 - k_f) * bbox.min.z;
+                    let x: Float = i_f * bbox.x.max + (1.0 - i_f) * bbox.x.min;
+                    let y: Float = j_f * bbox.y.max + (1.0 - j_f) * bbox.y.min;
+                    let z: Float = k_f * bbox.z.max + (1.0 - k_f) * bbox.z.min;
 
                     let newx: Float = cos_theta * x + sin_theta * z;
                     let newz: Float = -sin_theta * x + cos_theta * z;
@@ -94,7 +94,7 @@ impl RotateY {
             object,
             sin_theta,
             cos_theta,
-            bounding_box: Some(AABB::new(min, max)),
+            bounding_box: Some(AABB::new_from_coords(min, max)),
         }
     }
 

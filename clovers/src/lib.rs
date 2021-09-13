@@ -79,6 +79,7 @@ pub mod camera;
 pub mod color;
 pub mod colorize;
 pub mod hitable;
+pub mod interval;
 pub mod materials;
 pub mod normals;
 pub mod objects;

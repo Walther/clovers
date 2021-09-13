@@ -106,7 +106,7 @@ impl Sphere {
 
     /// Returns the axis-aligned bounding box [AABB] for the sphere.
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        let output_box = AABB::new(
+        let output_box = AABB::new_from_coords(
             self.center - Vec3::new(self.radius, self.radius, self.radius),
             self.center + Vec3::new(self.radius, self.radius, self.radius),
         );
