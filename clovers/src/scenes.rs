@@ -76,19 +76,14 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
         time_1,
     );
 
-    let mut hitables = HitableList::new();
+    // NOTE: this optimization can surface some implementation flaws; e.g. some triangles may end up missing. However, the speedup is massive
+    let hitables = objects_to_flat_hitablelist(scene_file.objects);
 
-    // TODO: verify fixes
-    const FLATTENED_OBJLIST: bool = false;
-    if FLATTENED_OBJLIST {
-        // NOTE: this optimization can surface some implementation flaws; e.g. some triangles may end up missing. However, the speedup is massive
-        hitables = objects_to_flat_hitablelist(scene_file.objects);
-    } else {
-        // NOTE: original, non-flattened implementation. Correct, but O(n) to object amount, nearly unusably slow with imported objects with triangles, e.g. teapot scene
-        for obj in scene_file.objects {
-            hitables.add(obj.into());
-        }
-    }
+    // NOTE: original, non-flattened implementation. Correct, but O(n) to object amount, nearly unusably slow with imported objects with triangles, e.g. teapot scene
+    // let mut hitables = HitableList::new();
+    // for obj in scene_file.objects {
+    //     hitables.add(obj.into());
+    // }
 
     let mut priority_objects = HitableList::new();
     for obj in scene_file.priority_objects {
