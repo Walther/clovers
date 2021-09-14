@@ -156,8 +156,9 @@ impl BVHNode {
 }
 
 fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
-    let box_a: Option<AABB> = a.bounding_box(0.0, 0.0);
-    let box_b: Option<AABB> = b.bounding_box(0.0, 0.0);
+    // TODO: proper time support?
+    let box_a: Option<AABB> = a.bounding_box(0.0, 1.0);
+    let box_b: Option<AABB> = b.bounding_box(0.0, 1.0);
 
     if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
         if box_a.axis(axis).min < box_b.axis(axis).min {
