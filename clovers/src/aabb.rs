@@ -56,10 +56,35 @@ impl AABB {
         // }
 
         // "Old method"
+        // for axis in 0..3 {
+        //     let invd = 1.0 / ray.direction[axis];
+        //     let mut t0: Float = (self.axis(axis).min - ray.origin[axis]) * invd;
+        //     let mut t1: Float = (self.axis(axis).max - ray.origin[axis]) * invd;
+        //     if invd < 0.0 {
+        //         core::mem::swap(&mut t0, &mut t1);
+        //     }
+        //     tmin = if t0 > tmin { t0 } else { tmin };
+        //     tmax = if t1 < tmax { t1 } else { tmax };
+        //     if tmax <= tmin {
+        //         return false;
+        //     }
+        // }
+
+        // "My adjusted method" - possibly more zero-resistant?
+        // TODO: validate
         for axis in 0..3 {
+            // If ray direction component is 0, invd becomes infinity.
+            // Ignore? False positive hit for aabb is probably better than false negative; the actual object can still be hit more accurately
             let invd = 1.0 / ray.direction[axis];
+            if !invd.is_normal() {
+                continue;
+            }
+            // If the value in parenthesis ends up as zero, 0*inf can be NaN
             let mut t0: Float = (self.axis(axis).min - ray.origin[axis]) * invd;
             let mut t1: Float = (self.axis(axis).max - ray.origin[axis]) * invd;
+            if !t0.is_normal() || !t1.is_normal() {
+                continue;
+            }
             if invd < 0.0 {
                 core::mem::swap(&mut t0, &mut t1);
             }
