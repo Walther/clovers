@@ -116,11 +116,11 @@ impl MovingSphere {
 
     /// Returns the axis-aligned bounding box of the [MovingSphere] object. This is the maximum possible bounding box of the entire span of the movement of the sphere, calculated from the two center positions and the radius.
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
-        let box0: AABB = AABB::new(
+        let box0: AABB = AABB::new_from_coords(
             self.center(t0) - Vec3::new(self.radius, self.radius, self.radius),
             self.center(t0) + Vec3::new(self.radius, self.radius, self.radius),
         );
-        let box1: AABB = AABB::new(
+        let box1: AABB = AABB::new_from_coords(
             self.center(t1) - Vec3::new(self.radius, self.radius, self.radius),
             self.center(t1) + Vec3::new(self.radius, self.radius, self.radius),
         );

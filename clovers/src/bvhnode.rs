@@ -47,11 +47,8 @@ impl BVHNode {
         let object_span = objects.len();
 
         if object_span == 1 {
-            // If we only have one object, create two child nodes with the same object.
-            // We do not have an explicit leaf node in our tree.
-            // TODO: this might not be smart, how to improve?
-            left = Box::new(objects[0].clone());
-            right = Box::new(objects[0].clone());
+            // If we only have one object, something has gone wrong.
+            panic!("BVHNode from_list called with one object");
         } else if object_span == 2 {
             // If we are comparing two objects, perform the comparison
             // Insert the child nodes in order
@@ -69,6 +66,19 @@ impl BVHNode {
                     panic!("Equal objects in BVHNode from_list");
                 }
             }
+        } else if object_span == 3 {
+            // Three objects: create one bare object and one BVHNode with two objects
+            objects.sort_by(|a, b| comparator(&*a, &*b));
+            left = Box::new(objects[0].clone());
+            right = Box::new(Hitable::BVHNode(BVHNode {
+                left: Box::new(objects[1].clone()),
+                right: Box::new(objects[2].clone()),
+                bounding_box: AABB::surrounding_box(
+                    // TODO: no unwrap?
+                    objects[1].bounding_box(time_0, time_1).unwrap(),
+                    objects[2].bounding_box(time_0, time_1).unwrap(),
+                ),
+            }))
         } else {
             // Otherwise, recurse
             objects.sort_by(|a, b| comparator(&*a, &*b));
@@ -146,11 +156,12 @@ impl BVHNode {
 }
 
 fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
-    let box_a: Option<AABB> = a.bounding_box(0.0, 0.0);
-    let box_b: Option<AABB> = b.bounding_box(0.0, 0.0);
+    // TODO: proper time support?
+    let box_a: Option<AABB> = a.bounding_box(0.0, 1.0);
+    let box_b: Option<AABB> = b.bounding_box(0.0, 1.0);
 
     if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
-        if box_a.min[axis] < box_b.min[axis] {
+        if box_a.axis(axis).min < box_b.axis(axis).min {
             Ordering::Less
         } else {
             // Default to greater, even if equal

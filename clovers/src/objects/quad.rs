@@ -59,7 +59,7 @@ impl Quad {
         // TODO: what is this?
         let w: Vec3 = n / n.dot(&n);
         let area = n.magnitude();
-        let mut aabb = AABB::new(q, q + u + v);
+        let mut aabb = AABB::new_from_coords(q, q + u + v);
         aabb.pad();
 
         Quad {

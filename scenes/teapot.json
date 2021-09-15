@@ -130,14 +130,6 @@
         },
         "comment": "utah teapot"
       }
-    },
-    {
-      "Triangle": {
-        "q": [0.0, 0.0, 0.0],
-        "u": [0.0, 0.0, 0.0],
-        "v": [0.0, 0.0, 0.0],
-        "comment": "empty object to appease bvhnode creation"
-      }
     }
   ],
   "priority_objects": [
