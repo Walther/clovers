@@ -27,3 +27,4 @@ This repository has some example model files for demonstrating triangle-based ob
 
 - Utah Teapot model `teapot.stl` CC0 1.0 Universal Public Domain [Wikipedia](https://en.wikipedia.org/wiki/File:Utah_teapot_(solid).stl)
 - Stanford Bunny model `bunny.stl` CC Attribution 3.0 Unported [Wikipedia](https://commons.wikimedia.org/wiki/File:Stanford_Bunny.stl)
+- Stanford Dragon model `dragon.stl` (stl converted version) CC Attribution [Thingiverse](https://www.thingiverse.com/thing:27666)
