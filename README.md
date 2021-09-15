@@ -20,3 +20,10 @@ I might pick an open license at some point, or make this project private.
 No guarantees, sorry!
 
 If you make a PR to this repository, please acknowledge that you are giving all rights to this project.
+
+### Model files
+
+This repository has some example model files for demonstrating triangle-based object imports in addition to the declarative object primitives.
+
+- Utah Teapot model `teapot.stl` CC0 1.0 Universal Public Domain [Wikipedia](https://en.wikipedia.org/wiki/File:Utah_teapot_(solid).stl)
+- Stanford Bunny model `bunny.stl` CC Attribution 3.0 Unported [Wikipedia](https://commons.wikimedia.org/wiki/File:Stanford_Bunny.stl)
