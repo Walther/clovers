@@ -148,21 +148,23 @@ impl From<Vec<Hitable>> for HitableList {
 impl HitableList {
     pub fn hit(
         &self,
-        ray: &Ray,
-        distance_min: Float,
-        distance_max: Float,
-        rng: &mut SmallRng,
+        _ray: &Ray,
+        _distance_min: Float,
+        _distance_max: Float,
+        _rng: &mut SmallRng,
     ) -> Option<HitRecord> {
-        let mut hit_record: Option<HitRecord> = None;
-        let mut closest = distance_max;
-        // TODO: with more objects, this may become a significant bottleneck?
-        for hitable in self.0.iter() {
-            if let Some(record) = hitable.hit(ray, distance_min, closest, rng) {
-                closest = record.distance;
-                hit_record = Some(record);
-            }
-        }
-        hit_record
+        // TODO: can this function be completely deprecated and removed?
+        panic!("HitableList::hit called, make sure to create a BVHNode instead");
+        // let mut hit_record: Option<HitRecord> = None;
+        // let mut closest = distance_max;
+        // // TODO: with more objects, this may become a significant bottleneck?
+        // for hitable in self.0.iter() {
+        //     if let Some(record) = hitable.hit(ray, distance_min, closest, rng) {
+        //         closest = record.distance;
+        //         hit_record = Some(record);
+        //     }
+        // }
+        // hit_record
     }
 
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
