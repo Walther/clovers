@@ -118,9 +118,10 @@ pub type Float = f32;
 pub const PI: Float = core::f32::consts::PI;
 /// Internal type alias: a nalgebra [Vector3](nalgebra::Vector3) which is a vector with three dimensions, containing three of our internal [Float] types
 pub type Vec3 = Vector3<Float>;
-/// Internal const: epsilon used for avoiding "shadow acne". See e.g. [Raytracing In One Weekend](https://raytracing.github.io/)
-pub const EPSILON_SHADOW_ACNE: Float = 0.001;
-/// Internal const: epsilon used for having a finitely-sized thickness for the bounding box of an infinitely-thin rectangle
-pub const EPSILON_RECT_THICKNESS: Float = 0.0001;
-/// Internal const: epsilon used in the hit calculation of a [ConstantMedium](objects::constant_medium::ConstantMedium)
-pub const EPSILON_CONSTANT_MEDIUM: Float = 0.0001;
+/// Internal const: epsilon used for avoiding "shadow acne". This is mostly used for the initial minimum distance for ray hits after reflecting or scattering from a surface. This can be made pretty small.
+pub const EPSILON_SHADOW_ACNE: Float = 0.000_001;
+/// Internal const: epsilon used for having a finitely-sized thickness for the bounding box of an infinitely-thin rectangle. Shouldn't be too small.
+pub const EPSILON_RECT_THICKNESS: Float = 0.000_1;
+/// Internal const: epsilon used in the hit calculation of a [ConstantMedium](objects::constant_medium::ConstantMedium).
+// TODO: what would be an appropriate value?
+pub const EPSILON_CONSTANT_MEDIUM: Float = 0.000_1;
