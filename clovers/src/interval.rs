@@ -32,10 +32,9 @@ impl Interval {
         }
     }
 
-    /// Returns an interval expanded with delta, half of which placed at each end of the interval
+    /// Returns an interval expanded with delta at both ends
     pub fn expand(&self, delta: Float) -> Self {
-        let padding: Float = delta / 2.0;
-        Interval::new(self.min - padding, self.max + padding)
+        Interval::new(self.min - delta, self.max + delta)
     }
 
     /// Returns the size of the interval
