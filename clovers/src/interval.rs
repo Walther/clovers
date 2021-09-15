@@ -16,8 +16,11 @@ pub struct Interval {
 
 impl Interval {
     /// Constructs a new interval
-    pub fn new(min: Float, max: Float) -> Self {
-        Interval { min, max }
+    pub fn new(a: Float, b: Float) -> Self {
+        Interval {
+            min: a.min(b),
+            max: a.max(b),
+        }
     }
 
     /// Constructs a new interval from two intervals
