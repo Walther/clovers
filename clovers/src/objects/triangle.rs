@@ -1,6 +1,7 @@
 //! A triangle object. Almost exact copy of [Quad](crate::objects::Quad), with an adjusted `hit_ab` method.
 // TODO: better docs
 
+use crate::interval::Interval;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
@@ -60,8 +61,24 @@ impl Triangle {
         let w: Vec3 = n / n.dot(&n);
         // Compared to quad, triangle has half the area
         let area = n.magnitude() / 2.0;
-        // TODO: more accurate AABB for triangle; this is from quad
-        let mut aabb: AABB = AABB::new_from_coords(q, q + u + v);
+        // Compute the AABB using the absolute coordinates of all corners
+        // TODO: refactor to prettier code
+        let corner1 = q;
+        let corner2 = q + u;
+        let corner3 = q + v;
+        let interval_x = Interval::new(
+            corner1[0].min(corner2[0]).min(corner3[0]),
+            corner1[0].max(corner2[0]).max(corner3[0]),
+        );
+        let interval_y = Interval::new(
+            corner1[1].min(corner2[1]).min(corner3[1]),
+            corner1[1].max(corner2[1]).max(corner3[1]),
+        );
+        let interval_z = Interval::new(
+            corner1[2].min(corner2[2]).min(corner3[2]),
+            corner1[2].max(corner2[2]).max(corner3[2]),
+        );
+        let mut aabb: AABB = AABB::new(interval_x, interval_y, interval_z);
         aabb.pad();
 
         Triangle {
