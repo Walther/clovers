@@ -61,11 +61,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     if opts.debug {
         tracing_subscriber::fmt()
             .with_max_level(Level::DEBUG)
+            .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
             .init();
         debug!("Debug logging enabled");
     } else {
         tracing_subscriber::fmt()
             .with_max_level(Level::ERROR)
+            .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
             .init();
     }
 
