@@ -1,8 +1,8 @@
 use bytemuck::{Pod, Zeroable};
 use clovers::{color::Color, scenes::Scene, Float, RenderOpts};
-use log::debug;
 use spirv_builder::{MetadataPrintout, SpirvBuilder};
 use std::{borrow::Cow, mem::size_of, path::PathBuf};
+use tracing::debug;
 use wgpu::{Extent3d, TextureAspect, TextureViewDescriptor};
 
 #[cfg(not(any(target_os = "android", target_arch = "wasm32")))]

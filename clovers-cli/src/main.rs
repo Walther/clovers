@@ -3,13 +3,12 @@
 // External imports
 use chrono::Utc;
 use clap::Clap;
-use env_logger::Env;
 use humantime::format_duration;
 use image::{ImageBuffer, Rgb, RgbImage};
-use log::{debug, info};
 use std::fs::File;
 use std::io::Read;
 use std::{error::Error, fs, time::Instant};
+use tracing::{debug, info, Level};
 
 // Internal imports
 use clovers::*;
@@ -60,10 +59,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     let opts: Opts = Opts::parse();
 
     if opts.debug {
-        env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
+        tracing_subscriber::fmt()
+            .with_max_level(Level::DEBUG)
+            .init();
         debug!("Debug logging enabled");
     } else {
-        env_logger::Builder::from_env(Env::default().default_filter_or("error")).init();
+        tracing_subscriber::fmt()
+            .with_max_level(Level::ERROR)
+            .init();
     }
 
     // Pretty printing output, unless in quiet mode
