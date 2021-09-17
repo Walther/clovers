@@ -70,7 +70,7 @@ pub struct ShaderConstants {
 // TODO: split into multiple functions, simplify, etc
 /// The main drawing function, returns a Vec<Color> as a pixelbuffer.
 pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
-    // Initialize the GPU instance
+    debug!("Initializing the GPU instance");
     let instance = wgpu::Instance::new(wgpu::Backends::VULKAN | wgpu::Backends::METAL);
     let adapter = instance
         .request_adapter(&wgpu::RequestAdapterOptions {
@@ -82,10 +82,10 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
         .expect("Failed to find an appropriate adapter");
     let features = wgpu::Features::PUSH_CONSTANTS;
     let limits = wgpu::Limits {
-        max_push_constant_size: 256,
+        max_push_constant_size: 128,
         ..Default::default()
     };
-    // Create the logical device and command queue
+    debug!("Creating the logical device and command queue");
     let (device, queue) = adapter
         .request_device(
             &wgpu::DeviceDescriptor {
@@ -97,7 +97,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
         )
         .await
         .expect("Failed to create device");
-    // Load the shaders from disk
+    debug!("Loading the shaders from disk");
     let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
         label: None,
         bind_group_layouts: &[],
@@ -111,18 +111,19 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     let swapchain_format = wgpu::TextureFormat::Rgba32Float;
 
     // TODO: build shaders at build time, not at runtime
+    debug!("Compiling the shader");
     let shader_mod_desc = load_shader();
-    debug!("Shader loaded");
+    debug!("Compiled the shader");
     let _shader_mod = device.create_shader_module(&shader_mod_desc);
     debug!("Shader module created");
 
     // TODO: what do we need for actually running the shader?
     let render_pipeline =
         create_pipeline(&device, &pipeline_layout, swapchain_format, shader_mod_desc);
-    debug!("Pipeline created");
+    debug!("Render pipeline created");
     let mut encoder =
         device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-    debug!("Encoder created");
+    debug!("Command encoder created");
 
     let texture_size = Extent3d {
         width: opts.width,
@@ -187,7 +188,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     );
     debug!("Shader constants pushed");
     rpass.draw(0..3, 0..1);
-    debug!("Draw called");
+    debug!("Render pass Draw called");
 
     // Start getting the results from the draw
     // Heavily based on https://github.com/gfx-rs/wgpu/blob/v0.9/wgpu/examples/capture/main.rs
@@ -201,6 +202,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
         usage: wgpu::BufferUsages::MAP_READ | wgpu::BufferUsages::COPY_DST,
         mapped_at_creation: false,
     });
+    debug!("Output buffer created");
 
     // Drop the render pass to prevent double mutable borrow on encoder
     drop(rpass);
@@ -228,6 +230,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     );
 
     queue.submit(Some(encoder.finish()));
+    debug!("Queue submitted");
 
     // Note that we're not calling `.await` here.
     let buffer_slice = output_buffer.slice(..);
@@ -237,6 +240,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     // In an actual application, `device.poll(...)` should
     // be called in an event loop or on another thread.
     device.poll(wgpu::Maintain::Wait);
+    debug!("Device polling completed");
 
     let mut pixelbuffer: Vec<Color> = vec![];
 
@@ -256,6 +260,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
                 pixelbuffer.push(color);
             }
         }
+        debug!("Finishded writing the pixelbuffer");
     }
 
     // Drop the GPU instance
