@@ -10,15 +10,15 @@ publish = false
 # clovers itself
 clovers = { path = "../clovers", features = ["serde-derive"]}
 # Required for everything
-rayon = "1.5.0"
+rayon = "1.5.1"
 rand = { version = "0.8.4", features = ["small_rng"], default-features = false }
-serde = { version = "1.0.129", features = ["derive"], default-features = false }
-serde_json = "1.0.60"
-indicatif = { version = "0.16.0", features = ["rayon"] }
-clap = { version = "3.0.0-beta.2" }
+serde = { version = "1.0.130", features = ["derive"], default-features = false }
+serde_json = "1.0.67"
+indicatif = { version = "0.16.2", features = ["rayon"] }
+clap = "3.0.0-beta.4"
 # Required for GUI
-pixels = { version = "0.6.0" }
-winit = { version = "0.25.0" }
-winit_input_helper = { version = "0.10.0" }
+pixels = "0.6.0"
+winit = "0.25.0"
+winit_input_helper = "0.10.0"
 
 [dev-dependencies]
