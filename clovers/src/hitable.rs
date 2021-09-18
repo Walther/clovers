@@ -123,7 +123,7 @@ impl Hitable {
             Hitable::Quad(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
             Hitable::Triangle(h) => h.random(origin, rng),
-            _ => Vec3::new(1.0, 0.0, 0.0), // TODO: fix bad default
+            _ => Vec3::new(rng.gen::<Float>(), rng.gen::<Float>(), rng.gen::<Float>()).normalize(),
         }
     }
 
