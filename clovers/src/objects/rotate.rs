@@ -26,7 +26,7 @@ pub struct RotateY {
     object: Box<Hitable>,
     sin_theta: Float,
     cos_theta: Float,
-    bounding_box: Option<AABB>,
+    aabb: Option<AABB>,
 }
 
 impl RotateY {
@@ -49,7 +49,7 @@ impl RotateY {
                     object,
                     sin_theta,
                     cos_theta,
-                    bounding_box: None,
+                    aabb: None,
                 }
             }
             // Got a bounding box
@@ -94,7 +94,7 @@ impl RotateY {
             object,
             sin_theta,
             cos_theta,
-            bounding_box: Some(AABB::new_from_coords(min, max)),
+            aabb: Some(AABB::new_from_coords(min, max)),
         }
     }
 
@@ -154,6 +154,6 @@ impl RotateY {
 
     /// Bounding box method for the [RotateY] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for rotation.
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        self.bounding_box
+        self.aabb
     }
 }

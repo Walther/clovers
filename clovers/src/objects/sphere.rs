@@ -26,15 +26,21 @@ pub struct Sphere {
     center: Vec3,
     radius: Float,
     material: Material,
+    aabb: AABB,
 }
 
 impl Sphere {
     /// Creates a new `Sphere` object with the given center, radius and material.
     pub fn new(center: Vec3, radius: Float, material: Material) -> Self {
+        let aabb = AABB::new_from_coords(
+            center - Vec3::new(radius, radius, radius),
+            center + Vec3::new(radius, radius, radius),
+        );
         Sphere {
             center,
             radius,
             material,
+            aabb,
         }
     }
 
@@ -106,11 +112,7 @@ impl Sphere {
 
     /// Returns the axis-aligned bounding box [AABB] for the sphere.
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        let output_box = AABB::new_from_coords(
-            self.center - Vec3::new(self.radius, self.radius, self.radius),
-            self.center + Vec3::new(self.radius, self.radius, self.radius),
-        );
-        Some(output_box)
+        Some(self.aabb)
     }
 
     /// Returns the probability density function for the sphere? TODO: what does this do again and how
