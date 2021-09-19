@@ -34,8 +34,8 @@ impl Default for CloversApp {
     fn default() -> Self {
         Self {
             input: "scenes/scene.json".to_owned(),
-            width: 1024,
-            height: 1024,
+            width: 512,
+            height: 512,
             samples: 100,
             max_depth: 100,
             gamma: 2.0,
@@ -73,7 +73,7 @@ impl epi::App for CloversApp {
             gamma,
             gpu,
             normalmap,
-            mut texture,
+            texture,
         } = self;
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
@@ -129,9 +129,10 @@ impl epi::App for CloversApp {
                     info!("Creating the renderer");
                     let mut renderer = draw_gui::Renderer::new(scene, renderopts);
                     let mut pixelbuffer = vec![0; 4 * *width as usize * *height as usize];
-                    // TODO: proper loop etc
                     info!("Calling draw()");
-                    renderer.draw(&mut pixelbuffer, 1);
+                    for frame_number in 1..=*samples {
+                        renderer.draw(&mut pixelbuffer, frame_number);
+                    }
 
                     info!("Collecting the pixelbuffer");
                     let pixels: Vec<_> = pixelbuffer
@@ -143,7 +144,9 @@ impl epi::App for CloversApp {
                     let texture_id = frame
                         .tex_allocator()
                         .alloc_srgba_premultiplied((*width as usize, *height as usize), &pixels);
-                    texture = Some(texture_id);
+                    info!("Setting the texture to the state");
+                    *texture = Some(texture_id);
+                    info!("{:?}", texture_id);
                 }
             });
         });
@@ -151,8 +154,10 @@ impl epi::App for CloversApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Render result");
             if let Some(texture) = self.texture {
-                info!("Adding the image to the UI");
-                ui.image(texture, egui::Vec2::splat(1024.0));
+                ui.image(
+                    texture,
+                    egui::Vec2::new(self.width as f32, self.height as f32),
+                );
             }
             egui::warn_if_debug_build(ui);
         });
