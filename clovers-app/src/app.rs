@@ -28,6 +28,10 @@ pub struct CloversApp {
     normalmap: bool,
     /// Texture to render the image to
     texture: Option<egui::TextureId>,
+    /// Rendering currently in progress?
+    rendering: bool,
+    /// Current rendering progress: `(current,total)`
+    progress: (u32, u32),
 }
 
 impl Default for CloversApp {
@@ -42,6 +46,8 @@ impl Default for CloversApp {
             gpu: false, // TODO: gpu rendering by default <3
             normalmap: false,
             texture: None,
+            rendering: false,
+            progress: (0, 0),
         }
     }
 }
@@ -74,6 +80,8 @@ impl epi::App for CloversApp {
             gpu,
             normalmap,
             texture,
+            rendering,
+            progress,
         } = self;
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
@@ -106,6 +114,8 @@ impl epi::App for CloversApp {
                 if ui.button("Render!").clicked() {
                     // TODO: error handling
 
+                    *rendering = true;
+
                     // Read the given scene file
                     info!("Reading the scene file");
                     let mut file = File::open(input.clone()).unwrap();
@@ -131,6 +141,8 @@ impl epi::App for CloversApp {
                     let mut pixelbuffer = vec![0; 4 * *width as usize * *height as usize];
                     info!("Calling draw()");
                     for frame_number in 1..=*samples {
+                        info!("Rendering sample {} of {}", &frame_number, &samples);
+                        *progress = (frame_number, *samples);
                         renderer.draw(&mut pixelbuffer, frame_number);
                     }
 
@@ -146,18 +158,31 @@ impl epi::App for CloversApp {
                         .alloc_srgba_premultiplied((*width as usize, *height as usize), &pixels);
                     info!("Setting the texture to the state");
                     *texture = Some(texture_id);
-                    info!("{:?}", texture_id);
+
+                    *rendering = false;
                 }
             });
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("Render result");
-            if let Some(texture) = self.texture {
-                ui.image(
-                    texture,
-                    egui::Vec2::new(self.width as f32, self.height as f32),
-                );
+            // Are we currently rendering?
+            if self.rendering {
+                ui.heading(format!(
+                    "Rendering progress: {} of {}",
+                    self.progress.0, self.progress.1
+                ));
+            } else {
+                // If we have a render result in the texture, show it
+                if let Some(texture) = self.texture {
+                    ui.heading("Render result");
+                    ui.image(
+                        texture,
+                        egui::Vec2::new(self.width as f32, self.height as f32),
+                    );
+                } else {
+                    // Fresh window; show a default heading
+                    ui.heading("Select your rendering options & press Render!");
+                }
             }
             egui::warn_if_debug_build(ui);
         });
