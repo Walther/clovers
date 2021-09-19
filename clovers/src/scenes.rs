@@ -10,6 +10,7 @@ use crate::{
 };
 use rand::rngs::SmallRng;
 use rand::SeedableRng;
+use tracing::info;
 
 #[derive(Debug)]
 /// A representation of the scene that is being rendered.
@@ -26,7 +27,6 @@ pub struct Scene {
 
 impl Scene {
     /// Creates a new [Scene] with the given parameters.
-    #[cfg_attr(feature = "traces", tracing::instrument)]
     pub fn new(
         time_0: Float,
         time_1: Float,
@@ -60,7 +60,6 @@ pub struct SceneFile {
 }
 
 /// Initializes a new [Scene] instance by parsing the contents of a [SceneFile] structure and then using those details to construct the [Scene].
-#[cfg_attr(feature = "traces", tracing::instrument)]
 pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     let time_0 = scene_file.time_0;
     let time_1 = scene_file.time_1;
@@ -78,14 +77,8 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
         time_1,
     );
 
-    // NOTE: this optimization can surface some implementation flaws; e.g. some triangles may end up missing. However, the speedup is massive
+    info!("Creating a flattened list from the objects");
     let hitables = objects_to_flat_hitablelist(scene_file.objects);
-
-    // NOTE: original, non-flattened implementation. Correct, but O(n) to object amount, nearly unusably slow with imported objects with triangles, e.g. teapot scene
-    // let mut hitables = HitableList::new();
-    // for obj in scene_file.objects {
-    //     hitables.add(obj.into());
-    // }
 
     let mut priority_objects = HitableList::new();
     for obj in scene_file.priority_objects {
