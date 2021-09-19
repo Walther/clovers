@@ -5,6 +5,7 @@ use clovers::{
     RenderOpts,
 };
 use eframe::{egui, epi};
+use tracing::info;
 
 use crate::draw_gui;
 
@@ -72,7 +73,7 @@ impl epi::App for CloversApp {
             gamma,
             gpu,
             normalmap,
-            texture: _,
+            mut texture,
         } = self;
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
@@ -106,10 +107,13 @@ impl epi::App for CloversApp {
                     // TODO: error handling
 
                     // Read the given scene file
+                    info!("Reading the scene file");
                     let mut file = File::open(input.clone()).unwrap();
                     let mut contents: String = String::new();
                     file.read_to_string(&mut contents).unwrap();
+                    info!("Parsing the scene file");
                     let scene_file: SceneFile = serde_json::from_str(&contents).unwrap();
+                    info!("Initializing the scene");
                     let scene: Scene = scenes::initialize(scene_file, *width, *height);
 
                     let renderopts: RenderOpts = RenderOpts {
@@ -122,20 +126,24 @@ impl epi::App for CloversApp {
                         normalmap: *normalmap,
                     };
 
+                    info!("Creating the renderer");
                     let mut renderer = draw_gui::Renderer::new(scene, renderopts);
                     let mut pixelbuffer = vec![0; 4 * *width as usize * *height as usize];
                     // TODO: proper loop etc
+                    info!("Calling draw()");
                     renderer.draw(&mut pixelbuffer, 1);
 
+                    info!("Collecting the pixelbuffer");
                     let pixels: Vec<_> = pixelbuffer
                         .chunks_exact(4)
                         .map(|p| egui::Color32::from_rgba_unmultiplied(p[0], p[1], p[2], p[3]))
                         .collect();
 
-                    let _texture = frame
+                    info!("Creating the texture");
+                    let texture_id = frame
                         .tex_allocator()
                         .alloc_srgba_premultiplied((*width as usize, *height as usize), &pixels);
-                    // self.texture = Some(texture);
+                    texture = Some(texture_id);
                 }
             });
         });
@@ -143,6 +151,7 @@ impl epi::App for CloversApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Render result");
             if let Some(texture) = self.texture {
+                info!("Adding the image to the UI");
                 ui.image(texture, egui::Vec2::splat(1024.0));
             }
             egui::warn_if_debug_build(ui);
