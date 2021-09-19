@@ -57,6 +57,7 @@ impl Translate {
 
     /// Bounding box method for the [Translate] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for translation.
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+        // TODO: cached into self.aabb ?
         let aabb = self.object.bounding_box(t0, t1);
         aabb.map(|b| b + self.offset)
     }

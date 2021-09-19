@@ -12,18 +12,18 @@ path = "src/main.rs"
 # Internal
 clovers = { path = "../clovers", features = ["serde-derive", "stl", "traces"]}
 # External
-rayon = "1.5.0"
+rayon = "1.5.1"
 rand = { version = "0.8.4", features = ["small_rng"], default-features = false }
-serde = { version = "1.0.129", features = ["derive"], default-features = false }
-serde_json = "1.0.60"
-image = { version = "0.23.12" }
-chrono = { version = "0.4.19" }
-humantime = { version = "2.0.1" }
-indicatif = { version = "0.16.0", features = ["rayon"] }
-clap = { version = "3.0.0-beta.2" }
+serde = { version = "1.0.130", features = ["derive"], default-features = false }
+serde_json = "1.0.67"
+image = "0.23.14"
+chrono = "0.4.19"
+humantime = "2.1.0"
+indicatif = { version = "0.16.2", features = ["rayon"] }
+clap = "3.0.0-beta.4"
 spirv-builder = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "eeb67ae7489e5df03231f73d108a8f2feae2ca1a" }
 wgpu = { version = "0.10.1", features = ["spirv"] }
-bytemuck = {version = "1.7.2", features = ["derive"]}
-futures = "0.3.16"
-tracing = "0.1"
-tracing-subscriber = "0.2"
+bytemuck = { version = "1.7.2", features = ["derive"] }
+futures = "0.3.17"
+tracing = "0.1.26"
+tracing-subscriber = "0.2.20"

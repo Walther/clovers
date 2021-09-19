@@ -20,6 +20,8 @@ pub struct MovingSphere {
     /// Material of the sphere
     #[cfg_attr(feature = "serde-derive", serde(default))]
     pub material: Material,
+    /// Axis-aligned bounding box
+    pub aabb: AABB,
 }
 
 impl MovingSphere {
@@ -32,6 +34,17 @@ impl MovingSphere {
         radius: Float,
         material: Material,
     ) -> Self {
+        let box0: AABB = AABB::new_from_coords(
+            center_0 - Vec3::new(radius, radius, radius),
+            center_0 + Vec3::new(radius, radius, radius),
+        );
+        let box1: AABB = AABB::new_from_coords(
+            center_1 - Vec3::new(radius, radius, radius),
+            center_1 + Vec3::new(radius, radius, radius),
+        );
+
+        let aabb = AABB::surrounding_box(box0, box1);
+
         MovingSphere {
             center_0,
             center_1,
@@ -39,6 +52,7 @@ impl MovingSphere {
             time_1,
             radius,
             material,
+            aabb,
         }
     }
 
@@ -115,16 +129,7 @@ impl MovingSphere {
     }
 
     /// Returns the axis-aligned bounding box of the [MovingSphere] object. This is the maximum possible bounding box of the entire span of the movement of the sphere, calculated from the two center positions and the radius.
-    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
-        let box0: AABB = AABB::new_from_coords(
-            self.center(t0) - Vec3::new(self.radius, self.radius, self.radius),
-            self.center(t0) + Vec3::new(self.radius, self.radius, self.radius),
-        );
-        let box1: AABB = AABB::new_from_coords(
-            self.center(t1) - Vec3::new(self.radius, self.radius, self.radius),
-            self.center(t1) + Vec3::new(self.radius, self.radius, self.radius),
-        );
-
-        Some(AABB::surrounding_box(box0, box1))
+    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+        Some(self.aabb)
     }
 }

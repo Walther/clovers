@@ -31,6 +31,8 @@ pub struct Boxy {
     sides: Box<HitableList>,
     /// The material of the box
     pub material: Material,
+    /// Axis-aligned bounding box
+    pub aabb: AABB,
 }
 
 impl Boxy {
@@ -102,11 +104,15 @@ impl Boxy {
             material,
         )));
 
+        // AABB
+        let aabb = AABB::new_from_coords(corner_0, corner_1);
+
         Boxy {
             corner_0,
             corner_1,
             sides: Box::new(sides),
             material,
+            aabb,
         }
     }
 
@@ -123,7 +129,7 @@ impl Boxy {
 
     /// Returns the axis-aligned bounding box [AABB] of the object.
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        Some(AABB::new_from_coords(self.corner_0, self.corner_1))
+        Some(self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
