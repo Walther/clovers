@@ -5,6 +5,8 @@ authors = ["Walther <veeti.haapsamo@gmail.com>"]
 edition = "2018"
 publish = false
 
+[lib]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 # clovers itself
@@ -17,8 +19,6 @@ serde_json = "1.0.67"
 indicatif = { version = "0.16.2", features = ["rayon"] }
 clap = "3.0.0-beta.4"
 # Required for GUI
-pixels = "0.6.0"
-winit = "0.25.0"
-winit_input_helper = "0.10.0"
+eframe = { version = "0.14.0", features = [] }
 
 [dev-dependencies]

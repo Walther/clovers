@@ -1,4 +1,4 @@
-use crate::{color::Color, colorize::colorize, scenes::Scene, Float};
+use clovers::{color::Color, colorize::colorize, scenes::Scene, Float};
 
 use clovers::RenderOpts;
 use indicatif::{ProgressBar, ProgressStyle};
@@ -6,81 +6,8 @@ use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
-use pixels::{Error, Pixels, SurfaceTexture};
-
-use winit::{
-    dpi::PhysicalSize,
-    event::{Event, VirtualKeyCode},
-    event_loop::{ControlFlow, EventLoop},
-    window::WindowBuilder,
-};
-
-use winit_input_helper::WinitInputHelper;
-
-// TODO: complete rewrite of this function
-pub fn draw_gui(opts: RenderOpts, scene: Scene) -> Result<(), Error> {
-    let event_loop = EventLoop::new();
-    let mut input = WinitInputHelper::new();
-    let window = {
-        let size = PhysicalSize::new(opts.width as f64, opts.height as f64);
-        WindowBuilder::new()
-            .with_title("clovers 🍀 ray tracing in rust 🦀")
-            .with_inner_size(size)
-            .with_min_inner_size(size)
-            .build(&event_loop)
-            .unwrap()
-    };
-    let mut pixels = {
-        let surface_texture = SurfaceTexture::new(opts.width, opts.height, &window);
-        Pixels::new(opts.width, opts.height, surface_texture)?
-    };
-
-    let mut world = World::new(
-        opts.width,
-        opts.height,
-        opts.samples,
-        opts.max_depth,
-        opts.gamma,
-        scene,
-    );
-    let mut frame_num = 0;
-
-    event_loop.run(move |event, _, control_flow| {
-        // Draw the current frame
-        if let Event::RedrawRequested(_) = event {
-            frame_num += 1;
-            world.draw(pixels.get_frame(), frame_num);
-            if pixels
-                .render()
-                .map_err(|e| println!("pixels.render() failed: {}", e))
-                .is_err()
-            {
-                *control_flow = ControlFlow::Exit;
-                return;
-            }
-        }
-
-        // Handle input events
-        if input.update(&event) {
-            // Close events
-            if input.key_pressed(VirtualKeyCode::Escape) || input.quit() {
-                *control_flow = ControlFlow::Exit;
-                return;
-            }
-
-            // Resize the window
-            if let Some(size) = input.window_resized() {
-                pixels.resize_surface(size.width, size.height);
-            }
-
-            // Update internal state and request a redraw
-            world.update();
-            window.request_redraw();
-        }
-    });
-}
-
-struct World {
+// TODO: clean up
+pub struct Renderer {
     width: u32,
     height: u32,
     scene: Scene,
@@ -91,35 +18,28 @@ struct World {
     gamma: Float,
 }
 
-impl World {
-    fn new(
-        width: u32,
-        height: u32,
-        samples: u32,
-        max_depth: u32,
-        gamma: Float,
-        scene: Scene,
-    ) -> Self {
+impl Renderer {
+    pub fn new(scene: Scene, opts: RenderOpts) -> Self {
         // Progress bar
-        let bar = ProgressBar::new(samples as u64);
+        let bar = ProgressBar::new(opts.samples as u64);
         bar.set_style(ProgressStyle::default_bar().template(
             "Elapsed: {elapsed_precise}\nSamples:  {bar} {pos}/{len}\nETA:     {eta_precise}",
         ));
 
-        World {
-            width,
-            height,
+        Renderer {
+            width: opts.width,
+            height: opts.height,
             scene,
-            float_buffer: vec![0.0; 4 * width as usize * height as usize], // rgba
+            float_buffer: vec![0.0; 4 * opts.width as usize * opts.height as usize], // rgba
             bar,
-            samples,
-            max_depth,
-            gamma,
+            samples: opts.samples,
+            max_depth: opts.max_depth,
+            gamma: opts.gamma,
         }
     }
 
     // Assumes the default texture format: [`wgpu::TextureFormat::Rgba8UnormSrgb`]
-    fn draw(&mut self, frame: &mut [u8], frame_num: u32) {
+    pub fn draw(&mut self, frame: &mut [u8], frame_num: u32) {
         // Stop iterating
         if frame_num > self.samples {
             return;
@@ -173,15 +93,10 @@ impl World {
                 // gamma correction
                 let color = color.gamma_correction(self.gamma);
                 let rgb = color.to_rgb_u8();
-                // weight the pixel down based on frame number
                 let rgba = [rgb[0], rgb[1], rgb[2], 0xFF]; //TODO: alpha in color?
 
                 pixel.copy_from_slice(&rgba);
             });
         self.bar.inc(1);
-    }
-
-    fn update(&self) {
-        // TODO
     }
 }
