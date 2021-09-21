@@ -7,7 +7,8 @@ use crate::{interval::Interval, ray::Ray, Float, Vec3, EPSILON_RECT_THICKNESS};
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
 /// This is useful for creating bounding volume hierarchies, which is an optimization for reducing the time spent on calculating ray-object intersections.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct AABB {
     /// The bounding interval on the X axis
@@ -85,8 +86,17 @@ impl AABB {
             if !t0.is_normal() || !t1.is_normal() {
                 continue;
             }
+            // TODO: clean up gpu compatibility hack
+            #[cfg(not(target_arch = "spirv"))]
             if invd < 0.0 {
                 core::mem::swap(&mut t0, &mut t1);
+            }
+            #[allow(clippy::manual_swap)]
+            #[cfg(target_arch = "spirv")]
+            if invd < 0.0 {
+                let swap = t0;
+                t0 = t1;
+                t1 = swap;
             }
             tmin = if t0 > tmin { t0 } else { tmin };
             tmax = if t1 < tmax { t1 } else { tmax };
@@ -138,7 +148,10 @@ impl AABB {
             0 => self.x,
             1 => self.y,
             2 => self.z,
+            #[cfg(not(target_arch = "spirv"))]
             _ => panic!("AABB::axis called with invalid parameter: {:?}", n),
+            #[cfg(target_arch = "spirv")]
+            _ => self.x, // NOTE: bad default for gpu purposes. Don't panic in the GPU!
         }
     }
 }
