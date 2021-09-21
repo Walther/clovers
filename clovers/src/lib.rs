@@ -83,6 +83,7 @@ pub use spirv_std::glam::Vec3;
 pub mod aabb;
 pub mod color;
 pub mod interval;
+pub mod onb;
 pub mod ray;
 
 // Internals: not gpu compatible yet
@@ -100,8 +101,6 @@ pub mod materials;
 pub mod normals;
 #[cfg(not(target_arch = "spirv"))]
 pub mod objects;
-#[cfg(not(target_arch = "spirv"))]
-pub mod onb;
 #[cfg(not(target_arch = "spirv"))]
 pub mod pdf;
 #[cfg(feature = "random")]

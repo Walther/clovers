@@ -2,7 +2,10 @@
 
 use crate::Vec3;
 
-#[derive(Debug)]
+#[cfg(target_arch = "spirv")]
+use spirv_std::num_traits::Float as FloatTrait;
+
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 /// An orthonormal basis structure.
 pub struct ONB {
     /// U
@@ -24,7 +27,16 @@ impl ONB {
         } else {
             Vec3::new(1.0, 0.0, 0.0)
         };
+
+        // TODO: better ergonomics. nalgebra uses a reference, glam uses plain value
+        #[cfg(target_arch = "spirv")]
+        let v = (w.cross(a)).normalize();
+        #[cfg(target_arch = "spirv")]
+        let u = w.cross(v);
+
+        #[cfg(not(target_arch = "spirv"))]
         let v = (w.cross(&a)).normalize();
+        #[cfg(not(target_arch = "spirv"))]
         let u = w.cross(&v);
 
         ONB { u, v, w }
