@@ -85,6 +85,7 @@ pub mod color;
 pub mod interval;
 pub mod onb;
 pub mod ray;
+pub mod textures; // TODO: partial support
 
 // Internals: not gpu compatible yet
 #[cfg(not(target_arch = "spirv"))]
@@ -111,8 +112,6 @@ pub mod random;
 #[cfg(feature = "random")]
 #[cfg(not(target_arch = "spirv"))]
 pub mod scenes;
-#[cfg(not(target_arch = "spirv"))] // TODO: requires enums with data to work
-pub mod textures;
 
 /// Rendering options struct
 #[derive(Debug)]
