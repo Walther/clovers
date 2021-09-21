@@ -60,35 +60,60 @@
 #![deny(unused_qualifications)]
 #![deny(missing_debug_implementations)]
 #![deny(missing_docs)]
-// TODO:
-#![allow(clippy::many_single_char_names)] // Lots of places with coordinates etc
+// TODO: Lots of places with coordinates etc
+#![allow(clippy::many_single_char_names)]
+//
 
-// no_std required for gpu accelerated rendering
+// TODO: make these cfg bits cleaner and nicer. Lots of cfg mess here in order to build spirv target support bit by bit
 #![cfg_attr(not(feature = "std"), no_std)]
+#[cfg(not(target_arch = "spirv"))]
 extern crate alloc;
+#[cfg(not(target_arch = "spirv"))]
 pub use alloc::boxed::Box;
+#[cfg(not(target_arch = "spirv"))]
 pub use alloc::vec::Vec;
 
 // Externals
+#[cfg(feature = "nalg")]
 use nalgebra::base::Vector3;
 
-// Internals
-pub mod aabb;
-pub mod bvhnode;
-pub mod camera;
-pub mod color;
-pub mod colorize;
-pub mod hitable;
+// Internals: GPU compatible
 pub mod interval;
+
+// Internals: not gpu compatible yet
+#[cfg(not(target_arch = "spirv"))]
+pub mod aabb;
+#[cfg(not(target_arch = "spirv"))]
+pub mod bvhnode;
+#[cfg(not(target_arch = "spirv"))]
+pub mod camera;
+#[cfg(not(target_arch = "spirv"))]
+pub mod color;
+#[cfg(not(target_arch = "spirv"))]
+pub mod colorize;
+#[cfg(not(target_arch = "spirv"))]
+pub mod hitable;
+#[cfg(not(target_arch = "spirv"))]
 pub mod materials;
+#[cfg(not(target_arch = "spirv"))]
 pub mod normals;
+#[cfg(not(target_arch = "spirv"))]
 pub mod objects;
+#[cfg(not(target_arch = "spirv"))]
 pub mod onb;
+#[cfg(not(target_arch = "spirv"))]
 pub mod pdf;
+#[cfg(feature = "random")]
+#[cfg(not(target_arch = "spirv"))]
 pub mod perlin;
+#[cfg(not(target_arch = "spirv"))]
 pub mod random;
+#[cfg(not(target_arch = "spirv"))]
 pub mod ray;
+#[cfg(feature = "random")]
+#[cfg(not(target_arch = "spirv"))]
 pub mod scenes;
+#[cfg(not(target_arch = "spirv"))]
 pub mod textures;
 
 /// Rendering options struct
@@ -117,6 +142,7 @@ pub type Float = f32;
 /// Internal helper: re-exports the pi constant as our internal [Float] type. TODO: selectable at run time instead of build time?
 pub const PI: Float = core::f32::consts::PI;
 /// Internal type alias: a nalgebra [Vector3](nalgebra::Vector3) which is a vector with three dimensions, containing three of our internal [Float] types
+#[cfg(feature = "nalg")]
 pub type Vec3 = Vector3<Float>;
 /// Internal const: epsilon used for avoiding "shadow acne". This is mostly used for the initial minimum distance for ray hits after reflecting or scattering from a surface.
 pub const EPSILON_SHADOW_ACNE: Float = 0.001;

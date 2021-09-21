@@ -5,6 +5,7 @@
 
 use crate::{Float, Vec3};
 use rand::rngs::SmallRng;
+#[cfg(feature = "random")]
 use rand::{Rng, SeedableRng};
 
 #[cfg(not(target_arch = "spirv"))]

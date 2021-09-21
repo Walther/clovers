@@ -10,6 +10,9 @@
 #![allow(clippy::all)]
 
 use spirv_std::glam::{vec2, vec4, Vec2, Vec4};
+
+use clovers::{interval::Interval, Float};
+
 pub struct ShaderConstants {
     pub width: u32,
     pub height: u32,
@@ -35,6 +38,8 @@ pub fn main_fs(
     let a = x / width;
     let b = y / height;
     let c = (x as u32 | y as u32) as f32;
+    let interval = Interval::new(x, y);
+    let _size: Float = interval.size();
     *output = vec4(a, b, c, 1.0);
 }
 
