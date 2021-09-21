@@ -4,8 +4,12 @@
 
 use crate::{Float, Vec3};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
+#[cfg(feature = "random")]
 use rand::rngs::SmallRng;
+#[cfg(feature = "random")]
 use rand::Rng;
+#[cfg(target_arch = "spirv")]
+use spirv_std::num_traits::Float as FloatTrait;
 
 /// RGB color based on three [Floats](crate::Float) values.
 #[derive(Copy, Clone, Debug)]
@@ -37,6 +41,7 @@ impl Color {
     }
 
     /// Creates a new [Color] with random parameters between `0.0..1.0`.
+    #[cfg(feature = "random")]
     pub fn random(mut rng: SmallRng) -> Color {
         Color {
             r: rng.gen::<Float>(),
@@ -67,6 +72,7 @@ impl Color {
     }
 
     /// Transforms the [Float] based [Color] into a 24-bit, 3 x u8 RGB color.
+    #[cfg(not(target_arch = "spirv"))]
     pub fn to_rgb_u8(&self) -> [u8; 3] {
         // TODO: might be possible to optimize
         let mut r = self.r;
@@ -94,6 +100,7 @@ impl Color {
     }
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl From<[u8; 3]> for Color {
     fn from(rgb: [u8; 3]) -> Self {
         Color::new(

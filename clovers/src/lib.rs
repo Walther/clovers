@@ -80,6 +80,7 @@ use nalgebra::base::Vector3;
 pub use spirv_std::glam::Vec3;
 
 // Internals: GPU compatible
+pub mod color;
 pub mod interval;
 pub mod ray;
 
@@ -90,8 +91,6 @@ pub mod aabb;
 pub mod bvhnode;
 #[cfg(not(target_arch = "spirv"))]
 pub mod camera;
-#[cfg(not(target_arch = "spirv"))]
-pub mod color;
 #[cfg(not(target_arch = "spirv"))]
 pub mod colorize;
 #[cfg(not(target_arch = "spirv"))]
