@@ -6,6 +6,8 @@ use crate::{Float, Vec3, PI};
 #[cfg(feature = "rand-crate")]
 #[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
+#[cfg(target_arch = "spirv")]
+use spirv_std::num_traits::Float as FloatTrait;
 
 /// Internal helper. Originally used for lambertian reflection with flaws
 pub fn random_in_unit_sphere(rng: &mut CloversRng) -> Vec3 {
@@ -13,7 +15,14 @@ pub fn random_in_unit_sphere(rng: &mut CloversRng) -> Vec3 {
     // TODO: figure out a non-loop method
     // See https://github.com/RayTracing/raytracing.github.io/issues/765
     loop {
-        position = 2.0 * Vec3::new(rng.gen(), rng.gen(), rng.gen()) - Vec3::new(1.0, 1.0, 1.0);
+        position = 2.0 * Vec3::new(rng.gen::<Float>(), rng.gen::<Float>(), rng.gen::<Float>())
+            - Vec3::new(1.0, 1.0, 1.0);
+        // TODO: better ergonomics. nalgebra uses a reference, glam uses plain value
+        #[cfg(target_arch = "spirv")]
+        if position.length_squared() >= 1.0 {
+            return position;
+        }
+        #[cfg(not(target_arch = "spirv"))]
         if position.magnitude_squared() >= 1.0 {
             return position;
         }
@@ -35,7 +44,14 @@ pub fn random_in_unit_disk(rng: &mut CloversRng) -> Vec3 {
     // See https://github.com/RayTracing/raytracing.github.io/issues/765
     loop {
         // TODO: understand this defocus disk thingy
-        position = 2.0 * Vec3::new(rng.gen(), rng.gen(), 0.0) - Vec3::new(1.0, 1.0, 0.0);
+        position =
+            2.0 * Vec3::new(rng.gen::<Float>(), rng.gen::<Float>(), 0.0) - Vec3::new(1.0, 1.0, 0.0);
+        // TODO: better ergonomics. nalgebra uses a reference, glam uses plain value
+        #[cfg(target_arch = "spirv")]
+        if position.dot(position) >= 1.0 {
+            return position;
+        }
+        #[cfg(not(target_arch = "spirv"))]
         if position.dot(&position) >= 1.0 {
             return position;
         }

@@ -85,6 +85,7 @@ pub mod aabb;
 pub mod color;
 pub mod interval;
 pub mod onb;
+pub mod random;
 pub mod ray;
 pub mod textures; // TODO: partial support
 
@@ -107,8 +108,6 @@ pub mod objects;
 pub mod pdf;
 #[cfg(not(target_arch = "spirv"))]
 pub mod perlin;
-#[cfg(not(target_arch = "spirv"))]
-pub mod random;
 #[cfg(not(target_arch = "spirv"))]
 pub mod scenes;
 
