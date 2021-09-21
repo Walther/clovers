@@ -2,7 +2,8 @@
 
 use crate::{color::Color, Float, Vec3};
 
-#[derive(Copy, Clone, Debug, Default)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[derive(Copy, Clone, Default)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A solid color texture. Simplest possible [Texture](crate::textures::Texture): returns a solid color at any surface coordinate or spatial position.
 pub struct SolidColor {

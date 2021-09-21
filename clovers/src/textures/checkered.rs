@@ -2,7 +2,11 @@
 
 use crate::{color::Color, Float, Vec3, PI};
 
-#[derive(Copy, Clone, Debug)]
+#[cfg(target_arch = "spirv")]
+use spirv_std::num_traits::Float as FloatTrait;
+
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[derive(Copy, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A standard checkered texture based on spatial 3D texturing.
 pub struct SpatialChecker {
@@ -65,7 +69,8 @@ impl SpatialChecker {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[derive(Copy, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A standard checkered texture based on 2D surface UV coordinates.
 pub struct SurfaceChecker {

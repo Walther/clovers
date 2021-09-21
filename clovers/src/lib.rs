@@ -112,7 +112,7 @@ pub mod random;
 #[cfg(feature = "random")]
 #[cfg(not(target_arch = "spirv"))]
 pub mod scenes;
-#[cfg(not(target_arch = "spirv"))]
+#[cfg(not(target_arch = "spirv"))] // TODO: requires enums with data to work
 pub mod textures;
 
 /// Rendering options struct
