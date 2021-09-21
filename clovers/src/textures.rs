@@ -15,10 +15,14 @@ use crate::{color::Color, Float, Vec3};
 #[cfg(feature = "random")]
 use noise_texture::NoiseTexture;
 
-#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
-#[derive(Copy, Clone)]
+#[cfg(target_arch = "spirv")]
+use crate::PI;
+#[cfg(target_arch = "spirv")]
+use spirv_std::num_traits::Float as FloatTrait;
+
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 #[cfg(not(target_arch = "spirv"))]
+#[derive(Copy, Clone, Debug)]
 /// A texture enum.
 pub enum Texture {
     /// NoiseTexture texture
@@ -49,10 +53,9 @@ pub enum TextureKind {
 pub struct Texture {
     kind: TextureKind,
     color: Color,
-    // TODO: proper implementation of additional textures!
-    // even: Color,
-    // odd: Color,
-    // density: Color,
+    even: Color,
+    odd: Color,
+    density: Float,
 }
 
 #[cfg(not(target_arch = "spirv"))]
@@ -72,12 +75,31 @@ impl Texture {
 #[cfg(target_arch = "spirv")]
 impl Texture {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
-    pub fn color(&self, _u: Float, _v: Float, _position: Vec3) -> Color {
+    pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match self.kind {
             TextureKind::SolidColor => self.color,
-            // TODO: proper implementation of additional textures!
-            TextureKind::SpatialChecker => self.color,
-            TextureKind::SurfaceChecker => self.color,
+            // TODO: cleaner implementation! These are copy-pasted from `clovers/src/textures/checkered.rs`
+            TextureKind::SpatialChecker => {
+                let density = self.density * PI;
+                let sines = 1.0
+                    * (density * position.x).sin()
+                    * (density * position.y).sin()
+                    * (density * position.z).sin();
+                if sines < 0.0 {
+                    self.odd
+                } else {
+                    self.even
+                }
+            }
+            TextureKind::SurfaceChecker => {
+                let density = self.density * PI;
+                let sines = 1.0 * (density * u).sin() * (density * v).sin();
+                if sines < 0.0 {
+                    self.odd
+                } else {
+                    self.even
+                }
+            }
         }
     }
 }
