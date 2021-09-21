@@ -9,8 +9,12 @@ use crate::{random::random_in_unit_disk, ray::Ray, Float, Vec3, PI};
 #[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
 
-#[derive(Copy, Clone, Debug)]
+#[cfg(target_arch = "spirv")]
+use spirv_std::num_traits::Float as FloatTrait;
+
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Copy, Clone)]
 /// The main [Camera] object used in the ray tracing.
 pub struct Camera {
     /// Coordinate of the lower left corner of the camera.
@@ -36,7 +40,7 @@ pub struct Camera {
     pub w: Vec3,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// Represents the fields that can be described in a Scene file. Some other fields the main Camera struct requires (such as aspect_ratio) are derived from other info (such as width, height)
 pub struct CameraInit {
@@ -74,8 +78,15 @@ impl Camera {
         let half_width: Float = aspect_ratio * half_height;
         let origin: Vec3 = look_from;
         let w: Vec3 = (look_from - look_at).normalize();
+        // TODO: better ergonomics. nalgebra uses a reference, glam uses plain value
+        #[cfg(not(target_arch = "spirv"))]
         let u: Vec3 = (up.cross(&w)).normalize();
+        #[cfg(not(target_arch = "spirv"))]
         let v: Vec3 = w.cross(&u);
+        #[cfg(target_arch = "spirv")]
+        let u: Vec3 = (up.cross(w)).normalize();
+        #[cfg(target_arch = "spirv")]
+        let v: Vec3 = w.cross(u);
 
         // TODO: understand this defocus
         let lower_left_corner: Vec3 = origin

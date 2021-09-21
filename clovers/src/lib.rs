@@ -82,6 +82,7 @@ pub use spirv_std::glam::Vec3;
 
 // Internals: GPU compatible
 pub mod aabb;
+pub mod camera;
 pub mod color;
 pub mod interval;
 pub mod onb;
@@ -92,8 +93,6 @@ pub mod textures; // TODO: partial support
 // Internals: not gpu compatible yet
 #[cfg(not(target_arch = "spirv"))]
 pub mod bvhnode;
-#[cfg(not(target_arch = "spirv"))]
-pub mod camera;
 #[cfg(not(target_arch = "spirv"))]
 pub mod colorize;
 #[cfg(not(target_arch = "spirv"))]
