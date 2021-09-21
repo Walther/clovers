@@ -3,7 +3,8 @@
 use crate::{Float, Vec3};
 
 /// A Ray has an origin and a direction, as well as an instant in time it exists in. Motion blur is achieved by creating multiple rays with slightly different times.
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[derive(Copy, Clone, PartialEq)]
 pub struct Ray {
     /// The origin of the ray.
     pub origin: Vec3,

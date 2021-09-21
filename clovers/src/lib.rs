@@ -58,7 +58,7 @@
 #![deny(unsafe_code)]
 #![deny(unused_lifetimes)]
 #![deny(unused_qualifications)]
-#![deny(missing_debug_implementations)]
+// #![deny(missing_debug_implementations)] // TODO: how to have this for standard builds but not for gpu builds?
 #![deny(missing_docs)]
 // TODO: Lots of places with coordinates etc
 #![allow(clippy::many_single_char_names)]
@@ -76,9 +76,12 @@ pub use alloc::vec::Vec;
 // Externals
 #[cfg(feature = "nalg")]
 use nalgebra::base::Vector3;
+#[cfg(target_arch = "spirv")]
+pub use spirv_std::glam::Vec3;
 
 // Internals: GPU compatible
 pub mod interval;
+pub mod ray;
 
 // Internals: not gpu compatible yet
 #[cfg(not(target_arch = "spirv"))]
@@ -108,8 +111,6 @@ pub mod pdf;
 pub mod perlin;
 #[cfg(not(target_arch = "spirv"))]
 pub mod random;
-#[cfg(not(target_arch = "spirv"))]
-pub mod ray;
 #[cfg(feature = "random")]
 #[cfg(not(target_arch = "spirv"))]
 pub mod scenes;
