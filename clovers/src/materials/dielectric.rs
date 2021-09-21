@@ -1,6 +1,7 @@
 //! A dielectric material. This resembles glass and other transparent and reflective materials.
 
 use super::{reflect, refract, schlick, MaterialType, ScatterRecord};
+use crate::CloversRng;
 use crate::{
     color::Color,
     hitable::HitRecord,
@@ -8,7 +9,9 @@ use crate::{
     ray::Ray,
     Float, Vec3,
 };
-use rand::rngs::SmallRng;
+// TODO: fix trait import
+#[cfg(feature = "rand-crate")]
+#[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
 
 #[derive(Copy, Clone, Debug)]
@@ -37,7 +40,7 @@ impl<'a> Dielectric {
         self,
         ray: &Ray,
         hit_record: &HitRecord,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> Option<ScatterRecord<'a>> {
         let albedo = self.color;
         let specular_ray: Ray;
@@ -77,7 +80,7 @@ impl<'a> Dielectric {
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
-        _rng: &mut SmallRng,
+        _rng: &mut CloversRng,
     ) -> Float {
         todo!()
     }

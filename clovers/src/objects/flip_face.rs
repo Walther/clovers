@@ -1,12 +1,12 @@
 //! An utility object that can be used to flip the face of the object. TODO: possibly deprecated?
 
+use crate::CloversRng;
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
     ray::Ray,
     Box, Float,
 };
-use rand::rngs::SmallRng;
 
 use super::Object;
 
@@ -40,7 +40,7 @@ impl FlipFace {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> Option<HitRecord> {
         self.object
             .hit(ray, distance_min, distance_max, rng)

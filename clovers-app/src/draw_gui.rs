@@ -2,7 +2,7 @@ use clovers::{color::Color, colorize::colorize, scenes::Scene, Float};
 
 use clovers::RenderOpts;
 // use indicatif::{ProgressBar, ProgressStyle};
-use rand::rngs::SmallRng;
+use clovers::CloversRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
@@ -58,7 +58,7 @@ impl Renderer {
                 let x = (i % width) as i16;
                 let y = height as i16 - (i / width) as i16; // flip y-axis
 
-                let mut rng = SmallRng::from_entropy();
+                let mut rng = CloversRng::from_entropy();
                 let mut color: Color = Color::new(0.0, 0.0, 0.0);
 
                 let u = (x as Float + rng.gen::<Float>()) / width as Float;

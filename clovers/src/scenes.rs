@@ -1,5 +1,6 @@
 //! A collection of objects, camera, and other things necessary to describe the environment you wish to render.
 
+use crate::CloversRng;
 use crate::{
     bvhnode::BVHNode,
     camera::{Camera, CameraInit},
@@ -8,7 +9,6 @@ use crate::{
     objects::Object,
     Float, Vec,
 };
-use rand::rngs::SmallRng;
 use rand::SeedableRng;
 use tracing::info;
 
@@ -34,7 +34,7 @@ impl Scene {
         objects: HitableList,
         priority_objects: HitableList,
         background_color: Color,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> Scene {
         Scene {
             objects: objects.into_bvh(time_0, time_1, rng),
@@ -63,7 +63,7 @@ pub struct SceneFile {
 pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     let time_0 = scene_file.time_0;
     let time_1 = scene_file.time_1;
-    let mut rng = SmallRng::from_entropy();
+    let mut rng = CloversRng::from_entropy();
     let background_color = scene_file.background_color;
     let camera = Camera::new(
         scene_file.camera.look_from,

@@ -1,6 +1,7 @@
 //! Lambertian material. This is the default material with a smooth, matte surface.
 
 use super::{MaterialType, ScatterRecord};
+use crate::CloversRng;
 use crate::{
     hitable::HitRecord,
     pdf::{CosinePDF, PDF},
@@ -8,7 +9,6 @@ use crate::{
     textures::Texture,
     Float, PI,
 };
-use rand::prelude::SmallRng;
 
 #[derive(Copy, Clone, Debug, Default)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -24,7 +24,7 @@ impl<'a> Lambertian {
         self,
         _ray: &Ray,
         hit_record: &HitRecord,
-        _rng: &mut SmallRng,
+        _rng: &mut CloversRng,
     ) -> Option<ScatterRecord<'a>> {
         Some(ScatterRecord {
             material_type: MaterialType::Diffuse,
@@ -42,7 +42,7 @@ impl<'a> Lambertian {
         _ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
-        _rng: &mut SmallRng,
+        _rng: &mut CloversRng,
     ) -> Float {
         // TODO: explain the math
         let cosine = hit_record.normal.dot(&scattered.direction.normalize());

@@ -1,5 +1,6 @@
 //! ConstantMedium object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 
+use crate::CloversRng;
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
@@ -8,7 +9,9 @@ use crate::{
     textures::Texture,
     Box, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
 };
-use rand::rngs::SmallRng;
+// TODO: fix trait import
+#[cfg(feature = "rand-crate")]
+#[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
 
 use super::Object;
@@ -59,7 +62,7 @@ impl ConstantMedium {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> Option<HitRecord> {
         let mut rec1: HitRecord;
         let mut rec2: HitRecord;

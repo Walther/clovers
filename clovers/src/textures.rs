@@ -3,7 +3,7 @@
 #![allow(clippy::large_enum_variant)] // TODO: NoiseTexture is massive compared to others.
 
 pub mod checkered;
-#[cfg(feature = "random")]
+#[cfg(not(target_arch = "spirv"))]
 pub mod noise_texture;
 pub mod solid_color;
 
@@ -12,7 +12,7 @@ pub use checkered::*;
 pub use solid_color::*;
 
 use crate::{color::Color, Float, Vec3};
-#[cfg(feature = "random")]
+#[cfg(not(target_arch = "spirv"))]
 use noise_texture::NoiseTexture;
 
 #[cfg(target_arch = "spirv")]
@@ -26,7 +26,6 @@ use spirv_std::num_traits::Float as FloatTrait;
 /// A texture enum.
 pub enum Texture {
     /// NoiseTexture texture
-    #[cfg(feature = "random")]
     NoiseTexture(NoiseTexture),
     /// SolidColor texture
     SolidColor(SolidColor),
@@ -63,7 +62,6 @@ impl Texture {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match self {
-            #[cfg(feature = "random")]
             Texture::NoiseTexture(n) => n.color(u, v, position),
             Texture::SolidColor(s) => s.color(u, v, position),
             Texture::SpatialChecker(c) => c.color(u, v, position),
@@ -132,7 +130,6 @@ impl From<SurfaceChecker> for Texture {
     }
 }
 
-#[cfg(feature = "random")]
 #[cfg(not(target_arch = "spirv"))]
 impl From<NoiseTexture> for Texture {
     fn from(s: NoiseTexture) -> Self {

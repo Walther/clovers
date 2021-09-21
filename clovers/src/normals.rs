@@ -1,11 +1,11 @@
 //! Alternative render method to [colorize](crate::colorize::colorize).
 
+use crate::CloversRng;
 use crate::{color::Color, ray::Ray, scenes::Scene, Float, Vec3, EPSILON_SHADOW_ACNE};
-use rand::rngs::SmallRng;
 
 /// Rendering function for getting a normal map in tangent space. Sends a [Ray] to the [Scene], sees what it hits, gets the normal at that point, and returns a color based on the normal mapping colorization. Wikipedia: [Normal mapping](https://en.wikipedia.org/wiki/Normal_mapping).
 // TODO: better name
-pub fn normal_map(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> Color {
+pub fn normal_map(ray: &Ray, scene: &Scene, rng: &mut CloversRng) -> Color {
     let hit_record = match scene.objects.hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng) {
         // If the ray hits nothing, early return black
         None => return Color::new(0.0, 0.0, 0.0),

@@ -104,12 +104,10 @@ pub mod normals;
 pub mod objects;
 #[cfg(not(target_arch = "spirv"))]
 pub mod pdf;
-#[cfg(feature = "random")]
 #[cfg(not(target_arch = "spirv"))]
 pub mod perlin;
 #[cfg(not(target_arch = "spirv"))]
 pub mod random;
-#[cfg(feature = "random")]
 #[cfg(not(target_arch = "spirv"))]
 pub mod scenes;
 
@@ -148,3 +146,33 @@ pub const EPSILON_RECT_THICKNESS: Float = 0.000_1;
 /// Internal const: epsilon used in the hit calculation of a [ConstantMedium](objects::constant_medium::ConstantMedium).
 // TODO: what would be an appropriate value?
 pub const EPSILON_CONSTANT_MEDIUM: Float = 0.000_1;
+/// Internal alias: allows swapping the implementation for CPU vs GPU
+#[cfg(feature = "rand-crate")]
+#[cfg(not(target_arch = "spirv"))]
+pub use rand::rngs::SmallRng as CloversRng;
+/// Internal alias: allows swapping the implementation for CPU vs GPU
+#[cfg(not(feature = "rand-crate"))]
+pub struct CloversRng {}
+#[cfg(not(feature = "rand-crate"))]
+impl CloversRng {
+    /// Generate a random value
+    pub fn gen<T>(&mut self) -> T
+    where
+        T: Into<Float>,
+    {
+        todo!()
+    }
+
+    /// Initialize the random number generator. This implementation is NOT actually based on entropy, but is named such due to api compatibility with rand::rngs::SmallRng
+    pub fn from_entropy() -> Self {
+        todo!()
+    }
+
+    /// Generate a random value in the given range
+    pub fn gen_range<T>(&mut self, _range: core::ops::Range<T>) -> T
+    where
+        T: Into<Float>,
+    {
+        todo!()
+    }
+}

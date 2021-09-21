@@ -1,12 +1,12 @@
 //! Utility object for rotating another object.
 
+use crate::CloversRng;
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
     ray::Ray,
     Box, Float, Vec3,
 };
-use rand::rngs::SmallRng;
 
 use super::Object;
 
@@ -104,7 +104,7 @@ impl RotateY {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> Option<HitRecord> {
         let mut origin: Vec3 = ray.origin;
         let mut direction: Vec3 = ray.direction;

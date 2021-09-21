@@ -1,6 +1,7 @@
 //! Isotropic material.
 
 use super::{MaterialType, ScatterRecord};
+use crate::CloversRng;
 use crate::{
     color::Color,
     hitable::HitRecord,
@@ -9,7 +10,6 @@ use crate::{
     textures::Texture,
     Float, PI,
 };
-use rand::prelude::SmallRng;
 
 #[derive(Debug, Copy, Clone, Default)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -30,7 +30,7 @@ impl<'a> Isotropic {
         self,
         _ray: &Ray,
         hit_record: &HitRecord,
-        _rng: &mut SmallRng,
+        _rng: &mut CloversRng,
     ) -> Option<ScatterRecord<'a>> {
         // TODO: fix / verify correctness!
         // this is just copied from lambertian as an experiment
@@ -52,7 +52,7 @@ impl<'a> Isotropic {
         _ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
-        _rng: &mut SmallRng,
+        _rng: &mut CloversRng,
     ) -> Float {
         // TODO: fix / verify correctness!
         // this is just copied from lambertian as an experiment

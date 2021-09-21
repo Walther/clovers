@@ -1,11 +1,14 @@
 //! Various internal helper functions for getting specific kinds of random values.
 
+use crate::CloversRng;
 use crate::{Float, Vec3, PI};
-use rand::rngs::SmallRng;
+// TODO: fix trait import
+#[cfg(feature = "rand-crate")]
+#[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
 
 /// Internal helper. Originally used for lambertian reflection with flaws
-pub fn random_in_unit_sphere(rng: &mut SmallRng) -> Vec3 {
+pub fn random_in_unit_sphere(rng: &mut CloversRng) -> Vec3 {
     let mut position: Vec3;
     // TODO: figure out a non-loop method
     // See https://github.com/RayTracing/raytracing.github.io/issues/765
@@ -18,7 +21,7 @@ pub fn random_in_unit_sphere(rng: &mut SmallRng) -> Vec3 {
 }
 
 /// Internal helper. Use this for the more correct "True Lambertian" reflection
-pub fn random_unit_vector(rng: &mut SmallRng) -> Vec3 {
+pub fn random_unit_vector(rng: &mut CloversRng) -> Vec3 {
     let a: Float = rng.gen_range(0.0..2.0 * PI);
     let z: Float = rng.gen_range(-1.0..1.0);
     let r: Float = (1.0 - z * z).sqrt();
@@ -26,7 +29,7 @@ pub fn random_unit_vector(rng: &mut SmallRng) -> Vec3 {
 }
 
 /// Internal helper.
-pub fn random_in_unit_disk(rng: &mut SmallRng) -> Vec3 {
+pub fn random_in_unit_disk(rng: &mut CloversRng) -> Vec3 {
     let mut position: Vec3;
     // TODO: figure out a non-loop method
     // See https://github.com/RayTracing/raytracing.github.io/issues/765
@@ -40,7 +43,7 @@ pub fn random_in_unit_disk(rng: &mut SmallRng) -> Vec3 {
 }
 
 /// Internal helper.
-pub fn random_cosine_direction(rng: &mut SmallRng) -> Vec3 {
+pub fn random_cosine_direction(rng: &mut CloversRng) -> Vec3 {
     let r1 = rng.gen::<Float>();
     let r2 = rng.gen::<Float>();
     let z = (1.0 - r2).sqrt();
@@ -53,7 +56,7 @@ pub fn random_cosine_direction(rng: &mut SmallRng) -> Vec3 {
 }
 
 /// Internal helper.
-pub fn random_to_sphere(radius: Float, distance_squared: Float, rng: &mut SmallRng) -> Vec3 {
+pub fn random_to_sphere(radius: Float, distance_squared: Float, rng: &mut CloversRng) -> Vec3 {
     let r1 = rng.gen::<Float>();
     let r2 = rng.gen::<Float>();
     let z = 1.0 + r2 * ((1.0 - radius * radius / distance_squared).sqrt() - 1.0);

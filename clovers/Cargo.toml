@@ -13,7 +13,7 @@ crate-type = ["lib"]
 [features]
 serde-derive = ["serde/derive", "nalgebra/serde-serialize"]
 nalg = ["nalgebra"]
-random = ["rand", "rand/small_rng"]
+rand-crate = ["rand/small_rng"]
 stl = ["stl_io", "std"]
 std = []
 traces = ["tracing"]
@@ -21,7 +21,7 @@ gpu = ["spirv-std/glam"]
 
 [dependencies]
 nalgebra = { version = "0.29.0", features = ["libm"], default-features = false, optional = true }
-rand = { version = "0.8.4", features = ["small_rng"], optional = true }
+rand = { version = "0.8.4", features = ["small_rng"], default-features = false, optional = true }
 serde = { version = "1.0.130", features = ["derive"], default-features = false, optional = true }
 stl_io = { version = "0.6.0", optional = true }
 tracing = { version = "0.1.26", optional = true }

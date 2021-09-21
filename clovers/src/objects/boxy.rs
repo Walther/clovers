@@ -1,6 +1,7 @@
 //! A box or a cuboid object: a parallelepiped with six rectangular faces. Named [Boxy] to avoid clashing with [Box].
 
 use super::Quad;
+use crate::CloversRng;
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable, HitableList},
@@ -8,7 +9,6 @@ use crate::{
     ray::Ray,
     Box, Float, Vec3,
 };
-use rand::rngs::SmallRng;
 
 /// BoxyInit structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 #[derive(Debug, Copy, Clone)]
@@ -122,7 +122,7 @@ impl Boxy {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> Option<HitRecord> {
         self.sides.hit(ray, distance_min, distance_max, rng)
     }
@@ -133,12 +133,18 @@ impl Boxy {
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    pub fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        time: Float,
+        rng: &mut CloversRng,
+    ) -> Float {
         self.sides.pdf_value(origin, vector, time, rng)
     }
 
     /// Returns a random point on the box
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    pub fn random(&self, origin: Vec3, rng: &mut CloversRng) -> Vec3 {
         self.sides.random(origin, rng)
     }
 }

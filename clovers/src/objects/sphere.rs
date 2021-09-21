@@ -1,10 +1,10 @@
 //! A sphere object.
 
+use crate::CloversRng;
 use crate::{
     aabb::AABB, hitable::HitRecord, materials::Material, onb::ONB, random::random_to_sphere,
     ray::Ray, Float, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
-use rand::rngs::SmallRng;
 
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -60,7 +60,7 @@ impl Sphere {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        _rng: &mut SmallRng,
+        _rng: &mut CloversRng,
     ) -> Option<HitRecord> {
         let oc: Vec3 = ray.origin - self.center;
         let a: Float = ray.direction.norm_squared();
@@ -116,7 +116,13 @@ impl Sphere {
     }
 
     /// Returns the probability density function for the sphere? TODO: what does this do again and how
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    pub fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        time: Float,
+        rng: &mut CloversRng,
+    ) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
             EPSILON_SHADOW_ACNE,
@@ -137,7 +143,7 @@ impl Sphere {
 
     // TODO: understand, document
     /// Utility function from Ray Tracing: The Rest of Your Life. TODO: understand, document
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    pub fn random(&self, origin: Vec3, rng: &mut CloversRng) -> Vec3 {
         let direction: Vec3 = self.center - origin;
         let distance_squared: Float = direction.norm_squared();
         let uvw = ONB::build_from_w(direction);

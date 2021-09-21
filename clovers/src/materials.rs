@@ -7,12 +7,12 @@ pub mod isotropic;
 pub mod lambertian;
 pub mod metal;
 
+use crate::CloversRng;
 pub use dielectric::*;
 pub use diffuse_light::*;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
-use rand::prelude::SmallRng;
 
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -42,7 +42,7 @@ impl Material {
         &self,
         ray: &Ray,
         hit_record: &HitRecord,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> Option<ScatterRecord> {
         match *self {
             Material::Dielectric(d) => Dielectric::scatter(d, ray, hit_record, rng),
@@ -59,7 +59,7 @@ impl Material {
         ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> Float {
         match *self {
             Material::Dielectric(m) => m.scattering_pdf(ray, hit_record, scattered, rng),

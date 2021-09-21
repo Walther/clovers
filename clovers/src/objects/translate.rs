@@ -1,12 +1,12 @@
 //! Utility object for translating i.e. moving another object.
 
+use crate::CloversRng;
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
     ray::Ray,
     Box, Float, Vec3,
 };
-use rand::rngs::SmallRng;
 
 use super::Object;
 
@@ -39,7 +39,7 @@ impl Translate {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> Option<HitRecord> {
         let moved_ray: Ray = Ray::new(ray.origin - self.offset, ray.direction, ray.time);
 

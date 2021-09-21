@@ -1,6 +1,7 @@
 //! A metal material.
 
 use super::{reflect, MaterialType, ScatterRecord};
+use crate::CloversRng;
 use crate::{
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
@@ -9,7 +10,6 @@ use crate::{
     textures::Texture,
     Float, Vec3,
 };
-use rand::prelude::SmallRng;
 
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -27,7 +27,7 @@ impl<'a> Metal {
         self,
         ray: &Ray,
         hit_record: &HitRecord,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> Option<ScatterRecord<'a>> {
         let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
         Some(ScatterRecord {
@@ -49,7 +49,7 @@ impl<'a> Metal {
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
-        _rng: &mut SmallRng,
+        _rng: &mut CloversRng,
     ) -> Float {
         0.0 // TODO: why does metal scatter 0? No mention in tutorial afaiu
     }

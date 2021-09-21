@@ -1,7 +1,7 @@
 use crate::{color::Color, colorize::colorize, normals::normal_map, ray::Ray, scenes, Float};
+use clovers::CloversRng;
 use clovers::RenderOpts;
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
-use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 use scenes::Scene;
@@ -39,7 +39,7 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
             let height = opts.height as Float;
 
             // Initialize a thread-local random number generator
-            let mut rng = SmallRng::from_entropy();
+            let mut rng = CloversRng::from_entropy();
 
             // Initialize a mutable base color for the pixel
             let mut color: Color = Color::new(0.0, 0.0, 0.0);
@@ -81,7 +81,7 @@ fn sample(
     y: Float,
     width: Float,
     height: Float,
-    rng: &mut SmallRng,
+    rng: &mut CloversRng,
     max_depth: u32,
 ) -> Option<Color> {
     let u = (x + rng.gen::<Float>()) / width;

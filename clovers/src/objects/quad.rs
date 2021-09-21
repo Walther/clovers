@@ -1,12 +1,15 @@
 //! A quadrilateral object.
 // TODO: better docs
 
+use crate::CloversRng;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
     Vec3, EPSILON_RECT_THICKNESS,
 };
-use rand::rngs::SmallRng;
+// TODO: fix trait import
+#[cfg(feature = "rand-crate")]
+#[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
 
 /// Initialization structure for a Quad object.
@@ -81,7 +84,7 @@ impl Quad {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        _rng: &mut SmallRng,
+        _rng: &mut CloversRng,
     ) -> Option<HitRecord> {
         let denom = self.normal.dot(&ray.direction);
 
@@ -128,7 +131,13 @@ impl Quad {
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    pub fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        time: Float,
+        rng: &mut CloversRng,
+    ) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
             EPSILON_SHADOW_ACNE,
@@ -147,7 +156,7 @@ impl Quad {
     }
 
     /// Returns a random point on the quadrilateral surface
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    pub fn random(&self, origin: Vec3, rng: &mut CloversRng) -> Vec3 {
         let point: Vec3 = self.q + (rng.gen::<Float>() * self.u) + (rng.gen::<Float>() * self.v);
         point - origin
     }

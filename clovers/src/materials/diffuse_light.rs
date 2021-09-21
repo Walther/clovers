@@ -1,6 +1,7 @@
 //! A diffuse light material.
 
 use super::ScatterRecord;
+use crate::CloversRng;
 use crate::{
     color::Color,
     hitable::HitRecord,
@@ -8,7 +9,6 @@ use crate::{
     textures::{SolidColor, Texture},
     Float, Vec3,
 };
-use rand::prelude::SmallRng;
 
 /// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
 #[derive(Copy, Clone, Debug)]
@@ -32,7 +32,7 @@ impl<'a> DiffuseLight {
         self,
         _ray: &Ray,
         _hit_record: &HitRecord,
-        _rng: &mut SmallRng,
+        _rng: &mut CloversRng,
     ) -> Option<ScatterRecord<'a>> {
         None
     }
@@ -43,7 +43,7 @@ impl<'a> DiffuseLight {
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
-        _rng: &mut SmallRng,
+        _rng: &mut CloversRng,
     ) -> Float {
         0.0 // TODO: cleanup
     }

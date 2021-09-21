@@ -2,7 +2,10 @@
 
 use core::cmp::Ordering;
 
-use rand::rngs::SmallRng;
+use crate::CloversRng;
+// TODO: fix trait import
+#[cfg(feature = "rand-crate")]
+#[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
 
 use crate::{
@@ -31,7 +34,7 @@ impl BVHNode {
         mut objects: Vec<Hitable>,
         time_0: Float,
         time_1: Float,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> BVHNode {
         // Initialize two child nodes
         let left: Box<Hitable>;
@@ -123,7 +126,7 @@ impl BVHNode {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        rng: &mut SmallRng,
+        rng: &mut CloversRng,
     ) -> Option<HitRecord> {
         // If we do not hit the bounding box of current node, early return None
         if !self.bounding_box.hit(ray, distance_min, distance_max) {

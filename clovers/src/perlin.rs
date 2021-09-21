@@ -3,10 +3,14 @@
 #![allow(clippy::needless_range_loop)] // TODO: figure out what clippy wants here
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
+use crate::CloversRng;
+
+// TODO: fix trait import
+#[cfg(feature = "rand-crate")]
+#[cfg(not(target_arch = "spirv"))]
+use rand::Rng;
+
 use crate::{Float, Vec3};
-use rand::rngs::SmallRng;
-#[cfg(feature = "random")]
-use rand::{Rng, SeedableRng};
 
 #[cfg(not(target_arch = "spirv"))]
 use core::fmt::Debug;
@@ -33,7 +37,7 @@ impl Debug for Perlin {
     }
 }
 
-fn perlin_generate_perm(rng: &mut SmallRng) -> [usize; 256] {
+fn perlin_generate_perm(rng: &mut CloversRng) -> [usize; 256] {
     let mut perm: [usize; 256] = [0; 256];
 
     for i in 0..256 {
@@ -44,7 +48,7 @@ fn perlin_generate_perm(rng: &mut SmallRng) -> [usize; 256] {
     perm
 }
 
-fn permute(p: &mut [usize; 256], rng: &mut SmallRng) {
+fn permute(p: &mut [usize; 256], rng: &mut CloversRng) {
     // For some reason the tutorial wants the reverse loop
     for i in (1..256).rev() {
         let target: usize = rng.gen_range(0..i);
@@ -76,7 +80,7 @@ fn perlin_interp(c: [[[Vec3; 2]; 2]; 2], u: Float, v: Float, w: Float) -> Float 
 }
 
 impl Perlin {
-    pub fn new(rng: &mut SmallRng) -> Self {
+    pub fn new(rng: &mut CloversRng) -> Self {
         let mut random_vectors: [Vec3; 256] = [Vec3::new(0.0, 0.0, 0.0); 256];
         for i in 0..256 {
             random_vectors[i] =
@@ -148,7 +152,9 @@ impl Perlin {
 
 impl Default for Perlin {
     fn default() -> Self {
-        let mut rng = SmallRng::from_entropy();
+        // TODO: fix import
+        use rand::SeedableRng;
+        let mut rng = CloversRng::from_entropy();
         Perlin::new(&mut rng)
     }
 }

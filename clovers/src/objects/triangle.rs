@@ -2,12 +2,15 @@
 // TODO: better docs
 
 use crate::interval::Interval;
+use crate::CloversRng;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
     Vec3, EPSILON_RECT_THICKNESS,
 };
-use rand::rngs::SmallRng;
+// TODO: fix trait import
+#[cfg(feature = "rand-crate")]
+#[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
 
 /// Initialization structure for a triangle primitive
@@ -109,7 +112,7 @@ impl Triangle {
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
-        _rng: &mut SmallRng,
+        _rng: &mut CloversRng,
     ) -> Option<HitRecord> {
         let denom = self.normal.dot(&ray.direction);
 
@@ -158,7 +161,13 @@ impl Triangle {
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    pub fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        time: Float,
+        rng: &mut CloversRng,
+    ) -> Float {
         // TODO: this is from quad and not updated!
         match self.hit(
             &Ray::new(origin, vector, time),
@@ -178,7 +187,7 @@ impl Triangle {
     }
 
     /// Returns a random point on the triangle surface
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    pub fn random(&self, origin: Vec3, rng: &mut CloversRng) -> Vec3 {
         let mut a = rng.gen::<Float>();
         let mut b = rng.gen::<Float>();
         if a + b > 1.0 {

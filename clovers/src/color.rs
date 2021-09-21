@@ -2,11 +2,12 @@
 
 // TODO: more flexible colors?
 
+use crate::CloversRng;
 use crate::{Float, Vec3};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
-#[cfg(feature = "random")]
-use rand::rngs::SmallRng;
-#[cfg(feature = "random")]
+// TODO: fix trait import
+#[cfg(feature = "rand-crate")]
+#[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
 #[cfg(target_arch = "spirv")]
 use spirv_std::num_traits::Float as FloatTrait;
@@ -42,8 +43,7 @@ impl Color {
     }
 
     /// Creates a new [Color] with random parameters between `0.0..1.0`.
-    #[cfg(feature = "random")]
-    pub fn random(mut rng: SmallRng) -> Color {
+    pub fn random(mut rng: CloversRng) -> Color {
         Color {
             r: rng.gen::<Float>(),
             g: rng.gen::<Float>(),
