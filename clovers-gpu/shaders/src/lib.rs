@@ -11,7 +11,7 @@
 
 use spirv_std::glam::{vec2, vec4, Vec2, Vec4};
 
-use clovers::{interval::Interval, Float};
+use clovers::{color::Color, CloversRng, Float};
 
 pub struct ShaderConstants {
     pub width: u32,
@@ -30,17 +30,18 @@ pub fn main_fs(
     output: &mut Vec4,
 ) {
     // TODO: actual shader for the raytracing
-    // currently only renders a simple color gradient
+
     let x = in_frag_coord.x;
     let y = in_frag_coord.y;
-    let width = constants.width as f32;
-    let height = constants.height as f32;
-    let a = x / width;
-    let b = y / height;
-    let c = (x as u32 | y as u32) as f32;
-    let interval = Interval::new(x, y);
-    let _size: Float = interval.size();
-    *output = vec4(a, b, c, 1.0);
+    let _width = constants.width as f32;
+    let _height = constants.height as f32;
+
+    // Random color
+    let seed: Float = y + x;
+    let seed = seed as u32;
+    let rng = CloversRng::from_seed(seed);
+    let color: Color = Color::random(rng);
+    *output = vec4(color.r, color.g, color.b, 1.0);
 }
 
 #[spirv(vertex)]
