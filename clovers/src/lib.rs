@@ -137,6 +137,7 @@ pub type Float = f32;
 pub const PI: Float = core::f32::consts::PI;
 /// Internal type alias: a nalgebra [Vector3](nalgebra::Vector3) which is a vector with three dimensions, containing three of our internal [Float] types
 #[cfg(feature = "nalg")]
+#[cfg(not(target_arch = "spirv"))]
 pub type Vec3 = Vector3<Float>;
 /// Internal const: epsilon used for avoiding "shadow acne". This is mostly used for the initial minimum distance for ray hits after reflecting or scattering from a surface.
 pub const EPSILON_SHADOW_ACNE: Float = 0.001;

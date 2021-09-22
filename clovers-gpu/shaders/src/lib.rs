@@ -9,9 +9,9 @@
 // TODO: temporary during development
 #![allow(clippy::all)]
 
-use spirv_std::glam::{vec2, vec4, Vec2, Vec4};
+use spirv_std::glam::{vec2, vec3, vec4, Vec2, Vec4};
 
-use clovers::{color::Color, CloversRng, Float};
+use clovers::{color::Color, textures::GPUTexture, textures::GPUTextureKind, Float};
 
 pub struct ShaderConstants {
     pub width: u32,
@@ -33,14 +33,31 @@ pub fn main_fs(
 
     let x = in_frag_coord.x;
     let y = in_frag_coord.y;
-    let _width = constants.width as f32;
-    let _height = constants.height as f32;
+    let width = constants.width as f32;
+    let height = constants.height as f32;
 
-    // Random color
-    let seed: Float = y + x;
-    let seed = seed as u32;
-    let rng = CloversRng::from_seed(seed);
-    let color: Color = Color::random(rng);
+    // Surface coordinates
+    let u: Float = x / width;
+    let v: Float = y / height;
+
+    // TODO: actual 3d position
+    let position = vec3(0.0, 0.0, 0.0);
+
+    // Texture demo
+    let color1 = Color::new(0.82, 0.82, 0.82);
+    let color2 = Color::new(0.82, 0.82, 0.82);
+    let color3 = Color::new(0.18, 0.18, 0.18);
+    let density: Float = 10.0;
+    // TODO: better ergonomics...
+    let texture: GPUTexture = GPUTexture {
+        kind: GPUTextureKind::SurfaceChecker,
+        color: color1,
+        even: color2,
+        odd: color3,
+        density,
+    };
+    let color = texture.color(u, v, position);
+
     *output = vec4(color.r, color.g, color.b, 1.0);
 }
 

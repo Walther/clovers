@@ -1,6 +1,6 @@
 use bytemuck::{Pod, Zeroable};
 use clovers::{color::Color, scenes::Scene, Float, RenderOpts};
-use spirv_builder::{MetadataPrintout, SpirvBuilder};
+use spirv_builder::{Capability, MetadataPrintout, SpirvBuilder};
 use std::{borrow::Cow, mem::size_of, path::PathBuf};
 use tracing::debug;
 use wgpu::{Extent3d, TextureAspect, TextureViewDescriptor};
@@ -279,6 +279,7 @@ fn load_shader() -> wgpu::ShaderModuleDescriptor<'static> {
         .copied()
         .collect::<PathBuf>();
     let compile_result = SpirvBuilder::new(crate_path, "spirv-unknown-vulkan1.1")
+        .capability(Capability::Int8)
         .print_metadata(MetadataPrintout::None)
         .build()
         .unwrap();

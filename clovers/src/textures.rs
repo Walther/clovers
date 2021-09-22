@@ -37,8 +37,9 @@ pub enum Texture {
 
 #[cfg(target_arch = "spirv")]
 #[derive(Copy, Clone)]
+#[repr(C)]
 /// A texture kind enum, GPU version
-pub enum TextureKind {
+pub enum GPUTextureKind {
     /// SolidColor texture
     SolidColor,
     /// SpatialChecker texture
@@ -50,12 +51,18 @@ pub enum TextureKind {
 #[cfg(target_arch = "spirv")]
 /// A texture struct, GPU version
 #[derive(Copy, Clone)]
-pub struct Texture {
-    kind: TextureKind,
-    color: Color,
-    even: Color,
-    odd: Color,
-    density: Float,
+#[repr(C)]
+pub struct GPUTexture {
+    /// Which kind of a texture is this
+    pub kind: GPUTextureKind,
+    /// Stores the main color for SolidColor
+    pub color: Color,
+    /// Stores the even color for SurfaceChecker and SpatialChecker
+    pub even: Color,
+    /// Stores the odd color for SurfaceChecker and SpatialChecker
+    pub odd: Color,
+    /// Stores the density for SurfaceChecker and SpatialChecker
+    pub density: Float,
 }
 
 #[cfg(not(target_arch = "spirv"))]
@@ -72,13 +79,13 @@ impl Texture {
 }
 
 #[cfg(target_arch = "spirv")]
-impl Texture {
+impl GPUTexture {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match self.kind {
-            TextureKind::SolidColor => self.color,
+            GPUTextureKind::SolidColor => self.color,
             // TODO: cleaner implementation! These are copy-pasted from `clovers/src/textures/checkered.rs`
-            TextureKind::SpatialChecker => {
+            GPUTextureKind::SpatialChecker => {
                 let density = self.density * PI;
                 let sines = 1.0
                     * (density * position.x).sin()
@@ -90,7 +97,7 @@ impl Texture {
                     self.even
                 }
             }
-            TextureKind::SurfaceChecker => {
+            GPUTextureKind::SurfaceChecker => {
                 let density = self.density * PI;
                 let sines = 1.0 * (density * u).sin() * (density * v).sin();
                 if sines < 0.0 {

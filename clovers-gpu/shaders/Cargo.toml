@@ -8,5 +8,5 @@ publish = false
 crate-type = ["dylib"]
 
 [dependencies]
-clovers = { path = "../../clovers", features = ["gpu"], default-features = false }
+clovers = { path = "../../clovers", target_arch = "spirv", features = ["gpu"], default-features = false }
 spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "eeb67ae7489e5df03231f73d108a8f2feae2ca1a", features = ["glam"] }
