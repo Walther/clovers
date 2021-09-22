@@ -5,6 +5,5 @@ members = [
   "clovers",
   "clovers-app",
   "clovers-cli",
-  # "clovers-gpu",
-  "clovers-gpu/shaders",
+  "clovers-gpu",
 ]
