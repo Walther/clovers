@@ -15,7 +15,6 @@ use crate::{color::Color, Float, Vec3};
 #[cfg(not(target_arch = "spirv"))]
 use noise_texture::NoiseTexture;
 
-#[cfg(target_arch = "spirv")]
 use crate::PI;
 #[cfg(target_arch = "spirv")]
 use spirv_std::num_traits::Float as FloatTrait;
@@ -35,7 +34,6 @@ pub enum Texture {
     SurfaceChecker(SurfaceChecker),
 }
 
-#[cfg(target_arch = "spirv")]
 #[derive(Copy, Clone)]
 #[repr(C)]
 /// A texture kind enum, GPU version
@@ -48,16 +46,13 @@ pub enum GPUTextureKind {
     SurfaceChecker,
 }
 
-#[cfg(target_arch = "spirv")]
 /// A texture struct, GPU version
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct GPUTexture {
     /// Which kind of a texture is this
     pub kind: GPUTextureKind,
-    /// Stores the main color for SolidColor
-    pub color: Color,
-    /// Stores the even color for SurfaceChecker and SpatialChecker
+    /// Stores the even color for SurfaceChecker and SpatialChecker, also used as the main color for SolidColor
     pub even: Color,
     /// Stores the odd color for SurfaceChecker and SpatialChecker
     pub odd: Color,
@@ -68,6 +63,7 @@ pub struct GPUTexture {
 #[cfg(not(target_arch = "spirv"))]
 impl Texture {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
+    #[deprecated]
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match self {
             Texture::NoiseTexture(n) => n.color(u, v, position),
@@ -78,12 +74,11 @@ impl Texture {
     }
 }
 
-#[cfg(target_arch = "spirv")]
 impl GPUTexture {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match self.kind {
-            GPUTextureKind::SolidColor => self.color,
+            GPUTextureKind::SolidColor => self.even,
             // TODO: cleaner implementation! These are copy-pasted from `clovers/src/textures/checkered.rs`
             GPUTextureKind::SpatialChecker => {
                 let density = self.density * PI;
@@ -142,5 +137,32 @@ impl From<SurfaceChecker> for Texture {
 impl From<NoiseTexture> for Texture {
     fn from(s: NoiseTexture) -> Self {
         Texture::NoiseTexture(s)
+    }
+}
+
+#[cfg(not(target_arch = "spirv"))]
+impl From<Texture> for GPUTexture {
+    fn from(t: Texture) -> Self {
+        match t {
+            Texture::NoiseTexture(_) => todo!(),
+            Texture::SolidColor(s) => GPUTexture {
+                kind: GPUTextureKind::SolidColor,
+                even: s.color,
+                odd: s.color, // Ignored
+                density: 1.0, // Ignored
+            },
+            Texture::SpatialChecker(s) => GPUTexture {
+                kind: GPUTextureKind::SpatialChecker,
+                even: s.even,
+                odd: s.odd,
+                density: s.density,
+            },
+            Texture::SurfaceChecker(s) => GPUTexture {
+                kind: GPUTextureKind::SurfaceChecker,
+                even: s.even,
+                odd: s.odd,
+                density: s.density,
+            },
+        }
     }
 }

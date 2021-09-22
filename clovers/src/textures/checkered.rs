@@ -75,12 +75,14 @@ impl SpatialChecker {
 /// A standard checkered texture based on 2D surface UV coordinates.
 pub struct SurfaceChecker {
     #[cfg_attr(feature = "serde-derive", serde(default = "default_even"))]
-    even: Color,
+    /// Uniform color for the even-numbered checkers of the texture.
+    pub even: Color,
     #[cfg_attr(feature = "serde-derive", serde(default = "default_odd"))]
-    odd: Color,
+    /// Uniform color for the odd-numbered checkers of the texture.
+    pub odd: Color,
     #[cfg_attr(feature = "serde-derive", serde(default = "default_density_surface"))]
     /// Controls the density of the checkered pattern. Default value is 10, which corresponds to using 10 tiles over the width of the object. On spheres, this means 10 tiles around the sphere.
-    density: Float,
+    pub density: Float,
 }
 
 impl SurfaceChecker {

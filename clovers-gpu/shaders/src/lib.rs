@@ -45,15 +45,13 @@ pub fn main_fs(
 
     // Texture demo
     let color1 = Color::new(0.82, 0.82, 0.82);
-    let color2 = Color::new(0.82, 0.82, 0.82);
-    let color3 = Color::new(0.18, 0.18, 0.18);
+    let color2 = Color::new(0.18, 0.18, 0.18);
     let density: Float = 10.0;
     // TODO: better ergonomics...
     let texture: GPUTexture = GPUTexture {
         kind: GPUTextureKind::SurfaceChecker,
-        color: color1,
-        even: color2,
-        odd: color3,
+        even: color1,
+        odd: color2,
         density,
     };
     let color = texture.color(u, v, position);
