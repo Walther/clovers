@@ -46,7 +46,7 @@ pub enum Object {
     /// FlipFace object initializer
     FlipFace(FlipFaceInit),
     /// MovingSphere object initializer
-    MovingSphere(MovingSphere),
+    MovingSphere(MovingSphereInit),
     /// ObjectList object initializer
     ObjectList(ObjectList),
     /// Quad object initializer
