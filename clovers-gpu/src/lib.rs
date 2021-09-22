@@ -9,9 +9,9 @@
 // TODO: temporary during development
 #![allow(clippy::all)]
 
-use spirv_std::glam::{vec2, vec3, vec4, Vec2, Vec4};
+use spirv_std::glam::{vec2, vec4, Vec2, Vec4};
 
-use clovers::{color::Color, textures::GPUTexture, textures::GPUTextureKind, Float};
+use clovers::{color::Color, textures::GPUTexture, textures::GPUTextureKind, Float, Vec3};
 
 pub struct ShaderConstants {
     pub width: u32,
@@ -41,7 +41,7 @@ pub fn main_fs(
     let v: Float = y / height;
 
     // TODO: actual 3d position
-    let position = vec3(0.0, 0.0, 0.0);
+    let position: Vec3 = Vec3::new(0.0, 0.0, 0.0);
 
     // Texture demo
     let color1 = Color::new(0.82, 0.82, 0.82);

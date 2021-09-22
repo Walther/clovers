@@ -2,20 +2,19 @@
 
 #![allow(clippy::large_enum_variant)] // TODO: NoiseTexture is massive compared to others.
 
+// GPU compatible
 pub mod checkered;
-#[cfg(not(target_arch = "spirv"))]
-pub mod noise_texture;
 pub mod solid_color;
-
 pub use checkered::*;
-// pub use noise_texture::*;
 pub use solid_color::*;
 
-use crate::{color::Color, Float, Vec3};
+// Not GPU compatible (yet)
+#[cfg(not(target_arch = "spirv"))]
+pub mod noise_texture;
+
+use crate::{color::Color, Float, Vec3, PI};
 #[cfg(not(target_arch = "spirv"))]
 use noise_texture::NoiseTexture;
-
-use crate::PI;
 
 #[cfg(target_arch = "spirv")]
 use crate::FloatTrait;
