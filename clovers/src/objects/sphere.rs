@@ -68,9 +68,9 @@ impl Sphere {
         _rng: &mut CloversRng,
     ) -> Option<HitRecord> {
         let oc: Vec3 = ray.origin - self.center;
-        let a: Float = ray.direction.norm_squared();
-        let half_b: Float = oc.dot(&ray.direction);
-        let c: Float = oc.norm_squared() - self.radius * self.radius;
+        let a: Float = ray.direction.length_squared();
+        let half_b: Float = oc.dot(ray.direction);
+        let c: Float = oc.length_squared() - self.radius * self.radius;
         let discriminant = half_b * half_b - a * c;
         if discriminant > 0.0 {
             let root: Float = discriminant.sqrt();
@@ -137,7 +137,7 @@ impl Sphere {
             None => 0.0,
             Some(_hit_record) => {
                 let cos_theta_max = (1.0
-                    - self.radius * self.radius / (self.center - origin).norm_squared())
+                    - self.radius * self.radius / (self.center - origin).length_squared())
                 .sqrt();
                 let solid_angle = 2.0 * PI * (1.0 - cos_theta_max);
 
@@ -150,7 +150,7 @@ impl Sphere {
     /// Utility function from Ray Tracing: The Rest of Your Life. TODO: understand, document
     pub fn random(&self, origin: Vec3, rng: &mut CloversRng) -> Vec3 {
         let direction: Vec3 = self.center - origin;
-        let distance_squared: Float = direction.norm_squared();
+        let distance_squared: Float = direction.length_squared();
         let uvw = ONB::build_from_w(direction);
         uvw.local(random_to_sphere(self.radius, distance_squared, rng))
     }

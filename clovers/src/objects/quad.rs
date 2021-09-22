@@ -62,21 +62,21 @@ impl Quad {
     pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Quad {
         // TODO: better ergonomics
         #[cfg(not(target_arch = "spirv"))]
-        let n: Vec3 = u.cross(&v);
+        let n: Vec3 = u.cross(v);
         #[cfg(target_arch = "spirv")]
         let n: Vec3 = u.cross(v);
         let normal: Vec3 = n.normalize();
         // TODO: what is this?
         #[cfg(not(target_arch = "spirv"))]
-        let d = -(normal.dot(&q));
+        let d = -(normal.dot(q));
         #[cfg(target_arch = "spirv")]
         let d = -(normal.dot(q));
         // TODO: what is this?
         #[cfg(not(target_arch = "spirv"))]
-        let w: Vec3 = n / n.dot(&n);
+        let w: Vec3 = n / n.dot(n);
         #[cfg(target_arch = "spirv")]
         let w: Vec3 = n / n.dot(n);
-        let area = n.magnitude();
+        let area = n.length();
         let mut aabb = AABB::new_from_coords(q, q + u + v);
         aabb.pad();
 
@@ -103,7 +103,7 @@ impl Quad {
     ) -> Option<HitRecord> {
         // TODO: better ergonomics
         #[cfg(not(target_arch = "spirv"))]
-        let denom = self.normal.dot(&ray.direction);
+        let denom = self.normal.dot(ray.direction);
         #[cfg(target_arch = "spirv")]
         let denom = self.normal.dot(ray.direction);
 
@@ -115,7 +115,7 @@ impl Quad {
         // Return false if the hit point parameter t is outside the ray interval
         // TODO: better ergonomics
         #[cfg(not(target_arch = "spirv"))]
-        let t = (-self.d - self.normal.dot(&ray.origin)) / denom;
+        let t = (-self.d - self.normal.dot(ray.origin)) / denom;
         #[cfg(target_arch = "spirv")]
         let t = (-self.d - self.normal.dot(ray.origin)) / denom;
         if t < distance_min || t > distance_max {
@@ -127,9 +127,9 @@ impl Quad {
         let planar_hitpt_vector: Vec3 = intersection - self.q;
         // TODO: better ergonomics
         #[cfg(not(target_arch = "spirv"))]
-        let alpha: Float = self.w.dot(&planar_hitpt_vector.cross(&self.v));
+        let alpha: Float = self.w.dot(planar_hitpt_vector.cross(self.v));
         #[cfg(not(target_arch = "spirv"))]
-        let beta: Float = self.w.dot(&self.u.cross(&planar_hitpt_vector));
+        let beta: Float = self.w.dot(self.u.cross(planar_hitpt_vector));
         #[cfg(target_arch = "spirv")]
         let alpha: Float = self.w.dot(planar_hitpt_vector.cross(self.v));
         #[cfg(target_arch = "spirv")]
@@ -176,8 +176,8 @@ impl Quad {
         ) {
             Some(hit_record) => {
                 let distance_squared =
-                    hit_record.distance * hit_record.distance * vector.norm_squared();
-                let cosine = vector.dot(&hit_record.normal).abs() / vector.magnitude();
+                    hit_record.distance * hit_record.distance * vector.length_squared();
+                let cosine = vector.dot(hit_record.normal).abs() / vector.length();
 
                 distance_squared / (cosine * self.area)
             }

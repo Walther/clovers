@@ -20,13 +20,7 @@ pub fn random_in_unit_sphere(rng: &mut CloversRng) -> Vec3 {
     loop {
         position = 2.0 * Vec3::new(rng.gen::<Float>(), rng.gen::<Float>(), rng.gen::<Float>())
             - Vec3::new(1.0, 1.0, 1.0);
-        // TODO: better ergonomics. nalgebra uses a reference, glam uses plain value
-        #[cfg(target_arch = "spirv")]
         if position.length_squared() >= 1.0 {
-            return position;
-        }
-        #[cfg(not(target_arch = "spirv"))]
-        if position.magnitude_squared() >= 1.0 {
             return position;
         }
     }
@@ -49,13 +43,7 @@ pub fn random_in_unit_disk(rng: &mut CloversRng) -> Vec3 {
         // TODO: understand this defocus disk thingy
         position =
             2.0 * Vec3::new(rng.gen::<Float>(), rng.gen::<Float>(), 0.0) - Vec3::new(1.0, 1.0, 0.0);
-        // TODO: better ergonomics. nalgebra uses a reference, glam uses plain value
-        #[cfg(target_arch = "spirv")]
         if position.dot(position) >= 1.0 {
-            return position;
-        }
-        #[cfg(not(target_arch = "spirv"))]
-        if position.dot(&position) >= 1.0 {
             return position;
         }
     }

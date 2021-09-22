@@ -78,14 +78,7 @@ impl Camera {
         let half_width: Float = aspect_ratio * half_height;
         let origin: Vec3 = look_from;
         let w: Vec3 = (look_from - look_at).normalize();
-        // TODO: better ergonomics. nalgebra uses a reference, glam uses plain value
-        #[cfg(not(target_arch = "spirv"))]
-        let u: Vec3 = (up.cross(&w)).normalize();
-        #[cfg(not(target_arch = "spirv"))]
-        let v: Vec3 = w.cross(&u);
-        #[cfg(target_arch = "spirv")]
         let u: Vec3 = (up.cross(w)).normalize();
-        #[cfg(target_arch = "spirv")]
         let v: Vec3 = w.cross(u);
 
         // TODO: understand this defocus

@@ -28,16 +28,8 @@ impl ONB {
             Vec3::new(1.0, 0.0, 0.0)
         };
 
-        // TODO: better ergonomics. nalgebra uses a reference, glam uses plain value
-        #[cfg(target_arch = "spirv")]
         let v = (w.cross(a)).normalize();
-        #[cfg(target_arch = "spirv")]
         let u = w.cross(v);
-
-        #[cfg(not(target_arch = "spirv"))]
-        let v = (w.cross(&a)).normalize();
-        #[cfg(not(target_arch = "spirv"))]
-        let u = w.cross(&v);
 
         ONB { u, v, w }
     }

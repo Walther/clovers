@@ -2,7 +2,7 @@
 // TODO: better docs
 
 use alloc::string::String;
-use nalgebra::Rotation3;
+use glam::{EulerRot, Mat3};
 use std::fs::OpenOptions;
 
 use crate::{
@@ -46,7 +46,9 @@ impl From<STL> for HitableList {
             let b: Vec3 = Vec3::new(b[0], b[1], b[2]);
             let c: Vec3 = Vec3::new(c[0], c[1], c[2]);
             // Handle rotation
-            let rotation = Rotation3::from_euler_angles(
+            let rotation = Mat3::from_euler(
+                // TODO: verify the order makes sense
+                EulerRot::XZY,
                 stl.rotation[0].to_radians(),
                 stl.rotation[1].to_radians(),
                 stl.rotation[2].to_radians(),

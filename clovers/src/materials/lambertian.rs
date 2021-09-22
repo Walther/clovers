@@ -51,7 +51,7 @@ impl<'a> Lambertian {
         _rng: &mut CloversRng,
     ) -> Float {
         // TODO: explain the math
-        let cosine = hit_record.normal.dot(&scattered.direction.normalize());
+        let cosine = hit_record.normal.dot(scattered.direction.normalize());
         if cosine < 0.0 {
             0.0
         } else {

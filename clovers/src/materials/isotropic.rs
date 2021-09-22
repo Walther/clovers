@@ -61,7 +61,7 @@ impl<'a> Isotropic {
     ) -> Float {
         // TODO: fix / verify correctness!
         // this is just copied from lambertian as an experiment
-        let cosine = hit_record.normal.dot(&scattered.direction.normalize());
+        let cosine = hit_record.normal.dot(scattered.direction.normalize());
         if cosine < 0.0 {
             0.0
         } else {

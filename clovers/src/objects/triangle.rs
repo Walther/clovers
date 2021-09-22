@@ -62,24 +62,24 @@ impl Triangle {
     pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Triangle {
         // TODO: better ergonomics
         #[cfg(not(target_arch = "spirv"))]
-        let n: Vec3 = u.cross(&v);
+        let n: Vec3 = u.cross(v);
         #[cfg(target_arch = "spirv")]
         let n: Vec3 = u.cross(v);
 
         let normal: Vec3 = n.normalize();
         // TODO: what is this?
         #[cfg(not(target_arch = "spirv"))]
-        let d = -(normal.dot(&q));
+        let d = -(normal.dot(q));
         #[cfg(target_arch = "spirv")]
         let d = -(normal.dot(q));
         // TODO: what is this?
         #[cfg(not(target_arch = "spirv"))]
-        let w: Vec3 = n / n.dot(&n);
+        let w: Vec3 = n / n.dot(n);
         #[cfg(target_arch = "spirv")]
         let w: Vec3 = n / n.dot(n);
         // Compared to quad, triangle has half the area
         #[cfg(not(target_arch = "spirv"))]
-        let area = n.magnitude() / 2.0;
+        let area = n.length() / 2.0;
         #[cfg(target_arch = "spirv")]
         let area = n.length() / 2.0;
 
@@ -135,7 +135,7 @@ impl Triangle {
     ) -> Option<HitRecord> {
         // TODO: better ergonomics
         #[cfg(not(target_arch = "spirv"))]
-        let denom = self.normal.dot(&ray.direction);
+        let denom = self.normal.dot(ray.direction);
         #[cfg(target_arch = "spirv")]
         let denom = self.normal.dot(ray.direction);
 
@@ -147,7 +147,7 @@ impl Triangle {
         // Return false if the hit point parameter t is outside the ray interval
         // TODO: better ergonomics
         #[cfg(not(target_arch = "spirv"))]
-        let t = (-self.d - self.normal.dot(&ray.origin)) / denom;
+        let t = (-self.d - self.normal.dot(ray.origin)) / denom;
         #[cfg(target_arch = "spirv")]
         let t = (-self.d - self.normal.dot(ray.origin)) / denom;
         if t < distance_min || t > distance_max {
@@ -159,9 +159,9 @@ impl Triangle {
         let planar_hitpt_vector: Vec3 = intersection - self.q;
         // TODO: better ergonomics
         #[cfg(not(target_arch = "spirv"))]
-        let alpha: Float = self.w.dot(&planar_hitpt_vector.cross(&self.v));
+        let alpha: Float = self.w.dot(planar_hitpt_vector.cross(self.v));
         #[cfg(not(target_arch = "spirv"))]
-        let beta: Float = self.w.dot(&self.u.cross(&planar_hitpt_vector));
+        let beta: Float = self.w.dot(self.u.cross(planar_hitpt_vector));
         #[cfg(target_arch = "spirv")]
         let alpha: Float = self.w.dot(planar_hitpt_vector.cross(self.v));
         #[cfg(target_arch = "spirv")]
@@ -213,9 +213,9 @@ impl Triangle {
                 // TODO: better ergonomics
                 #[cfg(not(target_arch = "spirv"))]
                 let distance_squared =
-                    hit_record.distance * hit_record.distance * vector.norm_squared();
+                    hit_record.distance * hit_record.distance * vector.length_squared();
                 #[cfg(not(target_arch = "spirv"))]
-                let cosine = vector.dot(&hit_record.normal).abs() / vector.magnitude();
+                let cosine = vector.dot(hit_record.normal).abs() / vector.length();
                 #[cfg(target_arch = "spirv")]
                 let distance_squared =
                     hit_record.distance * hit_record.distance * vector.length_squared();

@@ -83,9 +83,9 @@ impl MovingSphere {
         _rng: &mut CloversRng,
     ) -> Option<HitRecord> {
         let oc = ray.origin - self.center(ray.time);
-        let a: Float = ray.direction.norm_squared();
-        let half_b: Float = oc.dot(&ray.direction);
-        let c: Float = oc.norm_squared() - self.radius * self.radius;
+        let a: Float = ray.direction.length_squared();
+        let half_b: Float = oc.dot(ray.direction);
+        let c: Float = oc.length_squared() - self.radius * self.radius;
         let discriminant = half_b * half_b - a * c;
         if discriminant > 0.0 {
             let root: Float = discriminant.sqrt();

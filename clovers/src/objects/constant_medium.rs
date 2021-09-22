@@ -104,7 +104,7 @@ impl ConstantMedium {
             rec1.distance = 0.0;
         }
 
-        let ray_length: Float = ray.direction.norm();
+        let ray_length: Float = ray.direction.length();
         let distance_inside_boundary: Float = (rec2.distance - rec1.distance) * ray_length;
         let hit_distance: Float = self.neg_inv_density * (rng.gen::<Float>()).ln(); // TODO: verify if log_e is correct here
 

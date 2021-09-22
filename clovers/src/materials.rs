@@ -123,7 +123,7 @@ pub struct ScatterRecord<'a> {
 fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
     // TODO: better ergonomics
     #[cfg(not(target_arch = "spirv"))]
-    let result = vector - 2.0 * vector.dot(&normal) * normal;
+    let result = vector - 2.0 * vector.dot(normal) * normal;
     #[cfg(target_arch = "spirv")]
     let result = vector - 2.0 * vector.dot(normal) * normal;
 
@@ -133,13 +133,13 @@ fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
 fn refract(uv: Vec3, normal: Vec3, etai_over_etat: Float) -> Vec3 {
     // TODO: better ergonomics
     #[cfg(not(target_arch = "spirv"))]
-    let cos_theta: Float = -uv.dot(&normal);
+    let cos_theta: Float = -uv.dot(normal);
     #[cfg(target_arch = "spirv")]
     let cos_theta: Float = -uv.dot(normal);
 
     let r_out_parallel: Vec3 = etai_over_etat * (uv + cos_theta * normal);
     #[cfg(not(target_arch = "spirv"))]
-    let r_out_perp: Vec3 = -(1.0 - r_out_parallel.norm_squared()).sqrt() * normal;
+    let r_out_perp: Vec3 = -(1.0 - r_out_parallel.length_squared()).sqrt() * normal;
     #[cfg(target_arch = "spirv")]
     let r_out_perp: Vec3 = -(1.0 - r_out_parallel.length_squared()).sqrt() * normal;
 

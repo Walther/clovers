@@ -10,7 +10,7 @@ path = "src/main.rs"
 
 [dependencies]
 # Internal
-clovers = { path = "../clovers", features = ["serde-derive", "stl", "traces", "nalg", "rand-crate"]}
+clovers = { path = "../clovers", features = ["serde-derive", "stl", "traces", "rand-crate"]}
 # External
 rayon = "1.5.1"
 rand = { version = "0.8.4", features = ["small_rng"], default-features = true }
