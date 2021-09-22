@@ -1,12 +1,7 @@
 //! Utility object for rotating another object.
 
 use crate::CloversRng;
-use crate::{
-    aabb::AABB,
-    hitable::{HitRecord, Hitable},
-    ray::Ray,
-    Box, Float, Vec3,
-};
+use crate::{aabb::AABB, hitable::Hitable, hitrecord::HitRecord, ray::Ray, Box, Float, Vec3};
 
 #[cfg(target_arch = "spirv")]
 use crate::FloatTrait;

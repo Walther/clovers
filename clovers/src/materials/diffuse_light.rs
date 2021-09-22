@@ -5,7 +5,7 @@ use super::ScatterRecord;
 
 #[cfg(not(target_arch = "spirv"))]
 use crate::{
-    hitable::HitRecord,
+    hitrecord::HitRecord,
     textures::{SolidColor, Texture},
     CloversRng,
 };

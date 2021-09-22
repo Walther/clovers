@@ -30,9 +30,9 @@
 //!
 //! - Rendering is done by creating [Rays](ray::Ray) and seeing what they hit
 //! - A [Ray](ray::Ray) has an origin and a direction
-//! - Every [Object](objects::Object) has a `hit()` method that takes a [Ray](ray::Ray) and returns an Option<[HitRecord](hitable::HitRecord)>
+//! - Every [Object](objects::Object) has a `hit()` method that takes a [Ray](ray::Ray) and returns an Option<[HitRecord](hitrecord::HitRecord)>
 //! - If you get None, use that information to colorize your pixel with a default color
-//! - If you get Some([HitRecord](hitable::HitRecord)), use its details to colorize your pixel
+//! - If you get Some([HitRecord](hitrecord::HitRecord)), use its details to colorize your pixel
 //! - You most likely also want to recurse: depending on the material, maybe `scatter()` and cast a new [Ray](ray::Ray)?
 //!
 //! You most likely want to repeat this process multiple times for each of your pixels: generating multiple samples per pixel results in a higher quality image.
@@ -86,6 +86,7 @@ pub use spirv_std::num_traits::Float as FloatTrait;
 pub mod aabb;
 pub mod camera;
 pub mod color;
+pub mod hitrecord;
 pub mod interval;
 pub mod materials; // TODO: partial support
 pub mod onb;

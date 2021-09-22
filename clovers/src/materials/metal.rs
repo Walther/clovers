@@ -5,7 +5,7 @@ use super::{reflect, MaterialType, ScatterRecord};
 
 #[cfg(not(target_arch = "spirv"))]
 use crate::{
-    hitable::HitRecord,
+    hitrecord::HitRecord,
     pdf::{ZeroPDF, PDF},
     random::random_in_unit_sphere,
     textures::Texture,

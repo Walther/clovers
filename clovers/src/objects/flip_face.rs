@@ -1,12 +1,7 @@
 //! An utility object that can be used to flip the face of the object. TODO: possibly deprecated?
 
 use crate::CloversRng;
-use crate::{
-    aabb::AABB,
-    hitable::{HitRecord, Hitable},
-    ray::Ray,
-    Box, Float,
-};
+use crate::{aabb::AABB, hitable::Hitable, hitrecord::HitRecord, ray::Ray, Box, Float};
 
 use super::Object;
 

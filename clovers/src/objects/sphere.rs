@@ -2,7 +2,7 @@
 
 use crate::CloversRng;
 use crate::{
-    aabb::AABB, hitable::HitRecord, materials::Material, onb::ONB, random::random_to_sphere,
+    aabb::AABB, hitrecord::HitRecord, materials::Material, onb::ONB, random::random_to_sphere,
     ray::Ray, Float, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 

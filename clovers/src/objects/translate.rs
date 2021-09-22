@@ -1,12 +1,7 @@
 //! Utility object for translating i.e. moving another object.
 
 use crate::CloversRng;
-use crate::{
-    aabb::AABB,
-    hitable::{HitRecord, Hitable},
-    ray::Ray,
-    Box, Float, Vec3,
-};
+use crate::{aabb::AABB, hitable::Hitable, hitrecord::HitRecord, ray::Ray, Box, Float, Vec3};
 
 use super::Object;
 

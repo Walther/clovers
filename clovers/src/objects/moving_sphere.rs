@@ -1,7 +1,7 @@
 //! A moving sphere object.
 
 use crate::CloversRng;
-use crate::{aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3, PI};
+use crate::{aabb::AABB, hitrecord::HitRecord, materials::Material, ray::Ray, Float, Vec3, PI};
 
 #[derive(Clone)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]

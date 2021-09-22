@@ -1,7 +1,7 @@
 //! Materials enable different behaviors of light on objects.
 
 #[cfg(not(target_arch = "spirv"))]
-use crate::{hitable::HitRecord, pdf::PDF, CloversRng};
+use crate::{hitrecord::HitRecord, pdf::PDF, CloversRng};
 
 #[cfg(target_arch = "spirv")]
 use crate::FloatTrait;

@@ -3,7 +3,8 @@
 use crate::CloversRng;
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable},
+    hitable::Hitable,
+    hitrecord::HitRecord,
     materials::{isotropic::Isotropic, Material},
     ray::Ray,
     textures::Texture,

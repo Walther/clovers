@@ -5,8 +5,8 @@ use crate::interval::Interval;
 use crate::CloversRng;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
-    aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
-    Vec3, EPSILON_RECT_THICKNESS,
+    aabb::AABB, hitable::get_orientation, hitrecord::HitRecord, materials::Material, ray::Ray,
+    Float, Vec3, EPSILON_RECT_THICKNESS,
 };
 // TODO: fix trait import
 #[cfg(feature = "rand-crate")]
@@ -277,7 +277,7 @@ mod tests {
             time_0,
         );
 
-        let mut rng = SmallRng::from_entropy();
+        let mut rng = CloversRng::from_entropy();
 
         let aabb = xy_unit_triangle
             .bounding_box(time_0, time_1)
@@ -322,7 +322,7 @@ mod tests {
             time_0,
         );
 
-        let mut rng = SmallRng::from_entropy();
+        let mut rng = CloversRng::from_entropy();
 
         let aabb = xy_unit_triangle
             .bounding_box(time_0, time_1)
@@ -367,7 +367,7 @@ mod tests {
             time_0,
         );
 
-        let mut rng = SmallRng::from_entropy();
+        let mut rng = CloversRng::from_entropy();
 
         let aabb = neg_xy_unit_triangle
             .bounding_box(time_0, time_1)

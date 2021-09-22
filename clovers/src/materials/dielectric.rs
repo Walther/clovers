@@ -4,7 +4,7 @@
 use super::{reflect, refract, schlick, MaterialType, ScatterRecord};
 #[cfg(not(target_arch = "spirv"))]
 use crate::{
-    hitable::HitRecord,
+    hitrecord::HitRecord,
     pdf::{ZeroPDF, PDF},
     ray::Ray,
     CloversRng, Vec3,

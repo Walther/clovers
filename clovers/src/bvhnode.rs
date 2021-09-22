@@ -8,12 +8,7 @@ use crate::CloversRng;
 #[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
 
-use crate::{
-    aabb::AABB,
-    hitable::{HitRecord, Hitable},
-    ray::Ray,
-    Box, Float, Vec,
-};
+use crate::{aabb::AABB, hitable::Hitable, hitrecord::HitRecord, ray::Ray, Box, Float, Vec};
 
 /// Bounding Volume Hierarchy Node.
 ///

@@ -4,8 +4,8 @@
 use crate::CloversRng;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
-    aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
-    Vec3, EPSILON_RECT_THICKNESS,
+    aabb::AABB, hitable::get_orientation, hitrecord::HitRecord, materials::Material, ray::Ray,
+    Float, Vec3, EPSILON_RECT_THICKNESS,
 };
 // TODO: fix trait import
 #[cfg(feature = "rand-crate")]

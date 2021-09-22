@@ -4,7 +4,8 @@ use super::Quad;
 use crate::CloversRng;
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable, HitableList},
+    hitable::{Hitable, HitableList},
+    hitrecord::HitRecord,
     materials::Material,
     ray::Ray,
     Box, Float, Vec3,
