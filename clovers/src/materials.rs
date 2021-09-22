@@ -1,12 +1,15 @@
 //! Materials enable different behaviors of light on objects.
 
 #[cfg(not(target_arch = "spirv"))]
-use crate::{pdf::PDF, CloversRng};
+use crate::{hitrecord::HitRecord, pdf::PDF};
 
 #[cfg(target_arch = "spirv")]
 use crate::FloatTrait;
 
-use crate::{color::Color, hitrecord::HitRecord, ray::Ray, textures::GPUTexture, Float, Vec3};
+use crate::{
+    color::Color, hitrecord::GPUHitRecord, ray::Ray, textures::GPUTexture, CloversRng, Float, Vec3,
+};
+
 pub mod dielectric;
 pub mod diffuse_light;
 pub mod isotropic;
@@ -120,6 +123,18 @@ pub struct ScatterRecord<'a> {
     pub pdf_ptr: PDF<'a>,
 }
 
+/// GPU compatible ScatterRecord. Vastly simplified and work in progress
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub struct GPUScatterRecord {
+    /// The material type that was scattered on
+    pub material_type: MaterialType,
+    /// Direction of a generated specular ray
+    pub specular_ray: Ray,
+    /// Current color to take into account when following the scattered ray for futher iterations
+    pub attenuation: Color,
+}
+
 fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
     vector - 2.0 * vector.dot(normal) * normal
 }
@@ -162,6 +177,14 @@ pub struct GPUMaterial {
     pub kind: GPUMaterialKind,
     /// The emissive texture of the material, used for lights
     pub emit: GPUTexture,
+    /// Refractive index of the material, used for glass
+    pub refractive_index: Float,
+    /// Color of the material, used for glass
+    pub color: Color,
+    /// Albedo of the material
+    pub albedo: GPUTexture,
+    /// Fuzziness of the material, used for metal
+    pub fuzz: Float,
 }
 
 impl GPUMaterial {
@@ -169,7 +192,7 @@ impl GPUMaterial {
     pub fn emit(
         &self,
         ray: &Ray,
-        hit_record: &HitRecord,
+        hit_record: &GPUHitRecord,
         u: Float,
         v: Float,
         position: Vec3,
@@ -184,6 +207,111 @@ impl GPUMaterial {
                 position,
             ),
             _ => Color::new(0.0, 0.0, 0.0),
+        }
+    }
+
+    /// Scatters a ray from the material
+    pub fn scatter(
+        &self,
+        ray: &Ray,
+        hit_record: &GPUHitRecord,
+        rng: &mut CloversRng,
+    ) -> GPUScatterRecord {
+        match self.kind {
+            GPUMaterialKind::Dielectric => GPUDielectric::scatter(
+                GPUDielectric {
+                    refractive_index: self.refractive_index,
+                    color: self.color,
+                },
+                ray,
+                hit_record,
+                rng,
+            ),
+            GPUMaterialKind::DiffuseLight => {
+                GPUDiffuseLight::scatter(GPUDiffuseLight { emit: self.emit }, ray, hit_record, rng)
+            }
+            GPUMaterialKind::Isotropic => GPUIsotropic::scatter(
+                GPUIsotropic {
+                    albedo: self.albedo,
+                },
+                ray,
+                hit_record,
+                rng,
+            ),
+            GPUMaterialKind::Lambertian => GPULambertian::scatter(
+                GPULambertian {
+                    albedo: self.albedo,
+                },
+                ray,
+                hit_record,
+                rng,
+            ),
+            GPUMaterialKind::Metal => GPUMetal::scatter(
+                GPUMetal {
+                    albedo: self.albedo,
+                    fuzz: self.fuzz,
+                },
+                ray,
+                hit_record,
+                rng,
+            ),
+        }
+    }
+
+    /// Returns a probability? TODO: understand
+    pub fn scattering_pdf(
+        &self,
+        ray: &Ray,
+        hit_record: &GPUHitRecord,
+        scattered: &Ray,
+        rng: &mut CloversRng,
+    ) -> Float {
+        match self.kind {
+            GPUMaterialKind::Dielectric => GPUDielectric::scattering_pdf(
+                GPUDielectric {
+                    refractive_index: self.refractive_index,
+                    color: self.color,
+                },
+                ray,
+                hit_record,
+                scattered,
+                rng,
+            ),
+            GPUMaterialKind::DiffuseLight => GPUDiffuseLight::scattering_pdf(
+                GPUDiffuseLight { emit: self.emit },
+                ray,
+                hit_record,
+                scattered,
+                rng,
+            ),
+            GPUMaterialKind::Isotropic => GPUIsotropic::scattering_pdf(
+                GPUIsotropic {
+                    albedo: self.albedo,
+                },
+                ray,
+                hit_record,
+                scattered,
+                rng,
+            ),
+            GPUMaterialKind::Lambertian => GPULambertian::scattering_pdf(
+                GPULambertian {
+                    albedo: self.albedo,
+                },
+                ray,
+                hit_record,
+                scattered,
+                rng,
+            ),
+            GPUMaterialKind::Metal => GPUMetal::scattering_pdf(
+                GPUMetal {
+                    albedo: self.albedo,
+                    fuzz: self.fuzz,
+                },
+                ray,
+                hit_record,
+                scattered,
+                rng,
+            ),
         }
     }
 }

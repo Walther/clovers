@@ -5,6 +5,7 @@ use crate::{Float, Vec3};
 /// A Ray has an origin and a direction, as well as an instant in time it exists in. Motion blur is achieved by creating multiple rays with slightly different times.
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[derive(Copy, Clone, PartialEq)]
+#[repr(C)]
 pub struct Ray {
     /// The origin of the ray.
     pub origin: Vec3,
@@ -27,5 +28,14 @@ impl Ray {
     /// Evaluates the position (coordinate) at which the ray is at the given parameter, considering the origin and direction. Considering a default unit speed of 1 per unit time, this function can be given either a time or a distance.
     pub fn evaluate(&self, parameter: Float) -> Vec3 {
         self.origin + parameter * self.direction
+    }
+
+    /// Default ray. Starts at origin at time zero and is headed towards increasing z axis.
+    pub fn default() -> Ray {
+        Ray {
+            origin: Vec3::new(0.0, 0.0, 0.0),
+            direction: Vec3::new(0.0, 0.0, 1.0),
+            time: 0.0,
+        }
     }
 }

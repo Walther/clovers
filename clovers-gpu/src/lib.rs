@@ -7,11 +7,21 @@
 )]
 #![deny(warnings)]
 // TODO: temporary during development
+#![allow(unused_imports)]
+#![allow(unused_variables)]
 #![allow(clippy::all)]
 
 use spirv_std::glam::{vec2, vec4, Vec2, Vec4};
 
-use clovers::{color::Color, textures::GPUTexture, textures::GPUTextureKind, Float, Vec3};
+use clovers::{
+    color::Color,
+    hitrecord::GPUHitRecord,
+    materials::{GPULambertian, GPUMaterial, GPUMaterialKind, GPUScatterRecord},
+    ray::Ray,
+    textures::GPUTexture,
+    textures::GPUTextureKind,
+    CloversRng, Float, FloatTrait, Vec3,
+};
 
 pub struct ShaderConstants {
     pub width: u32,
@@ -40,12 +50,17 @@ pub fn main_fs(
     let u: Float = x / width;
     let v: Float = y / height;
 
-    // TODO: actual 3d position
-    let position: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+    let seed: u32 = y.trunc() as u32 * constants.width + x.trunc() as u32;
+    let mut rng = CloversRng::from_seed(seed);
+    let first: Float = rng.gen::<Float>();
 
-    // Texture demo
+    // TODO: actual 3d position
+    let position: Vec3 = Vec3::new(u, v, 1.0);
+
+    // Texture
     let color1 = Color::new(0.82, 0.82, 0.82);
     let color2 = Color::new(0.18, 0.18, 0.18);
+
     let density: Float = 10.0;
     // TODO: better ergonomics...
     let texture: GPUTexture = GPUTexture {
@@ -55,6 +70,34 @@ pub fn main_fs(
         density,
     };
     let color = texture.color(u, v, position);
+
+    // Material
+    let _lambertian: GPULambertian = GPULambertian { albedo: texture };
+    let refractive_index: Float = 1.5;
+    let fuzz: Float = 0.0;
+    let material: GPUMaterial = GPUMaterial {
+        kind: GPUMaterialKind::Lambertian,
+        emit: texture,    // ignored
+        refractive_index, // ignored
+        color: color1,    // ignored
+        albedo: texture,
+        fuzz, // ignored
+    };
+    let ray: Ray = Ray::new(Vec3::new(u, v, 0.0), Vec3::new(u, v, 1.0).normalize(), 0.0);
+    let normal: Vec3 = Vec3::new(u, v, -1.0).normalize();
+    let distance: Float = 1.0;
+    let hit_record: GPUHitRecord = GPUHitRecord {
+        distance,
+        position,
+        normal,
+        u,
+        v,
+        material,
+        front_face: 1,
+    };
+    // These do not work yet. error: Pointer operand 397[%397] must be a memory object declaration
+    // let scatter_record: GPUScatterRecord = material.scatter(&ray, &hit_record, &mut rng);
+    // let color = scatter_record.attenuation;
 
     *output = vec4(color.r, color.g, color.b, 1.0);
 }

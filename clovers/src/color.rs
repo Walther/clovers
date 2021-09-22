@@ -17,6 +17,7 @@ use crate::FloatTrait;
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[derive(Copy, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[repr(C)]
 pub struct Color {
     /// The red component of the color, as a [Float]
     pub r: Float,

@@ -1,19 +1,20 @@
 //! A metal material.
 
 #[cfg(not(target_arch = "spirv"))]
-use super::{reflect, MaterialType, ScatterRecord};
+use super::ScatterRecord;
+use super::{reflect, GPUScatterRecord, MaterialType};
 
 #[cfg(not(target_arch = "spirv"))]
 use crate::{
     hitrecord::HitRecord,
     pdf::{ZeroPDF, PDF},
-    random::random_in_unit_sphere,
-    ray::Ray,
     textures::Texture,
-    CloversRng, Float, Vec3,
 };
 
-use crate::textures::GPUTexture;
+use crate::{
+    hitrecord::GPUHitRecord, random::random_in_unit_sphere, ray::Ray, textures::GPUTexture,
+    CloversRng, Float, Vec3,
+};
 
 #[derive(Clone, Copy, Default)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
@@ -74,7 +75,10 @@ impl<'a> Metal {
 #[derive(Clone, Copy)]
 #[repr(C)]
 pub struct GPUMetal {
-    albedo: GPUTexture,
+    /// Albedo of the metal
+    pub albedo: GPUTexture,
+    /// Fuzziness of the metal
+    pub fuzz: Float,
 }
 
 #[cfg(not(target_arch = "spirv"))]
@@ -82,6 +86,40 @@ impl From<Metal> for GPUMetal {
     fn from(d: Metal) -> Self {
         GPUMetal {
             albedo: d.albedo.into(),
+            fuzz: d.fuzz,
+        }
+    }
+}
+
+impl GPUMetal {
+    /// Scattering probability density function for [GPUMetal]. Always returns zero. TODO: why?
+    pub fn scattering_pdf(
+        self,
+        _ray: &Ray,
+        _hit_record: &GPUHitRecord,
+        _scattered: &Ray,
+        _rng: &mut CloversRng,
+    ) -> Float {
+        0.0 // TODO: why does metal scatter 0? No mention in tutorial afaiu
+    }
+
+    /// Scatter function for the [Metal] material. Metal always reflects, and a specular ray is calculated with some randomness adjusted by the `fuzz` factor. This means the metal can be made more shiny or more matte. The returned [ScatterRecord] will have a probability density function of [ZeroPDF] and material type of [MaterialType::Specular]
+    pub fn scatter(
+        self,
+        ray: &Ray,
+        hit_record: &GPUHitRecord,
+        rng: &mut CloversRng,
+    ) -> GPUScatterRecord {
+        let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
+        GPUScatterRecord {
+            specular_ray: Ray::new(
+                hit_record.position,
+                reflected + self.fuzz * random_in_unit_sphere(rng),
+                ray.time,
+            ),
+            // TODO: fix coordinates. Currently metal only works for [SolidColor]
+            attenuation: self.albedo.color(0.0, 0.0, hit_record.position),
+            material_type: MaterialType::Specular,
         }
     }
 }

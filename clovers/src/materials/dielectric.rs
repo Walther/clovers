@@ -1,16 +1,21 @@
 //! A dielectric material. This resembles glass and other transparent and reflective materials.
 
 #[cfg(not(target_arch = "spirv"))]
-use super::{reflect, refract, schlick, MaterialType, ScatterRecord};
+use super::ScatterRecord;
+
+use super::{reflect, refract, schlick, GPUScatterRecord, MaterialType};
+
 #[cfg(not(target_arch = "spirv"))]
 use crate::{
     hitrecord::HitRecord,
     pdf::{ZeroPDF, PDF},
-    ray::Ray,
-    CloversRng, Vec3,
 };
 
-use crate::{color::Color, Float};
+#[cfg(target_arch = "spirv")]
+use crate::FloatTrait;
+
+use crate::{color::Color, hitrecord::GPUHitRecord, ray::Ray, CloversRng, Float, Vec3};
+
 // TODO: fix trait import
 #[cfg(feature = "rand-crate")]
 #[cfg(not(target_arch = "spirv"))]
@@ -110,8 +115,61 @@ impl Default for Dielectric {
 #[derive(Clone, Copy)]
 #[repr(C)]
 pub struct GPUDielectric {
-    refractive_index: Float,
-    color: Color,
+    /// Refractive index of the material. Used for calculating the new direction of a ray when entering the material at an angle. Follows Snell's law of refraction. Default value: 1.5, based on typical window glass.
+    pub refractive_index: Float,
+    /// Color of the material. Used for colorizing the rays. Default value: [`Color::new(1.0, 1.0, 1.0)`](crate::color::Color), producing a fully transparent, clear glass.
+    pub color: Color,
+}
+
+impl GPUDielectric {
+    /// Scattering probability density function for GPUDielectric material. NOTE: not implemented!
+    pub fn scattering_pdf(
+        self,
+        _ray: &Ray,
+        _hit_record: &GPUHitRecord,
+        _scattered: &Ray,
+        _rng: &mut CloversRng,
+    ) -> Float {
+        todo!()
+    }
+
+    /// Scatter method for the Dielectric material. Given a `ray` and a `hit_record`, evaluate a [ScatterRecord] based on possible reflection or refraction.
+    pub fn scatter(
+        self,
+        ray: &Ray,
+        hit_record: &GPUHitRecord,
+        rng: &mut CloversRng,
+    ) -> GPUScatterRecord {
+        let albedo = self.color;
+        let specular_ray: Ray;
+
+        let etai_over_etat: Float = match hit_record.front_face {
+            1 => 1.0 / self.refractive_index,
+            _ => self.refractive_index,
+        };
+
+        let unit_direction: Vec3 = ray.direction.normalize();
+        let cos_theta: Float = (-unit_direction.dot(hit_record.normal)).min(1.0);
+        let sin_theta: Float = (1.0 - cos_theta * cos_theta).sqrt();
+        if etai_over_etat * sin_theta > 1.0 {
+            let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
+            specular_ray = Ray::new(hit_record.position, reflected, ray.time);
+        } else {
+            let reflect_probability: Float = schlick(cos_theta, etai_over_etat);
+            if rng.gen::<Float>() < reflect_probability {
+                let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
+                specular_ray = Ray::new(hit_record.position, reflected, ray.time);
+            } else {
+                let refracted: Vec3 = refract(unit_direction, hit_record.normal, etai_over_etat);
+                specular_ray = Ray::new(hit_record.position, refracted, ray.time);
+            }
+        }
+        GPUScatterRecord {
+            material_type: MaterialType::Specular,
+            specular_ray,
+            attenuation: albedo,
+        }
+    }
 }
 
 #[cfg(not(target_arch = "spirv"))]

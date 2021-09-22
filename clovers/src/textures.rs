@@ -64,7 +64,6 @@ pub struct GPUTexture {
 #[cfg(not(target_arch = "spirv"))]
 impl Texture {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
-    #[deprecated]
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match self {
             Texture::NoiseTexture(n) => n.color(u, v, position),
