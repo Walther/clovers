@@ -5,13 +5,15 @@ use super::{MaterialType, ScatterRecord};
 
 #[cfg(not(target_arch = "spirv"))]
 use crate::{
+    color::Color,
     hitrecord::HitRecord,
     pdf::{CosinePDF, PDF},
+    ray::Ray,
     textures::Texture,
-    CloversRng,
+    CloversRng, Float, PI,
 };
 
-use crate::{color::Color, ray::Ray, textures::GPUTexture, Float, PI};
+use crate::textures::GPUTexture;
 
 #[derive(Clone, Copy, Default)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]

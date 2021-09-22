@@ -12,12 +12,9 @@ pub use solid_color::*;
 #[cfg(not(target_arch = "spirv"))]
 pub mod noise_texture;
 
-use crate::{color::Color, Float, Vec3, PI};
+use crate::{color::Color, Float, Vec3};
 #[cfg(not(target_arch = "spirv"))]
 use noise_texture::NoiseTexture;
-
-#[cfg(target_arch = "spirv")]
-use crate::FloatTrait;
 
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 #[cfg(not(target_arch = "spirv"))]
@@ -34,6 +31,8 @@ pub enum Texture {
     SurfaceChecker(SurfaceChecker),
 }
 
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[derive(Copy, Clone)]
 #[repr(C)]
 /// A texture kind enum, GPU version
@@ -47,6 +46,8 @@ pub enum GPUTextureKind {
 }
 
 /// A texture struct, GPU version
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct GPUTexture {

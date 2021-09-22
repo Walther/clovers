@@ -8,11 +8,12 @@ use crate::{
     hitrecord::HitRecord,
     pdf::{ZeroPDF, PDF},
     random::random_in_unit_sphere,
+    ray::Ray,
     textures::Texture,
-    CloversRng,
+    CloversRng, Float, Vec3,
 };
 
-use crate::{ray::Ray, textures::GPUTexture, Float, Vec3};
+use crate::textures::GPUTexture;
 
 #[derive(Clone, Copy, Default)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]

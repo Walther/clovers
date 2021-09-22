@@ -7,11 +7,12 @@ use super::{MaterialType, ScatterRecord};
 use crate::{
     hitrecord::HitRecord,
     pdf::{CosinePDF, PDF},
+    ray::Ray,
     textures::Texture,
-    CloversRng,
+    CloversRng, Float, PI,
 };
 
-use crate::{ray::Ray, textures::GPUTexture, Float, PI};
+use crate::textures::GPUTexture;
 
 #[derive(Clone, Copy, Default)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]

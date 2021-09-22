@@ -5,12 +5,11 @@ use super::ScatterRecord;
 
 #[cfg(not(target_arch = "spirv"))]
 use crate::{
-    hitrecord::HitRecord,
     textures::{SolidColor, Texture},
     CloversRng,
 };
 
-use crate::{color::Color, ray::Ray, textures::GPUTexture, Float, Vec3};
+use crate::{color::Color, hitrecord::HitRecord, ray::Ray, textures::GPUTexture, Float, Vec3};
 
 /// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
 #[derive(Clone, Copy)]
@@ -76,11 +75,37 @@ impl<'a> DiffuseLight {
     }
 }
 
+// TODO: clean up duplicated work due to GPU variants
+
 /// GPU accelerated diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
 #[derive(Clone, Copy)]
 #[repr(C)]
 pub struct GPUDiffuseLight {
-    emit: GPUTexture,
+    /// The texture used for the emission
+    pub emit: GPUTexture,
+}
+
+impl GPUDiffuseLight {
+    /// Creates a new [GPUDiffuseLight] material with the given [GPUTexture].
+    pub fn new(emission: GPUTexture) -> Self {
+        GPUDiffuseLight { emit: emission }
+    }
+
+    /// Emission function for [GPUDiffuseLight]. If the given [HitRecord] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.
+    pub fn emit(
+        self,
+        _ray: &Ray,
+        hit_record: &HitRecord,
+        u: Float,
+        v: Float,
+        position: Vec3,
+    ) -> Color {
+        if hit_record.front_face {
+            self.emit.color(u, v, position)
+        } else {
+            Color::new(0.0, 0.0, 0.0)
+        }
+    }
 }
 
 #[cfg(not(target_arch = "spirv"))]

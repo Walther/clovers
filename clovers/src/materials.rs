@@ -1,12 +1,12 @@
 //! Materials enable different behaviors of light on objects.
 
 #[cfg(not(target_arch = "spirv"))]
-use crate::{hitrecord::HitRecord, pdf::PDF, CloversRng};
+use crate::{pdf::PDF, CloversRng};
 
 #[cfg(target_arch = "spirv")]
 use crate::FloatTrait;
 
-use crate::{color::Color, ray::Ray, Float, Vec3};
+use crate::{color::Color, hitrecord::HitRecord, ray::Ray, textures::GPUTexture, Float, Vec3};
 pub mod dielectric;
 pub mod diffuse_light;
 pub mod isotropic;
@@ -141,7 +141,7 @@ fn schlick(cosine: Float, refractive_index: Float) -> Float {
 /// A GPU compatible material enum.
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub enum GPUMaterial {
+pub enum GPUMaterialKind {
     /// Dielectric material
     Dielectric,
     /// Lambertian material
@@ -154,4 +154,36 @@ pub enum GPUMaterial {
     Isotropic,
 }
 
-impl GPUMaterial {}
+/// A GPU compatible material struct
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub struct GPUMaterial {
+    /// The type of the material
+    pub kind: GPUMaterialKind,
+    /// The emissive texture of the material, used for lights
+    pub emit: GPUTexture,
+}
+
+impl GPUMaterial {
+    /// Returns the amount of light the material emits. By default, materials do not emit light, returning black.
+    pub fn emit(
+        &self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        u: Float,
+        v: Float,
+        position: Vec3,
+    ) -> Color {
+        match self.kind {
+            GPUMaterialKind::DiffuseLight => GPUDiffuseLight::emit(
+                GPUDiffuseLight { emit: self.emit },
+                ray,
+                hit_record,
+                u,
+                v,
+                position,
+            ),
+            _ => Color::new(0.0, 0.0, 0.0),
+        }
+    }
+}
