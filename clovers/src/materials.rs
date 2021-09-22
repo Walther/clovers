@@ -96,7 +96,7 @@ impl Material {
 
 #[derive(Clone, Copy)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
-#[cfg(not(target_arch = "spirv"))]
+#[repr(C)]
 /// Enum for the types of materials: Diffuse and Specular (i.e., matte and shiny)
 pub enum MaterialType {
     /// A matte material that does not reflect rays
@@ -121,26 +121,12 @@ pub struct ScatterRecord<'a> {
 }
 
 fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
-    // TODO: better ergonomics
-    #[cfg(not(target_arch = "spirv"))]
-    let result = vector - 2.0 * vector.dot(normal) * normal;
-    #[cfg(target_arch = "spirv")]
-    let result = vector - 2.0 * vector.dot(normal) * normal;
-
-    result
+    vector - 2.0 * vector.dot(normal) * normal
 }
 
 fn refract(uv: Vec3, normal: Vec3, etai_over_etat: Float) -> Vec3 {
-    // TODO: better ergonomics
-    #[cfg(not(target_arch = "spirv"))]
     let cos_theta: Float = -uv.dot(normal);
-    #[cfg(target_arch = "spirv")]
-    let cos_theta: Float = -uv.dot(normal);
-
     let r_out_parallel: Vec3 = etai_over_etat * (uv + cos_theta * normal);
-    #[cfg(not(target_arch = "spirv"))]
-    let r_out_perp: Vec3 = -(1.0 - r_out_parallel.length_squared()).sqrt() * normal;
-    #[cfg(target_arch = "spirv")]
     let r_out_perp: Vec3 = -(1.0 - r_out_parallel.length_squared()).sqrt() * normal;
 
     r_out_parallel + r_out_perp
@@ -151,3 +137,21 @@ fn schlick(cosine: Float, refractive_index: Float) -> Float {
     let r0 = r0 * r0;
     r0 + (1.0 - r0) * ((1.0 - cosine).powf(5.0))
 }
+
+/// A GPU compatible material enum.
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub enum GPUMaterial {
+    /// Dielectric material
+    Dielectric,
+    /// Lambertian material
+    Lambertian,
+    /// DiffuseLight material
+    DiffuseLight,
+    /// Metal material
+    Metal,
+    /// Isotropic material
+    Isotropic,
+}
+
+impl GPUMaterial {}

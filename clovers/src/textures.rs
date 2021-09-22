@@ -78,29 +78,29 @@ impl GPUTexture {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match self.kind {
-            GPUTextureKind::SolidColor => self.even,
-            // TODO: cleaner implementation! These are copy-pasted from `clovers/src/textures/checkered.rs`
-            GPUTextureKind::SpatialChecker => {
-                let density = self.density * PI;
-                let sines = 1.0
-                    * (density * position.x).sin()
-                    * (density * position.y).sin()
-                    * (density * position.z).sin();
-                if sines < 0.0 {
-                    self.odd
-                } else {
-                    self.even
-                }
+            GPUTextureKind::SolidColor => {
+                SolidColor::color(SolidColor { color: self.even }, u, v, position)
             }
-            GPUTextureKind::SurfaceChecker => {
-                let density = self.density * PI;
-                let sines = 1.0 * (density * u).sin() * (density * v).sin();
-                if sines < 0.0 {
-                    self.odd
-                } else {
-                    self.even
-                }
-            }
+            GPUTextureKind::SpatialChecker => SpatialChecker::color(
+                SpatialChecker {
+                    even: self.even,
+                    odd: self.odd,
+                    density: self.density,
+                },
+                u,
+                v,
+                position,
+            ),
+            GPUTextureKind::SurfaceChecker => SurfaceChecker::color(
+                SurfaceChecker {
+                    even: self.even,
+                    odd: self.odd,
+                    density: self.density,
+                },
+                u,
+                v,
+                position,
+            ),
         }
     }
 }
