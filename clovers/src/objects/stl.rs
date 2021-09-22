@@ -13,7 +13,8 @@ use crate::{
 };
 
 /// STL structure. This gets converted into an internal representation using [Triangles](crate::objects::Triangle)
-#[derive(Debug)]
+#[derive(Clone)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct STL {
     /// Path of the .stl file

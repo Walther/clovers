@@ -68,7 +68,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #[cfg(not(target_arch = "spirv"))]
 extern crate alloc;
-
 #[cfg(not(target_arch = "spirv"))]
 pub use alloc::boxed::Box;
 #[cfg(not(target_arch = "spirv"))]
@@ -111,7 +110,8 @@ pub mod perlin;
 pub mod scenes;
 
 /// Rendering options struct
-#[derive(Debug)]
+#[derive(Clone, Copy)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub struct RenderOpts {
     /// Width of the render in pixels
     pub width: u32,
@@ -149,62 +149,5 @@ pub const EPSILON_CONSTANT_MEDIUM: Float = 0.000_1;
 #[cfg(feature = "rand-crate")]
 #[cfg(not(target_arch = "spirv"))]
 pub use rand::rngs::SmallRng as CloversRng;
-
-// Alternative randmo implementation
 #[cfg(not(feature = "rand-crate"))]
-use core::intrinsics::transmute;
-#[cfg(not(feature = "rand-crate"))]
-#[cfg(target_arch = "spirv")]
-use spirv_std::num_traits::Float as FloatTrait;
-
-/// Internal alias: allows swapping the implementation for CPU vs GPU
-#[cfg(not(feature = "rand-crate"))]
-pub struct CloversRng {
-    state: u32,
-    a: u32,
-    c: u32,
-}
-#[cfg(not(feature = "rand-crate"))]
-impl CloversRng {
-    /// Generate a random value
-    pub fn gen<T>(&mut self) -> Float {
-        // TODO: does this make any sense
-        self.state = self.a * self.state + self.c;
-        let f: Float;
-        #[allow(unsafe_code)]
-        unsafe {
-            f = transmute::<u32, Float>(self.state);
-        }
-
-        // Return the fractional part of the float in order to keep the return value between 0..1
-        f.fract()
-    }
-
-    /// Initialize the random number generator. This implementation is NOT actually based on entropy, but is named such due to api compatibility with rand::rngs::SmallRng
-    pub fn from_entropy() -> Self {
-        // https://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use
-        // "Numerical Recipes"
-        let a = 1664525;
-        let c = 1013904223;
-        let state = a + c;
-        CloversRng { state, a, c }
-    }
-
-    /// Initialize the random number generator.
-    pub fn from_seed(seed: u32) -> Self {
-        // https://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use
-        // "Numerical Recipes"
-        let a = 1664525;
-        let c = 1013904223;
-        let state = seed + a + c;
-        CloversRng { state, a, c }
-    }
-
-    /// Generate a random value in the given range
-    pub fn gen_range<T>(&mut self, _range: core::ops::Range<T>) -> T
-    where
-        T: Into<Float>,
-    {
-        todo!()
-    }
-}
+pub use random::CloversRng;

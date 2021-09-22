@@ -4,7 +4,8 @@ use crate::{color::Color, perlin::Perlin, Float, Vec3};
 
 // TODO: This might be currently oddly broken and resulting in overflowy surfaces
 // TODO: better documentation
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A NoiseTexture object.
 pub struct NoiseTexture {

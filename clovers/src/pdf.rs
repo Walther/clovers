@@ -9,7 +9,10 @@ use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Box, Fl
 #[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
 
-#[derive(Debug)]
+#[cfg(target_arch = "spirv")]
+use spirv_std::num_traits::Float as FloatTrait;
+
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub enum PDF<'a> {
     CosinePDF(CosinePDF),
     HitablePDF(HitablePDF<'a>),
@@ -36,7 +39,7 @@ impl<'a> PDF<'a> {
     }
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub struct CosinePDF {
     uvw: ONB,
 }
@@ -62,7 +65,7 @@ impl CosinePDF {
     }
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub struct HitablePDF<'a> {
     origin: Vec3,
     hitable: &'a Hitable,
@@ -82,7 +85,7 @@ impl<'a> HitablePDF<'a> {
     }
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub struct MixturePDF<'a> {
     // Box to prevent infinite size
     pdf1: Box<PDF<'a>>,
@@ -111,7 +114,7 @@ impl<'a> MixturePDF<'a> {
 }
 
 // TODO: this is an ugly hack due to tutorial saying `srec.pdf_ptr = 0;` in 12.2 Handling Specular for Metal
-#[derive(Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub struct ZeroPDF {}
 
 impl ZeroPDF {

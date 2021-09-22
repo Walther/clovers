@@ -10,7 +10,8 @@ use crate::{
     Float, PI,
 };
 
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Clone, Copy, Default)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// Lambertian material. This is the default material with a smooth, matte surface.
 pub struct Lambertian {

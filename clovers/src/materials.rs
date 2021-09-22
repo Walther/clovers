@@ -86,7 +86,8 @@ impl Material {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Copy)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 /// Enum for the types of materials: Diffuse and Specular (i.e., matte and shiny)
 pub enum MaterialType {
     /// A matte material that does not reflect rays
@@ -95,7 +96,7 @@ pub enum MaterialType {
     Specular,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 /// A record of an scattering event of a [Ray] on a [Material].
 pub struct ScatterRecord<'a> {
     /// The material type that was scattered on

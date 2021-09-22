@@ -21,7 +21,7 @@ use rand::Rng;
 use tracing::info;
 
 /// Represents a ray-object intersection, with plenty of data about the intersection.
-#[derive(Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub struct HitRecord<'a> {
     /// Distance from the ray origin to the hitpoint
     pub distance: Float,
@@ -54,7 +54,8 @@ impl<'a> HitRecord<'a> {
 /// An abstraction for things that can be hit by [Rays](crate::ray::Ray).
 ///
 /// TODO: ideally, for cleaner abstraction, this could be a Trait. However, the performance implications might need deeper investigation and consideration...
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub enum Hitable {
     Boxy(Boxy),
     BVHNode(BVHNode),
@@ -147,7 +148,8 @@ impl Hitable {
 }
 
 /// Helper struct for storing multiple `Hitable` objects. This list has a `Hitable` implementation too, returning the closest possible hit
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub struct HitableList(pub Vec<Hitable>);
 
 impl From<Vec<Hitable>> for HitableList {

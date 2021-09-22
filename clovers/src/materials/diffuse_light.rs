@@ -11,7 +11,8 @@ use crate::{
 };
 
 /// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct DiffuseLight {
     emit: Texture,

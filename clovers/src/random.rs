@@ -1,6 +1,8 @@
 //! Various internal helper functions for getting specific kinds of random values.
 
+#[cfg(feature = "rand-crate")]
 use crate::CloversRng;
+
 use crate::{Float, Vec3, PI};
 // TODO: fix trait import
 #[cfg(feature = "rand-crate")]
@@ -82,4 +84,60 @@ pub fn random_to_sphere(radius: Float, distance_squared: Float, rng: &mut Clover
     let y = phi.sin() * (1.0 - z * z).sqrt();
 
     Vec3::new(x, y, z)
+}
+
+// For GPU random below
+#[cfg(not(feature = "rand-crate"))]
+use core::intrinsics::transmute;
+
+/// Alternative random implementation, used on GPU only
+#[cfg(not(feature = "rand-crate"))]
+pub struct CloversRng {
+    state: u32,
+    a: u32,
+    c: u32,
+}
+#[cfg(not(feature = "rand-crate"))]
+impl CloversRng {
+    /// Generate a random value
+    pub fn gen<T>(&mut self) -> Float {
+        // TODO: does this make any sense
+        self.state = self.a * self.state + self.c;
+        let f: Float;
+        #[allow(unsafe_code)]
+        unsafe {
+            f = transmute::<u32, Float>(self.state);
+        }
+
+        // Return the fractional part of the float in order to keep the return value between 0..1
+        f.fract()
+    }
+
+    /// Initialize the random number generator. This implementation is NOT actually based on entropy, but is named such due to api compatibility with rand::rngs::SmallRng
+    pub fn from_entropy() -> Self {
+        // https://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use
+        // "Numerical Recipes"
+        let a = 1664525;
+        let c = 1013904223;
+        let state = a + c;
+        CloversRng { state, a, c }
+    }
+
+    /// Initialize the random number generator.
+    pub fn from_seed(seed: u32) -> Self {
+        // https://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use
+        // "Numerical Recipes"
+        let a = 1664525;
+        let c = 1013904223;
+        let state = seed + a + c;
+        CloversRng { state, a, c }
+    }
+
+    /// Generate a random value in the given range
+    pub fn gen_range<T>(&mut self, _range: core::ops::Range<T>) -> T
+    where
+        T: Into<Float>,
+    {
+        todo!()
+    }
 }

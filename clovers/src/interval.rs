@@ -5,7 +5,8 @@ use core::ops::Add;
 use crate::Float;
 
 /// An interval structure.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct Interval {
     /// Smallest value of the interval. Must be kept in order  

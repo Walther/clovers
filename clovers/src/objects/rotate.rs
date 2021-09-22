@@ -8,9 +8,12 @@ use crate::{
     Box, Float, Vec3,
 };
 
+#[cfg(target_arch = "spirv")]
+use spirv_std::num_traits::Float as FloatTrait;
+
 use super::Object;
 
-#[derive(Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// RotateInit structure describes the necessary data for constructing a [RotateY]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct RotateInit {
@@ -20,7 +23,8 @@ pub struct RotateInit {
     pub angle: Float,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 /// RotateY object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
 pub struct RotateY {
     object: Box<Hitable>,

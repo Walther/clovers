@@ -49,6 +49,7 @@ pub enum TextureKind {
 
 #[cfg(target_arch = "spirv")]
 /// A texture struct, GPU version
+#[derive(Copy, Clone)]
 pub struct Texture {
     kind: TextureKind,
     color: Color,

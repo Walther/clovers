@@ -13,8 +13,11 @@ use crate::{
 #[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
 
+#[cfg(target_arch = "spirv")]
+use spirv_std::num_traits::Float as FloatTrait;
+
 /// Initialization structure for a triangle primitive
-#[derive(Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct TriangleInit {
     /// Corner point
@@ -29,7 +32,8 @@ pub struct TriangleInit {
 }
 
 /// Triangle shape. Heavily based on [Quad](crate::objects::Quad) and may contain inaccuracies
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct Triangle {
     /// Corner point
@@ -56,14 +60,29 @@ pub struct Triangle {
 impl Triangle {
     /// Creates a new triangle from a coordinate point and two side vectors relative to the point
     pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Triangle {
+        // TODO: better ergonomics
+        #[cfg(not(target_arch = "spirv"))]
         let n: Vec3 = u.cross(&v);
+        #[cfg(target_arch = "spirv")]
+        let n: Vec3 = u.cross(v);
+
         let normal: Vec3 = n.normalize();
         // TODO: what is this?
+        #[cfg(not(target_arch = "spirv"))]
         let d = -(normal.dot(&q));
+        #[cfg(target_arch = "spirv")]
+        let d = -(normal.dot(q));
         // TODO: what is this?
+        #[cfg(not(target_arch = "spirv"))]
         let w: Vec3 = n / n.dot(&n);
+        #[cfg(target_arch = "spirv")]
+        let w: Vec3 = n / n.dot(n);
         // Compared to quad, triangle has half the area
+        #[cfg(not(target_arch = "spirv"))]
         let area = n.magnitude() / 2.0;
+        #[cfg(target_arch = "spirv")]
+        let area = n.length() / 2.0;
+
         // Compute the AABB using the absolute coordinates of all corners
         // TODO: refactor to prettier code
         let corner1 = q;
@@ -114,7 +133,11 @@ impl Triangle {
         distance_max: Float,
         _rng: &mut CloversRng,
     ) -> Option<HitRecord> {
+        // TODO: better ergonomics
+        #[cfg(not(target_arch = "spirv"))]
         let denom = self.normal.dot(&ray.direction);
+        #[cfg(target_arch = "spirv")]
+        let denom = self.normal.dot(ray.direction);
 
         // No hit if the ray is parallel to the plane.
         if denom.abs() < EPSILON_RECT_THICKNESS {
@@ -122,7 +145,11 @@ impl Triangle {
         }
 
         // Return false if the hit point parameter t is outside the ray interval
+        // TODO: better ergonomics
+        #[cfg(not(target_arch = "spirv"))]
         let t = (-self.d - self.normal.dot(&ray.origin)) / denom;
+        #[cfg(target_arch = "spirv")]
+        let t = (-self.d - self.normal.dot(ray.origin)) / denom;
         if t < distance_min || t > distance_max {
             return None;
         }
@@ -130,8 +157,15 @@ impl Triangle {
         // Determine the hit point lies within the planar shape using its plane coordinates.
         let intersection: Vec3 = ray.evaluate(t);
         let planar_hitpt_vector: Vec3 = intersection - self.q;
+        // TODO: better ergonomics
+        #[cfg(not(target_arch = "spirv"))]
         let alpha: Float = self.w.dot(&planar_hitpt_vector.cross(&self.v));
+        #[cfg(not(target_arch = "spirv"))]
         let beta: Float = self.w.dot(&self.u.cross(&planar_hitpt_vector));
+        #[cfg(target_arch = "spirv")]
+        let alpha: Float = self.w.dot(planar_hitpt_vector.cross(self.v));
+        #[cfg(target_arch = "spirv")]
+        let beta: Float = self.w.dot(self.u.cross(planar_hitpt_vector));
 
         // Do we hit a coordinate within the surface of the plane?
         if !hit_ab(alpha, beta) {
@@ -176,9 +210,17 @@ impl Triangle {
             rng,
         ) {
             Some(hit_record) => {
+                // TODO: better ergonomics
+                #[cfg(not(target_arch = "spirv"))]
                 let distance_squared =
                     hit_record.distance * hit_record.distance * vector.norm_squared();
+                #[cfg(not(target_arch = "spirv"))]
                 let cosine = vector.dot(&hit_record.normal).abs() / vector.magnitude();
+                #[cfg(target_arch = "spirv")]
+                let distance_squared =
+                    hit_record.distance * hit_record.distance * vector.length_squared();
+                #[cfg(target_arch = "spirv")]
+                let cosine = vector.dot(hit_record.normal).abs() / vector.length();
 
                 distance_squared / (cosine * self.area)
             }

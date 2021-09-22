@@ -16,7 +16,7 @@ use rand::Rng;
 
 use super::Object;
 
-#[derive(Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// ConstantMediumInit structure describes the necessary data for constructing a [ConstantMedium]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct ConstantMediumInit {
@@ -38,7 +38,8 @@ fn default_density() -> Float {
     // 1e9
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 /// ConstantMedium object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 pub struct ConstantMedium {
     boundary: Box<Hitable>,

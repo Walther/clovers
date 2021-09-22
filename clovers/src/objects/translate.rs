@@ -10,7 +10,7 @@ use crate::{
 
 use super::Object;
 
-#[derive(Debug)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// TranslateInit structure describes the necessary data for constructing a [Translate] object. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct TranslateInit {
@@ -20,7 +20,8 @@ pub struct TranslateInit {
     pub offset: Vec3,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 /// Translate object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `offset` given.
 pub struct Translate {
     object: Box<Hitable>,

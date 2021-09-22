@@ -11,7 +11,8 @@ use crate::{
     Float, Vec3,
 };
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Clone, Copy, Default)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A metal material. The amount of reflection can be adjusted with the `fuzz` parameter.
 pub struct Metal {

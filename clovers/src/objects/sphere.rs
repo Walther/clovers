@@ -6,7 +6,11 @@ use crate::{
     ray::Ray, Float, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 
-#[derive(Clone, Copy, Debug)]
+#[cfg(target_arch = "spirv")]
+use spirv_std::num_traits::Float as FloatTrait;
+
+#[derive(Clone, Copy)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// SphereInit structure describes the necessary data for constructing a [Sphere]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
 pub struct SphereInit {
@@ -19,7 +23,8 @@ pub struct SphereInit {
     pub material: Material,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Clone, Copy)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A sphere object.
 pub struct Sphere {
