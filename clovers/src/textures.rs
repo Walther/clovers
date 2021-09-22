@@ -16,8 +16,9 @@ use crate::{color::Color, Float, Vec3};
 use noise_texture::NoiseTexture;
 
 use crate::PI;
+
 #[cfg(target_arch = "spirv")]
-use spirv_std::num_traits::Float as FloatTrait;
+use crate::FloatTrait;
 
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 #[cfg(not(target_arch = "spirv"))]

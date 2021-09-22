@@ -9,8 +9,9 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 #[cfg(feature = "rand-crate")]
 #[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
+
 #[cfg(target_arch = "spirv")]
-use spirv_std::num_traits::Float as FloatTrait;
+use crate::FloatTrait;
 
 /// RGB color based on three [Floats](crate::Float) values.
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]

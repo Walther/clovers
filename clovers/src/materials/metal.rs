@@ -1,19 +1,23 @@
 //! A metal material.
 
+#[cfg(not(target_arch = "spirv"))]
 use super::{reflect, MaterialType, ScatterRecord};
-use crate::CloversRng;
+
+#[cfg(not(target_arch = "spirv"))]
 use crate::{
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     random::random_in_unit_sphere,
-    ray::Ray,
     textures::Texture,
-    Float, Vec3,
+    CloversRng,
 };
+
+use crate::{ray::Ray, textures::GPUTexture, Float, Vec3};
 
 #[derive(Clone, Copy, Default)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[cfg(not(target_arch = "spirv"))]
 /// A metal material. The amount of reflection can be adjusted with the `fuzz` parameter.
 pub struct Metal {
     #[cfg_attr(feature = "serde-derive", serde(default))]
@@ -22,6 +26,7 @@ pub struct Metal {
     fuzz: Float,
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl<'a> Metal {
     /// Scatter function for the [Metal] material. Metal always reflects, and a specular ray is calculated with some randomness adjusted by the `fuzz` factor. This means the metal can be made more shiny or more matte. The returned [ScatterRecord] will have a probability density function of [ZeroPDF] and material type of [MaterialType::Specular]
     pub fn scatter(
@@ -60,6 +65,22 @@ impl<'a> Metal {
         Metal {
             albedo,
             fuzz: fuzz.min(1.0),
+        }
+    }
+}
+
+/// GPU accelerated Metal material
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct GPUMetal {
+    albedo: GPUTexture,
+}
+
+#[cfg(not(target_arch = "spirv"))]
+impl From<Metal> for GPUMetal {
+    fn from(d: Metal) -> Self {
+        GPUMetal {
+            albedo: d.albedo.into(),
         }
     }
 }

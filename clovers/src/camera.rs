@@ -10,7 +10,7 @@ use crate::{random::random_in_unit_disk, ray::Ray, Float, Vec3, PI};
 use rand::Rng;
 
 #[cfg(target_arch = "spirv")]
-use spirv_std::num_traits::Float as FloatTrait;
+use crate::FloatTrait;
 
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]

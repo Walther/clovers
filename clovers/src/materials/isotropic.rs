@@ -1,18 +1,21 @@
 //! Isotropic material.
 
+#[cfg(not(target_arch = "spirv"))]
 use super::{MaterialType, ScatterRecord};
-use crate::CloversRng;
+
+#[cfg(not(target_arch = "spirv"))]
 use crate::{
-    color::Color,
     hitable::HitRecord,
     pdf::{CosinePDF, PDF},
-    ray::Ray,
     textures::Texture,
-    Float, PI,
+    CloversRng,
 };
+
+use crate::{color::Color, ray::Ray, textures::GPUTexture, Float, PI};
 
 #[derive(Clone, Copy, Default)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[cfg(not(target_arch = "spirv"))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// Isotropic material. Used in [ConstantMedium](crate::objects::constant_medium). TODO: understand this!
 pub struct Isotropic {
@@ -20,6 +23,7 @@ pub struct Isotropic {
     albedo: Texture,
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl<'a> Isotropic {
     /// Creates a new [Isotropic] material with an albedo of the given [Texture].
     pub fn new(emission: Texture) -> Self {
@@ -62,6 +66,22 @@ impl<'a> Isotropic {
             0.0
         } else {
             cosine / PI
+        }
+    }
+}
+
+/// GPU accelerated Isotropic material
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct GPUIsotropic {
+    albedo: GPUTexture,
+}
+
+#[cfg(not(target_arch = "spirv"))]
+impl From<Isotropic> for GPUIsotropic {
+    fn from(d: Isotropic) -> Self {
+        GPUIsotropic {
+            albedo: d.albedo.into(),
         }
     }
 }

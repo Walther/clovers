@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[cfg(target_arch = "spirv")]
-use spirv_std::num_traits::Float as FloatTrait;
+use crate::FloatTrait;
 
 use super::Object;
 

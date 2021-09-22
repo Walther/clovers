@@ -13,7 +13,7 @@ use crate::{
 use rand::Rng;
 
 #[cfg(target_arch = "spirv")]
-use spirv_std::num_traits::Float as FloatTrait;
+use crate::FloatTrait;
 
 /// Initialization structure for a Quad object.
 #[derive(Clone, Copy)]

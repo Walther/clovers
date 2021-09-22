@@ -1,14 +1,16 @@
 //! A dielectric material. This resembles glass and other transparent and reflective materials.
 
+#[cfg(not(target_arch = "spirv"))]
 use super::{reflect, refract, schlick, MaterialType, ScatterRecord};
-use crate::CloversRng;
+#[cfg(not(target_arch = "spirv"))]
 use crate::{
-    color::Color,
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     ray::Ray,
-    Float, Vec3,
+    CloversRng, Vec3,
 };
+
+use crate::{color::Color, Float};
 // TODO: fix trait import
 #[cfg(feature = "rand-crate")]
 #[cfg(not(target_arch = "spirv"))]
@@ -16,6 +18,7 @@ use rand::Rng;
 
 #[derive(Clone, Copy)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[cfg(not(target_arch = "spirv"))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A dielectric material. This resembles glass and other transparent and reflective materials.
 pub struct Dielectric {
@@ -35,6 +38,7 @@ fn default_color() -> Color {
     Color::new(1.0, 1.0, 1.0)
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl<'a> Dielectric {
     /// Scatter method for the Dielectric material. Given a `ray` and a `hit_record`, evaluate a [ScatterRecord] based on possible reflection or refraction.
     pub fn scatter(
@@ -95,8 +99,27 @@ impl<'a> Dielectric {
     }
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl Default for Dielectric {
     fn default() -> Self {
         Dielectric::new(default_index(), default_color())
+    }
+}
+
+/// GPU accelerated Dielectric material
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct GPUDielectric {
+    refractive_index: Float,
+    color: Color,
+}
+
+#[cfg(not(target_arch = "spirv"))]
+impl From<Dielectric> for GPUDielectric {
+    fn from(d: Dielectric) -> Self {
+        GPUDielectric {
+            refractive_index: d.refractive_index,
+            color: d.color,
+        }
     }
 }

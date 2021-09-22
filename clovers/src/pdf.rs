@@ -10,7 +10,7 @@ use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Box, Fl
 use rand::Rng;
 
 #[cfg(target_arch = "spirv")]
-use spirv_std::num_traits::Float as FloatTrait;
+use crate::FloatTrait;
 
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub enum PDF<'a> {

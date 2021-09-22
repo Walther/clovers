@@ -1,23 +1,27 @@
 //! A diffuse light material.
 
+#[cfg(not(target_arch = "spirv"))]
 use super::ScatterRecord;
-use crate::CloversRng;
+
+#[cfg(not(target_arch = "spirv"))]
 use crate::{
-    color::Color,
     hitable::HitRecord,
-    ray::Ray,
     textures::{SolidColor, Texture},
-    Float, Vec3,
+    CloversRng,
 };
+
+use crate::{color::Color, ray::Ray, textures::GPUTexture, Float, Vec3};
 
 /// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
 #[derive(Clone, Copy)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[cfg(not(target_arch = "spirv"))]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct DiffuseLight {
     emit: Texture,
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl Default for DiffuseLight {
     /// Creates a new [DiffuseLight] with white light at intensity `100.0`
     fn default() -> Self {
@@ -27,6 +31,7 @@ impl Default for DiffuseLight {
     }
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl<'a> DiffuseLight {
     /// Scatter method for the [DiffuseLight] material. Always returns `None`, as diffuse light does not scatter.
     pub fn scatter(
@@ -68,5 +73,21 @@ impl<'a> DiffuseLight {
     /// Creates a new [DiffuseLight] material with the given [Texture].
     pub fn new(emission: Texture) -> Self {
         DiffuseLight { emit: emission }
+    }
+}
+
+/// GPU accelerated diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct GPUDiffuseLight {
+    emit: GPUTexture,
+}
+
+#[cfg(not(target_arch = "spirv"))]
+impl From<DiffuseLight> for GPUDiffuseLight {
+    fn from(d: DiffuseLight) -> Self {
+        GPUDiffuseLight {
+            emit: d.emit.into(),
+        }
     }
 }

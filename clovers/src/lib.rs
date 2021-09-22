@@ -76,14 +76,18 @@ pub use alloc::vec::Vec;
 // Externals
 #[cfg(feature = "nalg")]
 use nalgebra::base::Vector3;
+
 #[cfg(target_arch = "spirv")]
 pub use spirv_std::glam::Vec3;
+#[cfg(target_arch = "spirv")]
+pub use spirv_std::num_traits::Float as FloatTrait;
 
 // Internals: GPU compatible
 pub mod aabb;
 pub mod camera;
 pub mod color;
 pub mod interval;
+pub mod materials; // TODO: partial support
 pub mod onb;
 pub mod random;
 pub mod ray;
@@ -96,8 +100,6 @@ pub mod bvhnode;
 pub mod colorize;
 #[cfg(not(target_arch = "spirv"))]
 pub mod hitable;
-#[cfg(not(target_arch = "spirv"))]
-pub mod materials;
 #[cfg(not(target_arch = "spirv"))]
 pub mod normals;
 #[cfg(not(target_arch = "spirv"))]

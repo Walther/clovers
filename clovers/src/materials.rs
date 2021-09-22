@@ -1,13 +1,18 @@
 //! Materials enable different behaviors of light on objects.
 
-use crate::{color::Color, hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
+#[cfg(not(target_arch = "spirv"))]
+use crate::{hitable::HitRecord, pdf::PDF, CloversRng};
+
+#[cfg(target_arch = "spirv")]
+use crate::FloatTrait;
+
+use crate::{color::Color, ray::Ray, Float, Vec3};
 pub mod dielectric;
 pub mod diffuse_light;
 pub mod isotropic;
 pub mod lambertian;
 pub mod metal;
 
-use crate::CloversRng;
 pub use dielectric::*;
 pub use diffuse_light::*;
 pub use isotropic::*;
@@ -16,6 +21,7 @@ pub use metal::*;
 
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[cfg(not(target_arch = "spirv"))]
 /// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 pub enum Material {
     /// Dielectric material
@@ -30,12 +36,14 @@ pub enum Material {
     Isotropic(Isotropic),
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl Default for Material {
     fn default() -> Self {
         Self::Lambertian(Lambertian::default())
     }
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl Material {
     /// Scatters a ray from the material
     pub fn scatter(
@@ -88,6 +96,7 @@ impl Material {
 
 #[derive(Clone, Copy)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[cfg(not(target_arch = "spirv"))]
 /// Enum for the types of materials: Diffuse and Specular (i.e., matte and shiny)
 pub enum MaterialType {
     /// A matte material that does not reflect rays
@@ -97,6 +106,7 @@ pub enum MaterialType {
 }
 
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[cfg(not(target_arch = "spirv"))]
 /// A record of an scattering event of a [Ray] on a [Material].
 pub struct ScatterRecord<'a> {
     /// The material type that was scattered on
@@ -111,13 +121,28 @@ pub struct ScatterRecord<'a> {
 }
 
 fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
-    vector - 2.0 * vector.dot(&normal) * normal
+    // TODO: better ergonomics
+    #[cfg(not(target_arch = "spirv"))]
+    let result = vector - 2.0 * vector.dot(&normal) * normal;
+    #[cfg(target_arch = "spirv")]
+    let result = vector - 2.0 * vector.dot(normal) * normal;
+
+    result
 }
 
 fn refract(uv: Vec3, normal: Vec3, etai_over_etat: Float) -> Vec3 {
+    // TODO: better ergonomics
+    #[cfg(not(target_arch = "spirv"))]
     let cos_theta: Float = -uv.dot(&normal);
+    #[cfg(target_arch = "spirv")]
+    let cos_theta: Float = -uv.dot(normal);
+
     let r_out_parallel: Vec3 = etai_over_etat * (uv + cos_theta * normal);
+    #[cfg(not(target_arch = "spirv"))]
     let r_out_perp: Vec3 = -(1.0 - r_out_parallel.norm_squared()).sqrt() * normal;
+    #[cfg(target_arch = "spirv")]
+    let r_out_perp: Vec3 = -(1.0 - r_out_parallel.length_squared()).sqrt() * normal;
+
     r_out_parallel + r_out_perp
 }
 

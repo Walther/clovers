@@ -8,8 +8,9 @@ use crate::{Float, Vec3, PI};
 #[cfg(feature = "rand-crate")]
 #[cfg(not(target_arch = "spirv"))]
 use rand::Rng;
+
 #[cfg(target_arch = "spirv")]
-use spirv_std::num_traits::Float as FloatTrait;
+use crate::FloatTrait;
 
 /// Internal helper. Originally used for lambertian reflection with flaws
 pub fn random_in_unit_sphere(rng: &mut CloversRng) -> Vec3 {
