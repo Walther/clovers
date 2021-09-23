@@ -95,9 +95,10 @@ pub fn main_fs(
         material,
         front_face: 1,
     };
-    // These do not work yet. error: Pointer operand 397[%397] must be a memory object declaration
-    // let scatter_record: GPUScatterRecord = material.scatter(&ray, &hit_record, &mut rng);
-    // let color = scatter_record.attenuation;
+
+    // TODO: currently requires a forked `rust-gpu` with more aggressive inlining
+    let scatter_record: GPUScatterRecord = material.scatter(&ray, &hit_record, &mut rng);
+    let color = scatter_record.attenuation;
 
     *output = vec4(color.r, color.g, color.b, 1.0);
 }

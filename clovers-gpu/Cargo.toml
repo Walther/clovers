@@ -9,4 +9,4 @@ crate-type = ["dylib"]
 
 [dependencies]
 clovers = { path = "../clovers", features = ["gpu"], default-features = false }
-spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "35172f7edb708868ac69c99b119df0d83956e004", features = ["glam"] }
+spirv-std = { git = "https://github.com/Walther/rust-gpu", branch = "aggressive-inlining", features = ["glam"] }

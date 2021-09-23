@@ -21,7 +21,7 @@ chrono = "0.4.19"
 humantime = "2.1.0"
 indicatif = { version = "0.16.2", features = ["rayon"] }
 clap = "3.0.0-beta.4"
-spirv-builder = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "35172f7edb708868ac69c99b119df0d83956e004" }
+spirv-builder = { git = "https://github.com/Walther/rust-gpu", branch = "aggressive-inlining" }
 bytemuck = { version = "1.7.2", features = ["derive"] }
 futures = "0.3.17"
 tracing = "0.1.26"
