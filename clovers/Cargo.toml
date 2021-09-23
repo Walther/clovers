@@ -24,6 +24,6 @@ rand = { version = "0.8.4", features = ["small_rng"], default-features = false, 
 serde = { version = "1.0.130", features = ["derive"], default-features = false, optional = true }
 stl_io = { version = "0.6.0", optional = true }
 tracing = { version = "0.1.26", optional = true }
-spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "eeb67ae7489e5df03231f73d108a8f2feae2ca1a", features = ["glam"], optional = true }
+spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "35172f7edb708868ac69c99b119df0d83956e004", features = ["glam"], optional = true }
 
 [dev-dependencies]
