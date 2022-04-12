@@ -5,7 +5,7 @@ edition = "2018"
 publish = false
 
 [[bin]]
-name = "clovers"
+name = "clovers-cli"
 path = "src/main.rs"
 
 [dependencies]

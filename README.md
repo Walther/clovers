@@ -11,7 +11,9 @@ Currently, this project is highly experimental. Things change all the time.
 - `clovers-app/` contains the GUI application
 - `clovers-gpu/` contains the shaders for GPU accelerated rendering
 
-Run `cargo doc --open` to build and open the documentation.
+This project has a [Justfile](https://github.com/casey/just). If you have `just` installed, you can run `just` to list the available commands in this project, and run various forms of `just command --option args` to execute them.
+
+If you do not have `just` installed, open the [Justfile](./Justfile) in your favorite text editor to see the various available commands that you can then copy to your shell manually.
 
 ## License
 

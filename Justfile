@@ -2,13 +2,21 @@
 default:
   @just --list --unsorted
 
-# Run a basic scene with default settings with the CLI
-scene:
-  cargo run --bin clovers --release -- --input scenes/scene.json
-
 # Run the CLI application with the given parameters
 cli *ARGS:
-  cargo run --bin clovers --release -- {{ARGS}}
+  cargo run --bin clovers-cli --release -- {{ARGS}}
+
+# Run the GUI application
+gui:
+  cargo run --bin clovers-app --release
+
+# Build and open the documentation
+docs:
+  cargo doc --no-deps --open
+
+# Render a basic test scene with default settings with the CLI
+scene:
+  cargo run --bin clovers-cli --release -- --input scenes/scene.json
 
 # Render all the test scenes available in the repository
 all-scenes:

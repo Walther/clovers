@@ -1,3 +1,7 @@
+//! Graphical User Interface for the raytracing renderer.
+//!
+//! CPU-based rendering is fully functional. GPU-based rendering is at early experimentation stage only.
+
 #![forbid(unsafe_code)]
 #![cfg_attr(not(debug_assertions), deny(warnings))] // Forbid warnings in release builds
 #![warn(clippy::all, rust_2018_idioms)]

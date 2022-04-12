@@ -1,3 +1,7 @@
+//! Command Line Interface for the raytracing renderer.
+//!
+//! CPU-based rendering is fully functional. GPU-based rendering is at early experimentation stage only.
+
 #![deny(clippy::all)]
 
 // External imports
