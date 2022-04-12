@@ -6,7 +6,7 @@
 
 // External imports
 use chrono::Utc;
-use clap::Clap;
+use clap::Parser;
 use humantime::format_duration;
 use image::{ImageBuffer, Rgb, RgbImage};
 use std::fs::File;
@@ -21,7 +21,7 @@ mod draw_gpu;
 use scenes::*;
 
 // Configure CLI parameters
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(version = "0.1.0", author = "Walther", name = "clovers")]
 struct Opts {
     /// Input filename / location
