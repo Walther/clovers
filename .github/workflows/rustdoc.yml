@@ -24,6 +24,8 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
+          toolchain: nightly-2021-08-27 # rust-toolchain.toml not supported yet https://github.com/actions-rs/toolchain/pull/166
+          profile: minimal
           components: rustfmt, rust-src
 
       - name: Build Documentation
