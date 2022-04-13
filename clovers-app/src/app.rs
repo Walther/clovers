@@ -106,7 +106,7 @@ impl epi::App for CloversApp {
             ui.heading("File to render");
             ui.add(egui::TextEdit::singleline(input));
 
-            ui.heading("Experimental options");
+            ui.heading("Placeholder options - currently implemented in CLI only");
             ui.add(egui::Checkbox::new(gpu, "use gpu rendering"));
             ui.add(egui::Checkbox::new(normalmap, "only render a normal map"));
 
