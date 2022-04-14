@@ -14,6 +14,7 @@ use crate::{
 };
 use rand::rngs::SmallRng;
 use rand::Rng;
+
 #[cfg(feature = "traces")]
 use tracing::info;
 
@@ -227,6 +228,7 @@ impl HitableList {
     }
 
     pub fn into_bvh(self, time_0: Float, time_1: Float, rng: &mut SmallRng) -> BVHNode {
+        #[cfg(feature = "traces")]
         info!("Building the BVHNode tree");
         BVHNode::from_list(self.0, time_0, time_1, rng)
     }

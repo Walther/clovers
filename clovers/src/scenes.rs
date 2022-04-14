@@ -10,6 +10,8 @@ use crate::{
 };
 use rand::rngs::SmallRng;
 use rand::SeedableRng;
+
+#[cfg(feature = "traces")]
 use tracing::info;
 
 #[derive(Debug)]
@@ -77,6 +79,7 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
         time_1,
     );
 
+    #[cfg(feature = "traces")]
     info!("Creating a flattened list from the objects");
     let hitables = objects_to_flat_hitablelist(scene_file.objects);
 
