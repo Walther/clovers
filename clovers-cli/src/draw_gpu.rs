@@ -35,7 +35,7 @@ fn create_pipeline(
             strip_index_format: None,
             front_face: wgpu::FrontFace::Ccw,
             cull_mode: None,
-            clamp_depth: false,
+            unclipped_depth: false,
             polygon_mode: wgpu::PolygonMode::Fill,
             conservative: false,
         },
@@ -54,6 +54,7 @@ fn create_pipeline(
                 write_mask: wgpu::ColorWrites::ALL,
             }],
         }),
+        multiview: None,
     })
 }
 
@@ -77,6 +78,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
             power_preference: wgpu::PowerPreference::default(),
             // Do not request a drawing surface; headless mode
             compatible_surface: None,
+            force_fallback_adapter: false,
         })
         .await
         .expect("Failed to find an appropriate adapter");
