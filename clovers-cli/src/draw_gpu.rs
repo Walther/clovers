@@ -139,7 +139,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
         size: texture_size,
         mip_level_count: 1,
         sample_count: 1,
-        dimension: wgpu::TextureDimension::D3,
+        dimension: wgpu::TextureDimension::D2,
         format: wgpu::TextureFormat::Rgba32Float,
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
     };
@@ -149,7 +149,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     let texture_view_desc = TextureViewDescriptor {
         label: None,
         format: Some(wgpu::TextureFormat::Rgba32Float),
-        dimension: Some(wgpu::TextureViewDimension::D3),
+        dimension: Some(wgpu::TextureViewDimension::D2),
         aspect: TextureAspect::All,
         base_mip_level: Default::default(),
         mip_level_count: Default::default(),
