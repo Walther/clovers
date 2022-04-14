@@ -35,7 +35,7 @@ fn create_pipeline(
             strip_index_format: None,
             front_face: wgpu::FrontFace::Ccw,
             cull_mode: None,
-            clamp_depth: false,
+            unclipped_depth: false,
             polygon_mode: wgpu::PolygonMode::Fill,
             conservative: false,
         },
@@ -54,6 +54,7 @@ fn create_pipeline(
                 write_mask: wgpu::ColorWrites::ALL,
             }],
         }),
+        multiview: None,
     })
 }
 
@@ -77,6 +78,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
             power_preference: wgpu::PowerPreference::default(),
             // Do not request a drawing surface; headless mode
             compatible_surface: None,
+            force_fallback_adapter: false,
         })
         .await
         .expect("Failed to find an appropriate adapter");
@@ -137,7 +139,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
         size: texture_size,
         mip_level_count: 1,
         sample_count: 1,
-        dimension: wgpu::TextureDimension::D3,
+        dimension: wgpu::TextureDimension::D2,
         format: wgpu::TextureFormat::Rgba32Float,
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
     };
@@ -147,7 +149,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     let texture_view_desc = TextureViewDescriptor {
         label: None,
         format: Some(wgpu::TextureFormat::Rgba32Float),
-        dimension: Some(wgpu::TextureViewDimension::D3),
+        dimension: Some(wgpu::TextureViewDimension::D2),
         aspect: TextureAspect::All,
         base_mip_level: Default::default(),
         mip_level_count: Default::default(),

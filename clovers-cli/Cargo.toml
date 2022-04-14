@@ -1,7 +1,7 @@
 [package]
 name = "clovers-cli"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 publish = false
 
 [[bin]]
@@ -21,10 +21,9 @@ chrono = "0.4.19"
 humantime = "2.1.0"
 indicatif = { version = "0.16.2", features = ["rayon"] }
 clap = { version = "3.1.8", features = ["derive"] }
-spirv-builder = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "eeb67ae7489e5df03231f73d108a8f2feae2ca1a" }
+spirv-builder = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "116bf9c4d413df7413ae931ee31b2777c7abf64e" }
 bytemuck = { version = "1.7.2", features = ["derive"] }
 futures = "0.3.17"
 tracing = "0.1.26"
 tracing-subscriber = "0.2.20"
-# TODO: use a normal version after release of 0.11.0 or so, when web-sys dependency issue has been fixed and released
-wgpu = { git = "https://github.com/gfx-rs/wgpu", features = ["spirv"], rev = "d50e74747d515f7e377f249a2918d3e62a33a57a" }
+wgpu = { version = "0.12.0", features = ["spirv"] }
