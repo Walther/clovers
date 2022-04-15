@@ -104,24 +104,12 @@ impl epi::App for CloversApp {
             ui.heading("Rendering options");
             ui.add(egui::Slider::new(width, 0..=4096).text("width"));
             ui.add(egui::Slider::new(height, 0..=4096).text("height"));
-            ui.add(
-                egui::Slider::new(samples, 0..=10_000)
-                    .text("samples per pixel")
-                    .logarithmic(true),
-            );
+            ui.add(egui::Slider::new(samples, 0..=10_000).text("samples per pixel"));
             ui.add(egui::Slider::new(max_depth, 0..=1000).text("max ray bounce depth"));
             ui.add(egui::Slider::new(gamma, 0.0..=10.0).text("gamma"));
 
             ui.heading("File to render");
-            let i = input.clone(); // TODO: what is going on with these closure ownerships
-            ui.horizontal(|ui| {
-                if ui.button("Open file…").clicked() {
-                    if let Some(path) = rfd::FileDialog::new().pick_file() {
-                        *input = path.display().to_string();
-                    }
-                }
-                ui.monospace(i);
-            });
+            ui.add(egui::TextEdit::singleline(input));
 
             ui.heading("Placeholder options - currently implemented in CLI only");
             ui.add(egui::Checkbox::new(gpu, "use gpu rendering"));
