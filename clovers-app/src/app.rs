@@ -29,10 +29,10 @@ pub struct CloversApp {
     normalmap: bool,
     /// Texture to render the image to
     texture: Option<egui::TextureHandle>,
-    /// Rendering currently in progress?
-    rendering: bool,
     /// Current rendering progress: `(current,total)`
     progress: (u32, u32),
+    /// Thread handler for work outside the GUI thread
+    promise: Option<Promise<Vec<u8>>>,
 }
 
 impl Default for CloversApp {
@@ -47,8 +47,8 @@ impl Default for CloversApp {
             gpu: false, // TODO: gpu rendering by default <3
             normalmap: false,
             texture: None,
-            rendering: false,
             progress: (0, 0),
+            promise: None,
         }
     }
 }
@@ -81,8 +81,8 @@ impl epi::App for CloversApp {
             gpu,
             normalmap,
             texture: _,
-            rendering,
             progress: _,
+            promise: _,
         } = self;
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
@@ -115,8 +115,6 @@ impl epi::App for CloversApp {
                 if ui.button("Render!").clicked() {
                     // TODO: error handling
 
-                    *rendering = true;
-
                     // Read the given scene file
                     info!("Reading the scene file");
                     let mut file = File::open(input.clone()).unwrap();
@@ -141,58 +139,65 @@ impl epi::App for CloversApp {
                     let s = samples.clone();
                     let w = width.clone();
                     let h = height.clone();
+                    // let progress = &self.progress;
 
-                    let promise = Promise::spawn_thread("renderer", move || {
+                    self.promise = Some(Promise::spawn_thread("renderer", move || {
                         info!("Creating the renderer");
                         let mut renderer = draw_gui::Renderer::new(scene, renderopts);
                         let mut pixelbuffer = vec![0; 4 * w as usize * h as usize];
                         info!("Calling draw()");
                         for frame_number in 1..=s {
                             info!("Rendering sample {} of {}", &frame_number, s);
-                            // *progress = (frame_number, *samples);
+                            // *progress = (frame_number, s);
                             renderer.draw(&mut pixelbuffer, frame_number);
                         }
                         pixelbuffer
-                    });
-
-                    if let Some(result) = promise.ready() {
-                        // Use/show result
-                        info!("Creating the texture");
-                        let image = egui::ColorImage::from_rgba_unmultiplied(
-                            [*width as usize, *height as usize],
-                            &result,
-                        );
-                        let _texture_id = self.texture.get_or_insert_with(|| {
-                            // Load the texture only once.
-                            ui.ctx().load_texture("rendered_image", image)
-                        });
-
-                        *rendering = false;
-                    }
+                    }));
                 }
             });
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
+            // TODO: again with the odd borrow issues within closures, idgi?
+            let w = self.width.clone();
+            let h = self.height.clone();
+
             // Are we currently rendering?
-            if self.rendering {
-                ui.heading(format!(
-                    "Rendering progress: {} of {}",
-                    self.progress.0, self.progress.1
-                ));
-            } else {
-                // If we have a render result in the texture, show it
-                if let Some(texture) = &self.texture {
-                    ui.heading("Render result");
-                    ui.image(
-                        texture,
-                        egui::Vec2::new(self.width as f32, self.height as f32),
-                    );
+            if let Some(promise) = &self.promise {
+                if let Some(result) = promise.ready() {
+                    // Use/show result
+                    info!("Creating the texture");
+                    let image =
+                        egui::ColorImage::from_rgba_unmultiplied([w as usize, h as usize], &result);
+                    let _texture_id = self.texture.get_or_insert_with(|| {
+                        // Load the texture only once.
+                        ui.ctx().load_texture("rendered_image", image)
+                    });
+                    ctx.request_repaint();
+                    self.promise = None;
                 } else {
-                    // Fresh window; show a default heading
-                    ui.heading("Select your rendering options & press Render!");
+                    ui.heading(format!(
+                        "Rendering progress: {} of {}",
+                        self.progress.0, self.progress.1
+                    ));
                 }
             }
+
+            // If we have a render result in the texture, show it
+            if let Some(texture) = &self.texture {
+                ui.heading("Render result");
+                ui.image(
+                    texture,
+                    egui::Vec2::new(self.width as f32, self.height as f32),
+                );
+            }
+
+            // If we are in a fresh window, show instructions
+            if self.promise.is_none() && self.texture.is_none() {
+                // Fresh window; show a default heading
+                ui.heading("Select your rendering options & press Render!");
+            }
+
             egui::warn_if_debug_build(ui);
         });
     }
