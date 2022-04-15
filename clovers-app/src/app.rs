@@ -121,6 +121,10 @@ impl epi::App for CloversApp {
 
                     // Clear previous image
                     self.texture = None;
+                    let progress = Arc::clone(&self.progress);
+                    let mut p = progress.lock().unwrap();
+                    *p = 0;
+                    drop(p);
 
                     // Read the given scene file
                     info!("Reading the scene file");
@@ -146,11 +150,6 @@ impl epi::App for CloversApp {
                     let s = samples.clone();
                     let w = width.clone() as usize;
                     let h = height.clone() as usize;
-
-                    let progress = Arc::clone(&self.progress);
-                    let mut p = progress.lock().unwrap();
-                    *p = 0;
-                    drop(p);
 
                     self.promise = Some(Promise::spawn_thread("renderer", move || {
                         info!("Creating the renderer");
