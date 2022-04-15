@@ -104,7 +104,11 @@ impl epi::App for CloversApp {
             ui.heading("Rendering options");
             ui.add(egui::Slider::new(width, 0..=4096).text("width"));
             ui.add(egui::Slider::new(height, 0..=4096).text("height"));
-            ui.add(egui::Slider::new(samples, 0..=10_000).text("samples per pixel"));
+            ui.add(
+                egui::Slider::new(samples, 1..=10_000)
+                    .text("samples per pixel")
+                    .logarithmic(true),
+            );
             ui.add(egui::Slider::new(max_depth, 0..=1000).text("max ray bounce depth"));
             ui.add(egui::Slider::new(gamma, 0.0..=10.0).text("gamma"));
 
