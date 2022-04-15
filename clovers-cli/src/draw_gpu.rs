@@ -104,7 +104,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
         label: None,
         bind_group_layouts: &[],
         push_constant_ranges: &[wgpu::PushConstantRange {
-            stages: wgpu::ShaderStages::all(),
+            stages: wgpu::ShaderStages::VERTEX_FRAGMENT,
             range: 0..std::mem::size_of::<ShaderConstants>() as u32,
         }],
     });
@@ -184,7 +184,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     rpass.set_pipeline(&render_pipeline);
     debug!("Render pipeline set");
     rpass.set_push_constants(
-        wgpu::ShaderStages::all(),
+        wgpu::ShaderStages::VERTEX_FRAGMENT,
         0,
         bytemuck::bytes_of(&push_constants),
     );
