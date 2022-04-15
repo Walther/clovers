@@ -189,6 +189,7 @@ impl epi::App for CloversApp {
                     let p = self.progress.lock().unwrap();
                     ui.heading(format!("Rendering progress: {} of {}", *p, self.samples));
                     drop(p);
+                    ctx.request_repaint();
                 }
             }
 
