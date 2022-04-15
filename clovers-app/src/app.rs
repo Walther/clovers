@@ -116,6 +116,13 @@ impl epi::App for CloversApp {
             ui.add(egui::Checkbox::new(normalmap, "only render a normal map"));
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
+                // Progress bar
+                let p = self.progress.lock().unwrap();
+                let bar = *p as f32 / *samples as f32;
+                drop(p);
+                ui.add(egui::ProgressBar::new(bar));
+
+                // Render button
                 if ui.button("Render!").clicked() {
                     // TODO: error handling
 
