@@ -13,6 +13,7 @@ use std::fs::File;
 use std::io::Read;
 use std::{error::Error, fs, time::Instant};
 use tracing::{debug, info, Level};
+use tracing_subscriber::fmt::time;
 
 // Internal imports
 use clovers::*;
@@ -65,13 +66,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     if opts.debug {
         tracing_subscriber::fmt()
             .with_max_level(Level::DEBUG)
-            .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
+            .with_timer(time::UtcTime::rfc_3339())
             .init();
         debug!("Debug logging enabled");
     } else {
         tracing_subscriber::fmt()
             .with_max_level(Level::ERROR)
-            .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
+            .with_timer(time::UtcTime::rfc_3339())
             .init();
     }
 
