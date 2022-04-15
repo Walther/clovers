@@ -22,5 +22,6 @@ tracing-subscriber = { version="0.3.11", features = ["time"] }
 # Required for GUI
 eframe = { version = "0.17.0", features = [] }
 poll-promise = "0.1.0"
+rfd = "0.8"
 
 [dev-dependencies]
