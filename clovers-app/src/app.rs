@@ -158,17 +158,15 @@ impl epi::App for CloversApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            // TODO: again with the odd borrow issues within closures, idgi?
-            let w = self.width.clone();
-            let h = self.height.clone();
+            let w = self.width.clone() as usize;
+            let h = self.height.clone() as usize;
 
             // Are we currently rendering?
             if let Some(promise) = &self.promise {
                 if let Some(result) = promise.ready() {
                     // Use/show result
                     info!("Creating the texture");
-                    let image =
-                        egui::ColorImage::from_rgba_unmultiplied([w as usize, h as usize], &result);
+                    let image = egui::ColorImage::from_rgba_unmultiplied([w, h], &result);
                     let _texture_id = self.texture.get_or_insert_with(|| {
                         // Load the texture only once.
                         ui.ctx().load_texture("rendered_image", image)
