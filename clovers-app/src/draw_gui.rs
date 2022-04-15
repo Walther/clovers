@@ -1,7 +1,6 @@
 use clovers::{color::Color, colorize::colorize, scenes::Scene, Float};
 
 use clovers::RenderOpts;
-// use indicatif::{ProgressBar, ProgressStyle};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
@@ -12,7 +11,6 @@ pub struct Renderer {
     height: u32,
     scene: Scene,
     float_buffer: Vec<Float>,
-    // bar: ProgressBar,
     samples: u32,
     max_depth: u32,
     gamma: Float,
@@ -20,12 +18,6 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn new(scene: Scene, opts: RenderOpts) -> Self {
-        // Progress bar
-        // let bar = ProgressBar::new(opts.samples as u64);
-        // bar.set_style(ProgressStyle::default_bar().template(
-        //     "Elapsed: {elapsed_precise}\nSamples:  {bar} {pos}/{len}\nETA:     {eta_precise}",
-        // ));
-
         Renderer {
             width: opts.width,
             height: opts.height,
@@ -97,6 +89,5 @@ impl Renderer {
 
                 pixel.copy_from_slice(&rgba);
             });
-        // self.bar.inc(1);
     }
 }

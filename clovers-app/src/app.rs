@@ -27,7 +27,7 @@ pub struct CloversApp {
     /// Render a normal map only. Experimental feature.
     normalmap: bool,
     /// Texture to render the image to
-    texture: Option<egui::TextureId>,
+    texture: Option<egui::TextureHandle>,
     /// Rendering currently in progress?
     rendering: bool,
     /// Current rendering progress: `(current,total)`
@@ -60,8 +60,8 @@ impl epi::App for CloversApp {
     /// Called once before the first frame.
     fn setup(
         &mut self,
-        _ctx: &egui::CtxRef,
-        _frame: &mut epi::Frame<'_>,
+        _ctx: &egui::Context,
+        _frame: &epi::Frame,
         _storage: Option<&dyn epi::Storage>,
     ) {
         // Not using persistence for now
@@ -69,7 +69,7 @@ impl epi::App for CloversApp {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
-    fn update(&mut self, ctx: &egui::CtxRef, frame: &mut epi::Frame<'_>) {
+    fn update(&mut self, ctx: &egui::Context, frame: &epi::Frame) {
         let Self {
             input,
             width,
@@ -79,7 +79,7 @@ impl epi::App for CloversApp {
             gamma,
             gpu,
             normalmap,
-            texture,
+            texture: _,
             rendering,
             progress,
         } = self;
@@ -87,7 +87,7 @@ impl epi::App for CloversApp {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
             egui::menu::bar(ui, |ui| {
-                egui::menu::menu(ui, "File", |ui| {
+                egui::menu::menu_button(ui, "File", |ui| {
                     if ui.button("Quit").clicked() {
                         frame.quit();
                     }
@@ -146,18 +146,15 @@ impl epi::App for CloversApp {
                         renderer.draw(&mut pixelbuffer, frame_number);
                     }
 
-                    info!("Collecting the pixelbuffer");
-                    let pixels: Vec<_> = pixelbuffer
-                        .chunks_exact(4)
-                        .map(|p| egui::Color32::from_rgba_unmultiplied(p[0], p[1], p[2], p[3]))
-                        .collect();
-
                     info!("Creating the texture");
-                    let texture_id = frame
-                        .tex_allocator()
-                        .alloc_srgba_premultiplied((*width as usize, *height as usize), &pixels);
-                    info!("Setting the texture to the state");
-                    *texture = Some(texture_id);
+                    let image = egui::ColorImage::from_rgba_unmultiplied(
+                        [*width as usize, *height as usize],
+                        &pixelbuffer,
+                    );
+                    let _texture_id = self.texture.get_or_insert_with(|| {
+                        // Load the texture only once.
+                        ui.ctx().load_texture("rendered_image", image)
+                    });
 
                     *rendering = false;
                 }
@@ -173,7 +170,7 @@ impl epi::App for CloversApp {
                 ));
             } else {
                 // If we have a render result in the texture, show it
-                if let Some(texture) = self.texture {
+                if let Some(texture) = &self.texture {
                     ui.heading("Render result");
                     ui.image(
                         texture,

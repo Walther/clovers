@@ -13,7 +13,7 @@ fn main() {
 
     tracing_subscriber::fmt()
         .with_max_level(Level::DEBUG)
-        .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
+        .with_timer(tracing_subscriber::fmt::time::UtcTime::rfc_3339())
         .init();
 
     let app = clovers_app::CloversApp::default();
