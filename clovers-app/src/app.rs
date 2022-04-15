@@ -1,4 +1,8 @@
-use std::{fs::File, io::Read};
+use std::{
+    fs::File,
+    io::Read,
+    sync::{Arc, Mutex},
+};
 
 use clovers::{
     scenes::{self, Scene, SceneFile},
@@ -30,7 +34,7 @@ pub struct CloversApp {
     /// Texture to render the image to
     texture: Option<egui::TextureHandle>,
     /// Current rendering progress: `(current,total)`
-    progress: (u32, u32),
+    progress: Arc<Mutex<u32>>,
     /// Thread handler for work outside the GUI thread
     promise: Option<Promise<Vec<u8>>>,
 }
@@ -47,7 +51,7 @@ impl Default for CloversApp {
             gpu: false, // TODO: gpu rendering by default <3
             normalmap: false,
             texture: None,
-            progress: (0, 0),
+            progress: Arc::new(Mutex::new(0)),
             promise: None,
         }
     }
@@ -115,6 +119,9 @@ impl epi::App for CloversApp {
                 if ui.button("Render!").clicked() {
                     // TODO: error handling
 
+                    // Clear previous image
+                    self.texture = None;
+
                     // Read the given scene file
                     info!("Reading the scene file");
                     let mut file = File::open(input.clone()).unwrap();
@@ -137,19 +144,25 @@ impl epi::App for CloversApp {
 
                     // TODO: why are these manual clones needed? closure ownership is confusing
                     let s = samples.clone();
-                    let w = width.clone();
-                    let h = height.clone();
-                    // let progress = &self.progress;
+                    let w = width.clone() as usize;
+                    let h = height.clone() as usize;
+
+                    let progress = Arc::clone(&self.progress);
+                    let mut p = progress.lock().unwrap();
+                    *p = 0;
+                    drop(p);
 
                     self.promise = Some(Promise::spawn_thread("renderer", move || {
                         info!("Creating the renderer");
                         let mut renderer = draw_gui::Renderer::new(scene, renderopts);
-                        let mut pixelbuffer = vec![0; 4 * w as usize * h as usize];
+                        let mut pixelbuffer = vec![0; 4 * w * h];
                         info!("Calling draw()");
                         for frame_number in 1..=s {
                             info!("Rendering sample {} of {}", &frame_number, s);
-                            // *progress = (frame_number, s);
+                            let mut p = progress.lock().unwrap();
+                            *p = frame_number;
                             renderer.draw(&mut pixelbuffer, frame_number);
+                            drop(p);
                         }
                         pixelbuffer
                     }));
@@ -174,10 +187,9 @@ impl epi::App for CloversApp {
                     ctx.request_repaint();
                     self.promise = None;
                 } else {
-                    ui.heading(format!(
-                        "Rendering progress: {} of {}",
-                        self.progress.0, self.progress.1
-                    ));
+                    let p = self.progress.lock().unwrap();
+                    ui.heading(format!("Rendering progress: {} of {}", *p, self.samples));
+                    drop(p);
                 }
             }
 
