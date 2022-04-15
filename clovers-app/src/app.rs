@@ -5,6 +5,7 @@ use clovers::{
     RenderOpts,
 };
 use eframe::{egui, epi};
+use poll_promise::Promise;
 use tracing::info;
 
 use crate::draw_gui;
@@ -81,7 +82,7 @@ impl epi::App for CloversApp {
             normalmap,
             texture: _,
             rendering,
-            progress,
+            progress: _,
         } = self;
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
@@ -136,27 +137,38 @@ impl epi::App for CloversApp {
                         normalmap: *normalmap,
                     };
 
-                    info!("Creating the renderer");
-                    let mut renderer = draw_gui::Renderer::new(scene, renderopts);
-                    let mut pixelbuffer = vec![0; 4 * *width as usize * *height as usize];
-                    info!("Calling draw()");
-                    for frame_number in 1..=*samples {
-                        info!("Rendering sample {} of {}", &frame_number, &samples);
-                        *progress = (frame_number, *samples);
-                        renderer.draw(&mut pixelbuffer, frame_number);
-                    }
+                    // TODO: why are these manual clones needed? closure ownership is confusing
+                    let s = samples.clone();
+                    let w = width.clone();
+                    let h = height.clone();
 
-                    info!("Creating the texture");
-                    let image = egui::ColorImage::from_rgba_unmultiplied(
-                        [*width as usize, *height as usize],
-                        &pixelbuffer,
-                    );
-                    let _texture_id = self.texture.get_or_insert_with(|| {
-                        // Load the texture only once.
-                        ui.ctx().load_texture("rendered_image", image)
+                    let promise = Promise::spawn_thread("renderer", move || {
+                        info!("Creating the renderer");
+                        let mut renderer = draw_gui::Renderer::new(scene, renderopts);
+                        let mut pixelbuffer = vec![0; 4 * w as usize * h as usize];
+                        info!("Calling draw()");
+                        for frame_number in 1..=s {
+                            info!("Rendering sample {} of {}", &frame_number, s);
+                            // *progress = (frame_number, *samples);
+                            renderer.draw(&mut pixelbuffer, frame_number);
+                        }
+                        pixelbuffer
                     });
 
-                    *rendering = false;
+                    if let Some(result) = promise.ready() {
+                        // Use/show result
+                        info!("Creating the texture");
+                        let image = egui::ColorImage::from_rgba_unmultiplied(
+                            [*width as usize, *height as usize],
+                            &result,
+                        );
+                        let _texture_id = self.texture.get_or_insert_with(|| {
+                            // Load the texture only once.
+                            ui.ctx().load_texture("rendered_image", image)
+                        });
+
+                        *rendering = false;
+                    }
                 }
             });
         });
