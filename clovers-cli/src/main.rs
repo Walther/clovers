@@ -140,19 +140,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     info!("Writing an image file");
-    let target: String;
-    match opts.output {
-        Some(filename) => {
-            target = filename;
-        }
+
+    let target = match opts.output {
+        Some(filename) => filename,
         None => {
             // Default to using a timestamp & `renders/` directory
             let timestamp = Utc::now().timestamp();
             fs::create_dir_all("renders")?;
-            target = format!("renders/{}.png", timestamp);
+            format!("renders/{}.png", timestamp)
         }
     };
-    img.save(target.to_string())?;
+    img.save(&target)?;
     info!("Image saved to {}", target);
     println!("Image saved to: {}", target);
 

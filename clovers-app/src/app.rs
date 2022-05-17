@@ -157,10 +157,10 @@ impl epi::App for CloversApp {
                         normalmap: *normalmap,
                     };
 
-                    // TODO: why are these manual clones needed? closure ownership is confusing
-                    let s = samples.clone();
-                    let w = width.clone() as usize;
-                    let h = height.clone() as usize;
+                    // TODO: why is this needed? closure ownership is confusing
+                    let s = *samples;
+                    let w = *width as usize;
+                    let h = *height as usize;
 
                     self.promise = Some(Promise::spawn_thread("renderer", move || {
                         info!("Creating the renderer");
@@ -181,15 +181,15 @@ impl epi::App for CloversApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            let w = self.width.clone() as usize;
-            let h = self.height.clone() as usize;
+            let w = self.width as usize;
+            let h = self.height as usize;
 
             // Are we currently rendering?
             if let Some(promise) = &self.promise {
                 if let Some(result) = promise.ready() {
                     // Use/show result
                     info!("Creating the texture");
-                    let image = egui::ColorImage::from_rgba_unmultiplied([w, h], &result);
+                    let image = egui::ColorImage::from_rgba_unmultiplied([w, h], result);
                     let _texture_id = self.texture.get_or_insert_with(|| {
                         // Load the texture only once.
                         ui.ctx().load_texture("rendered_image", image)
