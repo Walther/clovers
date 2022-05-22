@@ -93,6 +93,7 @@ pub mod textures;
 
 /// Rendering options struct
 #[derive(Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct RenderOpts {
     /// Width of the render in pixels
     pub width: u32,

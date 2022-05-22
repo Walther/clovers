@@ -61,12 +61,9 @@ impl ConstantMedium {
         distance_max: Float,
         rng: &mut SmallRng,
     ) -> Option<HitRecord> {
-        let mut rec1: HitRecord;
-        let mut rec2: HitRecord;
-
         // TODO: explain how the fog works.
 
-        rec1 = match self
+        let mut rec1 = match self
             .boundary
             .hit(ray, Float::NEG_INFINITY, Float::INFINITY, rng)
         {
@@ -74,7 +71,7 @@ impl ConstantMedium {
             None => return None,
         };
 
-        rec2 = match self.boundary.hit(
+        let mut rec2 = match self.boundary.hit(
             ray,
             rec1.distance + EPSILON_CONSTANT_MEDIUM,
             Float::INFINITY,
