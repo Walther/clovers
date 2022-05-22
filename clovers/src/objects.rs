@@ -35,7 +35,7 @@ pub use triangle::*;
 /// A list of objects. Allows multiple objects to be used e.g. in a Rotate or Translate object as the target.
 pub type ObjectList = Vec<Object>;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 /// An object enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub enum Object {

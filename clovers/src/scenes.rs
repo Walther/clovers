@@ -49,7 +49,7 @@ impl Scene {
 }
 
 // TODO: better naming
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A serialized representation of a [Scene].
 pub struct SceneFile {
