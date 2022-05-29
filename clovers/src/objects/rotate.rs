@@ -138,13 +138,12 @@ impl RotateY {
         normal[0] = self.cos_theta * hit_record.normal[0] + self.sin_theta * hit_record.normal[2];
         normal[2] = -self.sin_theta * hit_record.normal[0] + self.cos_theta * hit_record.normal[2];
 
-        // TODO: uv coords? This probably breaks surface textures completely
         let mut record = HitRecord {
             distance,
             position,
             normal,
-            u: 0.0,
-            v: 0.0,
+            u: hit_record.u,
+            v: hit_record.v,
             material: &*hit_record.material,
             front_face: false, // TODO: fix having to declare it before calling face_normal
         };
