@@ -80,7 +80,9 @@ impl Hitable {
             Hitable::BVHNode(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::ConstantMedium(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::FlipFace(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::HitableList(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::HitableList(_h) => {
+                panic!("you should not call hit() on a hitablelist, heavy complexity")
+            }
             Hitable::MovingSphere(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Quad(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::RotateY(h) => h.hit(ray, distance_min, distance_max, rng),
@@ -149,23 +151,15 @@ impl From<Vec<Hitable>> for HitableList {
 }
 
 impl HitableList {
+    #[deprecated]
     pub fn hit(
         &self,
-        ray: &Ray,
-        distance_min: Float,
-        distance_max: Float,
-        rng: &mut SmallRng,
+        _ray: &Ray,
+        _distance_min: Float,
+        _distance_max: Float,
+        _rng: &mut SmallRng,
     ) -> Option<HitRecord> {
-        let mut hit_record: Option<HitRecord> = None;
-        let mut closest = distance_max;
-        // TODO: with more objects, this may become a significant bottleneck?
-        for hitable in self.0.iter() {
-            if let Some(record) = hitable.hit(ray, distance_min, closest, rng) {
-                closest = record.distance;
-                hit_record = Some(record);
-            }
-        }
-        hit_record
+        panic!("you should not call hit() on a hitablelist, heavy complexity")
     }
 
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {

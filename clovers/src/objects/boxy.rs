@@ -120,7 +120,16 @@ impl Boxy {
         distance_max: Float,
         rng: &mut SmallRng,
     ) -> Option<HitRecord> {
-        self.sides.hit(ray, distance_min, distance_max, rng)
+        // start with an empty hit_record, hit all sides, return closest
+        let mut hit_record: Option<HitRecord> = None;
+        let mut closest = distance_max;
+        for hitable in self.sides.0.iter() {
+            if let Some(record) = hitable.hit(ray, distance_min, closest, rng) {
+                closest = record.distance;
+                hit_record = Some(record);
+            }
+        }
+        hit_record
     }
 
     /// Returns the axis-aligned bounding box [AABB] of the object.
