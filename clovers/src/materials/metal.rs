@@ -36,8 +36,9 @@ impl<'a> Metal {
                 reflected + self.fuzz * random_in_unit_sphere(rng),
                 ray.time,
             )),
-            // TODO: fix coordinates. Currently metal only works for [SolidColor]
-            attenuation: self.albedo.color(0.0, 0.0, hit_record.position),
+            attenuation: self
+                .albedo
+                .color(hit_record.u, hit_record.v, hit_record.position),
             material_type: MaterialType::Specular,
             pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()),
         })
