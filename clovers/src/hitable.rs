@@ -171,6 +171,7 @@ impl HitableList {
         let mut output_box: Option<AABB> = None;
 
         // Go through all the objects, and expand the AABB
+        // TODO: this O(n) function gets called an awful amount of times in BVHNode construction via box_compare => quadratic behavior
         for object in self.0.iter() {
             // Check if the object has a box
             let bounding = match object.bounding_box(t0, t1) {

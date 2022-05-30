@@ -3,11 +3,10 @@
 use core::cmp::Ordering;
 
 use rand::rngs::SmallRng;
-use rand::Rng;
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable},
+    hitable::{HitRecord, Hitable, HitableList},
     ray::Ray,
     Box, Float, Vec,
 };
@@ -37,10 +36,21 @@ impl BVHNode {
         let left: Box<Hitable>;
         let right: Box<Hitable>;
 
-        // Pick a random axis to create the split on
-        // TODO: smarter algorithm?
-        let axis: usize = rng.gen_range(0..2);
         let comparators = [box_x_compare, box_y_compare, box_z_compare];
+
+        // What is the axis with the largest span?
+        // TODO: horribly inefficient, improve!
+        let hlist: HitableList = objects.clone().into();
+        let bounding: AABB = hlist
+            .bounding_box(time_0, time_1)
+            .expect("No bounding box for objects");
+        let spans = [
+            bounding.axis(0).size(),
+            bounding.axis(1).size(),
+            bounding.axis(2).size(),
+        ];
+        let largest = f32::max(f32::max(spans[0], spans[1]), spans[2]);
+        let axis: usize = spans.iter().position(|&x| x == largest).unwrap();
         let comparator = comparators[axis];
 
         // How many objects do we have?
@@ -48,7 +58,7 @@ impl BVHNode {
 
         if object_span == 1 {
             // If we only have one object, something has gone wrong.
-            panic!("BVHNode from_list called with one object");
+            unreachable!("BVHNode from_list called with one object");
         } else if object_span == 2 {
             // If we are comparing two objects, perform the comparison
             // Insert the child nodes in order
