@@ -5,12 +5,7 @@ use alloc::string::String;
 use nalgebra::Rotation3;
 use std::fs::OpenOptions;
 
-use crate::{
-    hitable::{Hitable, HitableList},
-    materials::Material,
-    objects::Triangle,
-    Float, Vec3,
-};
+use crate::{hitable::Hitable, materials::Material, objects::Triangle, Float, Vec3};
 
 /// STL structure. This gets converted into an internal representation using [Triangles](crate::objects::Triangle)
 #[derive(Clone, Debug)]
@@ -28,13 +23,13 @@ pub struct STL {
     pub rotation: Vec3,
 }
 
-impl From<STL> for HitableList {
+impl From<STL> for Vec<Hitable> {
     fn from(stl: STL) -> Self {
         // TODO: error handling!
         let mut file = OpenOptions::new().read(true).open(stl.path).unwrap();
         let mesh = stl_io::read_stl(&mut file).unwrap();
         let triangles = mesh.vertices;
-        let mut hitable_list = HitableList::new();
+        let mut hitable_list = Vec::new();
         for face in mesh.faces {
             // TODO: verify if this is the correct order / makes sense / gets correct directions and normals
             let a = triangles[face.vertices[0]];
@@ -59,7 +54,7 @@ impl From<STL> for HitableList {
             let c: Vec3 = c * stl.scale + stl.center;
 
             let triangle = Triangle::from_coordinates(a, b, c, stl.material);
-            hitable_list.add(Hitable::Triangle(triangle));
+            hitable_list.push(Hitable::Triangle(triangle));
         }
 
         hitable_list

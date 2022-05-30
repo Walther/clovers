@@ -4,7 +4,7 @@ use crate::{
     bvhnode::BVHNode,
     camera::{Camera, CameraInit},
     color::Color,
-    hitable::{Hitable, HitableList},
+    hitable::Hitable,
     objects::Object,
     Float, Vec,
 };
@@ -23,7 +23,7 @@ pub struct Scene {
     pub camera: Camera,
     /// The background color to use when the rays do not hit anything in the scene.
     pub background_color: Color, // TODO: make into Texture or something?
-    /// A [BVHNode](crate::bvhnode::BVHNode) tree of prioritized objects - e.g. glass items or lights - that affect the biased sampling of the scene.
+    /// A [BVHNode](crate::bvhnode::BVHNode) tree of prioritized objects - e.g. glass items or lights - that affect the biased sampling of the scene. Wrapped into a [Hitable] for convenience reasons (see various PDF functions).
     pub priority_objects: Hitable,
 }
 
@@ -33,17 +33,21 @@ impl Scene {
         time_0: Float,
         time_1: Float,
         camera: Camera,
-        objects: HitableList,
-        priority_objects: HitableList,
+        objects: Vec<Hitable>,
+        priority_objects: Vec<Hitable>,
         background_color: Color,
         rng: &mut SmallRng,
     ) -> Scene {
         Scene {
-            objects: objects.into_bvh(time_0, time_1, rng),
+            objects: BVHNode::from_list(objects, time_0, time_1, rng),
             camera,
             background_color,
-            // TODO: bvhnode for priority objects too?
-            priority_objects: priority_objects.into_hitable(),
+            priority_objects: Hitable::BVHNode(BVHNode::from_list(
+                priority_objects,
+                time_0,
+                time_1,
+                rng,
+            )),
         }
     }
 }
@@ -83,10 +87,7 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     info!("Creating a flattened list from the objects");
     let hitables = objects_to_flat_hitablelist(scene_file.objects);
 
-    let mut priority_objects = HitableList::new();
-    for obj in scene_file.priority_objects {
-        priority_objects.add(obj.into());
-    }
+    let priority_objects = objects_to_flat_hitablelist(scene_file.priority_objects);
 
     Scene::new(
         time_0,
@@ -99,26 +100,26 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     )
 }
 
-fn objects_to_flat_hitablelist(objects: Vec<Object>) -> HitableList {
-    let mut hitables = HitableList::new();
+fn objects_to_flat_hitablelist(objects: Vec<Object>) -> Vec<Hitable> {
+    let mut hitables = Vec::new();
     for obj in objects {
         match obj {
             // For "list-like" objects, unwrap them to a flat list
             Object::ObjectList(list) => {
                 for nested in list {
-                    hitables.add(nested.into());
+                    hitables.push(nested.into());
                 }
             }
             #[cfg(feature = "stl")]
             Object::STL(s) => {
-                let list: HitableList = s.into();
-                for nested in list.0 {
-                    hitables.add(nested);
+                let list: Vec<Hitable> = s.into();
+                for nested in list {
+                    hitables.push(nested);
                 }
             }
-            // Plain objects, just add them directly
+            // Plain objects, just push them directly
             _ => {
-                hitables.add(obj.into());
+                hitables.push(obj.into());
             }
         };
     }
