@@ -85,7 +85,6 @@ pub mod normals;
 pub mod objects;
 pub mod onb;
 pub mod pdf;
-pub mod perlin;
 pub mod random;
 pub mod ray;
 pub mod scenes;
