@@ -10,13 +10,10 @@ use crate::{
         Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
     },
     ray::Ray,
-    Float, Vec, Vec3,
+    Float, Vec3,
 };
 use rand::rngs::SmallRng;
 use rand::Rng;
-
-#[cfg(feature = "traces")]
-use tracing::info;
 
 /// Represents a ray-object intersection, with plenty of data about the intersection.
 #[derive(Debug)]
@@ -58,14 +55,18 @@ pub enum Hitable {
     BVHNode(BVHNode),
     ConstantMedium(ConstantMedium),
     FlipFace(FlipFace),
-    HitableList(HitableList),
     MovingSphere(MovingSphere),
     Quad(Quad),
     RotateY(RotateY),
     Sphere(Sphere),
     Translate(Translate),
     Triangle(Triangle),
+    Empty(Empty),
 }
+
+// TODO: remove horrible hack
+#[derive(Debug, Clone)]
+pub struct Empty {}
 
 impl Hitable {
     pub fn hit(
@@ -80,15 +81,13 @@ impl Hitable {
             Hitable::BVHNode(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::ConstantMedium(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::FlipFace(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::HitableList(_h) => {
-                panic!("you should not call hit() on a hitablelist, heavy complexity")
-            }
             Hitable::MovingSphere(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Quad(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::RotateY(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Sphere(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Translate(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Triangle(h) => h.hit(ray, distance_min, distance_max, rng),
+            Hitable::Empty(_) => None,
         }
     }
 
@@ -98,13 +97,13 @@ impl Hitable {
             Hitable::BVHNode(h) => h.bounding_box(t0, t1),
             Hitable::ConstantMedium(h) => h.bounding_box(t0, t1),
             Hitable::FlipFace(h) => h.bounding_box(t0, t1),
-            Hitable::HitableList(h) => h.bounding_box(t0, t1),
             Hitable::MovingSphere(h) => h.bounding_box(t0, t1),
             Hitable::Quad(h) => h.bounding_box(t0, t1),
             Hitable::RotateY(h) => h.bounding_box(t0, t1),
             Hitable::Sphere(h) => h.bounding_box(t0, t1),
             Hitable::Translate(h) => h.bounding_box(t0, t1),
             Hitable::Triangle(h) => h.bounding_box(t0, t1),
+            Hitable::Empty(_) => None,
         }
     }
 
@@ -112,7 +111,6 @@ impl Hitable {
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
             Hitable::Boxy(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::HitableList(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Triangle(h) => h.pdf_value(origin, vector, time, rng),
@@ -124,118 +122,11 @@ impl Hitable {
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         match self {
             Hitable::Boxy(h) => h.random(origin, rng),
-            Hitable::HitableList(h) => h.random(origin, rng),
             Hitable::Quad(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
             Hitable::Triangle(h) => h.random(origin, rng),
             _ => Vec3::new(rng.gen::<Float>(), rng.gen::<Float>(), rng.gen::<Float>()).normalize(),
         }
-    }
-
-    pub fn add(&mut self, object: Hitable) {
-        match self {
-            Hitable::HitableList(h) => h.add(object),
-            _ => panic!("Cannot add to other types of Hitable"),
-        }
-    }
-}
-
-/// Helper struct for storing multiple `Hitable` objects. This list has a `Hitable` implementation too, returning the closest possible hit
-#[derive(Debug, Clone)]
-pub struct HitableList(pub Vec<Hitable>);
-
-impl From<Vec<Hitable>> for HitableList {
-    fn from(v: Vec<Hitable>) -> Self {
-        HitableList(v)
-    }
-}
-
-impl HitableList {
-    #[deprecated]
-    pub fn hit(
-        &self,
-        _ray: &Ray,
-        _distance_min: Float,
-        _distance_max: Float,
-        _rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
-        panic!("you should not call hit() on a hitablelist, heavy complexity")
-    }
-
-    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
-        if self.0.is_empty() {
-            return None;
-        }
-
-        // Mutable AABB that we grow from zero
-        let mut output_box: Option<AABB> = None;
-
-        // Go through all the objects, and expand the AABB
-        for object in self.0.iter() {
-            // Check if the object has a box
-            let bounding = match object.bounding_box(t0, t1) {
-                // No box found for the object, early return.
-                // Having even one unbounded object in a list makes the entire list unbounded!
-                None => return None,
-                // Box found
-                Some(bounding) => bounding,
-            };
-
-            // Do we have an output_box already saved?
-            match output_box {
-                // If we do, expand it & recurse
-                Some(old_box) => {
-                    output_box = Some(AABB::surrounding_box(old_box, bounding));
-                }
-                // Otherwise, set output box to be the newly-found box
-                None => {
-                    output_box = Some(bounding);
-                }
-            }
-        }
-
-        // Return the final combined output_box
-        output_box
-    }
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        let weight = 1.0 / self.0.len() as Float;
-        let mut sum = 0.0;
-
-        self.0.iter().for_each(|object| {
-            sum += weight * object.pdf_value(origin, vector, time, rng);
-        });
-
-        sum
-    }
-
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        let int_size = self.0.len();
-        self.0[rng.gen_range(0..int_size)].random(origin, rng)
-    }
-
-    pub fn new() -> HitableList {
-        HitableList(Vec::new())
-    }
-
-    pub fn add(&mut self, object: Hitable) {
-        self.0.push(object);
-    }
-
-    pub fn into_bvh(self, time_0: Float, time_1: Float, rng: &mut SmallRng) -> BVHNode {
-        #[cfg(feature = "traces")]
-        info!("Building the BVHNode tree");
-        BVHNode::from_list(self.0, time_0, time_1, rng)
-    }
-
-    // TODO: fixme, silly
-    pub fn into_hitable(self) -> Hitable {
-        Hitable::HitableList(self)
-    }
-}
-
-impl Default for HitableList {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

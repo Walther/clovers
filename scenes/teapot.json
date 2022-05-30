@@ -118,7 +118,7 @@
         "center": [278.0, 100.0, 278.0],
         "scale": 25.0,
         "rotation": [-90.0, 180.0, 0.0],
-        "path": "scenes/teapot.stl",
+        "path": "teapot.stl",
         "material": {
           "Lambertian": {
             "albedo": {

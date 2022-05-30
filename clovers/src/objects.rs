@@ -1,9 +1,6 @@
 //! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
 
-use crate::{
-    hitable::{Hitable, HitableList},
-    Box,
-};
+use crate::{hitable::Hitable, Box};
 
 pub mod boxy; // avoid keyword
 pub mod constant_medium;
@@ -81,13 +78,8 @@ impl From<Object> for Hitable {
             Object::MovingSphere(x) => Hitable::MovingSphere(MovingSphere::new(
                 x.center_0, x.center_1, x.time_0, x.time_1, x.radius, x.material,
             )),
-            Object::ObjectList(x) => {
-                // TODO: create a BVHNode instead?
-                let mut hitable_list = HitableList::new();
-                for obj in x {
-                    hitable_list.add(obj.into())
-                }
-                Hitable::HitableList(hitable_list)
+            Object::ObjectList(_x) => {
+                unimplemented!("Do not call .into() directly, see objects_to_flat_hitablelist");
             }
             Object::Quad(x) => Hitable::Quad(Quad::new(x.q, x.u, x.v, x.material)),
             Object::RotateY(x) => {
@@ -97,10 +89,8 @@ impl From<Object> for Hitable {
             }
             Object::Sphere(x) => Hitable::Sphere(Sphere::new(x.center, x.radius, x.material)),
             #[cfg(feature = "stl")]
-            Object::STL(x) => {
-                // TODO: create a BVHNode instead?
-                let hitable_list: HitableList = x.into();
-                Hitable::HitableList(hitable_list)
+            Object::STL(_x) => {
+                unimplemented!("Do not call .into() directly, see objects_to_flat_hitablelist");
             }
             Object::Translate(x) => {
                 let obj = *x.object;

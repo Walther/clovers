@@ -3,11 +3,10 @@
 use core::cmp::Ordering;
 
 use rand::rngs::SmallRng;
-use rand::Rng;
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable},
+    hitable::{Empty, HitRecord, Hitable},
     ray::Ray,
     Box, Float, Vec,
 };
@@ -37,18 +36,35 @@ impl BVHNode {
         let left: Box<Hitable>;
         let right: Box<Hitable>;
 
-        // Pick a random axis to create the split on
-        // TODO: smarter algorithm?
-        let axis: usize = rng.gen_range(0..2);
         let comparators = [box_x_compare, box_y_compare, box_z_compare];
+
+        // What is the axis with the largest span?
+        // TODO: horribly inefficient, improve!
+        let bounding: AABB =
+            vec_bounding_box(&objects, time_0, time_1).expect("No bounding box for objects");
+        let spans = [
+            bounding.axis(0).size(),
+            bounding.axis(1).size(),
+            bounding.axis(2).size(),
+        ];
+        let largest = f32::max(f32::max(spans[0], spans[1]), spans[2]);
+        let axis: usize = spans.iter().position(|&x| x == largest).unwrap();
         let comparator = comparators[axis];
 
         // How many objects do we have?
         let object_span = objects.len();
 
         if object_span == 1 {
-            // If we only have one object, something has gone wrong.
-            panic!("BVHNode from_list called with one object");
+            // If we only have one object, add one and an empty object.
+            // TODO: can this hack be removed?
+            left = Box::new(objects[0].clone());
+            right = Box::new(Hitable::Empty(Empty {}));
+            let bounding_box = left.bounding_box(time_0, time_1).unwrap(); // TODO: remove unwrap
+            return BVHNode {
+                left,
+                right,
+                bounding_box,
+            };
         } else if object_span == 2 {
             // If we are comparing two objects, perform the comparison
             // Insert the child nodes in order
@@ -182,4 +198,41 @@ fn box_y_compare(a: &Hitable, b: &Hitable) -> Ordering {
 
 fn box_z_compare(a: &Hitable, b: &Hitable) -> Ordering {
     box_compare(a, b, 2)
+}
+
+// TODO: inefficient, O(n) *and* gets called at every iteration of BVHNode creation => quadratic behavior
+fn vec_bounding_box(vec: &Vec<Hitable>, t0: Float, t1: Float) -> Option<AABB> {
+    if vec.is_empty() {
+        return None;
+    }
+
+    // Mutable AABB that we grow from zero
+    let mut output_box: Option<AABB> = None;
+
+    // Go through all the objects, and expand the AABB
+    for object in vec.iter() {
+        // Check if the object has a box
+        let bounding = match object.bounding_box(t0, t1) {
+            // No box found for the object, early return.
+            // Having even one unbounded object in a list makes the entire list unbounded!
+            None => return None,
+            // Box found
+            Some(bounding) => bounding,
+        };
+
+        // Do we have an output_box already saved?
+        match output_box {
+            // If we do, expand it & recurse
+            Some(old_box) => {
+                output_box = Some(AABB::surrounding_box(old_box, bounding));
+            }
+            // Otherwise, set output box to be the newly-found box
+            None => {
+                output_box = Some(bounding);
+            }
+        }
+    }
+
+    // Return the final combined output_box
+    output_box
 }
