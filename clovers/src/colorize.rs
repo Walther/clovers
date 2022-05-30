@@ -72,6 +72,12 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
             let scattered = Ray::new(hit_record.position, mixture_pdf.generate(rng), ray.time);
             let pdf_val = mixture_pdf.value(scattered.direction, ray.time, rng);
 
+            if pdf_val == 0.0 {
+                // scattering impossible, prevent division by zero below
+                // for more ctx, see https://github.com/RayTracing/raytracing.github.io/issues/979#issuecomment-1034517236
+                return emitted;
+            }
+
             // Recurse
             let recurse = colorize(&scattered, scene, depth + 1, max_depth, rng);
 
