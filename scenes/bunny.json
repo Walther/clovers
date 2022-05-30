@@ -118,7 +118,7 @@
         "center": [378.0, -15.0, 278.0],
         "scale": 3.0,
         "rotation": [-90.0, 180.0, 0.0],
-        "path": "scenes/bunny.stl",
+        "path": "bunny.stl",
         "material": {
           "Lambertian": {
             "albedo": {
