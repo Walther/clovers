@@ -69,26 +69,29 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
             ));
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
 
-            let scattered = Ray::new(hit_record.position, mixture_pdf.generate(rng), ray.time);
-            let pdf_val = mixture_pdf.value(scattered.direction, ray.time, rng);
+            let scatter_ray = Ray::new(hit_record.position, mixture_pdf.generate(rng), ray.time);
+            let pdf_val = mixture_pdf.value(scatter_ray.direction, ray.time, rng);
 
-            if pdf_val == 0.0 {
+            if pdf_val <= 0.0 {
                 // scattering impossible, prevent division by zero below
                 // for more ctx, see https://github.com/RayTracing/raytracing.github.io/issues/979#issuecomment-1034517236
                 return emitted;
             }
 
             // Recurse
-            let recurse = colorize(&scattered, scene, depth + 1, max_depth, rng);
+            let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
+            let scattered = scatter_record.attenuation
+                * hit_record
+                    .material
+                    .scattering_pdf(ray, &hit_record, &scatter_ray, rng)
+                * recurse
+                / pdf_val;
+
+            // Ensure positive color
+            let scattered = scattered.non_negative();
 
             // Blend it all together
-            emitted
-                + scatter_record.attenuation
-                    * hit_record
-                        .material
-                        .scattering_pdf(ray, &hit_record, &scattered, rng)
-                    * recurse
-                    / pdf_val
+            emitted + scattered
         }
     }
 }

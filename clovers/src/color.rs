@@ -36,6 +36,15 @@ impl Color {
         Color { r, g, b }
     }
 
+    /// Returns a new [Color] with the each channel limited to positive values.
+    pub fn non_negative(&self) -> Color {
+        Color {
+            r: self.r.max(0.0),
+            g: self.g.max(0.0),
+            b: self.b.max(0.0),
+        }
+    }
+
     /// Creates a new [Color] with random parameters between `0.0..1.0`.
     pub fn random(mut rng: SmallRng) -> Color {
         Color {
