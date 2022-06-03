@@ -6,7 +6,7 @@
 //!
 //! # Guiding thoughts
 //! - Keep it clean: prefer good abstractions, avoid deep integration
-//! - Platform agnostic: hopefully runnable by both CPU and GPU, on desktop and WebAssembly, etc
+//! - Platform agnostic: hopefully runnable by both CPU and GPU, on desktop and `WebAssembly`, etc
 //! - Prefer correctness: no "cheating" optimizations / approximations
 //! - Look for beautiful light <3
 //!
@@ -28,16 +28,16 @@
 //!
 //! clovers is not opinionated on how you want to render your scene. In a usual scenario, you probably want to have some form of a pixel buffer, with knowledge of the `x` and `y` coordinates of your buffer.
 //!
-//! - Rendering is done by creating [Rays](ray::Ray) and seeing what they hit
-//! - A [Ray](ray::Ray) has an origin and a direction
-//! - Every [Object](objects::Object) has a `hit()` method that takes a [Ray](ray::Ray) and returns an Option<[HitRecord](hitable::HitRecord)>
+//! - Rendering is done by creating [`Ray`](ray::Ray)s and seeing what they hit
+//! - A [`Ray`](ray::Ray) has an origin and a direction
+//! - Every [`Object`](objects::Object) has a `hit()` method that takes a [Ray](ray::Ray) and returns an Option<[`HitRecord`](hitable::HitRecord)>
 //! - If you get None, use that information to colorize your pixel with a default color
-//! - If you get Some([HitRecord](hitable::HitRecord)), use its details to colorize your pixel
-//! - You most likely also want to recurse: depending on the material, maybe `scatter()` and cast a new [Ray](ray::Ray)?
+//! - If you get Some([`HitRecord`](hitable::HitRecord)), use its details to colorize your pixel
+//! - You most likely also want to recurse: depending on the material, maybe `scatter()` and cast a new [`Ray`](ray::Ray)?
 //!
 //! You most likely want to repeat this process multiple times for each of your pixels: generating multiple samples per pixel results in a higher quality image.
 //!
-//! The library provides an opinionated [colorize()](colorize::colorize) function that does the steps mentioned above. Using it is optional - feel free to implement your own methods that utilize the lower-level building blocks for more creative power!
+//! The library provides an opinionated [`colorize()`](colorize::colorize) function that does the steps mentioned above. Using it is optional - feel free to implement your own methods that utilize the lower-level building blocks for more creative power!
 //!
 //! ## Post processing
 //!
@@ -51,7 +51,7 @@
 //! At the end, use your pixel buffer - save to an image file, draw a frame in a GUI window, etc.
 
 // Lints
-#![deny(clippy::all)]
+#![deny(clippy::pedantic)]
 #![deny(explicit_outlives_requirements)]
 #![deny(trivial_casts)]
 #![deny(trivial_numeric_casts)]
@@ -60,8 +60,12 @@
 #![deny(unused_qualifications)]
 #![deny(missing_debug_implementations)]
 #![deny(missing_docs)]
-// TODO:
+// TODO: temporarily allowing some in order to get a majority of clippy::pedantic enabled
 #![allow(clippy::many_single_char_names)] // Lots of places with coordinates etc
+#![allow(clippy::missing_panics_doc)] // TODO: remove panics where feasible later
+#![allow(clippy::module_name_repetitions)] // TODO: later or ignore
+#![allow(clippy::cast_precision_loss)] // TODO: later or ignore
+#![allow(clippy::match_bool)] // disagree, can be readable
 
 // no_std required for gpu accelerated rendering
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -122,6 +126,6 @@ pub type Vec3 = Vector3<Float>;
 pub const EPSILON_SHADOW_ACNE: Float = 0.001;
 /// Internal const: epsilon used for having a finitely-sized thickness for the bounding box of an infinitely-thin rectangle. Shouldn't be too small.
 pub const EPSILON_RECT_THICKNESS: Float = 0.000_1;
-/// Internal const: epsilon used in the hit calculation of a [ConstantMedium](objects::constant_medium::ConstantMedium).
+/// Internal const: epsilon used in the hit calculation of a [`ConstantMedium`](objects::constant_medium::ConstantMedium).
 // TODO: what would be an appropriate value?
 pub const EPSILON_CONSTANT_MEDIUM: Float = 0.000_1;

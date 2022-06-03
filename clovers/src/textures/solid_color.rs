@@ -12,11 +12,13 @@ pub struct SolidColor {
 
 impl SolidColor {
     /// Creates a new solid color texture with the specified color.
+    #[must_use]
     pub fn new(color: Color) -> Self {
         SolidColor { color }
     }
 
     /// Evaluates the color ignoring the given surface coordinates and spatial position - always returns the solid color.
+    #[must_use]
     pub fn color(self, _u: Float, _v: Float, _position: Vec3) -> Color {
         self.color
     }

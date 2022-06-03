@@ -16,6 +16,7 @@ pub struct Interval {
 
 impl Interval {
     /// Constructs a new interval
+    #[must_use]
     pub fn new(a: Float, b: Float) -> Self {
         Interval {
             min: a.min(b),
@@ -25,6 +26,7 @@ impl Interval {
 
     /// Constructs a new interval from two intervals
     // TODO: explanation, clarification
+    #[must_use]
     pub fn new_from_intervals(a: Interval, b: Interval) -> Self {
         Interval {
             min: a.min.min(b.min),
@@ -33,11 +35,13 @@ impl Interval {
     }
 
     /// Returns an interval expanded with delta at both ends
+    #[must_use]
     pub fn expand(&self, delta: Float) -> Self {
         Interval::new(self.min - delta, self.max + delta)
     }
 
     /// Returns the size of the interval
+    #[must_use]
     pub fn size(self) -> Float {
         self.max - self.min
     }

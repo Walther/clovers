@@ -20,6 +20,7 @@ pub fn normal_map(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> Color {
 }
 
 /// Given a surface normal, return a color based on normal mapping colorization.
+#[must_use]
 pub fn normal_to_color(normal: Vec3) -> Color {
     // normalize just in case
     let normal: Vec3 = normal.normalize();

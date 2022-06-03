@@ -52,6 +52,7 @@ pub struct Triangle {
 
 impl Triangle {
     /// Creates a new triangle from a coordinate point and two side vectors relative to the point
+    #[must_use]
     pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Triangle {
         let n: Vec3 = u.cross(&v);
         let normal: Vec3 = n.normalize();
@@ -95,6 +96,7 @@ impl Triangle {
     }
 
     /// Creates a new triangle from three Cartesian space coordinates
+    #[must_use]
     pub fn from_coordinates(a: Vec3, b: Vec3, c: Vec3, material: Material) -> Triangle {
         // Coordinate transform: from absolute coordinates to relative coordinates
         let q: Vec3 = a;
@@ -151,6 +153,7 @@ impl Triangle {
     }
 
     /// Returns the bounding box of the triangle
+    #[must_use]
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         // TODO: this is from quad and not updated!
         // although i guess a triangle's aabb is the same as the quad's aabb in worst case
@@ -217,7 +220,7 @@ mod tests {
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(1.0, 0.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),
-            Default::default(),
+            Material::default(),
         );
 
         let ray = Ray::new(
@@ -262,7 +265,7 @@ mod tests {
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),
             Vec3::new(1.0, 0.0, 0.0),
-            Default::default(),
+            Material::default(),
         );
 
         let ray = Ray::new(
@@ -307,7 +310,7 @@ mod tests {
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(-1.0, 0.0, 0.0),
             Vec3::new(0.0, -1.0, 0.0),
-            Default::default(),
+            Material::default(),
         );
 
         let ray = Ray::new(

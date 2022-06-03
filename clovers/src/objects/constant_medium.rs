@@ -1,4 +1,4 @@
-//! ConstantMedium object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
+//! `ConstantMedium` object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 
 use crate::{
     aabb::AABB,
@@ -15,7 +15,7 @@ use super::Object;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// ConstantMediumInit structure describes the necessary data for constructing a [ConstantMedium]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
+/// `ConstantMediumInit` structure describes the necessary data for constructing a [`ConstantMedium`]. Used with [serde] when importing [`SceneFiles`](crate::scenes::SceneFile).
 pub struct ConstantMediumInit {
     /// The boundary object for the constant medium. This determines the size and shape of the fog object.
     pub boundary: Box<Object>,
@@ -36,7 +36,7 @@ fn default_density() -> Float {
 }
 
 #[derive(Debug, Clone)]
-/// ConstantMedium object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
+/// `ConstantMedium` object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 pub struct ConstantMedium {
     boundary: Box<Hitable>,
     phase_function: Material,
@@ -44,7 +44,8 @@ pub struct ConstantMedium {
 }
 
 impl ConstantMedium {
-    /// Creates a new [ConstantMedium] with a known size, shape and density.
+    /// Creates a new [`ConstantMedium`] with a known size, shape and density.
+    #[must_use]
     pub fn new(boundary: Box<Hitable>, density: Float, texture: Texture) -> Self {
         ConstantMedium {
             boundary,
@@ -53,7 +54,7 @@ impl ConstantMedium {
         }
     }
 
-    /// Hit function for the [ConstantMedium] object. Returns a [HitRecord] if hit. TODO: explain the math for the fog
+    /// Hit function for the [`ConstantMedium`] object. Returns a [`HitRecord`] if hit. TODO: explain the math for the fog
     pub fn hit(
         &self,
         ray: &Ray,
@@ -125,6 +126,7 @@ impl ConstantMedium {
     }
 
     /// Returns the axis-aligned bounding box [AABB] of the defining `boundary` object for the fog.
+    #[must_use]
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         self.boundary.bounding_box(t0, t1)
     }

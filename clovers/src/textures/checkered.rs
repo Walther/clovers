@@ -40,7 +40,8 @@ fn default_density_surface() -> Float {
 }
 
 impl SpatialChecker {
-    /// Create a new SpatialChecker object with the specified colors and density.
+    /// Create a new `SpatialChecker` object with the specified colors and density.
+    #[must_use]
     pub fn new(color1: Color, color2: Color, density: Float) -> Self {
         SpatialChecker {
             even: color1,
@@ -49,7 +50,8 @@ impl SpatialChecker {
         }
     }
 
-    /// Evaluates the color at the given spatial position coordinate. Note that the SpatialChecker is spatial - surface coordinates are ignored.
+    /// Evaluates the color at the given spatial position coordinate. Note that the `SpatialChecker` is spatial - surface coordinates are ignored.
+    #[must_use]
     pub fn color(self, _u: Float, _v: Float, position: Vec3) -> Color {
         // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;
@@ -79,7 +81,8 @@ pub struct SurfaceChecker {
 }
 
 impl SurfaceChecker {
-    /// Create a new SurfaceChecker object with the specified colors and density.
+    /// Create a new `SurfaceChecker` object with the specified colors and density.
+    #[must_use]
     pub fn new(color1: Color, color2: Color, density: Float) -> Self {
         SurfaceChecker {
             even: color1,
@@ -88,7 +91,8 @@ impl SurfaceChecker {
         }
     }
 
-    /// Evaluates the color at the given surface position coordinates. Note that SurfaceChecker is surface-based, and thus ignores the spatial position coordinate.
+    /// Evaluates the color at the given surface position coordinates. Note that `SurfaceChecker` is surface-based, and thus ignores the spatial position coordinate.
+    #[must_use]
     pub fn color(self, u: Float, v: Float, _position: Vec3) -> Color {
         // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;

@@ -17,6 +17,7 @@ pub struct ONB {
 
 impl ONB {
     /// Builds a new [ONB] structure given a normal vector.
+    #[must_use]
     pub fn build_from_w(normal: Vec3) -> ONB {
         let w = (normal).normalize();
         let a: Vec3 = if (w.x).abs() > 0.9 {
@@ -31,6 +32,7 @@ impl ONB {
     }
 
     /// Returns the ONB-projected version of the provided vector?
+    #[must_use]
     pub fn local(&self, vec: Vec3) -> Vec3 {
         vec.x * self.u + vec.y * self.v + vec.z * self.w
     }

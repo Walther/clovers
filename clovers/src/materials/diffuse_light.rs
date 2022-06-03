@@ -18,7 +18,7 @@ pub struct DiffuseLight {
 }
 
 impl Default for DiffuseLight {
-    /// Creates a new [DiffuseLight] with white light at intensity `100.0`
+    /// Creates a new [`DiffuseLight`] with white light at intensity `100.0`
     fn default() -> Self {
         DiffuseLight {
             emit: Texture::SolidColor(SolidColor::new(Color::new(100.0, 100.0, 100.0))),
@@ -27,7 +27,8 @@ impl Default for DiffuseLight {
 }
 
 impl<'a> DiffuseLight {
-    /// Scatter method for the [DiffuseLight] material. Always returns `None`, as diffuse light does not scatter.
+    /// Scatter method for the [`DiffuseLight`] material. Always returns `None`, as diffuse light does not scatter.
+    #[allow(clippy::unused_self)]
     pub fn scatter(
         self,
         _ray: &Ray,
@@ -37,7 +38,8 @@ impl<'a> DiffuseLight {
         None
     }
 
-    /// Scattering probability density function for the [DiffuseLight] material. Always returns 0, as diffuse light does not scatter.
+    /// Scattering probability density function for the [`DiffuseLight`] material. Always returns 0, as diffuse light does not scatter.
+    #[allow(clippy::unused_self)] // TODO:
     pub fn scattering_pdf(
         self,
         _ray: &Ray,
@@ -48,7 +50,8 @@ impl<'a> DiffuseLight {
         0.0 // TODO: cleanup
     }
 
-    /// Emission function for [DiffuseLight]. If the given [HitRecord] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.
+    /// Emission function for [`DiffuseLight`]. If the given [`HitRecord`] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.
+    #[must_use]
     pub fn emit(
         self,
         _ray: &Ray,
@@ -64,7 +67,8 @@ impl<'a> DiffuseLight {
         }
     }
 
-    /// Creates a new [DiffuseLight] material with the given [Texture].
+    /// Creates a new [`DiffuseLight`] material with the given [Texture].
+    #[must_use]
     pub fn new(emission: Texture) -> Self {
         DiffuseLight { emit: emission }
     }

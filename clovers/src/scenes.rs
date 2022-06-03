@@ -65,7 +65,8 @@ pub struct SceneFile {
     priority_objects: Vec<Object>,
 }
 
-/// Initializes a new [Scene] instance by parsing the contents of a [SceneFile] structure and then using those details to construct the [Scene].
+/// Initializes a new [Scene] instance by parsing the contents of a [`SceneFile`] structure and then using those details to construct the [Scene].
+#[must_use]
 pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     let time_0 = scene_file.time_0;
     let time_1 = scene_file.time_1;
