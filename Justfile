@@ -16,7 +16,7 @@ docs:
 
 # Render a basic test scene with default settings with the CLI
 scene:
-  cargo run --bin clovers-cli --release -- --input scenes/scene.json
+  cargo run --bin clovers-cli --release -- --input scenes/scene.json -w 1920 -h 1080
 
 # Render all the test scenes available in the repository
 all-scenes:
