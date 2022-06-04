@@ -12,7 +12,7 @@ use super::Object;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// FlipFaceInit structure describes the necessary data for constructing a [FlipFace]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
+/// `FlipFaceInit` structure describes the necessary data for constructing a [`FlipFace`]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 pub struct FlipFaceInit {
     /// The object to wrap with the face flipping feature.
     pub object: Box<Object>,
@@ -27,14 +27,15 @@ pub struct FlipFace {
 impl FlipFace {
     // TODO: possibly deprecate / remove?
 
-    /// Creates a new instance of a [FlipFace]
+    /// Creates a new instance of a [`FlipFace`]
+    #[must_use]
     pub fn new(object: Hitable) -> Self {
         FlipFace {
             object: Box::new(object),
         }
     }
 
-    /// Hit function for the [FlipFace] object. Considering this is a utility object that wraps an internal `object`, it returns a [HitRecord] with the `front_face` property flipped, if the given [Ray] hits the object.
+    /// Hit function for the [`FlipFace`] object. Considering this is a utility object that wraps an internal `object`, it returns a [`HitRecord`] with the `front_face` property flipped, if the given [Ray] hits the object.
     pub fn hit(
         &self,
         ray: &Ray,
@@ -50,7 +51,8 @@ impl FlipFace {
             })
     }
 
-    /// Returns the axis-aligned bounding box [AABB] of the [FlipFace] object. Considering this is a utility object that wraps an internal `object`, it returns the bounding box of the internal object.
+    /// Returns the axis-aligned bounding box [AABB] of the [`FlipFace`] object. Considering this is a utility object that wraps an internal `object`, it returns the bounding box of the internal object.
+    #[must_use]
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         self.object.bounding_box(t0, t1)
     }

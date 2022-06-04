@@ -35,7 +35,7 @@ pub struct Camera {
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// Represents the fields that can be described in a Scene file. Some other fields the main Camera struct requires (such as aspect_ratio) are derived from other info (such as width, height)
+/// Represents the fields that can be described in a Scene file. Some other fields the main Camera struct requires (such as `aspect_ratio`) are derived from other info (such as width, height)
 pub struct CameraInit {
     /// Describes where the camera is
     pub look_from: Vec3,
@@ -54,6 +54,7 @@ pub struct CameraInit {
 
 impl Camera {
     /// Creates a new [Camera] with the given parameters.
+    #[must_use]
     pub fn new(
         look_from: Vec3,
         look_at: Vec3,

@@ -23,6 +23,7 @@ pub enum Texture {
 
 impl Texture {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
+    #[must_use]
     pub fn color(&self, u: Float, v: Float, position: Vec3) -> Color {
         match *self {
             Texture::SolidColor(s) => SolidColor::color(s, u, v, position),

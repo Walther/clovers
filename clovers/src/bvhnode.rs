@@ -13,7 +13,7 @@ use crate::{
 
 /// Bounding Volume Hierarchy Node.
 ///
-/// A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also BVHNodes. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
+/// A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also `BVHNode`s. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 #[derive(Debug, Clone)]
 pub struct BVHNode {
     /// Left child of the BVHNode
@@ -25,7 +25,7 @@ pub struct BVHNode {
 }
 
 impl BVHNode {
-    /// Create a new BVHNode tree from a given list of [Objects](crate::objects::Object)
+    /// Create a new `BVHNode` tree from a given list of [Object](crate::objects::Object)s
     pub fn from_list(
         mut objects: Vec<Hitable>,
         time_0: Float,
@@ -48,6 +48,7 @@ impl BVHNode {
             bounding.axis(2).size(),
         ];
         let largest = f32::max(f32::max(spans[0], spans[1]), spans[2]);
+        #[allow(clippy::float_cmp)] // TODO: better code for picking the largest axis...
         let axis: usize = spans.iter().position(|&x| x == largest).unwrap();
         let comparator = comparators[axis];
 
@@ -94,7 +95,7 @@ impl BVHNode {
                     objects[1].bounding_box(time_0, time_1).unwrap(),
                     objects[2].bounding_box(time_0, time_1).unwrap(),
                 ),
-            }))
+            }));
         } else {
             // Otherwise, recurse
             objects.sort_by(|a, b| comparator(&*a, &*b));
@@ -133,7 +134,7 @@ impl BVHNode {
         }
     }
 
-    /// The main `hit` function for a [BVHNode]. Given a [Ray](crate::ray::Ray), and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the encased objects during that interval.
+    /// The main `hit` function for a [`BVHNode`]. Given a [Ray](crate::ray::Ray), and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the encased objects during that interval.
     pub fn hit(
         &self,
         ray: &Ray,
@@ -165,7 +166,8 @@ impl BVHNode {
         }
     }
 
-    /// Returns the axis-aligned bounding box [AABB] of the objects within this [BVHNode].
+    /// Returns the axis-aligned bounding box [AABB] of the objects within this [`BVHNode`].
+    #[must_use]
     pub fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
         Some(self.bounding_box)
     }

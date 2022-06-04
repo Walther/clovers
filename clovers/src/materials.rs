@@ -71,6 +71,7 @@ impl Material {
     }
 
     /// Returns the amount of light the material emits. By default, materials do not emit light, returning black.
+    #[must_use]
     pub fn emit(
         &self,
         ray: &Ray,

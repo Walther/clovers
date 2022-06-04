@@ -39,6 +39,7 @@ pub struct CosinePDF {
 }
 
 impl CosinePDF {
+    #[must_use]
     pub fn new(w: Vec3) -> Self {
         CosinePDF {
             uvw: ONB::build_from_w(w),
@@ -66,6 +67,7 @@ pub struct HitablePDF<'a> {
 }
 
 impl<'a> HitablePDF<'a> {
+    #[must_use]
     pub fn new(hitable: &'a Hitable, origin: Vec3) -> Self {
         HitablePDF { origin, hitable }
     }
@@ -87,6 +89,7 @@ pub struct MixturePDF<'a> {
 }
 
 impl<'a> MixturePDF<'a> {
+    #[must_use]
     pub fn new(pdf1: PDF<'a>, pdf2: PDF<'a>) -> Self {
         MixturePDF {
             pdf1: Box::new(pdf1),
@@ -112,14 +115,17 @@ impl<'a> MixturePDF<'a> {
 pub struct ZeroPDF {}
 
 impl ZeroPDF {
+    #[must_use]
     pub fn new() -> Self {
         ZeroPDF {}
     }
 
+    #[allow(clippy::unused_self)]
     pub fn value(&self, _direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
         0.0
     }
 
+    #[allow(clippy::unused_self)]
     pub fn generate(&self, _rng: &mut SmallRng) -> Vec3 {
         Vec3::new(1.0, 0.0, 0.0)
     }

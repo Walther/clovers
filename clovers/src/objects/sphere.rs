@@ -8,7 +8,7 @@ use rand::rngs::SmallRng;
 
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// SphereInit structure describes the necessary data for constructing a [Sphere]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
+/// `SphereInit` structure describes the necessary data for constructing a [Sphere]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 pub struct SphereInit {
     /// Center of the sphere.
     pub center: Vec3,
@@ -31,6 +31,7 @@ pub struct Sphere {
 
 impl Sphere {
     /// Creates a new `Sphere` object with the given center, radius and material.
+    #[must_use]
     pub fn new(center: Vec3, radius: Float, material: Material) -> Self {
         let aabb = AABB::new_from_coords(
             center - Vec3::new(radius, radius, radius),
@@ -45,6 +46,7 @@ impl Sphere {
     }
 
     /// Returns the U,V surface coordinates of a hitpoint
+    #[must_use]
     pub fn get_uv(&self, hit_position: Vec3, _time: Float) -> (Float, Float) {
         let translated: Vec3 = (hit_position - self.center) / self.radius;
         let phi: Float = translated.z.atan2(translated.x);
@@ -54,7 +56,7 @@ impl Sphere {
         (u, v)
     }
 
-    /// Hit method for the [Sphere] object. Returns a [HitRecord] if the given [Ray] intersects with the sphere at the given distance interval.
+    /// Hit method for the [Sphere] object. Returns a [`HitRecord`] if the given [Ray] intersects with the sphere at the given distance interval.
     pub fn hit(
         &self,
         ray: &Ray,
@@ -111,6 +113,7 @@ impl Sphere {
     }
 
     /// Returns the axis-aligned bounding box [AABB] for the sphere.
+    #[must_use]
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         Some(self.aabb)
     }

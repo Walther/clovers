@@ -10,7 +10,7 @@ use crate::{
 };
 use rand::{rngs::SmallRng, Rng};
 
-/// BoxyInit structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
+/// `BoxyInit` structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct BoxyInit {
@@ -35,6 +35,7 @@ pub struct Boxy {
 
 impl Boxy {
     /// Initializes a new instance of a box, given two opposing [Vec3] corners `corner_0` and `corner_1`, and a [Material] `material`.
+    #[must_use]
     pub fn new(corner_0: Vec3, corner_1: Vec3, material: Material) -> Self {
         // Construct the two opposite vertices with the minimum and maximum coordinates.
         let min: Vec3 = Vec3::new(
@@ -97,17 +98,17 @@ impl Boxy {
     }
 
     /// Returns the axis-aligned bounding box [AABB] of the object.
+    #[must_use]
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         Some(self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        let weight = 1.0 / self.sides.len() as Float;
         let mut sum = 0.0;
 
         self.sides.iter().for_each(|object| {
-            sum += weight * object.pdf_value(origin, vector, time, rng);
+            sum += object.pdf_value(origin, vector, time, rng) / 6.0;
         });
 
         sum

@@ -12,7 +12,7 @@ use super::Object;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// RotateInit structure describes the necessary data for constructing a [RotateY]. Used with [serde] when importing [SceneFiles](crate::scenes::SceneFile).
+/// `RotateInit` structure describes the necessary data for constructing a [`RotateY`]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 pub struct RotateInit {
     /// The encased [Object] to rotate
     pub object: Box<Object>,
@@ -21,7 +21,7 @@ pub struct RotateInit {
 }
 
 #[derive(Debug, Clone)]
-/// RotateY object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
+/// `RotateY` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
 pub struct RotateY {
     object: Box<Hitable>,
     sin_theta: Float,
@@ -31,6 +31,7 @@ pub struct RotateY {
 
 impl RotateY {
     /// Creates a new `RotateY` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
+    #[must_use]
     pub fn new(object: Box<Hitable>, angle: Float) -> Self {
         // TODO: add proper time support
         let time_0: Float = 0.0;
@@ -76,10 +77,10 @@ impl RotateY {
                     let y: Float = j_f * bbox.y.max + (1.0 - j_f) * bbox.y.min;
                     let z: Float = k_f * bbox.z.max + (1.0 - k_f) * bbox.z.min;
 
-                    let newx: Float = cos_theta * x + sin_theta * z;
-                    let newz: Float = -sin_theta * x + cos_theta * z;
+                    let new_x: Float = cos_theta * x + sin_theta * z;
+                    let new_z: Float = -sin_theta * x + cos_theta * z;
 
-                    let tester: Vec3 = Vec3::new(newx, y, newz);
+                    let tester: Vec3 = Vec3::new(new_x, y, new_z);
 
                     for c in 0..3 {
                         min[c] = min[c].min(tester[c]);
@@ -98,7 +99,7 @@ impl RotateY {
         }
     }
 
-    /// Hit method for the [RotateY] object. Finds the rotation-adjusted [HitRecord] for the possible intersection of the [Ray] with the encased [Object].
+    /// Hit method for the [`RotateY`] object. Finds the rotation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
     pub fn hit(
         &self,
         ray: &Ray,
@@ -151,7 +152,8 @@ impl RotateY {
         Some(record)
     }
 
-    /// Bounding box method for the [RotateY] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for rotation.
+    /// Bounding box method for the [`RotateY`] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for rotation.
+    #[must_use]
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         self.aabb
     }

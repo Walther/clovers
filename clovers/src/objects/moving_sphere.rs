@@ -25,7 +25,8 @@ pub struct MovingSphere {
 }
 
 impl MovingSphere {
-    /// Creates a new `MovingSphere` object. See the struct documentation for more information: [MovingSphere].
+    /// Creates a new `MovingSphere` object. See the struct documentation for more information: [`MovingSphere`].
+    #[must_use]
     pub fn new(
         center_0: Vec3,
         center_1: Vec3,
@@ -57,6 +58,7 @@ impl MovingSphere {
     }
 
     /// Returns the interpolated center of the moving sphere at the given time.
+    #[must_use]
     pub fn center(&self, time: Float) -> Vec3 {
         self.center_0
             + ((time - self.time_0) / (self.time_1 - self.time_0)) * (self.center_1 - self.center_0)
@@ -64,6 +66,7 @@ impl MovingSphere {
 
     /// Returns the U,V surface coordinates of a hitpoint
     // TODO: verify this is up to date with the sphere get_uv methods and matches a surface coordinate instead of volumetric space cordinate
+    #[must_use]
     pub fn get_uv(&self, hit_position: Vec3, time: Float) -> (Float, Float) {
         let translated: Vec3 = (hit_position - self.center(time)) / self.radius;
         let phi: Float = translated.z.atan2(translated.x);
@@ -73,7 +76,7 @@ impl MovingSphere {
         (u, v)
     }
 
-    /// Hit method for the [MovingSphere] object. First gets the interpolated center position at the given time, then follows the implementation of [Sphere](crate::objects::Sphere) object's hit method.
+    /// Hit method for the [`MovingSphere`] object. First gets the interpolated center position at the given time, then follows the implementation of [Sphere](crate::objects::Sphere) object's hit method.
     pub fn hit(
         &self,
         ray: &Ray,
@@ -128,7 +131,8 @@ impl MovingSphere {
         None
     }
 
-    /// Returns the axis-aligned bounding box of the [MovingSphere] object. This is the maximum possible bounding box of the entire span of the movement of the sphere, calculated from the two center positions and the radius.
+    /// Returns the axis-aligned bounding box of the [`MovingSphere`] object. This is the maximum possible bounding box of the entire span of the movement of the sphere, calculated from the two center positions and the radius.
+    #[must_use]
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         Some(self.aabb)
     }

@@ -13,7 +13,7 @@ use rand::prelude::SmallRng;
 
 #[derive(Debug, Copy, Clone, Default)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// Isotropic material. Used in [ConstantMedium](crate::objects::constant_medium). TODO: understand this!
+/// Isotropic material. Used in [`ConstantMedium`](crate::objects::constant_medium). TODO: understand this!
 pub struct Isotropic {
     #[cfg_attr(feature = "serde-derive", serde(default))]
     albedo: Texture,
@@ -21,11 +21,12 @@ pub struct Isotropic {
 
 impl<'a> Isotropic {
     /// Creates a new [Isotropic] material with an albedo of the given [Texture].
+    #[must_use]
     pub fn new(emission: Texture) -> Self {
         Isotropic { albedo: emission }
     }
 
-    /// Returns a [ScatterRecord] based on the [HitRecord] coordinates and the given [Texture], or [None] if the ray did not hit the material. TODO: verify implementation, copied from [Lambertian](crate::materials::Lambertian)
+    /// Returns a [`ScatterRecord`] based on the [`HitRecord`] coordinates and the given [Texture], or [None] if the ray did not hit the material. TODO: verify implementation, copied from [Lambertian](crate::materials::Lambertian)
     pub fn scatter(
         self,
         _ray: &Ray,
@@ -47,6 +48,7 @@ impl<'a> Isotropic {
     }
 
     /// Returns the scattering probability density function for the [Isotropic] material. TODO: verify implementation, copied from [Lambertian](crate::materials::Lambertian)
+    #[allow(clippy::unused_self)] // TODO:
     pub fn scattering_pdf(
         self,
         _ray: &Ray,

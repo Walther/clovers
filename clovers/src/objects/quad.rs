@@ -51,6 +51,7 @@ pub struct Quad {
 
 impl Quad {
     /// Creates a new quad
+    #[must_use]
     pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Quad {
         let n: Vec3 = u.cross(&v);
         let normal: Vec3 = n.normalize();
@@ -123,6 +124,7 @@ impl Quad {
     }
 
     /// Returns the bounding box of the quad
+    #[must_use]
     pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         Some(self.aabb)
     }

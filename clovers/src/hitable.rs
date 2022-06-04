@@ -91,6 +91,7 @@ impl Hitable {
         }
     }
 
+    #[must_use]
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         match self {
             Hitable::Boxy(h) => h.bounding_box(t0, t1),
@@ -131,6 +132,7 @@ impl Hitable {
 }
 
 /// Returns a tuple of `(front_face, normal)`. Used in lieu of `set_face_normal` in the Ray Tracing for the Rest Of Your Life book.
+#[must_use]
 pub fn get_orientation(ray: &Ray, outward_normal: Vec3) -> (bool, Vec3) {
     let front_face = ray.direction.dot(&outward_normal) < 0.0;
     let normal = if front_face {

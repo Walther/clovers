@@ -37,6 +37,7 @@ impl<'a> Lambertian {
     }
 
     /// Returns the scattering probability density function for the [Lambertian] material. TODO: explain the math
+    #[allow(clippy::unused_self)] // TODO:
     pub fn scattering_pdf(
         self,
         _ray: &Ray,

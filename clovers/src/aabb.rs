@@ -20,6 +20,7 @@ pub struct AABB {
 
 impl AABB {
     /// Creates a new axis-aligned bounding box from three intervals
+    #[must_use]
     pub fn new(interval_x: Interval, interval_y: Interval, interval_z: Interval) -> AABB {
         AABB {
             x: interval_x,
@@ -29,6 +30,7 @@ impl AABB {
     }
 
     /// Creates a new axis-aligned bounding box from two coordinates. Treats the two points a and b as extrema for the bounding box, so we don't require a particular minimum/maximum coordinate order.
+    #[must_use]
     pub fn new_from_coords(a: Vec3, b: Vec3) -> AABB {
         AABB {
             x: Interval::new(a[0].min(b[0]), a[0].max(b[0])),
@@ -38,6 +40,7 @@ impl AABB {
     }
 
     /// Given a [Ray], returns whether the ray hits the bounding box or not. Based on ["An Optimized AABB Hit Method"](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
+    #[must_use]
     pub fn hit(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
         // TODO: Create an improved hit method with more robust handling of zeroes. See https://github.com/RayTracing/raytracing.github.io/issues/927
         // Both methods below are susceptible for NaNs and infinities, and have subtly different edge cases.
@@ -100,6 +103,7 @@ impl AABB {
     }
 
     /// Given two axis-aligned bounding boxes, return a new [AABB] that contains both.
+    #[must_use]
     pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
         AABB {
             x: Interval::new_from_intervals(box0.x, box1.x),
@@ -133,6 +137,7 @@ impl AABB {
 
     /// Returns the interval of the given axis.
     // TODO: this api is kind of annoying
+    #[must_use]
     pub fn axis(self, n: usize) -> Interval {
         match n {
             0 => self.x,
