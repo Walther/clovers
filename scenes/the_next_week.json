@@ -11006,11 +11006,6 @@
         "radius": 80,
         "material": {
           "Lambertian": {
-            "albedo": {
-              "NoiseTexture": {
-                "scale": 0.1
-              }
-            }
           }
         }
       }

@@ -184,11 +184,12 @@ let marble = {
     radius: 80.0,
     material: {
       Lambertian: {
-        albedo: {
-          NoiseTexture: {
-            scale: 0.1,
-          },
-        },
+        // albedo: {
+          // Originally NoiseTexture. Removed support for it.
+          // NoiseTexture: {
+          //   scale: 0.1,
+          // },
+        // },
       },
     },
   },

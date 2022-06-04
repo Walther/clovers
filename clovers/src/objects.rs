@@ -1,6 +1,6 @@
 //! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
 
-use crate::{hitable::Hitable, Box};
+use crate::{bvhnode::BVHNode, hitable::Hitable, Box};
 
 pub mod boxy; // avoid keyword
 pub mod constant_medium;
@@ -79,8 +79,13 @@ impl From<Object> for Hitable {
                 // TODO: time
                 x.center_0, x.center_1, 0.0, 1.0, x.radius, x.material,
             )),
-            Object::ObjectList(_x) => {
-                unimplemented!("Do not call .into() directly, see objects_to_flat_hitablelist");
+            Object::ObjectList(x) => {
+                let objects: Vec<Hitable> = x
+                    .iter()
+                    .map(|object| -> Hitable { object.clone().into() })
+                    .collect();
+                let bvh = BVHNode::from_list(objects, 0.0, 1.0);
+                Hitable::BVHNode(bvh)
             }
             Object::Quad(x) => Hitable::Quad(Quad::new(x.q, x.u, x.v, x.material)),
             Object::RotateY(x) => {
