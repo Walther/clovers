@@ -166,6 +166,21 @@ impl BVHNode {
         }
     }
 
+    #[must_use]
+    /// Returns the count of the nodes in the tree
+    pub fn count(&self) -> usize {
+        let leftsum = match &*self.left {
+            Hitable::BVHNode(b) => b.count(),
+            _ => 1,
+        };
+        let rightsum = match &*self.right {
+            Hitable::BVHNode(b) => b.count(),
+            _ => 1,
+        };
+
+        leftsum + rightsum
+    }
+
     /// Returns the axis-aligned bounding box [AABB] of the objects within this [`BVHNode`].
     #[must_use]
     pub fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
