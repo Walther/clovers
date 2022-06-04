@@ -3,14 +3,69 @@
 
 use alloc::string::String;
 use nalgebra::Rotation3;
+use rand::prelude::SmallRng;
 use std::fs::OpenOptions;
 
-use crate::{hitable::Hitable, materials::Material, objects::Triangle, Float, Vec3};
+use crate::{
+    aabb::AABB,
+    bvhnode::BVHNode,
+    hitable::{HitRecord, Hitable},
+    materials::Material,
+    objects::Triangle,
+    ray::Ray,
+    Float, Vec3,
+};
+
+/// Internal STL object representation after initialization. Contains the material for all triangles in it to avoid having n copies.
+#[derive(Debug, Clone)]
+pub struct STL {
+    /// Bounding Volume Hierarchy tree for the object
+    pub bvhnode: BVHNode,
+    /// Material for the object
+    pub material: Material,
+    /// Axis-aligned bounding box of the object
+    pub aabb: AABB,
+}
+
+impl STL {
+    #[must_use]
+    /// Create a new STL object with the given initialization parameters.
+    pub fn new(stl_init: STLInit, time_0: Float, time_1: Float) -> Self {
+        let material = stl_init.material;
+        let triangles: Vec<Hitable> = stl_init.into();
+        let bvhnode = BVHNode::from_list(triangles, time_0, time_1);
+        // TODO: remove unwrap
+        let aabb = bvhnode.bounding_box(time_0, time_1).unwrap();
+
+        STL {
+            bvhnode,
+            material,
+            aabb,
+        }
+    }
+
+    /// Hit method for the STL object
+    pub fn hit(
+        &self,
+        ray: &Ray,
+        distance_min: f32,
+        distance_max: f32,
+        rng: &mut SmallRng,
+    ) -> Option<HitRecord> {
+        self.bvhnode.hit(ray, distance_min, distance_max, rng)
+    }
+
+    /// Return the axis-aligned bounding box for the object
+    #[must_use]
+    pub fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<AABB> {
+        Some(self.aabb)
+    }
+}
 
 /// STL structure. This gets converted into an internal representation using [Triangles](crate::objects::Triangle)
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct STL {
+pub struct STLInit {
     /// Path of the .stl file
     pub path: String,
     /// Material to use for the .stl object
@@ -23,10 +78,10 @@ pub struct STL {
     pub rotation: Vec3,
 }
 
-impl From<STL> for Vec<Hitable> {
-    fn from(stl: STL) -> Self {
+impl From<STLInit> for Vec<Hitable> {
+    fn from(stl_init: STLInit) -> Self {
         // TODO: error handling!
-        let mut file = OpenOptions::new().read(true).open(stl.path).unwrap();
+        let mut file = OpenOptions::new().read(true).open(stl_init.path).unwrap();
         let mesh = stl_io::read_stl(&mut file).unwrap();
         let triangles = mesh.vertices;
         let mut hitable_list = Vec::new();
@@ -41,19 +96,19 @@ impl From<STL> for Vec<Hitable> {
             let c: Vec3 = Vec3::new(c[0], c[1], c[2]);
             // Handle rotation
             let rotation = Rotation3::from_euler_angles(
-                stl.rotation[0].to_radians(),
-                stl.rotation[1].to_radians(),
-                stl.rotation[2].to_radians(),
+                stl_init.rotation[0].to_radians(),
+                stl_init.rotation[1].to_radians(),
+                stl_init.rotation[2].to_radians(),
             );
             let a: Vec3 = rotation * a;
             let b: Vec3 = rotation * b;
             let c: Vec3 = rotation * c;
             // Handle scaling and offset
-            let a: Vec3 = a * stl.scale + stl.center;
-            let b: Vec3 = b * stl.scale + stl.center;
-            let c: Vec3 = c * stl.scale + stl.center;
+            let a: Vec3 = a * stl_init.scale + stl_init.center;
+            let b: Vec3 = b * stl_init.scale + stl_init.center;
+            let c: Vec3 = c * stl_init.scale + stl_init.center;
 
-            let triangle = Triangle::from_coordinates(a, b, c, stl.material);
+            let triangle = Triangle::from_coordinates(a, b, c, stl_init.material);
             hitable_list.push(Hitable::Triangle(triangle));
         }
 
