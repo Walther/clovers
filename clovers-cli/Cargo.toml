@@ -19,7 +19,7 @@ futures = "0.3.21"
 humantime = "2.1.0"
 image = { version =  "0.24.2", features = ["png"], default-features = false }
 indicatif = { version = "0.16.2", features = ["rayon"], default-features = false }
-rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
+rand = { version = "0.8.5", features = ["small_rng", "getrandom"], default-features = false }
 rayon = "1.5.3"
 serde = { version = "1.0.137", features = ["derive"], default-features = false }
 serde_json = { version = "1.0", features = ["alloc"], default-features = false }
