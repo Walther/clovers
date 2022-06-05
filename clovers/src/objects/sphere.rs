@@ -1,10 +1,10 @@
 //! A sphere object.
 
 use crate::{
-    aabb::AABB, hitable::HitRecord, materials::Material, onb::ONB, random::random_to_sphere,
-    ray::Ray, Float, Vec3, EPSILON_SHADOW_ACNE, PI,
+    aabb::AABB, hitable::HitRecord, materials::Material, onb::ONB, ray::Ray, Float, Vec3,
+    EPSILON_SHADOW_ACNE, PI,
 };
-use rand::rngs::SmallRng;
+use rand::{rngs::SmallRng, Rng};
 
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -146,4 +146,17 @@ impl Sphere {
         let uvw = ONB::build_from_w(direction);
         uvw.local(random_to_sphere(self.radius, distance_squared, rng))
     }
+}
+
+/// Internal helper.
+fn random_to_sphere(radius: Float, distance_squared: Float, rng: &mut SmallRng) -> Vec3 {
+    let r1: Float = rng.gen();
+    let r2: Float = rng.gen();
+    let z = 1.0 + r2 * ((1.0 - radius * radius / distance_squared).sqrt() - 1.0);
+
+    let phi = 2.0 * PI * r1;
+    let x = phi.cos() * (1.0 - z * z).sqrt();
+    let y = phi.sin() * (1.0 - z * z).sqrt();
+
+    Vec3::new(x, y, z)
 }
