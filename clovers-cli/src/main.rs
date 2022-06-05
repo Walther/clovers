@@ -107,6 +107,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let scene_file: SceneFile = serde_json::from_str(&contents)?;
     info!("Initializing the scene");
     let scene: Scene = scenes::initialize(scene_file, opts.width, opts.height);
+    info!("Count of nodes in the BVH tree: {}", scene.objects.count());
 
     info!("Calling draw()");
     let start = Instant::now();

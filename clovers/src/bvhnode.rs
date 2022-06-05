@@ -26,12 +26,8 @@ pub struct BVHNode {
 
 impl BVHNode {
     /// Create a new `BVHNode` tree from a given list of [Object](crate::objects::Object)s
-    pub fn from_list(
-        mut objects: Vec<Hitable>,
-        time_0: Float,
-        time_1: Float,
-        rng: &mut SmallRng,
-    ) -> BVHNode {
+    #[must_use]
+    pub fn from_list(mut objects: Vec<Hitable>, time_0: Float, time_1: Float) -> BVHNode {
         // Initialize two child nodes
         let left: Box<Hitable>;
         let right: Box<Hitable>;
@@ -104,13 +100,12 @@ impl BVHNode {
             let mid = object_span / 2;
             let objects_right = objects.split_off(mid);
             left = Box::new(Hitable::BVHNode(BVHNode::from_list(
-                objects, time_0, time_1, rng,
+                objects, time_0, time_1,
             )));
             right = Box::new(Hitable::BVHNode(BVHNode::from_list(
                 objects_right,
                 time_0,
                 time_1,
-                rng,
             )));
         }
 
@@ -164,6 +159,21 @@ impl BVHNode {
                 hit_right
             }
         }
+    }
+
+    #[must_use]
+    /// Returns the count of the nodes in the tree
+    pub fn count(&self) -> usize {
+        let leftsum = match &*self.left {
+            Hitable::BVHNode(b) => b.count(),
+            _ => 1,
+        };
+        let rightsum = match &*self.right {
+            Hitable::BVHNode(b) => b.count(),
+            _ => 1,
+        };
+
+        leftsum + rightsum
     }
 
     /// Returns the axis-aligned bounding box [AABB] of the objects within this [`BVHNode`].

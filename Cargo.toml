@@ -3,8 +3,6 @@ resolver = "2"
 
 members = [
   "clovers",
-  "clovers-app",
   "clovers-cli",
-  # "clovers-gpu",
   "clovers-gpu/shaders",
 ]

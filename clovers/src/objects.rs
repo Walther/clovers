@@ -1,6 +1,6 @@
 //! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
 
-use crate::{hitable::Hitable, Box};
+use crate::{bvhnode::BVHNode, hitable::Hitable, Box};
 
 pub mod boxy; // avoid keyword
 pub mod constant_medium;
@@ -43,7 +43,7 @@ pub enum Object {
     /// FlipFace object initializer
     FlipFace(FlipFaceInit),
     /// MovingSphere object initializer
-    MovingSphere(MovingSphere),
+    MovingSphere(MovingSphereInit),
     /// ObjectList object initializer
     ObjectList(ObjectList),
     /// Quad object initializer
@@ -54,7 +54,7 @@ pub enum Object {
     Sphere(SphereInit),
     #[cfg(feature = "stl")]
     /// STL object initializer
-    STL(STL),
+    STL(STLInit),
     /// Translate object initializer
     Translate(TranslateInit),
     /// Triangle object initializer
@@ -76,10 +76,16 @@ impl From<Object> for Hitable {
                 Hitable::FlipFace(FlipFace::new(obj))
             }
             Object::MovingSphere(x) => Hitable::MovingSphere(MovingSphere::new(
-                x.center_0, x.center_1, x.time_0, x.time_1, x.radius, x.material,
+                // TODO: time
+                x.center_0, x.center_1, 0.0, 1.0, x.radius, x.material,
             )),
-            Object::ObjectList(_x) => {
-                unimplemented!("Do not call .into() directly, see objects_to_flat_hitablelist");
+            Object::ObjectList(x) => {
+                let objects: Vec<Hitable> = x
+                    .iter()
+                    .map(|object| -> Hitable { object.clone().into() })
+                    .collect();
+                let bvh = BVHNode::from_list(objects, 0.0, 1.0);
+                Hitable::BVHNode(bvh)
             }
             Object::Quad(x) => Hitable::Quad(Quad::new(x.q, x.u, x.v, x.material)),
             Object::RotateY(x) => {
@@ -89,8 +95,9 @@ impl From<Object> for Hitable {
             }
             Object::Sphere(x) => Hitable::Sphere(Sphere::new(x.center, x.radius, x.material)),
             #[cfg(feature = "stl")]
-            Object::STL(_x) => {
-                unimplemented!("Do not call .into() directly, see objects_to_flat_hitablelist");
+            Object::STL(x) => {
+                // TODO: time
+                Hitable::STL(STL::new(x, 0.0, 1.0))
             }
             Object::Translate(x) => {
                 let obj = *x.object;

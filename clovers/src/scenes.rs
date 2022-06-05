@@ -8,8 +8,6 @@ use crate::{
     objects::Object,
     Float, Vec,
 };
-use rand::rngs::SmallRng;
-use rand::SeedableRng;
 
 #[cfg(feature = "traces")]
 use tracing::info;
@@ -29,6 +27,7 @@ pub struct Scene {
 
 impl Scene {
     /// Creates a new [Scene] with the given parameters.
+    #[must_use]
     pub fn new(
         time_0: Float,
         time_1: Float,
@@ -36,17 +35,15 @@ impl Scene {
         objects: Vec<Hitable>,
         priority_objects: Vec<Hitable>,
         background_color: Color,
-        rng: &mut SmallRng,
     ) -> Scene {
         Scene {
-            objects: BVHNode::from_list(objects, time_0, time_1, rng),
+            objects: BVHNode::from_list(objects, time_0, time_1),
             camera,
             background_color,
             priority_objects: Hitable::BVHNode(BVHNode::from_list(
                 priority_objects,
                 time_0,
                 time_1,
-                rng,
             )),
         }
     }
@@ -70,7 +67,6 @@ pub struct SceneFile {
 pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     let time_0 = scene_file.time_0;
     let time_1 = scene_file.time_1;
-    let mut rng = SmallRng::from_entropy();
     let background_color = scene_file.background_color;
     let camera = Camera::new(
         scene_file.camera.look_from,
@@ -86,9 +82,8 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
 
     #[cfg(feature = "traces")]
     info!("Creating a flattened list from the objects");
-    let hitables = objects_to_flat_hitablelist(scene_file.objects);
-
-    let priority_objects = objects_to_flat_hitablelist(scene_file.priority_objects);
+    let hitables: Vec<Hitable> = objects_to_hitables(scene_file.objects);
+    let priority_objects: Vec<Hitable> = objects_to_hitables(scene_file.priority_objects);
 
     Scene::new(
         time_0,
@@ -97,32 +92,13 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
         hitables,
         priority_objects,
         background_color,
-        &mut rng,
     )
 }
 
-fn objects_to_flat_hitablelist(objects: Vec<Object>) -> Vec<Hitable> {
+fn objects_to_hitables(objects: Vec<Object>) -> Vec<Hitable> {
     let mut hitables = Vec::new();
     for obj in objects {
-        match obj {
-            // For "list-like" objects, unwrap them to a flat list
-            Object::ObjectList(list) => {
-                for nested in list {
-                    hitables.push(nested.into());
-                }
-            }
-            #[cfg(feature = "stl")]
-            Object::STL(s) => {
-                let list: Vec<Hitable> = s.into();
-                for nested in list {
-                    hitables.push(nested);
-                }
-            }
-            // Plain objects, just push them directly
-            _ => {
-                hitables.push(obj.into());
-            }
-        };
+        hitables.push(obj.into());
     }
 
     hitables
