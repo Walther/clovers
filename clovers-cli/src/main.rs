@@ -5,15 +5,15 @@
 #![deny(clippy::all)]
 
 // External imports
-use chrono::Utc;
 use clap::Parser;
 use humantime::format_duration;
 use image::{ImageBuffer, Rgb, RgbImage};
 use std::fs::File;
 use std::io::Read;
 use std::{error::Error, fs, time::Instant};
+use time::OffsetDateTime;
 use tracing::{debug, info, Level};
-use tracing_subscriber::fmt::time;
+use tracing_subscriber::fmt::time::UtcTime;
 
 // Internal imports
 use clovers::*;
@@ -66,13 +66,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     if opts.debug {
         tracing_subscriber::fmt()
             .with_max_level(Level::DEBUG)
-            .with_timer(time::UtcTime::rfc_3339())
+            .with_timer(UtcTime::rfc_3339())
             .init();
         debug!("Debug logging enabled");
     } else {
         tracing_subscriber::fmt()
             .with_max_level(Level::ERROR)
-            .with_timer(time::UtcTime::rfc_3339())
+            .with_timer(UtcTime::rfc_3339())
             .init();
     }
 
@@ -146,7 +146,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Some(filename) => filename,
         None => {
             // Default to using a timestamp & `renders/` directory
-            let timestamp = Utc::now().timestamp();
+            let timestamp = OffsetDateTime::now_utc().unix_timestamp();
             fs::create_dir_all("renders")?;
             format!("renders/{}.png", timestamp)
         }
