@@ -112,27 +112,37 @@ impl Hitable {
         }
     }
 
-    // TODO: handle all objects
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
             Hitable::Boxy(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::BVHNode(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::ConstantMedium(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::FlipFace(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::STL(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::Translate(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Triangle(h) => h.pdf_value(origin, vector, time, rng),
-            _ => 0.0,
+            // TODO: create pdf_value functions for all objects
+            Hitable::Empty(_) | Hitable::MovingSphere(_) | Hitable::RotateY(_) => 0.0,
         }
     }
 
-    // TODO: handle all objects
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         match self {
             Hitable::Boxy(h) => h.random(origin, rng),
             Hitable::BVHNode(h) => h.random(origin, rng),
+            Hitable::ConstantMedium(h) => h.random(origin, rng),
+            Hitable::FlipFace(h) => h.random(origin, rng),
             Hitable::Quad(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
+            Hitable::STL(h) => h.random(origin, rng),
+            Hitable::Translate(h) => h.random(origin, rng),
             Hitable::Triangle(h) => h.random(origin, rng),
-            _ => random_in_unit_sphere(rng), // TODO: remove temp hack >:(
+            // TODO: create random point functions for all objects
+            Hitable::Empty(_) | Hitable::MovingSphere(_) | Hitable::RotateY(_) => {
+                random_in_unit_sphere(rng)
+            }
         }
     }
 }

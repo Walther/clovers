@@ -4,7 +4,7 @@ use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable},
     ray::Ray,
-    Box, Float,
+    Box, Float, Vec3,
 };
 use rand::rngs::SmallRng;
 
@@ -55,5 +55,15 @@ impl FlipFace {
     #[must_use]
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         self.object.bounding_box(t0, t1)
+    }
+
+    /// Returns a probability density function value based on the inner object
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+        self.object.pdf_value(origin, vector, time, rng)
+    }
+
+    /// Returns a random point on the surface of the inner object
+    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+        self.object.random(origin, rng)
     }
 }
