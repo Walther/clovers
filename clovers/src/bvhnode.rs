@@ -2,13 +2,13 @@
 
 use core::cmp::Ordering;
 
-use rand::rngs::SmallRng;
+use rand::{rngs::SmallRng, Rng};
 
 use crate::{
     aabb::AABB,
     hitable::{Empty, HitRecord, Hitable},
     ray::Ray,
-    Box, Float, Vec,
+    Box, Float, Vec, Vec3,
 };
 
 /// Bounding Volume Hierarchy Node.
@@ -180,6 +180,22 @@ impl BVHNode {
     #[must_use]
     pub fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
         Some(self.bounding_box)
+    }
+
+    /// Returns a probability density function value based on the children
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: f32, rng: &mut SmallRng) -> f32 {
+        (self.left.pdf_value(origin, vector, time, rng)
+            + self.right.pdf_value(origin, vector, time, rng))
+            / 2.0
+    }
+
+    /// Returns a random point on the surface of one of the children
+    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+        if rng.gen::<bool>() {
+            self.left.random(origin, rng)
+        } else {
+            self.right.random(origin, rng)
+        }
     }
 }
 

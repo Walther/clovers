@@ -130,4 +130,15 @@ impl ConstantMedium {
     pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         self.boundary.bounding_box(t0, t1)
     }
+
+    /// Returns a probability density function value based on the boundary object
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+        self.boundary.pdf_value(origin, vector, time, rng)
+    }
+
+    /// Returns a random point on the surface of the boundary of the fog
+    // TODO: should this return a random point inside the volume instead?
+    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+        self.boundary.random(origin, rng)
+    }
 }

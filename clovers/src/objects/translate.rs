@@ -63,4 +63,16 @@ impl Translate {
         let aabb = self.object.bounding_box(t0, t1);
         aabb.map(|b| b + self.offset)
     }
+
+    /// Returns a probability density function value based on the inner object
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+        // TODO: is this correct?
+        self.object
+            .pdf_value(origin + self.offset, vector, time, rng)
+    }
+
+    /// Returns a random point on the surface of the moved object
+    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+        self.object.random(origin, rng) + self.offset
+    }
 }

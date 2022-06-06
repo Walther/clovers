@@ -60,6 +60,16 @@ impl STL {
     pub fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<AABB> {
         Some(self.aabb)
     }
+
+    /// Returns a probability density function value based on the object
+    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+        self.bvhnode.pdf_value(origin, vector, time, rng)
+    }
+
+    /// Returns a random point on the ssurface of the object
+    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+        self.bvhnode.random(origin, rng)
+    }
 }
 
 /// STL structure. This gets converted into an internal representation using [Triangles](crate::objects::Triangle)

@@ -276,7 +276,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
 // TODO: no unwraps, polite error handling
 fn load_shader() -> wgpu::ShaderModuleDescriptor<'static> {
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let crate_path = [manifest_dir, "..", "clovers-gpu", "shaders"]
+    let crate_path = [manifest_dir, "..", "clovers-gpu"]
         .iter()
         .copied()
         .collect::<PathBuf>();
