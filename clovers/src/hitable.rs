@@ -10,11 +10,11 @@ use crate::{
         Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
         STL,
     },
+    random::random_in_unit_sphere,
     ray::Ray,
     Float, Vec3,
 };
 use rand::rngs::SmallRng;
-use rand::Rng;
 
 /// Represents a ray-object intersection, with plenty of data about the intersection.
 #[derive(Debug)]
@@ -112,10 +112,11 @@ impl Hitable {
         }
     }
 
-    // TODO: does this actually handle all objects?
+    // TODO: handle all objects
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
             Hitable::Boxy(h) => h.pdf_value(origin, vector, time, rng),
+            Hitable::BVHNode(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Triangle(h) => h.pdf_value(origin, vector, time, rng),
@@ -123,14 +124,15 @@ impl Hitable {
         }
     }
 
-    // TODO: does this actually handle all objects?
+    // TODO: handle all objects
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         match self {
             Hitable::Boxy(h) => h.random(origin, rng),
+            Hitable::BVHNode(h) => h.random(origin, rng),
             Hitable::Quad(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
             Hitable::Triangle(h) => h.random(origin, rng),
-            _ => Vec3::new(rng.gen::<Float>(), rng.gen::<Float>(), rng.gen::<Float>()).normalize(),
+            _ => random_in_unit_sphere(rng), // TODO: remove temp hack >:(
         }
     }
 }

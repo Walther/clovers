@@ -91,8 +91,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
             let scattered = scattered.non_negative();
 
             // Blend it all together
-            // TODO: temporarily taking the average, as it fixes the overblown colors. This is (probably) not correct though!
-            (emitted + scattered) / 2.0
+            emitted + scattered
         }
     }
 }
