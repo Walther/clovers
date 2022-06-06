@@ -24,11 +24,10 @@ let scene = {
 };
 
 let ground_texture = {
-  Lambertian: {
-    albedo: {
-      SolidColor: {
-        color: [0.5, 0.5, 0.5],
-      },
+  kind: "Lambertian",
+  albedo: {
+    SolidColor: {
+      color: [0.5, 0.5, 0.5],
     },
   },
 };
@@ -46,9 +45,8 @@ let glass_sphere = {
   center: [0.0, 1.0, 0.0],
   radius: 1.0,
   material: {
-    Dielectric: {
-      refractive_index: 1.5,
-    },
+    kind: "Dielectric",
+    refractive_index: 1.5,
   },
 };
 scene.objects.push(glass_sphere);
@@ -59,11 +57,10 @@ let lambertian_sphere = {
   center: [-4.0, 1.0, 0.0],
   radius: 1.0,
   material: {
-    Lambertian: {
-      albedo: {
-        SolidColor: {
-          color: [0.4, 0.2, 0.1],
-        },
+    kind: "Lambertian",
+    albedo: {
+      SolidColor: {
+        color: [0.4, 0.2, 0.1],
       },
     },
   },
@@ -75,12 +72,11 @@ let metal_sphere = {
   center: [4.0, 1.0, 0.0],
   radius: 1.0,
   material: {
-    Metal: {
-      fuzz: 0.0,
-      albedo: {
-        SolidColor: {
-          color: [0.7, 0.6, 0.5],
-        },
+    kind: "Metal",
+    fuzz: 0.0,
+    albedo: {
+      SolidColor: {
+        color: [0.7, 0.6, 0.5],
       },
     },
   },
@@ -109,9 +105,8 @@ for (let a = -11; a < 11; a++) {
         },
       };
       let sphere_material = {
-        Lambertian: {
-          albedo: texture,
-        },
+        kind: "Lambertian",
+        albedo: texture,
       };
       let center_1 = [
         center_0[0],
@@ -143,10 +138,9 @@ for (let a = -11; a < 11; a++) {
       };
       let fuzz = random_float(0.0, 0.5);
       let sphere_material = {
-        Metal: {
-          albedo: texture,
-          fuzz,
-        },
+        kind: "Metal",
+        albedo: texture,
+        fuzz,
       };
       let sphere = {
         kind: "Sphere",
@@ -158,9 +152,8 @@ for (let a = -11; a < 11; a++) {
     } else {
       // glass
       let sphere_material = {
-        Dielectric: {
-          refractive_index: 1.5,
-        },
+        kind: "Dielectric",
+        refractive_index: 1.5,
       };
       let sphere = {
         kind: "Sphere",

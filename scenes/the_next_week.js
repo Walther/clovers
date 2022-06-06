@@ -24,11 +24,10 @@ let scene = {
 };
 
 let ground = {
-  Lambertian: {
-    albedo: {
-      SolidColor: {
-        color: [0.48, 0.83, 0.53],
-      },
+  kind: "Lambertian",
+  albedo: {
+    SolidColor: {
+      color: [0.48, 0.83, 0.53],
     },
   },
 };
@@ -64,11 +63,10 @@ let light = {
   u: [300.0, 0.0, 0.0],
   v: [0.0, 0.0, 265.0],
   material: {
-    DiffuseLight: {
-      emit: {
-        SolidColor: {
-          color: [7.0, 7.0, 7.0],
-        },
+    kind: "DiffuseLight",
+    emit: {
+      SolidColor: {
+        color: [7.0, 7.0, 7.0],
       },
     },
   },
@@ -84,11 +82,10 @@ let moving_sphere = {
   time_1,
   radius: 50.0,
   material: {
-    Lambertian: {
-      albedo: {
-        SolidColor: {
-          color: [0.7, 0.3, 0.1],
-        },
+    kind: "Lambertian",
+    albedo: {
+      SolidColor: {
+        color: [0.7, 0.3, 0.1],
       },
     },
   },
@@ -100,9 +97,8 @@ let glass_sphere = {
   center: [260.0, 150.0, 45.0],
   radius: 50.0,
   material: {
-    Dielectric: {
-      refractive_index: 1.5,
-    },
+    kind: "Dielectric",
+    refractive_index: 1.5,
   },
 };
 scene.objects.push(glass_sphere);
@@ -112,12 +108,11 @@ let half_matte_metal_sphere = {
   center: [0.0, 150.0, 145.0],
   radius: 50.0,
   material: {
-    Metal: {
-      fuzz: 1.0,
-      albedo: {
-        SolidColor: {
-          color: [0.8, 0.8, 0.9],
-        },
+    kind: "Metal",
+    fuzz: 1.0,
+    albedo: {
+      SolidColor: {
+        color: [0.8, 0.8, 0.9],
       },
     },
   },
@@ -130,9 +125,8 @@ let blue_sphere_glass = {
   center: [360.0, 150.0, 145.0],
   radius: 70.0,
   material: {
-    Dielectric: {
-      refractive_index: 1.5,
-    },
+    kind: "Dielectric",
+    refractive_index: 1.5,
   },
 };
 scene.objects.push(blue_sphere_glass);
@@ -174,14 +168,13 @@ let marble = {
   center: [220.0, 280.0, 300.0],
   radius: 80.0,
   material: {
-    Lambertian: {
-      // albedo: {
-      // Originally NoiseTexture. Removed support for it.
-      // NoiseTexture: {
-      //   scale: 0.1,
-      // },
-      // },
-    },
+    kind: "Lambertian",
+    // albedo: {
+    // Originally NoiseTexture. Removed support for it.
+    // NoiseTexture: {
+    //   scale: 0.1,
+    // },
+    // },
   },
 };
 scene.objects.push(marble);
@@ -193,11 +186,10 @@ let spherebox = {
 };
 let num_spheres = 1000;
 let white = {
-  Lambertian: {
-    albedo: {
-      SolidColor: {
-        color: [0.73, 0.73, 0.73],
-      },
+  kind: "Lambertian",
+  albedo: {
+    SolidColor: {
+      color: [0.73, 0.73, 0.73],
     },
   },
 };

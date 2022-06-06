@@ -17,11 +17,10 @@
       "u": [0, 0, 555],
       "v": [0, 555, 0],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [0.12, 0.45, 0.15]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [0.12, 0.45, 0.15]
           }
         }
       },
@@ -33,11 +32,10 @@
       "u": [0, 0, -555],
       "v": [0, 555, 0],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [0.65, 0.05, 0.05]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [0.65, 0.05, 0.05]
           }
         }
       },
@@ -49,11 +47,10 @@
       "u": [555, 0, 0],
       "v": [0, 0, 555],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [0.73, 0.73, 0.73]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [0.73, 0.73, 0.73]
           }
         }
       },
@@ -65,11 +62,10 @@
       "u": [555, 0, 0],
       "v": [0, 0, 555],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [0.73, 0.73, 0.73]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [0.73, 0.73, 0.73]
           }
         }
       },
@@ -81,11 +77,10 @@
       "u": [555, 0, 0],
       "v": [0, 555, 0],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [0.73, 0.73, 0.73]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [0.73, 0.73, 0.73]
           }
         }
       },
@@ -97,11 +92,10 @@
       "u": [330, 0, 0],
       "v": [0, 0, 305],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [7, 7, 7]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [7, 7, 7]
           }
         }
       },
@@ -118,11 +112,10 @@
           "corner_0": [0, 0, 0],
           "corner_1": [165, 330, 165],
           "material": {
-            "Lambertian": {
-              "albedo": {
-                "SolidColor": {
-                  "color": [0.73, 0.73, 0.73]
-                }
+            "kind": "Lambertian",
+            "albedo": {
+              "SolidColor": {
+                "color": [0.73, 0.73, 0.73]
               }
             }
           },
@@ -135,10 +128,9 @@
       "center": [190, 90, 190],
       "radius": 90,
       "material": {
-        "Dielectric": {
-          "refractive_index": 1.5,
-          "color": [1, 1, 1]
-        }
+        "kind": "Dielectric",
+        "refractive_index": 1.5,
+        "color": [1, 1, 1]
       },
       "comment": "glass sphere"
     }
@@ -150,11 +142,10 @@
       "u": [330, 0, 0],
       "v": [0, 0, 305],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [7, 7, 7]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [7, 7, 7]
           }
         }
       },
@@ -165,10 +156,9 @@
       "center": [190, 90, 190],
       "radius": 90,
       "material": {
-        "Dielectric": {
-          "refractive_index": 1.5,
-          "color": [1, 1, 1]
-        }
+        "kind": "Dielectric",
+        "refractive_index": 1.5,
+        "color": [1, 1, 1]
       }
     }
   ]

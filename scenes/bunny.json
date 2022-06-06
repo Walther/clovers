@@ -45,15 +45,14 @@
         0
       ],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.12,
-                0.45,
-                0.15
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [
+              0.12,
+              0.45,
+              0.15
+            ]
           }
         }
       },
@@ -77,15 +76,14 @@
         0
       ],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.65,
-                0.05,
-                0.05
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [
+              0.65,
+              0.05,
+              0.05
+            ]
           }
         }
       },
@@ -109,15 +107,14 @@
         555
       ],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.73,
-                0.73,
-                0.73
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [
+              0.73,
+              0.73,
+              0.73
+            ]
           }
         }
       },
@@ -141,15 +138,14 @@
         555
       ],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.73,
-                0.73,
-                0.73
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [
+              0.73,
+              0.73,
+              0.73
+            ]
           }
         }
       },
@@ -173,15 +169,14 @@
         0
       ],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.73,
-                0.73,
-                0.73
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [
+              0.73,
+              0.73,
+              0.73
+            ]
           }
         }
       },
@@ -205,15 +200,14 @@
         305
       ],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [
-                7,
-                7,
-                7
-              ]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [
+              7,
+              7,
+              7
+            ]
           }
         }
       },
@@ -234,15 +228,14 @@
       ],
       "path": "bunny.stl",
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.9,
-                0.9,
-                0.9
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [
+              0.9,
+              0.9,
+              0.9
+            ]
           }
         }
       },
@@ -268,15 +261,14 @@
         305
       ],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [
-                7,
-                7,
-                7
-              ]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [
+              7,
+              7,
+              7
+            ]
           }
         }
       },

@@ -43,15 +43,14 @@
       ],
       "scale": 15,
       "material": {
-        "Metal": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.9,
-                0.6,
-                0.3
-              ]
-            }
+        "kind": "Metal",
+        "albedo": {
+          "SolidColor": {
+            "color": [
+              0.9,
+              0.6,
+              0.3
+            ]
           }
         }
       }
@@ -74,21 +73,20 @@
         10000
       ],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SurfaceChecker": {
-              "even": [
-                0.9,
-                0.9,
-                0.9
-              ],
-              "odd": [
-                0.1,
-                0.1,
-                0.1
-              ],
-              "density": 100
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SurfaceChecker": {
+            "even": [
+              0.9,
+              0.9,
+              0.9
+            ],
+            "odd": [
+              0.1,
+              0.1,
+              0.1
+            ],
+            "density": 100
           }
         }
       },
@@ -112,15 +110,14 @@
         300
       ],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [
-                10,
-                10,
-                10
-              ]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [
+              10,
+              10,
+              10
+            ]
           }
         }
       },
@@ -146,15 +143,14 @@
         300
       ],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [
-                10,
-                10,
-                10
-              ]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [
+              10,
+              10,
+              10
+            ]
           }
         }
       },

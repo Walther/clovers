@@ -28,11 +28,10 @@ let light = {
   u: [200.0, 0.0, 0.0],
   v: [0.0, 0.0, 200.0],
   material: {
-    DiffuseLight: {
-      emit: {
-        SolidColor: {
-          color: [3.0, 3.0, 3.0],
-        },
+    kind: "DiffuseLight",
+    emit: {
+      SolidColor: {
+        color: [3.0, 3.0, 3.0],
       },
     },
   },
@@ -49,10 +48,9 @@ let ground = {
   u: [20.0, 0.0, 0.0],
   v: [0.0, 0.0, 20.0],
   material: {
-    Lambertian: {
-      albedo: {
-        SpatialChecker: {},
-      },
+    kind: "Lambertian",
+    albedo: {
+      SpatialChecker: {},
     },
   },
 };
@@ -75,12 +73,11 @@ for (var y = -2; y <= 2; y += 1) {
     // First row: Lambertian with checker
     if (y == -2) {
       sphere["material"] = {
-        Lambertian: {
-          albedo: {
-            SurfaceChecker: {
-              even: color,
-              odd: [color[0] / 2.0, color[1] / 2.0, color[2] / 2.0],
-            },
+        kind: "Lambertian",
+        albedo: {
+          SurfaceChecker: {
+            even: color,
+            odd: [color[0] / 2.0, color[1] / 2.0, color[2] / 2.0],
           },
         },
       };
@@ -88,11 +85,10 @@ for (var y = -2; y <= 2; y += 1) {
     // Second row: Lambertian solid color
     else if (y == -1) {
       sphere["material"] = {
-        Lambertian: {
-          albedo: {
-            SolidColor: {
-              color,
-            },
+        kind: "Lambertian",
+        albedo: {
+          SolidColor: {
+            color,
           },
         },
       };
@@ -100,25 +96,23 @@ for (var y = -2; y <= 2; y += 1) {
     // Third row: Metal
     else if (y == 0) {
       sphere["material"] = {
-        Metal: {
-          albedo: {
-            SolidColor: {
-              color,
-            },
+        kind: "Metal",
+        albedo: {
+          SolidColor: {
+            color,
           },
-          // Start with no fuzz, increase based on x. Dodge the negative index.
-          fuzz: 0.0 + 0.1 * (2 + x),
         },
+        // Start with no fuzz, increase based on x. Dodge the negative index.
+        fuzz: 0.0 + 0.1 * (2 + x),
       };
     }
     // Fourth row: Dielectric
     else if (y == 1) {
       sphere["material"] = {
-        Dielectric: {
-          // brighter color for the glass spheres
-          color: [color[0] + 0.5, color[1] + 0.5, color[2] + 0.5],
-          refractive_index: 1.5,
-        },
+        kind: "Dielectric",
+        // brighter color for the glass spheres
+        color: [color[0] + 0.5, color[1] + 0.5, color[2] + 0.5],
+        refractive_index: 1.5,
       };
     }
     // Fifth row: ConstantMedium
@@ -141,11 +135,10 @@ for (var y = -2; y <= 2; y += 1) {
     // Default back to Lambertian with color tinting
     else {
       sphere["material"] = {
-        Lambertian: {
-          albedo: {
-            SolidColor: {
-              color,
-            },
+        kind: "Lambertian",
+        albedo: {
+          SolidColor: {
+            color,
           },
         },
       };

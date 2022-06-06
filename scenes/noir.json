@@ -2,98 +2,46 @@
   "time_0": 0,
   "time_1": 1,
   "camera": {
-    "look_from": [
-      278,
-      278,
-      -800
-    ],
-    "look_at": [
-      278,
-      278,
-      0
-    ],
-    "up": [
-      0,
-      1,
-      0
-    ],
+    "look_from": [278, 278, -800],
+    "look_at": [278, 278, 0],
+    "up": [0, 1, 0],
     "vertical_fov": 40,
     "aperture": 0,
     "focus_distance": 10
   },
-  "background_color": [
-    0,
-    0,
-    0
-  ],
+  "background_color": [0, 0, 0],
   "objects": [
     {
       "kind": "Translate",
-      "offset": [
-        265,
-        0,
-        295
-      ],
+      "offset": [265, 0, 295],
       "object": {
         "kind": "RotateY",
-          "angle": 15,
-          "object": {
-            "kind": "Boxy",
-              "corner_0": [
-                0,
-                0,
-                0
-              ],
-              "corner_1": [
-                165,
-                330,
-                165
-              ],
-              "material": {
-                "Lambertian": {
-                  "albedo": {
-                    "SolidColor": {
-                      "color": [
-                        0.73,
-                        0.73,
-                        0.73
-                      ]
-                    }
-                  }
-                }
+        "angle": 15,
+        "object": {
+          "kind": "Boxy",
+          "corner_0": [0, 0, 0],
+          "corner_1": [165, 330, 165],
+          "material": {
+            "kind": "Lambertian",
+            "albedo": {
+              "SolidColor": {
+                "color": [0.73, 0.73, 0.73]
               }
-            
-          
+            }
+          }
         }
       }
     },
     {
       "kind": "Quad",
-      "q": [
-        113,
-        554,
-        127
-      ],
-      "u": [
-        330,
-        0,
-        0
-      ],
-      "v": [
-        0,
-        0,
-        305
-      ],
+      "q": [113, 554, 127],
+      "u": [330, 0, 0],
+      "v": [0, 0, 305],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [
-                7,
-                7,
-                7
-              ]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [7, 7, 7]
           }
         }
       },
@@ -101,52 +49,26 @@
     },
     {
       "kind": "Sphere",
-      "center": [
-        190,
-        90,
-        190
-      ],
+      "center": [190, 90, 190],
       "radius": 90,
       "material": {
-        "Dielectric": {
-          "refractive_index": 1.5,
-          "color": [
-            1,
-            1,
-            1
-          ]
-        }
+        "kind": "Dielectric",
+        "refractive_index": 1.5,
+        "color": [1, 1, 1]
       }
     }
   ],
   "priority_objects": [
     {
       "kind": "Quad",
-      "q": [
-        113,
-        554,
-        127
-      ],
-      "u": [
-        330,
-        0,
-        0
-      ],
-      "v": [
-        0,
-        0,
-        305
-      ],
+      "q": [113, 554, 127],
+      "u": [330, 0, 0],
+      "v": [0, 0, 305],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [
-                7,
-                7,
-                7
-              ]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [7, 7, 7]
           }
         }
       },
@@ -154,21 +76,12 @@
     },
     {
       "kind": "Sphere",
-      "center": [
-        190,
-        90,
-        190
-      ],
+      "center": [190, 90, 190],
       "radius": 90,
       "material": {
-        "Dielectric": {
-          "refractive_index": 1.5,
-          "color": [
-            1,
-            1,
-            1
-          ]
-        }
+        "kind": "Dielectric",
+        "refractive_index": 1.5,
+        "color": [1, 1, 1]
       }
     }
   ]

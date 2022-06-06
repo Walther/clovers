@@ -45,15 +45,14 @@
         100
       ],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [
-                2.5,
-                2.5,
-                2.5
-              ]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [
+              2.5,
+              2.5,
+              2.5
+            ]
           }
         }
       }
@@ -67,21 +66,20 @@
       ],
       "radius": 8,
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SurfaceChecker": {
-              "even": [
-                1,
-                0,
-                0
-              ],
-              "odd": [
-                1,
-                1,
-                1
-              ],
-              "density": 12
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SurfaceChecker": {
+            "even": [
+              1,
+              0,
+              0
+            ],
+            "odd": [
+              1,
+              1,
+              1
+            ],
+            "density": 12
           }
         }
       }
@@ -106,15 +104,14 @@
         100
       ],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [
-                2.5,
-                2.5,
-                2.5
-              ]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [
+              2.5,
+              2.5,
+              2.5
+            ]
           }
         }
       }

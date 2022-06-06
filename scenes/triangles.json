@@ -2,58 +2,25 @@
   "time_0": 0,
   "time_1": 1,
   "camera": {
-    "look_from": [
-      278,
-      278,
-      -800
-    ],
-    "look_at": [
-      278,
-      278,
-      0
-    ],
-    "up": [
-      0,
-      1,
-      0
-    ],
+    "look_from": [278, 278, -800],
+    "look_at": [278, 278, 0],
+    "up": [0, 1, 0],
     "vertical_fov": 40,
     "aperture": 0,
     "focus_distance": 10
   },
-  "background_color": [
-    0,
-    0,
-    0
-  ],
+  "background_color": [0, 0, 0],
   "objects": [
     {
       "kind": "Quad",
-      "q": [
-        555,
-        0,
-        0
-      ],
-      "u": [
-        0,
-        0,
-        555
-      ],
-      "v": [
-        0,
-        555,
-        0
-      ],
+      "q": [555, 0, 0],
+      "u": [0, 0, 555],
+      "v": [0, 555, 0],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.12,
-                0.45,
-                0.15
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [0.12, 0.45, 0.15]
           }
         }
       },
@@ -61,31 +28,14 @@
     },
     {
       "kind": "Quad",
-      "q": [
-        0,
-        0,
-        555
-      ],
-      "u": [
-        0,
-        0,
-        -555
-      ],
-      "v": [
-        0,
-        555,
-        0
-      ],
+      "q": [0, 0, 555],
+      "u": [0, 0, -555],
+      "v": [0, 555, 0],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.65,
-                0.05,
-                0.05
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [0.65, 0.05, 0.05]
           }
         }
       },
@@ -93,31 +43,14 @@
     },
     {
       "kind": "Quad",
-      "q": [
-        0,
-        0,
-        0
-      ],
-      "u": [
-        555,
-        0,
-        0
-      ],
-      "v": [
-        0,
-        0,
-        555
-      ],
+      "q": [0, 0, 0],
+      "u": [555, 0, 0],
+      "v": [0, 0, 555],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.73,
-                0.73,
-                0.73
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [0.73, 0.73, 0.73]
           }
         }
       },
@@ -125,31 +58,14 @@
     },
     {
       "kind": "Quad",
-      "q": [
-        0,
-        555,
-        0
-      ],
-      "u": [
-        555,
-        0,
-        0
-      ],
-      "v": [
-        0,
-        0,
-        555
-      ],
+      "q": [0, 555, 0],
+      "u": [555, 0, 0],
+      "v": [0, 0, 555],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.73,
-                0.73,
-                0.73
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [0.73, 0.73, 0.73]
           }
         }
       },
@@ -157,31 +73,14 @@
     },
     {
       "kind": "Quad",
-      "q": [
-        0,
-        0,
-        555
-      ],
-      "u": [
-        555,
-        0,
-        0
-      ],
-      "v": [
-        0,
-        555,
-        0
-      ],
+      "q": [0, 0, 555],
+      "u": [555, 0, 0],
+      "v": [0, 555, 0],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.73,
-                0.73,
-                0.73
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [0.73, 0.73, 0.73]
           }
         }
       },
@@ -189,31 +88,14 @@
     },
     {
       "kind": "Quad",
-      "q": [
-        113,
-        554,
-        127
-      ],
-      "u": [
-        330,
-        0,
-        0
-      ],
-      "v": [
-        0,
-        0,
-        305
-      ],
+      "q": [113, 554, 127],
+      "u": [330, 0, 0],
+      "v": [0, 0, 305],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [
-                7,
-                7,
-                7
-              ]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [7, 7, 7]
           }
         }
       },
@@ -221,31 +103,14 @@
     },
     {
       "kind": "Triangle",
-      "q": [
-        255,
-        10,
-        255
-      ],
-      "u": [
-        0,
-        100,
-        0
-      ],
-      "v": [
-        100,
-        0,
-        0
-      ],
+      "q": [255, 10, 255],
+      "u": [0, 100, 0],
+      "v": [100, 0, 0],
       "material": {
-        "Lambertian": {
-          "albedo": {
-            "SolidColor": {
-              "color": [
-                0.72,
-                0.72,
-                0.72
-              ]
-            }
+        "kind": "Lambertian",
+        "albedo": {
+          "SolidColor": {
+            "color": [0.72, 0.72, 0.72]
           }
         }
       },
@@ -253,52 +118,23 @@
     },
     {
       "kind": "Triangle",
-      "q": [
-        0,
-        0,
-        0
-      ],
-      "u": [
-        0,
-        0,
-        0
-      ],
-      "v": [
-        0,
-        0,
-        0
-      ],
+      "q": [0, 0, 0],
+      "u": [0, 0, 0],
+      "v": [0, 0, 0],
       "comment": "empty object to appease bvhnode creation"
     }
   ],
   "priority_objects": [
     {
       "kind": "Quad",
-      "q": [
-        113,
-        554,
-        127
-      ],
-      "u": [
-        330,
-        0,
-        0
-      ],
-      "v": [
-        0,
-        0,
-        305
-      ],
+      "q": [113, 554, 127],
+      "u": [330, 0, 0],
+      "v": [0, 0, 305],
       "material": {
-        "DiffuseLight": {
-          "emit": {
-            "SolidColor": {
-              "color": [
-                7,
-                7,
-                7
-              ]
-            }
+        "kind": "DiffuseLight",
+        "emit": {
+          "SolidColor": {
+            "color": [7, 7, 7]
           }
         }
       },
