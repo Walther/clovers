@@ -23,16 +23,15 @@ let scene = {
 
 // Big light for smooth lighting of the entire scene
 let light = {
-  Quad: {
-    q: [-100.0, 80.0, -100.0],
-    u: [200.0, 0.0, 0.0],
-    v: [0.0, 0.0, 200.0],
-    material: {
-      DiffuseLight: {
-        emit: {
-          SolidColor: {
-            color: [3.0, 3.0, 3.0],
-          },
+  kind: "Quad",
+  q: [-100.0, 80.0, -100.0],
+  u: [200.0, 0.0, 0.0],
+  v: [0.0, 0.0, 200.0],
+  material: {
+    DiffuseLight: {
+      emit: {
+        SolidColor: {
+          color: [3.0, 3.0, 3.0],
         },
       },
     },
@@ -45,15 +44,14 @@ scene.priority_objects.push(light);
 // Checkerboard ground
 // The defaults should make this a unit square checkerboard
 let ground = {
-  Quad: {
-    q: [-10.0, 0.001, -10.0],
-    u: [20.0, 0.0, 0.0],
-    v: [0.0, 0.0, 20.0],
-    material: {
-      Lambertian: {
-        albedo: {
-          SpatialChecker: {},
-        },
+  kind: "Quad",
+  q: [-10.0, 0.001, -10.0],
+  u: [20.0, 0.0, 0.0],
+  v: [0.0, 0.0, 20.0],
+  material: {
+    Lambertian: {
+      albedo: {
+        SpatialChecker: {},
       },
     },
   },
@@ -69,15 +67,14 @@ for (var y = -2; y <= 2; y += 1) {
     let color = [0.2 + 0.1 * x, 0.2 + 0.1 * y, 0.2 + 0.1 * height];
     // Default sphere
     let sphere = {
-      Sphere: {
-        // TODO: fix the camera setup, these coordinates are in weird order :|
-        center: [y * 3.0, radius * 1.0, x * 3.0],
-        radius: radius,
-      },
+      kind: "Sphere",
+      // TODO: fix the camera setup, these coordinates are in weird order :|
+      center: [y * 3.0, radius * 1.0, x * 3.0],
+      radius: radius,
     };
     // First row: Lambertian with checker
     if (y == -2) {
-      sphere["Sphere"]["material"] = {
+      sphere["material"] = {
         Lambertian: {
           albedo: {
             SurfaceChecker: {
@@ -90,7 +87,7 @@ for (var y = -2; y <= 2; y += 1) {
     }
     // Second row: Lambertian solid color
     else if (y == -1) {
-      sphere["Sphere"]["material"] = {
+      sphere["material"] = {
         Lambertian: {
           albedo: {
             SolidColor: {
@@ -102,7 +99,7 @@ for (var y = -2; y <= 2; y += 1) {
     }
     // Third row: Metal
     else if (y == 0) {
-      sphere["Sphere"]["material"] = {
+      sphere["material"] = {
         Metal: {
           albedo: {
             SolidColor: {
@@ -116,7 +113,7 @@ for (var y = -2; y <= 2; y += 1) {
     }
     // Fourth row: Dielectric
     else if (y == 1) {
-      sphere["Sphere"]["material"] = {
+      sphere["material"] = {
         Dielectric: {
           // brighter color for the glass spheres
           color: [color[0] + 0.5, color[1] + 0.5, color[2] + 0.5],
@@ -128,23 +125,22 @@ for (var y = -2; y <= 2; y += 1) {
     else if (y == 2) {
       sphere = {
         // TODO: this is a weird override because ConstantMedium is an object, not a material by its own
-        ConstantMedium: {
-          boundary: {
-            Sphere: sphere["Sphere"],
-          },
-          texture: {
-            SolidColor: {
-              color,
-            },
-          },
-          // Start with high density, lower it
-          density: 1.0 - 0.2 * (2 + x),
+        kind: "ConstantMedium",
+        boundary: {
+          ...sphere,
         },
+        texture: {
+          SolidColor: {
+            color,
+          },
+        },
+        // Start with high density, lower it
+        density: 1.0 - 0.2 * (2 + x),
       };
     }
     // Default back to Lambertian with color tinting
     else {
-      sphere["Sphere"]["material"] = {
+      sphere["material"] = {
         Lambertian: {
           albedo: {
             SolidColor: {
@@ -159,5 +155,5 @@ for (var y = -2; y <= 2; y += 1) {
   }
 }
 
-let json = JSON.stringify(scene, null, 2);
+let json = JSON.stringify(scene);
 fs.writeFileSync(path.join(__dirname, "debug_scene.json"), json);

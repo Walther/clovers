@@ -34,22 +34,20 @@ let ground_texture = {
 };
 
 let ground_sphere = {
-  Sphere: {
-    center: [0.0, -1000.0, 0.0],
-    radius: 1000.0,
-    material: ground_texture,
-  },
+  kind: "Sphere",
+  center: [0.0, -1000.0, 0.0],
+  radius: 1000.0,
+  material: ground_texture,
 };
 scene.objects.push(ground_sphere);
 
 let glass_sphere = {
-  Sphere: {
-    center: [0.0, 1.0, 0.0],
-    radius: 1.0,
-    material: {
-      Dielectric: {
-        refractive_index: 1.5,
-      },
+  kind: "Sphere",
+  center: [0.0, 1.0, 0.0],
+  radius: 1.0,
+  material: {
+    Dielectric: {
+      refractive_index: 1.5,
     },
   },
 };
@@ -57,15 +55,14 @@ scene.objects.push(glass_sphere);
 scene.priority_objects.push(glass_sphere);
 
 let lambertian_sphere = {
-  Sphere: {
-    center: [-4.0, 1.0, 0.0],
-    radius: 1.0,
-    material: {
-      Lambertian: {
-        albedo: {
-          SolidColor: {
-            color: [0.4, 0.2, 0.1],
-          },
+  kind: "Sphere",
+  center: [-4.0, 1.0, 0.0],
+  radius: 1.0,
+  material: {
+    Lambertian: {
+      albedo: {
+        SolidColor: {
+          color: [0.4, 0.2, 0.1],
         },
       },
     },
@@ -74,16 +71,15 @@ let lambertian_sphere = {
 scene.objects.push(lambertian_sphere);
 
 let metal_sphere = {
-  Sphere: {
-    center: [4.0, 1.0, 0.0],
-    radius: 1.0,
-    material: {
-      Metal: {
-        fuzz: 0.0,
-        albedo: {
-          SolidColor: {
-            color: [0.7, 0.6, 0.5],
-          },
+  kind: "Sphere",
+  center: [4.0, 1.0, 0.0],
+  radius: 1.0,
+  material: {
+    Metal: {
+      fuzz: 0.0,
+      albedo: {
+        SolidColor: {
+          color: [0.7, 0.6, 0.5],
         },
       },
     },
@@ -124,14 +120,13 @@ for (let a = -11; a < 11; a++) {
       ];
 
       let moving_sphere = {
-        MovingSphere: {
-          center_0,
-          center_1,
-          time_0,
-          time_1,
-          radius: 0.2,
-          material: sphere_material,
-        },
+        kind: "MovingSphere",
+        center_0,
+        center_1,
+        time_0,
+        time_1,
+        radius: 0.2,
+        material: sphere_material,
       };
       scene.objects.push(moving_sphere);
     } else if (choose_mat < 0.95) {
@@ -154,11 +149,10 @@ for (let a = -11; a < 11; a++) {
         },
       };
       let sphere = {
-        Sphere: {
-          center: center_0,
-          radius: 0.2,
-          material: sphere_material,
-        },
+        kind: "Sphere",
+        center: center_0,
+        radius: 0.2,
+        material: sphere_material,
       };
       scene.objects.push(sphere);
     } else {
@@ -169,16 +163,15 @@ for (let a = -11; a < 11; a++) {
         },
       };
       let sphere = {
-        Sphere: {
-          center: center_0,
-          radius: 0.2,
-          material: sphere_material,
-        },
+        kind: "Sphere",
+        center: center_0,
+        radius: 0.2,
+        material: sphere_material,
       };
       scene.objects.push(sphere);
     }
   }
 }
 
-let json = JSON.stringify(scene, null, 2);
+let json = JSON.stringify(scene);
 fs.writeFileSync(path.join(__dirname, "one_weekend.json"), json);
