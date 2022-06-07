@@ -29,12 +29,18 @@ pub use triangle::*;
 
 // TODO: This is kind of an ugly hack, having to double-implement various structures to have an external representation vs internal representation. How could this be made cleaner?
 
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A list of objects. Allows multiple objects to be used e.g. in a Rotate or Translate object as the target.
-pub type ObjectList = Vec<Object>;
+pub struct ObjectList {
+    /// The encased [Object] list
+    pub objects: Vec<Object>,
+}
 
 #[derive(Clone, Debug)]
 /// An object enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
 pub enum Object {
     /// Boxy object initializer
     Boxy(BoxyInit),
@@ -81,6 +87,7 @@ impl From<Object> for Hitable {
             )),
             Object::ObjectList(x) => {
                 let objects: Vec<Hitable> = x
+                    .objects
                     .iter()
                     .map(|object| -> Hitable { object.clone().into() })
                     .collect();

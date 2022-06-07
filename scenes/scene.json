@@ -12,149 +12,161 @@
   },
   "objects": [
     {
-      "STL": {
-        "comment": "dragon",
-        "path": "dragon.stl",
-        "rotation": [-90, 180, 0],
-        "center": [270, 300, 600],
-        "scale": 15,
-        "material": {
-          "Metal": { "albedo": { "SolidColor": { "color": [0.9, 0.6, 0.3] } } }
+      "kind": "STL",
+      "comment": "dragon",
+      "path": "dragon.stl",
+      "rotation": [-90, 180, 0],
+      "center": [270, 300, 600],
+      "scale": 15,
+      "material": {
+        "kind": "Metal",
+        "albedo": {
+          "kind": "SolidColor",
+          "color": [0.9, 0.6, 0.3]
         }
       }
     },
     {
-      "STL": {
-        "path": "teapot.stl",
-        "comment": "teapot",
-        "rotation": [-90, 180, 0],
-        "center": [650, 0, 100],
-        "material": {
-          "Lambertian": {
-            "albedo": { "SolidColor": { "color": [0.5, 0.9, 0.7] } }
-          }
-        },
-        "scale": 20
-      }
+      "kind": "STL",
+      "path": "teapot.stl",
+      "comment": "teapot",
+      "rotation": [-90, 180, 0],
+      "center": [650, 0, 100],
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SolidColor",
+          "color": [0.5, 0.9, 0.7]
+        }
+      },
+      "scale": 20
     },
     {
-      "STL": {
-        "comment": "bunny",
-        "path": "bunny.stl",
-        "scale": 3,
-        "center": [-80, -15, 300],
-        "rotation": [-90, 180, 0],
-        "material": {
-          "Lambertian": {
-            "albedo": { "SolidColor": { "color": [0.7, 0.3, 0.5] } }
-          }
+      "kind": "STL",
+      "comment": "bunny",
+      "path": "bunny.stl",
+      "scale": 3,
+      "center": [-80, -15, 300],
+      "rotation": [-90, 180, 0],
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SolidColor",
+          "color": [0.7, 0.3, 0.5]
         }
       }
     },
     {
-      "Translate": {
-        "comment": "tall box",
-        "offset": [750, 0, 600],
+      "kind": "Translate",
+      "comment": "tall box",
+      "offset": [750, 0, 600],
+      "object": {
+        "kind": "RotateY",
+        "angle": 35,
         "object": {
-          "RotateY": {
-            "angle": 35,
-            "object": {
-              "ConstantMedium": {
-                "density": 0.01,
-                "boundary": {
-                  "Boxy": {
-                    "corner_0": [0, 0, 0],
-                    "corner_1": [200, 400, 200],
-                    "material": {
-                      "Isotropic": {
-                        "albedo": { "SolidColor": { "color": [0.9, 0.9, 0.9] } }
-                      }
-                    }
-                  }
-                },
-                "texture": { "SolidColor": { "color": [0.9, 0.9, 0.9] } }
+          "kind": "ConstantMedium",
+          "density": 0.01,
+          "boundary": {
+            "kind": "Boxy",
+            "corner_0": [0, 0, 0],
+            "corner_1": [200, 400, 200],
+            "material": {
+              "kind": "Isotropic",
+              "albedo": {
+                "kind": "SolidColor",
+                "color": [0.9, 0.9, 0.9]
               }
             }
           }
-        }
-      }
-    },
-    {
-      "Sphere": {
-        "comment": "metal sphere",
-        "radius": 90,
-        "center": [400, 90, 300],
-        "material": {
-          "Metal": {
-            "fuzz": 0.05,
-            "albedo": { "SolidColor": { "color": [0.7, 0.7, 0.7] } }
-          }
-        }
-      }
-    },
-    {
-      "Quad": {
-        "q": [-5000, 0, -500],
-        "u": [10000, 0, 0],
-        "v": [0, 0, 10000],
-        "comment": "floor",
-        "material": {
-          "Metal": {
-            "albedo": {
-              "SurfaceChecker": {
-                "even": [0.9, 0.9, 0.9],
-                "odd": [0.1, 0.1, 0.1],
-                "density": 100
-              }
-            },
-            "fuzz": 0.015
-          }
-        }
-      }
-    },
-    {
-      "Quad": {
-        "q": [0, 700, -100],
-        "u": [600, 0, 0],
-        "v": [0, 0, 300],
-        "material": {
-          "DiffuseLight": { "emit": { "SolidColor": { "color": [7, 7, 7] } } }
         },
-        "comment": "big ceiling light"
+        "texture": {
+          "kind": "SolidColor",
+          "color": [0.9, 0.9, 0.9]
+        }
       }
     },
     {
-      "Sphere": {
-        "center": [190, 120, 190],
-        "radius": 90,
-        "material": {
-          "Dielectric": { "refractive_index": 1.5, "color": [1, 1, 1] }
-        },
-        "comment": "glass sphere"
+      "kind": "Sphere",
+      "comment": "metal sphere",
+      "radius": 90,
+      "center": [400, 90, 300],
+      "material": {
+        "kind": "Metal",
+        "fuzz": 0.05,
+        "albedo": {
+          "kind": "SolidColor",
+          "color": [0.7, 0.7, 0.7]
+        }
       }
+    },
+    {
+      "kind": "Quad",
+      "q": [-5000, 0, -500],
+      "u": [10000, 0, 0],
+      "v": [0, 0, 10000],
+      "comment": "floor",
+      "material": {
+        "kind": "Metal",
+        "albedo": {
+          "kind": "SurfaceChecker",
+          "even": [0.9, 0.9, 0.9],
+          "odd": [0.1, 0.1, 0.1],
+          "density": 100
+        },
+        "fuzz": 0.015
+      }
+    },
+    {
+      "kind": "Quad",
+      "q": [0, 700, -100],
+      "u": [600, 0, 0],
+      "v": [0, 0, 300],
+      "material": {
+        "kind": "DiffuseLight",
+        "emit": {
+          "kind": "SolidColor",
+          "color": [7, 7, 7]
+        }
+      },
+      "comment": "big ceiling light"
+    },
+    {
+      "kind": "Sphere",
+      "center": [190, 120, 190],
+      "radius": 90,
+      "material": {
+        "kind": "Dielectric",
+        "refractive_index": 1.5,
+        "color": [1, 1, 1]
+      },
+      "comment": "glass sphere"
     }
   ],
   "priority_objects": [
     {
-      "Quad": {
-        "q": [113, 554, 127],
-        "u": [330, 0, 0],
-        "v": [0, 0, 305],
-        "material": {
-          "DiffuseLight": { "emit": { "SolidColor": { "color": [7, 7, 7] } } }
-        },
-        "comment": "big ceiling light"
-      }
+      "kind": "Quad",
+      "q": [113, 554, 127],
+      "u": [330, 0, 0],
+      "v": [0, 0, 305],
+      "material": {
+        "kind": "DiffuseLight",
+        "emit": {
+          "kind": "SolidColor",
+          "color": [7, 7, 7]
+        }
+      },
+      "comment": "big ceiling light"
     },
     {
-      "Sphere": {
-        "center": [190, 120, 190],
-        "radius": 90,
-        "material": {
-          "Dielectric": { "refractive_index": 1.5, "color": [1, 1, 1] }
-        },
-        "comment": "glass sphere"
-      }
+      "kind": "Sphere",
+      "center": [190, 120, 190],
+      "radius": 90,
+      "material": {
+        "kind": "Dielectric",
+        "refractive_index": 1.5,
+        "color": [1, 1, 1]
+      },
+      "comment": "glass sphere"
     }
   ]
 }

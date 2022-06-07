@@ -1,154 +1,130 @@
 {
-  "time_0": 0.0,
-  "time_1": 1.0,
+  "time_0": 0,
+  "time_1": 1,
   "camera": {
-    "look_from": [278.0, 278.0, -800.0],
-    "look_at": [278.0, 278.0, 0.0],
-    "up": [0.0, 1.0, 0.0],
-    "vertical_fov": 40.0,
-    "aperture": 0.0,
-    "focus_distance": 10.0
+    "look_from": [278, 278, -800],
+    "look_at": [278, 278, 0],
+    "up": [0, 1, 0],
+    "vertical_fov": 40,
+    "aperture": 0,
+    "focus_distance": 10
   },
-  "background_color": [0.0, 0.0, 0.0],
+  "background_color": [0, 0, 0],
   "objects": [
     {
-      "Quad": {
-        "q": [555.0, 0.0, 0.0],
-        "u": [0.0, 0.0, 555.0],
-        "v": [0.0, 555.0, 0.0],
-        "material": {
-          "Lambertian": {
-            "albedo": {
-              "SolidColor": {
-                "color": [0.12, 0.45, 0.15]
-              }
-            }
-          }
-        },
-        "comment": "green wall, left"
-      }
+      "kind": "Quad",
+      "q": [555, 0, 0],
+      "u": [0, 0, 555],
+      "v": [0, 555, 0],
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SolidColor",
+          "color": [0.12, 0.45, 0.15]
+        }
+      },
+      "comment": "green wall, left"
     },
     {
-      "Quad": {
-        "q": [0.0, 0.0, 555.0],
-        "u": [0.0, 0.0, -555.0],
-        "v": [0.0, 555.0, 0.0],
-        "material": {
-          "Lambertian": {
-            "albedo": {
-              "SolidColor": {
-                "color": [0.65, 0.05, 0.05]
-              }
-            }
-          }
-        },
-        "comment": "red wall, right"
-      }
+      "kind": "Quad",
+      "q": [0, 0, 555],
+      "u": [0, 0, -555],
+      "v": [0, 555, 0],
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SolidColor",
+          "color": [0.65, 0.05, 0.05]
+        }
+      },
+      "comment": "red wall, right"
     },
     {
-      "Quad": {
-        "q": [0.0, 0.0, 0.0],
-        "u": [555.0, 0.0, 0.0],
-        "v": [0.0, 0.0, 555.0],
-        "material": {
-          "Lambertian": {
-            "albedo": {
-              "SolidColor": {
-                "color": [0.73, 0.73, 0.73]
-              }
-            }
-          }
-        },
-        "comment": "floor"
-      }
+      "kind": "Quad",
+      "q": [0, 0, 0],
+      "u": [555, 0, 0],
+      "v": [0, 0, 555],
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SolidColor",
+          "color": [0.73, 0.73, 0.73]
+        }
+      },
+      "comment": "floor"
     },
     {
-      "Quad": {
-        "q": [0.0, 555.0, 0.0],
-        "u": [555.0, 0.0, 0.0],
-        "v": [0.0, 0.0, 555.0],
-        "material": {
-          "Lambertian": {
-            "albedo": {
-              "SolidColor": {
-                "color": [0.73, 0.73, 0.73]
-              }
-            }
-          }
-        },
-        "comment": "ceiling"
-      }
+      "kind": "Quad",
+      "q": [0, 555, 0],
+      "u": [555, 0, 0],
+      "v": [0, 0, 555],
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SolidColor",
+          "color": [0.73, 0.73, 0.73]
+        }
+      },
+      "comment": "ceiling"
     },
     {
-      "Quad": {
-        "q": [0.0, 0.0, 555.0],
-        "u": [555.0, 0.0, 0.0],
-        "v": [0.0, 555.0, 0.0],
-        "material": {
-          "Lambertian": {
-            "albedo": {
-              "SolidColor": {
-                "color": [0.73, 0.73, 0.73]
-              }
-            }
-          }
-        },
-        "comment": "back wall"
-      }
+      "kind": "Quad",
+      "q": [0, 0, 555],
+      "u": [555, 0, 0],
+      "v": [0, 555, 0],
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SolidColor",
+          "color": [0.73, 0.73, 0.73]
+        }
+      },
+      "comment": "back wall"
     },
     {
-      "Quad": {
-        "q": [113.0, 554.0, 127.0],
-        "u": [330.0, 0.0, 0.0],
-        "v": [0.0, 0.0, 305.0],
-        "material": {
-          "DiffuseLight": {
-            "emit": {
-              "SolidColor": {
-                "color": [7.0, 7.0, 7.0]
-              }
-            }
-          }
-        },
-        "comment": "big ceiling light"
-      }
+      "kind": "Quad",
+      "q": [113, 554, 127],
+      "u": [330, 0, 0],
+      "v": [0, 0, 305],
+      "material": {
+        "kind": "DiffuseLight",
+        "emit": {
+          "kind": "SolidColor",
+          "color": [7, 7, 7]
+        }
+      },
+      "comment": "big ceiling light"
     },
     {
-      "STL": {
-        "center": [378.0, -15.0, 278.0],
-        "scale": 3.0,
-        "rotation": [-90.0, 180.0, 0.0],
-        "path": "bunny.stl",
-        "material": {
-          "Lambertian": {
-            "albedo": {
-              "SolidColor": {
-                "color": [0.9, 0.9, 0.9]
-              }
-            }
-          }
-        },
-        "comment": "stanford bunny"
-      }
+      "kind": "STL",
+      "center": [378, -15, 278],
+      "scale": 3,
+      "rotation": [-90, 180, 0],
+      "path": "bunny.stl",
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SolidColor",
+          "color": [0.9, 0.9, 0.9]
+        }
+      },
+      "comment": "stanford bunny"
     }
   ],
   "priority_objects": [
     {
-      "Quad": {
-        "q": [113.0, 554.0, 127.0],
-        "u": [330.0, 0.0, 0.0],
-        "v": [0.0, 0.0, 305.0],
-        "material": {
-          "DiffuseLight": {
-            "emit": {
-              "SolidColor": {
-                "color": [7.0, 7.0, 7.0]
-              }
-            }
-          }
-        },
-        "comment": "big ceiling light"
-      }
+      "kind": "Quad",
+      "q": [113, 554, 127],
+      "u": [330, 0, 0],
+      "v": [0, 0, 305],
+      "material": {
+        "kind": "DiffuseLight",
+        "emit": {
+          "kind": "SolidColor",
+          "color": [7, 7, 7]
+        }
+      },
+      "comment": "big ceiling light"
     }
   ]
 }

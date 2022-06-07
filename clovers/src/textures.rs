@@ -12,6 +12,7 @@ use crate::{color::Color, Float, Vec3};
 #[derive(Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A texture enum.
+#[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
 pub enum Texture {
     /// SolidColor texture
     SolidColor(SolidColor),

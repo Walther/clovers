@@ -12,53 +12,44 @@
   "background_color": [0, 0, 0],
   "objects": [
     {
-      "Quad": {
-        "q": [-100.0, 80.0, -100.0],
-        "u": [200.0, 0.0, 0.0],
-        "v": [0.0, 0.0, 100.0],
-        "material": {
-          "DiffuseLight": {
-            "emit": {
-              "SolidColor": {
-                "color": [2.5, 2.5, 2.5]
-              }
-            }
-          }
+      "kind": "Quad",
+      "q": [-100, 80, -100],
+      "u": [200, 0, 0],
+      "v": [0, 0, 100],
+      "material": {
+        "kind": "DiffuseLight",
+        "emit": {
+          "kind": "SolidColor",
+          "color": [2.5, 2.5, 2.5]
         }
       }
     },
     {
-      "Sphere": {
-        "center": [0, 0, 0],
-        "radius": 8,
-        "material": {
-          "Lambertian": {
-            "albedo": {
-              "SurfaceChecker": {
-                "even": [1, 0, 0],
-                "odd": [1, 1, 1],
-                "density": 12
-              }
-            }
-          }
+      "kind": "Sphere",
+      "center": [0, 0, 0],
+      "radius": 8,
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SurfaceChecker",
+          "even": [1, 0, 0],
+          "odd": [1, 1, 1],
+          "density": 12
         }
       }
     }
   ],
   "priority_objects": [
     {
-      "Quad": {
-        "q": [-100.0, 80.0, -100.0],
-        "u": [200.0, 0.0, 0.0],
-        "v": [0.0, 0.0, 100.0],
-        "material": {
-          "DiffuseLight": {
-            "emit": {
-              "SolidColor": {
-                "color": [2.5, 2.5, 2.5]
-              }
-            }
-          }
+      "kind": "Quad",
+      "q": [-100, 80, -100],
+      "u": [200, 0, 0],
+      "v": [0, 0, 100],
+      "material": {
+        "kind": "DiffuseLight",
+        "emit": {
+          "kind": "SolidColor",
+          "color": [2.5, 2.5, 2.5]
         }
       }
     }

@@ -23,5 +23,5 @@ all-scenes:
   DATE=$(date -Is); \
   mkdir -p renders/$DATE; \
   for scene in $(ls scenes/ |grep json); \
-  do just cli --input scenes/$scene --output renders/$DATE/${scene%.json}.png; \
+  do just cli -s 1 --input scenes/$scene --output renders/$DATE/${scene%.json}.png; \
   done;

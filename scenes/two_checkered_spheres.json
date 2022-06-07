@@ -1,147 +1,71 @@
 {
-  "time_0": 0.0,
-  "time_1": 1.0,
+  "time_0": 0,
+  "time_1": 1,
   "camera": {
-    "look_from": [
-      13.0,
-      2.0,
-      3.0
-    ],
-    "look_at": [
-      0.0,
-      0.0,
-      0.0
-    ],
-    "up": [
-      0.0,
-      1.0,
-      0.0
-    ],
-    "vertical_fov": 20.0,
-    "aperture": 0.0,
-    "focus_distance": 1.0
+    "look_from": [13, 2, 3],
+    "look_at": [0, 0, 0],
+    "up": [0, 1, 0],
+    "vertical_fov": 20,
+    "aperture": 0,
+    "focus_distance": 1
   },
-  "background_color": [
-    0.7,
-    0.7,
-    0.7
-  ],
+  "background_color": [0.7, 0.7, 0.7],
   "objects": [
     {
-      "Sphere": {
-        "center": [
-          0.0,
-          -10.0,
-          0.0
-        ],
-        "radius": 10.0,
-        "material": {
-          "Lambertian": {
-            "albedo": {
-              "SurfaceChecker": {
-                "even": [
-                  0.2,
-                  0.3,
-                  0.1
-                ],
-                "odd": [
-                  0.9,
-                  0.9,
-                  0.9
-                ],
-                "density": 10.0
-              }
-            }
-          }
+      "kind": "Sphere",
+      "center": [0, -10, 0],
+      "radius": 10,
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SurfaceChecker",
+          "even": [0.2, 0.3, 0.1],
+          "odd": [0.9, 0.9, 0.9],
+          "density": 10
         }
       }
     },
     {
-      "Sphere": {
-        "center": [
-          0.0,
-          10.0,
-          0.0
-        ],
-        "radius": 10.0,
-        "material": {
-          "Lambertian": {
-            "albedo": {
-              "SurfaceChecker": {
-                "even": [
-                  0.2,
-                  0.3,
-                  0.1
-                ],
-                "odd": [
-                  0.9,
-                  0.9,
-                  0.9
-                ],
-                "density": 10.0
-              }
-            }
-          }
+      "kind": "Sphere",
+      "center": [0, 10, 0],
+      "radius": 10,
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SurfaceChecker",
+          "even": [0.2, 0.3, 0.1],
+          "odd": [0.9, 0.9, 0.9],
+          "density": 10
         }
       }
     }
   ],
   "priority_objects": [
     {
-      "Sphere": {
-        "center": [
-          0.0,
-          -10.0,
-          0.0
-        ],
-        "radius": 10.0,
-        "material": {
-          "Lambertian": {
-            "albedo": {
-              "SurfaceChecker": {
-                "even": [
-                  0.2,
-                  0.3,
-                  0.1
-                ],
-                "odd": [
-                  0.9,
-                  0.9,
-                  0.9
-                ],
-                "density": 10.0
-              }
-            }
-          }
+      "kind": "Sphere",
+      "center": [0, -10, 0],
+      "radius": 10,
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SurfaceChecker",
+          "even": [0.2, 0.3, 0.1],
+          "odd": [0.9, 0.9, 0.9],
+          "density": 10
         }
       }
     },
     {
-      "Sphere": {
-        "center": [
-          0.0,
-          10.0,
-          0.0
-        ],
-        "radius": 10.0,
-        "material": {
-          "Lambertian": {
-            "albedo": {
-              "SurfaceChecker": {
-                "even": [
-                  0.2,
-                  0.3,
-                  0.1
-                ],
-                "odd": [
-                  0.9,
-                  0.9,
-                  0.9
-                ],
-                "density": 10.0
-              }
-            }
-          }
+      "kind": "Sphere",
+      "center": [0, 10, 0],
+      "radius": 10,
+      "material": {
+        "kind": "Lambertian",
+        "albedo": {
+          "kind": "SurfaceChecker",
+          "even": [0.2, 0.3, 0.1],
+          "odd": [0.9, 0.9, 0.9],
+          "density": 10
         }
       }
     }

@@ -24,12 +24,10 @@ let scene = {
 };
 
 let ground = {
-  Lambertian: {
-    albedo: {
-      SolidColor: {
-        color: [0.48, 0.83, 0.53],
-      },
-    },
+  kind: "Lambertian",
+  albedo: {
+    kind: "SolidColor",
+    color: [0.48, 0.83, 0.53],
   },
 };
 
@@ -47,11 +45,10 @@ for (let i = 0; i < boxes_per_side; i++) {
     let z1 = z0 + w - box_epsilon;
 
     let box = {
-      Boxy: {
-        corner_0: [x0, y0, z0],
-        corner_1: [x1, y1, z1],
-        material: ground,
-      },
+      kind: "Boxy",
+      corner_0: [x0, y0, z0],
+      corner_1: [x1, y1, z1],
+      material: ground,
     };
 
     boxes.push(box);
@@ -60,18 +57,15 @@ for (let i = 0; i < boxes_per_side; i++) {
 scene.objects.push(...boxes);
 
 let light = {
-  Quad: {
-    q: [123.0, 554.0, 147.0],
-    u: [300.0, 0.0, 0.0],
-    v: [0.0, 0.0, 265.0],
-    material: {
-      DiffuseLight: {
-        emit: {
-          SolidColor: {
-            color: [7.0, 7.0, 7.0],
-          },
-        },
-      },
+  kind: "Quad",
+  q: [123.0, 554.0, 147.0],
+  u: [300.0, 0.0, 0.0],
+  v: [0.0, 0.0, 265.0],
+  material: {
+    kind: "DiffuseLight",
+    emit: {
+      kind: "SolidColor",
+      color: [7.0, 7.0, 7.0],
     },
   },
 };
@@ -79,51 +73,43 @@ scene.objects.push(light);
 scene.priority_objects.push(light);
 
 let moving_sphere = {
-  MovingSphere: {
-    center_0: [400.0, 400.0, 200.0],
-    center_1: [420.0, 400.0, 200.0],
-    time_0,
-    time_1,
-    radius: 50.0,
-    material: {
-      Lambertian: {
-        albedo: {
-          SolidColor: {
-            color: [0.7, 0.3, 0.1],
-          },
-        },
-      },
+  kind: "MovingSphere",
+  center_0: [400.0, 400.0, 200.0],
+  center_1: [420.0, 400.0, 200.0],
+  time_0,
+  time_1,
+  radius: 50.0,
+  material: {
+    kind: "Lambertian",
+    albedo: {
+      kind: "SolidColor",
+      color: [0.7, 0.3, 0.1],
     },
   },
 };
 scene.objects.push(moving_sphere);
 
 let glass_sphere = {
-  Sphere: {
-    center: [260.0, 150.0, 45.0],
-    radius: 50.0,
-    material: {
-      Dielectric: {
-        refractive_index: 1.5,
-      },
-    },
+  kind: "Sphere",
+  center: [260.0, 150.0, 45.0],
+  radius: 50.0,
+  material: {
+    kind: "Dielectric",
+    refractive_index: 1.5,
   },
 };
 scene.objects.push(glass_sphere);
 
 let half_matte_metal_sphere = {
-  Sphere: {
-    center: [0.0, 150.0, 145.0],
-    radius: 50.0,
-    material: {
-      Metal: {
-        fuzz: 1.0,
-        albedo: {
-          SolidColor: {
-            color: [0.8, 0.8, 0.9],
-          },
-        },
-      },
+  kind: "Sphere",
+  center: [0.0, 150.0, 145.0],
+  radius: 50.0,
+  material: {
+    kind: "Metal",
+    fuzz: 1.0,
+    albedo: {
+      kind: "SolidColor",
+      color: [0.8, 0.8, 0.9],
     },
   },
 };
@@ -131,112 +117,99 @@ scene.objects.push(half_matte_metal_sphere);
 
 // subsurface scattering object, first part
 let blue_sphere_glass = {
-  Sphere: {
-    center: [360.0, 150.0, 145.0],
-    radius: 70.0,
-    material: {
-      Dielectric: {
-        refractive_index: 1.5,
-      },
-    },
+  kind: "Sphere",
+  center: [360.0, 150.0, 145.0],
+  radius: 70.0,
+  material: {
+    kind: "Dielectric",
+    refractive_index: 1.5,
   },
 };
 scene.objects.push(blue_sphere_glass);
 
 // subsurface scattering object, second part
 let blue_sphere_smoke = {
-  ConstantMedium: {
-    density: 0.2,
-    boundary: {
-      ...blue_sphere_glass,
-    },
-    texture: {
-      SolidColor: {
-        color: [0.2, 0.4, 0.9],
-      },
-    },
+  kind: "ConstantMedium",
+  density: 0.2,
+  boundary: {
+    ...blue_sphere_glass,
+  },
+  texture: {
+    kind: "SolidColor",
+    color: [0.2, 0.4, 0.9],
   },
 };
 scene.objects.push(blue_sphere_smoke);
 
 // Big mist for the whole scene
 let mist = {
-  ConstantMedium: {
-    density: 0.0001,
-    boundary: {
-      Sphere: {
-        center: [0.0, 0.0, 0.0],
-        radius: 5000.0,
-      },
-    },
-    texture: {
-      SolidColor: {
-        color: [1.0, 1.0, 1.0],
-      },
-    },
+  kind: "ConstantMedium",
+  density: 0.0001,
+  boundary: {
+    kind: "Sphere",
+    center: [0.0, 0.0, 0.0],
+    radius: 5000.0,
+  },
+  texture: {
+    kind: "SolidColor",
+    color: [1.0, 1.0, 1.0],
   },
 };
 scene.objects.push(mist);
 
 let marble = {
-  Sphere: {
-    center: [220.0, 280.0, 300.0],
-    radius: 80.0,
-    material: {
-      Lambertian: {
-        // albedo: {
-          // Originally NoiseTexture. Removed support for it.
-          // NoiseTexture: {
-          //   scale: 0.1,
-          // },
-        // },
-      },
-    },
+  kind: "Sphere",
+  center: [220.0, 280.0, 300.0],
+  radius: 80.0,
+  material: {
+    kind: "Lambertian",
+    // albedo: {
+    // Originally NoiseTexture. Removed support for it.
+    // NoiseTexture: {
+    //   scale: 0.1,
+    // },
+    // },
   },
 };
 scene.objects.push(marble);
 
 // Sphere-rasterized pseudo box
 let spherebox = {
-  ObjectList: [],
+  kind: "ObjectList",
+  objects: [],
 };
 let num_spheres = 1000;
 let white = {
-  Lambertian: {
-    albedo: {
-      SolidColor: {
-        color: [0.73, 0.73, 0.73],
-      },
-    },
+  kind: "Lambertian",
+  albedo: {
+    kind: "SolidColor",
+    color: [0.73, 0.73, 0.73],
   },
 };
 for (let i = 0; i < num_spheres; i++) {
   let sphere = {
-    Sphere: {
-      center: [
-        random_float(0.0, 165.0),
-        random_float(0.0, 165.0),
-        random_float(0.0, 165.0),
-      ],
-      radius: 10.0,
-      material: white,
-    },
+    kind: "Sphere",
+    center: [
+      random_float(0.0, 165.0),
+      random_float(0.0, 165.0),
+      random_float(0.0, 165.0),
+    ],
+    radius: 10.0,
+    material: white,
   };
-  spherebox.ObjectList.push(sphere);
+  spherebox.objects.push(sphere);
 }
 let rotated_spherebox = {
-  RotateY: {
-    angle: 15.0,
-    object: spherebox,
-  },
+  kind: "RotateY",
+  angle: 15.0,
+  object: spherebox,
 };
 let translated_spherebox = {
-  Translate: {
-    offset: [-100.0, 270.0, 395.0],
-    object: rotated_spherebox,
-  },
+  kind: "Translate",
+  offset: [-100.0, 270.0, 395.0],
+  object: rotated_spherebox,
 };
 scene.objects.push(translated_spherebox);
 
-let json = JSON.stringify(scene, null, 2);
+let json = JSON.stringify(scene);
 fs.writeFileSync(path.join(__dirname, "the_next_week.json"), json);
