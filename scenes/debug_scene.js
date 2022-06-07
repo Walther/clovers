@@ -30,9 +30,8 @@ let light = {
   material: {
     kind: "DiffuseLight",
     emit: {
-      SolidColor: {
-        color: [3.0, 3.0, 3.0],
-      },
+      kind: "SolidColor",
+      color: [3.0, 3.0, 3.0],
     },
   },
 };
@@ -50,7 +49,7 @@ let ground = {
   material: {
     kind: "Lambertian",
     albedo: {
-      SpatialChecker: {},
+      kind: "SpatialChecker",
     },
   },
 };
@@ -75,10 +74,9 @@ for (var y = -2; y <= 2; y += 1) {
       sphere["material"] = {
         kind: "Lambertian",
         albedo: {
-          SurfaceChecker: {
-            even: color,
-            odd: [color[0] / 2.0, color[1] / 2.0, color[2] / 2.0],
-          },
+          kind: "SurfaceChecker",
+          even: color,
+          odd: [color[0] / 2.0, color[1] / 2.0, color[2] / 2.0],
         },
       };
     }
@@ -87,9 +85,8 @@ for (var y = -2; y <= 2; y += 1) {
       sphere["material"] = {
         kind: "Lambertian",
         albedo: {
-          SolidColor: {
-            color,
-          },
+          kind: "SolidColor",
+          color,
         },
       };
     }
@@ -98,9 +95,8 @@ for (var y = -2; y <= 2; y += 1) {
       sphere["material"] = {
         kind: "Metal",
         albedo: {
-          SolidColor: {
-            color,
-          },
+          kind: "SolidColor",
+          color,
         },
         // Start with no fuzz, increase based on x. Dodge the negative index.
         fuzz: 0.0 + 0.1 * (2 + x),
@@ -124,9 +120,8 @@ for (var y = -2; y <= 2; y += 1) {
           ...sphere,
         },
         texture: {
-          SolidColor: {
-            color,
-          },
+          kind: "SolidColor",
+          color,
         },
         // Start with high density, lower it
         density: 1.0 - 0.2 * (2 + x),
@@ -137,9 +132,8 @@ for (var y = -2; y <= 2; y += 1) {
       sphere["material"] = {
         kind: "Lambertian",
         albedo: {
-          SolidColor: {
-            color,
-          },
+          kind: "SolidColor",
+          color,
         },
       };
     }

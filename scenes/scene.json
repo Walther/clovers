@@ -21,9 +21,8 @@
       "material": {
         "kind": "Metal",
         "albedo": {
-          "SolidColor": {
-            "color": [0.9, 0.6, 0.3]
-          }
+          "kind": "SolidColor",
+          "color": [0.9, 0.6, 0.3]
         }
       }
     },
@@ -36,9 +35,8 @@
       "material": {
         "kind": "Lambertian",
         "albedo": {
-          "SolidColor": {
-            "color": [0.5, 0.9, 0.7]
-          }
+          "kind": "SolidColor",
+          "color": [0.5, 0.9, 0.7]
         }
       },
       "scale": 20
@@ -53,9 +51,8 @@
       "material": {
         "kind": "Lambertian",
         "albedo": {
-          "SolidColor": {
-            "color": [0.7, 0.3, 0.5]
-          }
+          "kind": "SolidColor",
+          "color": [0.7, 0.3, 0.5]
         }
       }
     },
@@ -76,17 +73,15 @@
             "material": {
               "kind": "Isotropic",
               "albedo": {
-                "SolidColor": {
-                  "color": [0.9, 0.9, 0.9]
-                }
+                "kind": "SolidColor",
+                "color": [0.9, 0.9, 0.9]
               }
             }
           }
         },
         "texture": {
-          "SolidColor": {
-            "color": [0.9, 0.9, 0.9]
-          }
+          "kind": "SolidColor",
+          "color": [0.9, 0.9, 0.9]
         }
       }
     },
@@ -99,9 +94,8 @@
         "kind": "Metal",
         "fuzz": 0.05,
         "albedo": {
-          "SolidColor": {
-            "color": [0.7, 0.7, 0.7]
-          }
+          "kind": "SolidColor",
+          "color": [0.7, 0.7, 0.7]
         }
       }
     },
@@ -114,11 +108,10 @@
       "material": {
         "kind": "Metal",
         "albedo": {
-          "SurfaceChecker": {
-            "even": [0.9, 0.9, 0.9],
-            "odd": [0.1, 0.1, 0.1],
-            "density": 100
-          }
+          "kind": "SurfaceChecker",
+          "even": [0.9, 0.9, 0.9],
+          "odd": [0.1, 0.1, 0.1],
+          "density": 100
         },
         "fuzz": 0.015
       }
@@ -131,9 +124,8 @@
       "material": {
         "kind": "DiffuseLight",
         "emit": {
-          "SolidColor": {
-            "color": [7, 7, 7]
-          }
+          "kind": "SolidColor",
+          "color": [7, 7, 7]
         }
       },
       "comment": "big ceiling light"
@@ -159,9 +151,8 @@
       "material": {
         "kind": "DiffuseLight",
         "emit": {
-          "SolidColor": {
-            "color": [7, 7, 7]
-          }
+          "kind": "SolidColor",
+          "color": [7, 7, 7]
         }
       },
       "comment": "big ceiling light"

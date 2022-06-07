@@ -26,9 +26,8 @@ let scene = {
 let ground = {
   kind: "Lambertian",
   albedo: {
-    SolidColor: {
-      color: [0.48, 0.83, 0.53],
-    },
+    kind: "SolidColor",
+    color: [0.48, 0.83, 0.53],
   },
 };
 
@@ -65,9 +64,8 @@ let light = {
   material: {
     kind: "DiffuseLight",
     emit: {
-      SolidColor: {
-        color: [7.0, 7.0, 7.0],
-      },
+      kind: "SolidColor",
+      color: [7.0, 7.0, 7.0],
     },
   },
 };
@@ -84,9 +82,8 @@ let moving_sphere = {
   material: {
     kind: "Lambertian",
     albedo: {
-      SolidColor: {
-        color: [0.7, 0.3, 0.1],
-      },
+      kind: "SolidColor",
+      color: [0.7, 0.3, 0.1],
     },
   },
 };
@@ -111,9 +108,8 @@ let half_matte_metal_sphere = {
     kind: "Metal",
     fuzz: 1.0,
     albedo: {
-      SolidColor: {
-        color: [0.8, 0.8, 0.9],
-      },
+      kind: "SolidColor",
+      color: [0.8, 0.8, 0.9],
     },
   },
 };
@@ -139,9 +135,8 @@ let blue_sphere_smoke = {
     ...blue_sphere_glass,
   },
   texture: {
-    SolidColor: {
-      color: [0.2, 0.4, 0.9],
-    },
+    kind: "SolidColor",
+    color: [0.2, 0.4, 0.9],
   },
 };
 scene.objects.push(blue_sphere_smoke);
@@ -156,9 +151,8 @@ let mist = {
     radius: 5000.0,
   },
   texture: {
-    SolidColor: {
-      color: [1.0, 1.0, 1.0],
-    },
+    kind: "SolidColor",
+    color: [1.0, 1.0, 1.0],
   },
 };
 scene.objects.push(mist);
@@ -188,9 +182,8 @@ let num_spheres = 1000;
 let white = {
   kind: "Lambertian",
   albedo: {
-    SolidColor: {
-      color: [0.73, 0.73, 0.73],
-    },
+    kind: "SolidColor",
+    color: [0.73, 0.73, 0.73],
   },
 };
 for (let i = 0; i < num_spheres; i++) {

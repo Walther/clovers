@@ -26,9 +26,8 @@ let scene = {
 let ground_texture = {
   kind: "Lambertian",
   albedo: {
-    SolidColor: {
-      color: [0.5, 0.5, 0.5],
-    },
+    kind: "SolidColor",
+    color: [0.5, 0.5, 0.5],
   },
 };
 
@@ -59,9 +58,8 @@ let lambertian_sphere = {
   material: {
     kind: "Lambertian",
     albedo: {
-      SolidColor: {
-        color: [0.4, 0.2, 0.1],
-      },
+      kind: "SolidColor",
+      color: [0.4, 0.2, 0.1],
     },
   },
 };
@@ -75,9 +73,8 @@ let metal_sphere = {
     kind: "Metal",
     fuzz: 0.0,
     albedo: {
-      SolidColor: {
-        color: [0.7, 0.6, 0.5],
-      },
+      kind: "SolidColor",
+      color: [0.7, 0.6, 0.5],
     },
   },
 };
@@ -100,9 +97,8 @@ for (let a = -11; a < 11; a++) {
         random_float(0.0, 1.0),
       ];
       let texture = {
-        SolidColor: {
-          color,
-        },
+        kind: "SolidColor",
+        color,
       };
       let sphere_material = {
         kind: "Lambertian",
@@ -132,9 +128,8 @@ for (let a = -11; a < 11; a++) {
         random_float(0.0, 1.0),
       ];
       let texture = {
-        SolidColor: {
-          color,
-        },
+        kind: "SolidColor",
+        color,
       };
       let fuzz = random_float(0.0, 0.5);
       let sphere_material = {
