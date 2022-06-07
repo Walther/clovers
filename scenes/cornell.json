@@ -98,9 +98,11 @@
     {
       "kind": "Translate",
       "offset": [265, 0, 295],
+      "comment": "moved tall box",
       "object": {
         "kind": "RotateY",
         "angle": 15,
+        "comment": "rotated tall box",
         "object": {
           "kind": "Boxy",
           "corner_0": [0, 0, 0],
@@ -112,7 +114,7 @@
               "color": [0.73, 0.73, 0.73]
             }
           },
-          "comment": "rotated tall box"
+          "comment": "tall box"
         }
       }
     },
@@ -151,7 +153,8 @@
         "kind": "Dielectric",
         "refractive_index": 1.5,
         "color": [1, 1, 1]
-      }
+      },
+      "comment": "glass sphere"
     }
   ]
 }
