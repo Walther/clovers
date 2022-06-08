@@ -100,6 +100,7 @@ impl RotateY {
     }
 
     /// Hit method for the [`RotateY`] object. Finds the rotation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,

@@ -71,6 +71,7 @@ pub enum Hitable {
 pub struct Empty {}
 
 impl Hitable {
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,
@@ -112,6 +113,7 @@ impl Hitable {
         }
     }
 
+    #[must_use]
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
             Hitable::Boxy(h) => h.pdf_value(origin, vector, time, rng),
@@ -128,6 +130,7 @@ impl Hitable {
         }
     }
 
+    #[must_use]
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         match self {
             Hitable::Boxy(h) => h.random(origin, rng),

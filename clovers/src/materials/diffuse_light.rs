@@ -29,6 +29,7 @@ impl Default for DiffuseLight {
 impl<'a> DiffuseLight {
     /// Scatter method for the [`DiffuseLight`] material. Always returns `None`, as diffuse light does not scatter.
     #[allow(clippy::unused_self)]
+    #[must_use]
     pub fn scatter(
         self,
         _ray: &Ray,
@@ -40,6 +41,7 @@ impl<'a> DiffuseLight {
 
     /// Scattering probability density function for the [`DiffuseLight`] material. Always returns 0, as diffuse light does not scatter.
     #[allow(clippy::unused_self)] // TODO:
+    #[must_use]
     pub fn scattering_pdf(
         self,
         _ray: &Ray,

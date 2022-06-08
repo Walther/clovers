@@ -36,6 +36,7 @@ impl FlipFace {
     }
 
     /// Hit function for the [`FlipFace`] object. Considering this is a utility object that wraps an internal `object`, it returns a [`HitRecord`] with the `front_face` property flipped, if the given [Ray] hits the object.
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,
@@ -58,11 +59,13 @@ impl FlipFace {
     }
 
     /// Returns a probability density function value based on the inner object
+    #[must_use]
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         self.object.pdf_value(origin, vector, time, rng)
     }
 
     /// Returns a random point on the surface of the inner object
+    #[must_use]
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         self.object.random(origin, rng)
     }

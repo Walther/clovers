@@ -39,6 +39,7 @@ impl Default for Material {
 
 impl Material {
     /// Scatters a ray from the material
+    #[must_use]
     pub fn scatter(
         &self,
         ray: &Ray,
@@ -55,6 +56,7 @@ impl Material {
     }
 
     /// Returns a probability? TODO: understand
+    #[must_use]
     pub fn scattering_pdf(
         &self,
         ray: &Ray,
@@ -111,10 +113,14 @@ pub struct ScatterRecord<'a> {
     pub pdf_ptr: PDF<'a>,
 }
 
+// TODO: are these up to date / correct?
+
+#[must_use]
 fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
     vector - 2.0 * vector.dot(&normal) * normal
 }
 
+#[must_use]
 fn refract(uv: Vec3, normal: Vec3, etai_over_etat: Float) -> Vec3 {
     let cos_theta: Float = -uv.dot(&normal);
     let r_out_parallel: Vec3 = etai_over_etat * (uv + cos_theta * normal);
@@ -122,6 +128,7 @@ fn refract(uv: Vec3, normal: Vec3, etai_over_etat: Float) -> Vec3 {
     r_out_parallel + r_out_perp
 }
 
+#[must_use]
 fn schlick(cosine: Float, refractive_index: Float) -> Float {
     let r0 = (1.0 - refractive_index) / (1.0 + refractive_index);
     let r0 = r0 * r0;

@@ -11,6 +11,7 @@ use crate::{
 use rand::rngs::SmallRng;
 
 /// The main coloring function. Sends a [Ray] to the [Scene], sees if it hits anything, and eventually returns a [Color]. Taking into account the [Material](crate::materials::Material) that is hit, the method recurses with various adjustments, with a new [Ray] started from the location that was hit.
+#[must_use]
 pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut SmallRng) -> Color {
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
@@ -68,10 +69,8 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
                 hit_record.position,
             ));
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
-
             let scatter_ray = Ray::new(hit_record.position, mixture_pdf.generate(rng), ray.time);
             let pdf_val = mixture_pdf.value(scatter_ray.direction, ray.time, rng);
-
             if pdf_val <= 0.0 {
                 // scattering impossible, prevent division by zero below
                 // for more ctx, see https://github.com/RayTracing/raytracing.github.io/issues/979#issuecomment-1034517236

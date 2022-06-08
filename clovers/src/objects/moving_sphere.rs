@@ -92,6 +92,7 @@ impl MovingSphere {
     }
 
     /// Hit method for the [`MovingSphere`] object. First gets the interpolated center position at the given time, then follows the implementation of [Sphere](crate::objects::Sphere) object's hit method.
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,

@@ -57,6 +57,7 @@ impl Sphere {
     }
 
     /// Hit method for the [Sphere] object. Returns a [`HitRecord`] if the given [Ray] intersects with the sphere at the given distance interval.
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,
@@ -119,6 +120,7 @@ impl Sphere {
     }
 
     /// Returns the probability density function for the sphere? TODO: what does this do again and how
+    #[must_use]
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
@@ -140,6 +142,7 @@ impl Sphere {
 
     // TODO: understand, document
     /// Utility function from Ray Tracing: The Rest of Your Life. TODO: understand, document
+    #[must_use]
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         let direction: Vec3 = self.center - origin;
         let distance_squared: Float = direction.norm_squared();

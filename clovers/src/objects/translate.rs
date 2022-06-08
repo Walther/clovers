@@ -35,6 +35,7 @@ impl Translate {
     }
 
     /// Hit method for the [Translate] object. Finds the translation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,
@@ -65,6 +66,7 @@ impl Translate {
     }
 
     /// Returns a probability density function value based on the inner object
+    #[must_use]
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         // TODO: is this correct?
         self.object
@@ -72,6 +74,7 @@ impl Translate {
     }
 
     /// Returns a random point on the surface of the moved object
+    #[must_use]
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         self.object.random(origin, rng) + self.offset
     }

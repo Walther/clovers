@@ -27,6 +27,7 @@ impl<'a> Isotropic {
     }
 
     /// Returns a [`ScatterRecord`] based on the [`HitRecord`] coordinates and the given [Texture], or [None] if the ray did not hit the material. TODO: verify implementation, copied from [Lambertian](crate::materials::Lambertian)
+    #[must_use]
     pub fn scatter(
         self,
         _ray: &Ray,
@@ -49,6 +50,7 @@ impl<'a> Isotropic {
 
     /// Returns the scattering probability density function for the [Isotropic] material. TODO: verify implementation, copied from [Lambertian](crate::materials::Lambertian)
     #[allow(clippy::unused_self)] // TODO:
+    #[must_use]
     pub fn scattering_pdf(
         self,
         _ray: &Ray,

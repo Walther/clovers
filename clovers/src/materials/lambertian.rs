@@ -20,6 +20,7 @@ pub struct Lambertian {
 
 impl<'a> Lambertian {
     /// Returns None, if ray is absorbed. Otherwise, returns a ray, albedo of what was hit, and (?) a value used for probability density function based sampling
+    #[must_use]
     pub fn scatter(
         self,
         _ray: &Ray,
@@ -38,6 +39,7 @@ impl<'a> Lambertian {
 
     /// Returns the scattering probability density function for the [Lambertian] material. TODO: explain the math
     #[allow(clippy::unused_self)] // TODO:
+    #[must_use]
     pub fn scattering_pdf(
         self,
         _ray: &Ray,
@@ -55,6 +57,7 @@ impl<'a> Lambertian {
     }
 
     /// Creates a new instance of the [Lambertian] material with an albedo of the given [Texture].
+    #[must_use]
     pub fn new(albedo: impl Into<Texture>) -> Self {
         Lambertian {
             albedo: albedo.into(),

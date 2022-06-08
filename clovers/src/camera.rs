@@ -99,6 +99,7 @@ impl Camera {
 
     // TODO: fix the mysterious (u,v) vs (s,t) change that came from the tutorial
     /// Generates a new [Ray] from the camera, at a random location of the aperture, at a random time interval between `time_0`, `time_1` of the camera.
+    #[must_use]
     pub fn get_ray(self, s: Float, t: Float, rng: &mut SmallRng) -> Ray {
         // TODO: add a better defocus blur / depth of field implementation
         let rd: Vec3 = self.lens_radius * random_in_unit_disk(rng);

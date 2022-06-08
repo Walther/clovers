@@ -95,6 +95,7 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     )
 }
 
+#[must_use]
 fn objects_to_hitables(objects: Vec<Object>) -> Vec<Hitable> {
     let mut hitables = Vec::new();
     for obj in objects {

@@ -106,6 +106,7 @@ impl Triangle {
     }
 
     /// Hit method for the triangle
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,
@@ -161,6 +162,7 @@ impl Triangle {
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
+    #[must_use]
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         // TODO: this is from quad and not updated!
         match self.hit(
@@ -181,6 +183,7 @@ impl Triangle {
     }
 
     /// Returns a random point on the triangle surface
+    #[must_use]
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         let mut a = rng.gen::<Float>();
         let mut b = rng.gen::<Float>();
@@ -195,6 +198,7 @@ impl Triangle {
     }
 }
 
+#[must_use]
 fn hit_ab(a: Float, b: Float) -> bool {
     // Given the hit point in plane coordinates, return false if it is outside the
     // primitive, otherwise return true.
