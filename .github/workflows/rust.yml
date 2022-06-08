@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_test:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,3 +24,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: EmbarkStudios/cargo-deny-action@v1
+  lint: # inspired by https://github.com/EmbarkStudios/rust-gpu/blob/main/.github/workflows/ci.yaml
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install rustup components
+        run: rustup component add rustfmt clippy
+      - name: Install rust-toolchain # cargo version is a random command that forces the installation of rust-toolchain
+        run: cargo version
+      - name: cargo fetch --locked
+        run: cargo fetch --locked
+      - name: Rustfmt
+        run: cargo fmt --all -- --check
+      - name: Check docs are valid
+        run: RUSTDOCFLAGS=-Dwarnings cargo doc --no-deps
+      - name: Clippy
+        run: cargo clippy
