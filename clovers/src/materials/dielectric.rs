@@ -79,8 +79,8 @@ impl<'a> Dielectric {
         _hit_record: &HitRecord,
         _scattered: &Ray,
         _rng: &mut SmallRng,
-    ) -> Float {
-        todo!()
+    ) -> Option<Float> {
+        None // TODO: should a dielectric material scatter? how much?
     }
 
     /// Creates a new [Dielectric] material with the given refractive index and color.

@@ -46,8 +46,8 @@ impl<'a> DiffuseLight {
         _hit_record: &HitRecord,
         _scattered: &Ray,
         _rng: &mut SmallRng,
-    ) -> Float {
-        0.0 // TODO: cleanup
+    ) -> Option<Float> {
+        None
     }
 
     /// Emission function for [`DiffuseLight`]. If the given [`HitRecord`] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.

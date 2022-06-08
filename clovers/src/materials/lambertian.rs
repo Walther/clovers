@@ -44,13 +44,13 @@ impl<'a> Lambertian {
         hit_record: &HitRecord,
         scattered: &Ray,
         _rng: &mut SmallRng,
-    ) -> Float {
+    ) -> Option<Float> {
         // TODO: explain the math
         let cosine = hit_record.normal.dot(&scattered.direction.normalize());
         if cosine < 0.0 {
-            0.0
+            None
         } else {
-            cosine / PI
+            Some(cosine / PI)
         }
     }
 

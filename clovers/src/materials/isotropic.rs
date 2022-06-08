@@ -55,14 +55,14 @@ impl<'a> Isotropic {
         hit_record: &HitRecord,
         scattered: &Ray,
         _rng: &mut SmallRng,
-    ) -> Float {
+    ) -> Option<Float> {
         // TODO: fix / verify correctness!
         // this is just copied from lambertian as an experiment
         let cosine = hit_record.normal.dot(&scattered.direction.normalize());
         if cosine < 0.0 {
-            0.0
+            None
         } else {
-            cosine / PI
+            Some(cosine / PI)
         }
     }
 }

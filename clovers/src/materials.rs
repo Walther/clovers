@@ -61,7 +61,7 @@ impl Material {
         hit_record: &HitRecord,
         scattered: &Ray,
         rng: &mut SmallRng,
-    ) -> Float {
+    ) -> Option<Float> {
         match *self {
             Material::Dielectric(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
             Material::DiffuseLight(m) => m.scattering_pdf(ray, hit_record, scattered, rng),

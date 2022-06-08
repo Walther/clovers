@@ -78,20 +78,23 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
                 return emitted;
             }
 
-            // Recurse
-            let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
-            let scattered = scatter_record.attenuation
-                * hit_record
+            // Calculate the PDF weighting for the scatter // TODO: understand the literature for this, and explain
+            if let Some(scattering_pdf) =
+                hit_record
                     .material
                     .scattering_pdf(ray, &hit_record, &scatter_ray, rng)
-                * recurse
-                / pdf_val;
-
-            // Ensure positive color
-            let scattered = scattered.non_negative();
-
-            // Blend it all together
-            emitted + scattered
+            {
+                // Recurse for the scattering ray
+                let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
+                // Weight it according to the PDF
+                let scattered = scatter_record.attenuation * scattering_pdf * recurse / pdf_val;
+                // Ensure positive color
+                let scattered = scattered.non_negative();
+                // Blend it all together
+                return emitted + scattered;
+            }
+            // No scatter, only emit
+            emitted
         }
     }
 }

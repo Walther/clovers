@@ -52,8 +52,8 @@ impl<'a> Metal {
         _hit_record: &HitRecord,
         _scattered: &Ray,
         _rng: &mut SmallRng,
-    ) -> Float {
-        0.0 // TODO: why does metal scatter 0? No mention in tutorial afaiu
+    ) -> Option<Float> {
+        None // TODO: why does metal never scatter? should it scatter if fuzzy?
     }
 
     /// Creates a new [Metal] material with the albedo of the given [Texture] and a smoothness-roughness factor specified by `fuzz` parameter.
