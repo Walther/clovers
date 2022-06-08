@@ -100,7 +100,7 @@
       "center": [378, -15, 278],
       "scale": 3,
       "rotation": [-90, 180, 0],
-      "path": "bunny.stl",
+      "path": "stl/bunny.stl",
       "material": {
         "kind": "Lambertian",
         "albedo": {

@@ -1,6 +1,6 @@
 # clovers 🍀 ray tracing in rust 🦀
 
-![Raytraced render of a Cornell box with a large ceiling light, one green wall, one red wall, one tall box, and a glass sphere.](scene.png)
+![Raytraced render with a lot of fancy objects! metal-based checkerboard floor with a slight fuzziness to it, teal-colored matte teapot on the left, pink matte bunny on the right, golden metal dragon in the back center, a dark metal sphere with slight fuzziness and a hovering clear glass sphere in the front center, and a slightly ominous tall tower of fog in the back left](scene.png)
 
 ## Usage
 
@@ -8,7 +8,6 @@ Currently, this project is highly experimental. Things change all the time.
 
 - `clovers/` contains the library
 - `clovers-cli/` contains the CLI application
-- `clovers-app/` contains the GUI application
 - `clovers-gpu/` contains the shaders for GPU accelerated rendering
 
 The automatically built documentation is hosted at <https://walther.github.io/clovers/clovers/>.
@@ -32,3 +31,5 @@ This repository has some example model files for demonstrating triangle-based ob
 - Utah Teapot model `teapot.stl` CC0 1.0 Universal Public Domain [Wikipedia](https://en.wikipedia.org/wiki/File:Utah_teapot_(solid).stl)
 - Stanford Bunny model `bunny.stl` CC Attribution 3.0 Unported [Wikipedia](https://commons.wikimedia.org/wiki/File:Stanford_Bunny.stl)
 - Stanford Dragon model `dragon.stl` (stl converted version) CC Attribution [Thingiverse](https://www.thingiverse.com/thing:27666)
+- Rubber Duck model `duck.stl` CC0 1.0 Universal Public Domain [Thingiverse](https://www.thingiverse.com/thing:139894)
+
