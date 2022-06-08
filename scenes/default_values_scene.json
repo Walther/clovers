@@ -47,9 +47,8 @@
       "material": {
         "kind": "Lambertian",
         "albedo": {
-          "SpatialChecker": {
-            "density": 0.1
-          }
+          "kind": "SpatialChecker",
+          "density": 0.1
         }
       },
       "comment": "floor. note slightly moved y axis for spatial checker to be visible and not in the exact transition plane"
