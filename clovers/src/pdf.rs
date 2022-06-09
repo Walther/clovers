@@ -2,6 +2,7 @@
 
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
+use crate::random::random_in_unit_sphere;
 use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Box, Float, Vec3, PI};
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -9,6 +10,7 @@ use rand::Rng;
 #[derive(Debug)]
 pub enum PDF<'a> {
     CosinePDF(CosinePDF),
+    SpherePDF(SpherePDF),
     HitablePDF(HitablePDF<'a>),
     MixturePDF(MixturePDF<'a>),
     ZeroPDF(ZeroPDF),
@@ -19,6 +21,7 @@ impl<'a> PDF<'a> {
     pub fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
             PDF::CosinePDF(p) => p.value(direction, time, rng),
+            PDF::SpherePDF(p) => p.value(direction, time, rng),
             PDF::HitablePDF(p) => p.value(direction, time, rng),
             PDF::MixturePDF(p) => p.value(direction, time, rng),
             PDF::ZeroPDF(p) => p.value(direction, time, rng),
@@ -28,6 +31,7 @@ impl<'a> PDF<'a> {
     pub fn generate(&self, rng: &mut SmallRng) -> Vec3 {
         match self {
             PDF::CosinePDF(p) => p.generate(rng),
+            PDF::SpherePDF(p) => p.generate(rng),
             PDF::HitablePDF(p) => p.generate(rng),
             PDF::MixturePDF(p) => p.generate(rng),
             PDF::ZeroPDF(p) => p.generate(rng),
@@ -115,6 +119,28 @@ impl<'a> MixturePDF<'a> {
         } else {
             self.pdf2.generate(rng)
         }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct SpherePDF {}
+
+impl SpherePDF {
+    #[must_use]
+    pub fn new() -> Self {
+        SpherePDF {}
+    }
+
+    #[allow(clippy::unused_self)]
+    #[must_use]
+    pub fn value(&self, _direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+        1.0 / (4.0 * PI)
+    }
+
+    #[allow(clippy::unused_self)]
+    #[must_use]
+    pub fn generate(&self, rng: &mut SmallRng) -> Vec3 {
+        random_in_unit_sphere(rng)
     }
 }
 
