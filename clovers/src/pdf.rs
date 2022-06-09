@@ -15,6 +15,7 @@ pub enum PDF<'a> {
 }
 
 impl<'a> PDF<'a> {
+    #[must_use]
     pub fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
             PDF::CosinePDF(p) => p.value(direction, time, rng),
@@ -23,6 +24,7 @@ impl<'a> PDF<'a> {
             PDF::ZeroPDF(p) => p.value(direction, time, rng),
         }
     }
+    #[must_use]
     pub fn generate(&self, rng: &mut SmallRng) -> Vec3 {
         match self {
             PDF::CosinePDF(p) => p.generate(rng),
@@ -46,6 +48,7 @@ impl CosinePDF {
         }
     }
 
+    #[must_use]
     pub fn value(&self, direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
         let cosine = direction.normalize().dot(&self.uvw.w);
         if cosine <= 0.0 {
@@ -55,6 +58,7 @@ impl CosinePDF {
         }
     }
 
+    #[must_use]
     pub fn generate(&self, rng: &mut SmallRng) -> Vec3 {
         self.uvw.local(random_cosine_direction(rng))
     }
@@ -72,10 +76,12 @@ impl<'a> HitablePDF<'a> {
         HitablePDF { origin, hitable }
     }
 
+    #[must_use]
     pub fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         self.hitable.pdf_value(self.origin, direction, time, rng)
     }
 
+    #[must_use]
     pub fn generate(&self, rng: &mut SmallRng) -> Vec3 {
         self.hitable.random(self.origin, rng)
     }
@@ -97,10 +103,12 @@ impl<'a> MixturePDF<'a> {
         }
     }
 
+    #[must_use]
     pub fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         0.5 * self.pdf1.value(direction, time, rng) + 0.5 * self.pdf2.value(direction, time, rng)
     }
 
+    #[must_use]
     pub fn generate(&self, rng: &mut SmallRng) -> Vec3 {
         if rng.gen::<bool>() {
             self.pdf1.generate(rng)
@@ -121,11 +129,13 @@ impl ZeroPDF {
     }
 
     #[allow(clippy::unused_self)]
+    #[must_use]
     pub fn value(&self, _direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
         0.0
     }
 
     #[allow(clippy::unused_self)]
+    #[must_use]
     pub fn generate(&self, _rng: &mut SmallRng) -> Vec3 {
         Vec3::new(1.0, 0.0, 0.0)
     }

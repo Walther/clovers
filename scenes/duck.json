@@ -97,18 +97,19 @@
     },
     {
       "kind": "STL",
-      "center": [278, 100, 278],
-      "scale": 25,
-      "rotation": [-90, 180, 0],
-      "path": "stl/teapot.stl",
+      "center": [278, 70, 278],
+      "scale": 3,
+      "rotation": [-90, 135, 0],
+      "path": "stl/duck.stl",
       "material": {
-        "kind": "Lambertian",
+        "kind": "Metal",
+        "fuzz": 0.03,
         "albedo": {
           "kind": "SolidColor",
-          "color": [0.9, 0.9, 0.9]
+          "color": [0.9, 0.9, 0.1]
         }
       },
-      "comment": "utah teapot"
+      "comment": "rubber duck"
     }
   ],
   "priority_objects": [

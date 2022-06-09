@@ -23,6 +23,7 @@ pub struct Metal {
 
 impl<'a> Metal {
     /// Scatter function for the [Metal] material. Metal always reflects, and a specular ray is calculated with some randomness adjusted by the `fuzz` factor. This means the metal can be made more shiny or more matte. The returned [`ScatterRecord`] will have a probability density function of [`ZeroPDF`] and material type of [`MaterialType::Specular`]
+    #[must_use]
     pub fn scatter(
         self,
         ray: &Ray,
@@ -46,14 +47,15 @@ impl<'a> Metal {
 
     /// Scattering probability density function for [Metal]. Always returns zero. TODO: why?
     #[allow(clippy::unused_self)] // TODO:
+    #[must_use]
     pub fn scattering_pdf(
         self,
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
         _rng: &mut SmallRng,
-    ) -> Float {
-        0.0 // TODO: why does metal scatter 0? No mention in tutorial afaiu
+    ) -> Option<Float> {
+        None // TODO: why does metal never scatter? should it scatter if fuzzy?
     }
 
     /// Creates a new [Metal] material with the albedo of the given [Texture] and a smoothness-roughness factor specified by `fuzz` parameter.

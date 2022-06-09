@@ -77,6 +77,7 @@ impl Quad {
     }
 
     /// Hit method for the quad rectangle
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,
@@ -130,6 +131,7 @@ impl Quad {
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
+    #[must_use]
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
@@ -149,12 +151,14 @@ impl Quad {
     }
 
     /// Returns a random point on the quadrilateral surface
+    #[must_use]
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         let point: Vec3 = self.q + (rng.gen::<Float>() * self.u) + (rng.gen::<Float>() * self.v);
         point - origin
     }
 }
 
+#[must_use]
 fn hit_ab(a: Float, b: Float) -> bool {
     // Given the hit point in plane coordinates, return false if it is outside the
     // primitive, otherwise return true.

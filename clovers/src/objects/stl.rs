@@ -45,6 +45,7 @@ impl STL {
     }
 
     /// Hit method for the STL object
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,
@@ -62,11 +63,13 @@ impl STL {
     }
 
     /// Returns a probability density function value based on the object
+    #[must_use]
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         self.bvhnode.pdf_value(origin, vector, time, rng)
     }
 
     /// Returns a random point on the ssurface of the object
+    #[must_use]
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         self.bvhnode.random(origin, rng)
     }
@@ -89,6 +92,7 @@ pub struct STLInit {
 }
 
 impl From<STLInit> for Vec<Hitable> {
+    #[must_use]
     fn from(stl_init: STLInit) -> Self {
         // TODO: error handling!
         let mut file = OpenOptions::new().read(true).open(stl_init.path).unwrap();

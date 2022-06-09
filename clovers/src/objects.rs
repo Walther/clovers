@@ -68,6 +68,7 @@ pub enum Object {
 }
 
 impl From<Object> for Hitable {
+    #[must_use]
     fn from(obj: Object) -> Hitable {
         match obj {
             Object::Boxy(x) => Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, x.material)),

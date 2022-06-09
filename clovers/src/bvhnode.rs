@@ -130,6 +130,7 @@ impl BVHNode {
     }
 
     /// The main `hit` function for a [`BVHNode`]. Given a [Ray](crate::ray::Ray), and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the encased objects during that interval.
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,
@@ -183,6 +184,7 @@ impl BVHNode {
     }
 
     /// Returns a probability density function value based on the children
+    #[must_use]
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: f32, rng: &mut SmallRng) -> f32 {
         (self.left.pdf_value(origin, vector, time, rng)
             + self.right.pdf_value(origin, vector, time, rng))
@@ -190,6 +192,7 @@ impl BVHNode {
     }
 
     /// Returns a random point on the surface of one of the children
+    #[must_use]
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         if rng.gen::<bool>() {
             self.left.random(origin, rng)
@@ -229,6 +232,7 @@ fn box_z_compare(a: &Hitable, b: &Hitable) -> Ordering {
 }
 
 // TODO: inefficient, O(n) *and* gets called at every iteration of BVHNode creation => quadratic behavior
+#[must_use]
 fn vec_bounding_box(vec: &Vec<Hitable>, t0: Float, t1: Float) -> Option<AABB> {
     if vec.is_empty() {
         return None;

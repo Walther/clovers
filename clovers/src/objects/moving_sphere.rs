@@ -5,7 +5,7 @@ use rand::rngs::SmallRng;
 
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// `SphereInit` structure describes the necessary data for constructing a [Sphere]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
+/// `SphereInit` structure describes the necessary data for constructing a [`Sphere`](super::Sphere). Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 pub struct MovingSphereInit {
     /// Center point of the sphere at time_0
     pub center_0: Vec3,
@@ -92,6 +92,7 @@ impl MovingSphere {
     }
 
     /// Hit method for the [`MovingSphere`] object. First gets the interpolated center position at the given time, then follows the implementation of [Sphere](crate::objects::Sphere) object's hit method.
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,

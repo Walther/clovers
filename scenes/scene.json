@@ -14,7 +14,7 @@
     {
       "kind": "STL",
       "comment": "dragon",
-      "path": "dragon.stl",
+      "path": "stl/dragon.stl",
       "rotation": [-90, 180, 0],
       "center": [270, 300, 600],
       "scale": 15,
@@ -28,7 +28,7 @@
     },
     {
       "kind": "STL",
-      "path": "teapot.stl",
+      "path": "stl/teapot.stl",
       "comment": "teapot",
       "rotation": [-90, 180, 0],
       "center": [650, 0, 100],
@@ -44,7 +44,7 @@
     {
       "kind": "STL",
       "comment": "bunny",
-      "path": "bunny.stl",
+      "path": "stl/bunny.stl",
       "scale": 3,
       "center": [-80, -15, 300],
       "rotation": [-90, 180, 0],

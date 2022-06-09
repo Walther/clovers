@@ -55,6 +55,7 @@ impl ConstantMedium {
     }
 
     /// Hit function for the [`ConstantMedium`] object. Returns a [`HitRecord`] if hit. TODO: explain the math for the fog
+    #[must_use]
     pub fn hit(
         &self,
         ray: &Ray,
@@ -132,12 +133,14 @@ impl ConstantMedium {
     }
 
     /// Returns a probability density function value based on the boundary object
+    #[must_use]
     pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         self.boundary.pdf_value(origin, vector, time, rng)
     }
 
     /// Returns a random point on the surface of the boundary of the fog
     // TODO: should this return a random point inside the volume instead?
+    #[must_use]
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         self.boundary.random(origin, rng)
     }

@@ -29,6 +29,7 @@ impl Default for DiffuseLight {
 impl<'a> DiffuseLight {
     /// Scatter method for the [`DiffuseLight`] material. Always returns `None`, as diffuse light does not scatter.
     #[allow(clippy::unused_self)]
+    #[must_use]
     pub fn scatter(
         self,
         _ray: &Ray,
@@ -40,14 +41,15 @@ impl<'a> DiffuseLight {
 
     /// Scattering probability density function for the [`DiffuseLight`] material. Always returns 0, as diffuse light does not scatter.
     #[allow(clippy::unused_self)] // TODO:
+    #[must_use]
     pub fn scattering_pdf(
         self,
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
         _rng: &mut SmallRng,
-    ) -> Float {
-        0.0 // TODO: cleanup
+    ) -> Option<Float> {
+        None
     }
 
     /// Emission function for [`DiffuseLight`]. If the given [`HitRecord`] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.

@@ -33,6 +33,7 @@ fn default_color() -> Color {
 
 impl<'a> Dielectric {
     /// Scatter method for the Dielectric material. Given a `ray` and a `hit_record`, evaluate a [`ScatterRecord`] based on possible reflection or refraction.
+    #[must_use]
     pub fn scatter(
         self,
         ray: &Ray,
@@ -73,14 +74,15 @@ impl<'a> Dielectric {
 
     /// Scattering probability density function for Dielectric material. NOTE: not implemented!
     #[allow(clippy::unused_self)] // TODO
+    #[must_use]
     pub fn scattering_pdf(
         self,
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
         _rng: &mut SmallRng,
-    ) -> Float {
-        todo!()
+    ) -> Option<Float> {
+        None // TODO: should a dielectric material scatter? how much?
     }
 
     /// Creates a new [Dielectric] material with the given refractive index and color.
