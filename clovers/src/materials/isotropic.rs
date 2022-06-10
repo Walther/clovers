@@ -4,7 +4,7 @@ use super::{MaterialType, ScatterRecord};
 use crate::{
     color::Color,
     hitable::HitRecord,
-    pdf::{CosinePDF, PDF},
+    pdf::{SpherePDF, PDF},
     ray::Ray,
     textures::Texture,
     Float, PI,
@@ -26,7 +26,7 @@ impl<'a> Isotropic {
         Isotropic { albedo: emission }
     }
 
-    /// Returns a [`ScatterRecord`] based on the [`HitRecord`] coordinates and the given [Texture], or [None] if the ray did not hit the material. TODO: verify implementation, copied from [Lambertian](crate::materials::Lambertian)
+    /// Returns a [`ScatterRecord`] based on the [`HitRecord`] coordinates and the given [Texture], or [None] if the ray did not hit the material.
     #[must_use]
     pub fn scatter(
         self,
@@ -34,8 +34,6 @@ impl<'a> Isotropic {
         hit_record: &HitRecord,
         _rng: &mut SmallRng,
     ) -> Option<ScatterRecord<'a>> {
-        // TODO: fix / verify correctness!
-        // this is just copied from lambertian as an experiment
         let albedo: Color = self
             .albedo
             .color(hit_record.u, hit_record.v, hit_record.position);
@@ -44,27 +42,20 @@ impl<'a> Isotropic {
             material_type: MaterialType::Diffuse,
             specular_ray: None,
             attenuation: albedo,
-            pdf_ptr: PDF::CosinePDF(CosinePDF::new(hit_record.normal)),
+            pdf_ptr: PDF::SpherePDF(SpherePDF::new()),
         })
     }
 
-    /// Returns the scattering probability density function for the [Isotropic] material. TODO: verify implementation, copied from [Lambertian](crate::materials::Lambertian)
-    #[allow(clippy::unused_self)] // TODO:
+    /// Returns the scattering probability density function for the [Isotropic] material
+    #[allow(clippy::unused_self)]
     #[must_use]
     pub fn scattering_pdf(
         self,
         _ray: &Ray,
-        hit_record: &HitRecord,
-        scattered: &Ray,
+        _hit_record: &HitRecord,
+        _scattered: &Ray,
         _rng: &mut SmallRng,
     ) -> Option<Float> {
-        // TODO: fix / verify correctness!
-        // this is just copied from lambertian as an experiment
-        let cosine = hit_record.normal.dot(&scattered.direction.normalize());
-        if cosine < 0.0 {
-            None
-        } else {
-            Some(cosine / PI)
-        }
+        Some(1.0 / (4.0 * PI))
     }
 }

@@ -82,6 +82,7 @@ pub struct STLInit {
     /// Path of the .stl file
     pub path: String,
     /// Material to use for the .stl object
+    #[cfg_attr(feature = "serde-derive", serde(default))]
     pub material: Material,
     /// Scaling factor for the object
     pub scale: Float,

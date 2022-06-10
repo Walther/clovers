@@ -119,7 +119,7 @@ impl Boxy {
     /// Returns a random point on the box
     #[must_use]
     pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        let index: usize = rng.gen_range(0..7);
+        let index: usize = rng.gen_range(0..6);
         self.sides[index].random(origin, rng)
     }
 }
