@@ -22,7 +22,7 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
         10.0, 10.0, 10.0,
     ))));
     let lamp = Object::Quad(QuadInit {
-        q: Vec3::new(0.0, 5.0, -4.0),
+        q: Vec3::new(-2.0, 4.0, -2.0),
         u: Vec3::new(4.0, 0.0, 0.0),
         v: Vec3::new(0.0, 0.0, 4.0),
         material: Material::DiffuseLight(light),
@@ -46,12 +46,13 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
                                 }
                             }
                             for x in all_positions.chunks_exact(3) {
-                                dbg!(&x);
                                 let material: Material = Default::default();
+                                // NOTE: gLTF format uses absolute vertex positions for all three corners of the triangle
+                                // NOTE: internal representation uses triangle origin q, and relative u,v edge vectors
                                 let triangle = Object::Triangle(TriangleInit {
                                     q: x[0],
-                                    u: x[2],
-                                    v: x[1],
+                                    u: x[1] - x[0],
+                                    v: x[2] - x[0],
                                     material,
                                 });
                                 objects.push(triangle);
@@ -63,7 +64,7 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
             }
         }
     }
-    dbg!(&objects);
+    dbg!(&objects.len());
 
     // Various into() transformations
     let objects: Vec<Hitable> = objects.iter().map(|o| o.clone().into()).collect();
@@ -75,8 +76,8 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
 
     // Example hardcoded camera
     let camera = Camera::new(
-        Vec3::new(2.0, 2.0, -10.0),
-        Vec3::new(2.0, 2.0, 0.0),
+        Vec3::new(0.0, 0.0, 6.0),
+        Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(0.0, 1.0, 0.0),
         40.0,
         1.0,
