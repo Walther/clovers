@@ -15,6 +15,7 @@ clovers = { path = "../clovers", features = ["serde-derive", "stl", "traces"], d
 # External
 clap = { version = "3.1.18", features = ["std", "derive"], default-features = false  }
 futures = "0.3.21"
+gltf = { version = "1" }
 humantime = "2.1.0"
 image = { version =  "0.24.2", features = ["png"], default-features = false }
 indicatif = { version = "0.16.2", features = ["rayon"], default-features = false }
