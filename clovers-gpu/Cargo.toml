@@ -8,4 +8,4 @@ publish = false
 crate-type = ["dylib"]
 
 [dependencies]
-spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "116bf9c4d413df7413ae931ee31b2777c7abf64e", features = ["glam"] }
+spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "7e83721978ccfb9132e6de262c6e1789811cfb4d", features = ["glam"] }
