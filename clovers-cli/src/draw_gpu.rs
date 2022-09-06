@@ -21,7 +21,7 @@ fn create_pipeline(
     swapchain_format: wgpu::TextureFormat,
     shader_binary: wgpu::ShaderModuleDescriptor<'_>,
 ) -> wgpu::RenderPipeline {
-    let module = device.create_shader_module(&shader_binary);
+    let module = device.create_shader_module(shader_binary);
     device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
         label: None,
         layout: Some(pipeline_layout),
@@ -48,11 +48,11 @@ fn create_pipeline(
         fragment: Some(wgpu::FragmentState {
             module: &module,
             entry_point: shaders::main_fs,
-            targets: &[wgpu::ColorTargetState {
+            targets: &[Some(wgpu::ColorTargetState {
                 format: swapchain_format,
                 blend: None,
                 write_mask: wgpu::ColorWrites::ALL,
-            }],
+            })],
         }),
         multiview: None,
     })
@@ -116,8 +116,6 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     debug!("Compiling the shader");
     let shader_mod_desc = load_shader();
     debug!("Compiled the shader");
-    let _shader_mod = device.create_shader_module(&shader_mod_desc);
-    debug!("Shader module created");
 
     // TODO: what do we need for actually running the shader?
     let render_pipeline =
@@ -160,14 +158,14 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
     debug!("Texture view created");
     let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
         label: None,
-        color_attachments: &[wgpu::RenderPassColorAttachment {
+        color_attachments: &[Some(wgpu::RenderPassColorAttachment {
             view: &texture_view,
             resolve_target: Default::default(),
             ops: wgpu::Operations {
                 load: wgpu::LoadOp::Clear(wgpu::Color::GREEN),
                 store: true,
             },
-        }],
+        })],
         depth_stencil_attachment: None,
     });
     debug!("Render pass created");
@@ -236,7 +234,7 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
 
     // Note that we're not calling `.await` here.
     let buffer_slice = output_buffer.slice(..);
-    let buffer_future = buffer_slice.map_async(wgpu::MapMode::Read);
+    buffer_slice.map_async(wgpu::MapMode::Read, |_| {});
 
     // Poll the device in a blocking manner so that our future resolves.
     // In an actual application, `device.poll(...)` should
@@ -246,24 +244,22 @@ pub async fn draw(opts: RenderOpts, _scene: Scene) -> Vec<Color> {
 
     let mut pixelbuffer: Vec<Color> = vec![];
 
-    if let Ok(()) = buffer_future.await {
-        debug!("Writing the pixelbuffer");
-        let padded_buffer = buffer_slice.get_mapped_range();
-        // from the padded_buffer we write just the unpadded bytes into the image
-        for chunk in padded_buffer.chunks(buffer_dimensions.padded_bytes_per_row) {
-            let row = &chunk[..buffer_dimensions.unpadded_bytes_per_row];
-            // TODO: infomercial voice: "there has to be a better way"
-            for pixel in row.chunks(4 * 4) {
-                let r = Float::from_ne_bytes([pixel[0], pixel[1], pixel[2], pixel[3]]);
-                let g = Float::from_ne_bytes([pixel[4], pixel[5], pixel[6], pixel[7]]);
-                let b = Float::from_ne_bytes([pixel[8], pixel[9], pixel[10], pixel[11]]);
-                let _a = Float::from_ne_bytes([pixel[12], pixel[13], pixel[14], pixel[15]]);
-                let color = Color::new(r, g, b);
-                pixelbuffer.push(color);
-            }
+    debug!("Writing the pixelbuffer");
+    let padded_buffer = buffer_slice.get_mapped_range();
+    // from the padded_buffer we write just the unpadded bytes into the image
+    for chunk in padded_buffer.chunks(buffer_dimensions.padded_bytes_per_row) {
+        let row = &chunk[..buffer_dimensions.unpadded_bytes_per_row];
+        // TODO: infomercial voice: "there has to be a better way"
+        for pixel in row.chunks(4 * 4) {
+            let r = Float::from_ne_bytes([pixel[0], pixel[1], pixel[2], pixel[3]]);
+            let g = Float::from_ne_bytes([pixel[4], pixel[5], pixel[6], pixel[7]]);
+            let b = Float::from_ne_bytes([pixel[8], pixel[9], pixel[10], pixel[11]]);
+            let _a = Float::from_ne_bytes([pixel[12], pixel[13], pixel[14], pixel[15]]);
+            let color = Color::new(r, g, b);
+            pixelbuffer.push(color);
         }
-        debug!("Finishded writing the pixelbuffer");
     }
+    debug!("Finishded writing the pixelbuffer");
 
     // Drop the GPU instance
     drop(instance);
@@ -290,6 +286,8 @@ fn load_shader() -> wgpu::ShaderModuleDescriptor<'static> {
     let spirv = match spirv {
         wgpu::ShaderSource::Wgsl(cow) => wgpu::ShaderSource::Wgsl(Cow::Owned(cow.into_owned())),
         wgpu::ShaderSource::SpirV(cow) => wgpu::ShaderSource::SpirV(Cow::Owned(cow.into_owned())),
+        wgpu::ShaderSource::Naga(_) => todo!(),
+        _ => todo!(),
     };
     wgpu::ShaderModuleDescriptor {
         label: Some("clovers-shader"),
