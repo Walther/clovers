@@ -82,6 +82,7 @@ allow = [
     "CC0-1.0",
     "ISC",
     "MIT",
+    "Unicode-DFS-2016",
     "Zlib",
 ]
 # List of explicitly disallowed licenses

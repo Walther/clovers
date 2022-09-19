@@ -17,11 +17,11 @@ std = []
 traces = ["tracing"]
 
 [dependencies]
-nalgebra = { version = "0.31.0", features = ["libm"], default-features = false }
+nalgebra = { version = "0.31.1", features = ["libm"], default-features = false }
 rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
-serde = { version = "1.0.137", features = ["derive"], default-features = false, optional = true }
+serde = { version = "1.0.144", features = ["derive"], default-features = false, optional = true }
 # TODO: remove git dependency after there's a new release with https://github.com/hmeyer/stl_io/pull/14
 stl_io = { git = "https://github.com/hmeyer/stl_io", rev = "80cce5351ee4f8eb2c5cfa9114f8c2bf961f62fa", optional = true }
-tracing = { version = "0.1.34", optional = true }
+tracing = { version = "0.1.36", optional = true }
 
 [dev-dependencies]

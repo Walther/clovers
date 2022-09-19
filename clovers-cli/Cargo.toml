@@ -13,20 +13,20 @@ path = "src/main.rs"
 clovers = { path = "../clovers", features = ["serde-derive", "stl", "traces"], default-features = false }
 
 # External
-clap = { version = "3.1.18", features = ["std", "derive"], default-features = false  }
-futures = "0.3.21"
+clap = { version = "3.2.22", features = ["std", "derive"], default-features = false  }
+futures = "0.3.24"
 humantime = "2.1.0"
-image = { version =  "0.24.2", features = ["png"], default-features = false }
-indicatif = { version = "0.16.2", features = ["rayon"], default-features = false }
+image = { version =  "0.24.3", features = ["png"], default-features = false }
+indicatif = { version = "0.17.1", features = ["rayon"], default-features = false }
 rand = { version = "0.8.5", features = ["small_rng", "getrandom"], default-features = false }
 rayon = "1.5.3"
-serde = { version = "1.0.137", features = ["derive"], default-features = false }
+serde = { version = "1.0.144", features = ["derive"], default-features = false }
 serde_json = { version = "1.0", features = ["alloc"], default-features = false }
-time = { version = "0.3.9", default-features = false }
-tracing = "0.1.34"
-tracing-subscriber = { version = "0.3.11", features = ["time"] }
+time = { version = "0.3.14", default-features = false }
+tracing = "0.1.36"
+tracing-subscriber = { version = "0.3.15", features = ["time"] }
 
 # GPU specific
-bytemuck = { version = "1.9.1", features = ["derive"], default-features = false }
-spirv-builder = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "116bf9c4d413df7413ae931ee31b2777c7abf64e" }
-wgpu = { version = "0.12.0", features = ["spirv"], default-features = false }
+bytemuck = { version = "1.12.1", features = ["derive"], default-features = false }
+spirv-builder = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "7e83721978ccfb9132e6de262c6e1789811cfb4d" }
+wgpu = { version = "0.13.1", features = ["spirv"], default-features = false }

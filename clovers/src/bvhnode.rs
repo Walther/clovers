@@ -81,7 +81,7 @@ impl BVHNode {
             }
         } else if object_span == 3 {
             // Three objects: create one bare object and one BVHNode with two objects
-            objects.sort_by(|a, b| comparator(&*a, &*b));
+            objects.sort_by(comparator);
             left = Box::new(objects[0].clone());
             right = Box::new(Hitable::BVHNode(BVHNode {
                 left: Box::new(objects[1].clone()),
@@ -94,7 +94,7 @@ impl BVHNode {
             }));
         } else {
             // Otherwise, recurse
-            objects.sort_by(|a, b| comparator(&*a, &*b));
+            objects.sort_by(comparator);
 
             // Split the vector; divide and conquer
             let mid = object_span / 2;

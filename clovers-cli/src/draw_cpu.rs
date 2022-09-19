@@ -11,14 +11,13 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
     // Progress bar
     let pixels = (opts.width * opts.height) as u64;
     let bar = ProgressBar::new(pixels);
-    bar.set_draw_delta(pixels / 1000);
 
     if opts.quiet {
         bar.set_draw_target(ProgressDrawTarget::hidden())
     } else {
         bar.set_style(ProgressStyle::default_bar().template(
             "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
-        ));
+        ).unwrap());
     }
 
     let black = Color::new(0.0, 0.0, 0.0);

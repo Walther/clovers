@@ -146,7 +146,7 @@ impl RotateY {
             normal,
             u: hit_record.u,
             v: hit_record.v,
-            material: &*hit_record.material,
+            material: hit_record.material,
             front_face: false, // TODO: fix having to declare it before calling face_normal
         };
         record.set_face_normal(&rotated_r, normal);
