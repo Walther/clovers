@@ -65,7 +65,6 @@
 #![allow(clippy::missing_panics_doc)] // TODO: remove panics where feasible later
 #![allow(clippy::module_name_repetitions)] // TODO: later or ignore
 #![allow(clippy::cast_precision_loss)] // TODO: later or ignore
-#![allow(clippy::match_bool)] // disagree, can be readable
 
 // no_std required for gpu accelerated rendering
 #![cfg_attr(not(feature = "std"), no_std)]
