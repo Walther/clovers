@@ -6,10 +6,6 @@ default:
 cli *ARGS:
   cargo run --bin clovers-cli --release -- {{ARGS}}
 
-# Run the GUI application
-gui:
-  cargo run --bin clovers-app --release
-
 # Build and open the documentation
 docs:
   cargo doc --no-deps --open
