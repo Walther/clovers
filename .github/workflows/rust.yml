@@ -15,11 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v1
-      - uses: extractions/setup-just@v1
       - name: Build
         run: cargo build --verbose
       - name: Run tests
         run: cargo test --verbose
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: extractions/setup-just@v1
       - name: Render all test images
         run: just all-scenes
       - uses: actions/upload-artifact@v3
