@@ -16,7 +16,7 @@ scene:
 
 # Render all the test scenes available in the repository
 all-scenes:
-  DATE=$(date -Is); \
+  DATE=$(date -u +%Y-%m-%d--%H-%M-%S); \
   mkdir -p renders/$DATE; \
   for scene in $(ls scenes/ |grep json); \
   do just cli -s 1 --input scenes/$scene --output renders/$DATE/${scene%.json}.png; \
