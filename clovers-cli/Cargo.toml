@@ -14,7 +14,6 @@ clovers = { path = "../clovers", features = ["serde-derive", "stl", "traces"], d
 
 # External
 clap = { version = "3.2.22", features = ["std", "derive"], default-features = false  }
-futures = "0.3.24"
 humantime = "2.1.0"
 image = { version =  "0.24.4", features = ["png"], default-features = false }
 indicatif = { version = "0.17.1", features = ["rayon"], default-features = false }
@@ -25,8 +24,3 @@ serde_json = { version = "1.0", features = ["alloc"], default-features = false }
 time = { version = "0.3.14", default-features = false }
 tracing = "0.1.36"
 tracing-subscriber = { version = "0.3.15", features = ["time"] }
-
-# GPU specific
-bytemuck = { version = "1.12.1", features = ["derive"], default-features = false }
-spirv-builder = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "985007fc087bb9952106eb3015357bb019e7916a" }
-wgpu = { version = "0.13.1", features = ["spirv"], default-features = false }

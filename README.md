@@ -8,7 +8,6 @@ Currently, this project is highly experimental. Things change all the time.
 
 - `clovers/` contains the library
 - `clovers-cli/` contains the CLI application
-- `clovers-gpu/` contains the shaders for GPU accelerated rendering
 
 The automatically built documentation is hosted at <https://walther.github.io/clovers/clovers/>.
 
@@ -28,8 +27,7 @@ If you make a PR to this repository, please acknowledge that you are giving all 
 
 This repository has some example model files for demonstrating triangle-based object imports in addition to the declarative object primitives.
 
-- Utah Teapot model `teapot.stl` CC0 1.0 Universal Public Domain [Wikipedia](https://en.wikipedia.org/wiki/File:Utah_teapot_(solid).stl)
+- Utah Teapot model `teapot.stl` CC0 1.0 Universal Public Domain [Wikipedia](<https://en.wikipedia.org/wiki/File:Utah_teapot_(solid).stl>)
 - Stanford Bunny model `bunny.stl` CC Attribution 3.0 Unported [Wikipedia](https://commons.wikimedia.org/wiki/File:Stanford_Bunny.stl)
 - Stanford Dragon model `dragon.stl` (stl converted version) CC Attribution [Thingiverse](https://www.thingiverse.com/thing:27666)
 - Rubber Duck model `duck.stl` CC0 1.0 Universal Public Domain [Thingiverse](https://www.thingiverse.com/thing:139894)
-
