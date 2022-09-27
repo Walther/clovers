@@ -28,7 +28,7 @@ jobs:
       - name: Build release
         run: cargo build --release --verbose
       - name: Render all test images
-        run: just all-scenes
+        run: just render-ci
       - uses: actions/upload-artifact@v3
         with:
           name: renders
