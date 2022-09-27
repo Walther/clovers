@@ -43,9 +43,10 @@ impl<'a> Dielectric {
         let albedo = self.color;
         let specular_ray: Ray;
 
-        let etai_over_etat: Float = match hit_record.front_face {
-            true => 1.0 / self.refractive_index,
-            false => self.refractive_index,
+        let etai_over_etat: Float = if hit_record.front_face {
+            1.0 / self.refractive_index
+        } else {
+            self.refractive_index
         };
 
         let unit_direction: Vec3 = ray.direction.normalize();

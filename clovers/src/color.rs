@@ -2,8 +2,6 @@
 
 // TODO: more flexible colors?
 
-#![allow(clippy::pedantic)] // TODO: REMOVE
-
 use crate::{Float, Vec3};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 use rand::rngs::SmallRng;
@@ -84,35 +82,22 @@ impl Color {
 
     /// Transforms the [Float] based [Color] into a 24-bit, 3 x u8 RGB color.
     #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::cast_sign_loss)]
     pub fn to_rgb_u8(&self) -> [u8; 3] {
-        // TODO: might be possible to optimize
-        let mut r = self.r;
-        let mut g = self.g;
-        let mut b = self.b;
-        // Fix NaN to zero & remove negatives
-        if r.is_nan() || r < 0.0 {
-            r = 0.0;
-        };
-        if g.is_nan() || g < 0.0 {
-            g = 0.0;
-        };
-        if b.is_nan() || b < 0.0 {
-            b = 0.0;
-        };
-        // Fix too large numbers
-        r = r.min(1.0);
-        g = g.min(1.0);
-        b = b.min(1.0);
-        // Integer-i-fy
-        let r = (255.99 * r).floor() as u8;
-        let g = (255.99 * g).floor() as u8;
-        let b = (255.99 * b).floor() as u8;
-        [r, g, b]
+        [self.r, self.g, self.b].map(|mut component| {
+            if component.is_nan() {
+                component = 0.0;
+            }
+            component = component.clamp(0.0, 1.0);
+            (255.99 * component).floor() as u8
+        })
     }
 }
 
 impl From<[u8; 3]> for Color {
     fn from(rgb: [u8; 3]) -> Self {
+        #[allow(clippy::cast_lossless)]
         Color::new(
             (rgb[0] as Float) / 255.99,
             (rgb[1] as Float) / 255.99,

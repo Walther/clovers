@@ -66,12 +66,12 @@ impl RotateY {
         );
 
         // Calculate new bounds
-        for i in 0..2 {
-            for j in 0..2 {
-                for k in 0..2 {
-                    let i_f: Float = i as Float;
-                    let j_f: Float = j as Float;
-                    let k_f: Float = k as Float;
+        for i in [0.0, 1.0] {
+            for j in [0.0, 1.0] {
+                for k in [0.0, 1.0] {
+                    let i_f: Float = i;
+                    let j_f: Float = j;
+                    let k_f: Float = k;
 
                     let x: Float = i_f * bbox.x.max + (1.0 - i_f) * bbox.x.min;
                     let y: Float = j_f * bbox.y.max + (1.0 - j_f) * bbox.y.min;

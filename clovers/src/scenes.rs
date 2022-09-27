@@ -68,6 +68,8 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
     let time_0 = scene_file.time_0;
     let time_1 = scene_file.time_1;
     let background_color = scene_file.background_color;
+
+    #[allow(clippy::cast_precision_loss)]
     let camera = Camera::new(
         scene_file.camera.look_from,
         scene_file.camera.look_at,

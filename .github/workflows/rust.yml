@@ -19,6 +19,20 @@ jobs:
         run: cargo build --verbose
       - name: Run tests
         run: cargo test --verbose
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: extractions/setup-just@v1
+      - uses: Swatinem/rust-cache@v1
+      - name: Build release
+        run: cargo build --release --verbose
+      - name: Render all test images
+        run: just render-ci
+      - uses: actions/upload-artifact@v3
+        with:
+          name: renders
+          path: renders/*
   cargo-deny:
     runs-on: ubuntu-latest
     steps:
