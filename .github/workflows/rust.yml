@@ -32,7 +32,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: renders
-          path: renders/
+          path: renders/*
   cargo-deny:
     runs-on: ubuntu-latest
     steps:
