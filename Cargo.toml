@@ -4,5 +4,4 @@ resolver = "2"
 members = [
   "clovers",
   "clovers-cli",
-  "clovers-gpu",
 ]

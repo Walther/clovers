@@ -18,7 +18,6 @@ use tracing_subscriber::fmt::time::UtcTime;
 // Internal imports
 use clovers::*;
 mod draw_cpu;
-mod draw_gpu;
 use scenes::*;
 
 // Configure CLI parameters
@@ -114,7 +113,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let pixelbuffer = match opts.gpu {
         // Note: live progress bar printed within draw_cpu::draw
         false => draw_cpu::draw(renderopts, scene),
-        true => futures::executor::block_on(draw_gpu::draw(renderopts, scene)),
+        true => unimplemented!("GPU accelerated rendering is currently unimplemented"),
     };
     info!("Drawing a pixelbuffer finished");
 
