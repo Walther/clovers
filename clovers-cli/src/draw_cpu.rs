@@ -1,10 +1,12 @@
+use std::sync::Arc;
+
 use crate::{color::Color, colorize::colorize, normals::normal_map, ray::Ray, scenes, Float};
 use clovers::RenderOpts;
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
-use rayon::prelude::*;
 use scenes::Scene;
+use tokio::runtime::Runtime;
 
 /// The main drawing function, returns a Vec<Color> as a pixelbuffer.
 pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
@@ -22,48 +24,67 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
 
     let black = Color::new(0.0, 0.0, 0.0);
     let mut pixelbuffer = vec![black; pixels as usize];
+    let mut futurebuffer = Vec::new();
+    let scene = Arc::new(scene); // TODO: is it possible to remove this Arc? with par_iter i only used a &scene, no Arc
 
-    pixelbuffer
-        .par_iter_mut()
-        .enumerate()
-        .for_each(|(index, pixel)| {
-            // Enumerate gives us an usize, width and height are u32. perform conversions
-            let x = (index % (opts.width as usize)) as Float;
-            let y = (index / (opts.width as usize)) as Float;
-            let width = opts.width as Float;
-            let height = opts.height as Float;
+    let rt = Runtime::new().unwrap();
+    rt.block_on(async {
+        // Multi-threading go brr
+        for index in 0..pixels {
+            let result = {
+                let bar = bar.clone();
+                let scene = scene.clone();
+                // Expensive pixel rendering here
+                tokio::spawn(async move {
+                    // Enumerate gives us an usize, width and height are u32. perform conversions
+                    let x = (index % (opts.width as u64)) as Float;
+                    let y = (index / (opts.width as u64)) as Float;
+                    let width = opts.width as Float;
+                    let height = opts.height as Float;
 
-            // Initialize a thread-local random number generator
-            let mut rng = SmallRng::from_entropy();
+                    // Initialize a thread-local random number generator
+                    let mut rng = SmallRng::from_entropy();
 
-            // Initialize a mutable base color for the pixel
-            let mut color: Color = Color::new(0.0, 0.0, 0.0);
+                    // Initialize a mutable base color for the pixel
+                    let mut color: Color = Color::new(0.0, 0.0, 0.0);
 
-            if opts.normalmap {
-                // If we are rendering just a normalmap, make it quick and early return
-                let u = x / width;
-                let v = y / height;
-                let ray: Ray = scene.camera.get_ray(u, v, &mut rng);
-                color = normal_map(&ray, &scene, &mut rng);
-                *pixel = color;
-                return;
-            }
+                    if opts.normalmap {
+                        // If we are rendering just a normalmap, make it quick and early return
+                        let u = x / width;
+                        let v = y / height;
+                        let ray: Ray = scene.camera.get_ray(u, v, &mut rng);
+                        color = normal_map(&ray, &scene.clone(), &mut rng);
+                        return color;
+                    }
 
-            // Multisampling for antialiasing
-            for _sample in 0..opts.samples {
-                if let Some(s) = sample(&scene, x, y, width, height, &mut rng, opts.max_depth) {
-                    color += s
+                    // Multisampling for antialiasing
+                    for _sample in 0..opts.samples {
+                        if let Some(s) =
+                            sample(&scene, x, y, width, height, &mut rng, opts.max_depth)
+                        {
+                            color += s
+                        }
+                    }
+                    color /= opts.samples as Float;
+
+                    // After multisampling, perform gamma correction and store final color into the pixel
+                    color = color.gamma_correction(opts.gamma);
+                    bar.inc(1);
+                    color
+                })
+            };
+            futurebuffer.push(result)
+        }
+
+        for (index, result) in futurebuffer.into_iter().enumerate() {
+            match result.await {
+                Ok(pixel) => {
+                    pixelbuffer[index as usize] = pixel;
                 }
+                Err(_) => todo!(),
             }
-            color /= opts.samples as Float;
-
-            // After multisampling, perform gamma correction and store final color into the pixel
-            color = color.gamma_correction(opts.gamma);
-            *pixel = color;
-
-            bar.inc(1);
-        });
-
+        }
+    });
     pixelbuffer
 }
 
