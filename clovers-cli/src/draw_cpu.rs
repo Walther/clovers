@@ -8,50 +8,48 @@ use scenes::Scene;
 
 /// The main drawing function, returns a Vec<Color> as a pixelbuffer.
 pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
-    // Progress bar
+    // Setup
     let pixels = (opts.width * opts.height) as u64;
-    let bar = ProgressBar::new(pixels);
+    let width = opts.width as Float;
+    let height = opts.height as Float;
+    let thread_count = std::thread::available_parallelism().unwrap().get() as u64;
+    let chunk_size = (pixels / thread_count) as usize;
+
+    // Progress bar
+    let bar = ProgressBar::new(thread_count);
 
     if opts.quiet {
         bar.set_draw_target(ProgressDrawTarget::hidden())
     } else {
         bar.set_style(ProgressStyle::default_bar().template(
-            "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
+            "Elapsed: {elapsed_precise}\nChunks:  {bar} {pos}/{len}\nETA:     {eta_precise}",
         ).unwrap());
     }
 
-    let black = Color::new(0.0, 0.0, 0.0);
-    let mut pixelbuffer = vec![black; pixels as usize];
-
-    pixelbuffer
-        .par_iter_mut()
+    vec![(); pixels as usize]
+        .par_chunks(chunk_size)
         .enumerate()
-        .for_each(|(index, pixel)| {
-            // Enumerate gives us an usize, width and height are u32. perform conversions
-            let x = index % (opts.width as usize);
-            let y = index / (opts.width as usize);
-
-            // Convert most of these to Floats
-            let x = x as Float;
-            let y = y as Float;
-            let width = opts.width as Float;
-            let height = opts.height as Float;
-
-            // Initialize a thread-local random number generator
+        .map(|(chunk_index, chunk)| {
             let mut rng = SmallRng::from_entropy();
+            let mut chunk_buffer: Vec<Color> = Vec::with_capacity(chunk_size);
 
-            // Initialize a mutable base color for the pixel
-            let mut color: Color = Color::new(0.0, 0.0, 0.0);
+            for index in 0..chunk.len() {
+                let index = (index + chunk_index * chunk_size) as u32;
+                let x = (index % opts.width) as Float;
+                let y = (index / opts.width) as Float;
 
-            // TODO: could this be made nicer?
-            if opts.normalmap {
-                // If we are rendering just a normalmap, make it quick and early return
-                let u = x / width;
-                let v = y / height;
-                let ray: Ray = scene.camera.get_ray(u, v, &mut rng);
-                color = normal_map(&ray, &scene, &mut rng);
-                *pixel = color;
-            } else {
+                // Initialize a mutable base color for the pixel
+                let mut color: Color = Color::new(0.0, 0.0, 0.0);
+
+                if opts.normalmap {
+                    // If we are rendering just a normalmap, make it quick and early return
+                    let u = x / width;
+                    let v = y / height;
+                    let ray: Ray = scene.camera.get_ray(u, v, &mut rng);
+                    color = normal_map(&ray, &scene, &mut rng);
+                    chunk_buffer.push(color);
+                    continue;
+                }
                 // Otherwise, do a regular render
 
                 // Multisampling for antialiasing
@@ -64,13 +62,13 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
 
                 // After multisampling, perform gamma correction and store final color into the pixel
                 color = color.gamma_correction(opts.gamma);
-                *pixel = color;
-
-                bar.inc(1);
+                chunk_buffer.push(color)
             }
-        });
-
-    pixelbuffer
+            bar.inc(1);
+            chunk_buffer
+        })
+        .flatten()
+        .collect()
 }
 
 /// Get a single sample for a single pixel in the scene. Has slight jitter for antialiasing when multisampling.
