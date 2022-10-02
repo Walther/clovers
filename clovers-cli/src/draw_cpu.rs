@@ -14,6 +14,8 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
     let height = opts.height as Float;
     let thread_count = std::thread::available_parallelism().unwrap().get() as u64;
     let chunk_size = (pixels / thread_count) as usize;
+    let black: Color = Color::new(0.0, 0.0, 0.0);
+    let mut pixel_buffer = vec![black; pixels as usize];
 
     // Progress bar
     let bar = ProgressBar::new(thread_count);
@@ -26,17 +28,16 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
         ).unwrap());
     }
 
-    vec![(); pixels as usize]
-        .par_chunks(chunk_size)
+    pixel_buffer
+        .par_chunks_mut(chunk_size)
         .enumerate()
-        .map(|(chunk_index, chunk)| {
+        .for_each(|(chunk_index, chunk)| {
             let mut rng = SmallRng::from_entropy();
-            let mut chunk_buffer: Vec<Color> = Vec::with_capacity(chunk_size);
 
-            for index in 0..chunk.len() {
-                let index = (index + chunk_index * chunk_size) as u32;
-                let x = (index % opts.width) as Float;
-                let y = (index / opts.width) as Float;
+            for (index, pixel) in chunk.iter_mut().enumerate() {
+                let index = index + chunk_index * chunk_size;
+                let x = (index % (opts.width as usize)) as Float;
+                let y = (index / (opts.width as usize)) as Float;
 
                 // Initialize a mutable base color for the pixel
                 let mut color: Color = Color::new(0.0, 0.0, 0.0);
@@ -47,8 +48,7 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
                     let v = y / height;
                     let ray: Ray = scene.camera.get_ray(u, v, &mut rng);
                     color = normal_map(&ray, &scene, &mut rng);
-                    chunk_buffer.push(color);
-                    continue;
+                    *pixel = color;
                 }
                 // Otherwise, do a regular render
 
@@ -62,13 +62,11 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
 
                 // After multisampling, perform gamma correction and store final color into the pixel
                 color = color.gamma_correction(opts.gamma);
-                chunk_buffer.push(color)
+                *pixel = color;
             }
             bar.inc(1);
-            chunk_buffer
-        })
-        .flatten()
-        .collect()
+        });
+    pixel_buffer
 }
 
 /// Get a single sample for a single pixel in the scene. Has slight jitter for antialiasing when multisampling.
