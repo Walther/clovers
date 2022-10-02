@@ -28,12 +28,8 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
         .enumerate()
         .for_each(|(index, pixel)| {
             // Enumerate gives us an usize, width and height are u32. perform conversions
-            let x = index % (opts.width as usize);
-            let y = index / (opts.width as usize);
-
-            // Convert most of these to Floats
-            let x = x as Float;
-            let y = y as Float;
+            let x = (index % (opts.width as usize)) as Float;
+            let y = (index / (opts.width as usize)) as Float;
             let width = opts.width as Float;
             let height = opts.height as Float;
 
@@ -43,7 +39,6 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
             // Initialize a mutable base color for the pixel
             let mut color: Color = Color::new(0.0, 0.0, 0.0);
 
-            // TODO: could this be made nicer?
             if opts.normalmap {
                 // If we are rendering just a normalmap, make it quick and early return
                 let u = x / width;
@@ -51,23 +46,22 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
                 let ray: Ray = scene.camera.get_ray(u, v, &mut rng);
                 color = normal_map(&ray, &scene, &mut rng);
                 *pixel = color;
-            } else {
-                // Otherwise, do a regular render
-
-                // Multisampling for antialiasing
-                for _sample in 0..opts.samples {
-                    if let Some(s) = sample(&scene, x, y, width, height, &mut rng, opts.max_depth) {
-                        color += s
-                    }
-                }
-                color /= opts.samples as Float;
-
-                // After multisampling, perform gamma correction and store final color into the pixel
-                color = color.gamma_correction(opts.gamma);
-                *pixel = color;
-
-                bar.inc(1);
+                return;
             }
+
+            // Multisampling for antialiasing
+            for _sample in 0..opts.samples {
+                if let Some(s) = sample(&scene, x, y, width, height, &mut rng, opts.max_depth) {
+                    color += s
+                }
+            }
+            color /= opts.samples as Float;
+
+            // After multisampling, perform gamma correction and store final color into the pixel
+            color = color.gamma_correction(opts.gamma);
+            *pixel = color;
+
+            bar.inc(1);
         });
 
     pixelbuffer
