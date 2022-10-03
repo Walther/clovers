@@ -16,6 +16,7 @@ clovers = { path = "../clovers", features = ["serde-derive", "stl", "traces"], d
 clap = { version = "4.0.8", features = ["std", "derive"], default-features = false  }
 humantime = "2.1.0"
 image = { version =  "0.24.4", features = ["png"], default-features = false }
+img-parts = "0.3.0"
 indicatif = { version = "0.17.1", features = ["rayon"], default-features = false }
 rand = { version = "0.8.5", features = ["small_rng", "getrandom"], default-features = false }
 rayon = "1.5.3"

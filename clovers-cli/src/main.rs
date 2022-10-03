@@ -7,9 +7,10 @@
 // External imports
 use clap::Parser;
 use humantime::format_duration;
-use image::{ImageBuffer, Rgb, RgbImage};
+use image::{ImageBuffer, ImageOutputFormat, Rgb, RgbImage};
+use img_parts::png::{Png, PngChunk};
 use std::fs::File;
-use std::io::Read;
+use std::io::{Cursor, Read};
 use std::{error::Error, fs, time::Instant};
 use time::OffsetDateTime;
 use tracing::{debug, info, Level};
@@ -97,9 +98,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         quiet: opts.quiet,
         normalmap: opts.normalmap,
     };
+    let threads = std::thread::available_parallelism()?;
 
     info!("Reading the scene file");
-    let mut file = File::open(opts.input)?;
+    let mut file = File::open(&opts.input)?;
     let mut contents: String = String::new();
     file.read_to_string(&mut contents)?;
     info!("Parsing the scene file");
@@ -132,14 +134,32 @@ fn main() -> Result<(), Box<dyn Error>> {
     // TODO: fix the coordinate system
 
     let duration = Instant::now() - start;
+    let formatted_duration = format_duration(duration);
+    info!("Finished render in {}", formatted_duration);
 
     if !opts.quiet {
         println!(); // Empty line after progress bar
-        info!("Finished render in {}", format_duration(duration));
-        println!("Finished render in {}", format_duration(duration));
+        println!("Finished render in {}", formatted_duration);
     }
 
     info!("Writing an image file");
+
+    let mut bytes: Vec<u8> = Vec::new();
+    img.write_to(&mut Cursor::new(&mut bytes), ImageOutputFormat::Png)?;
+    let mut png = Png::from_bytes(bytes.into())?;
+
+    let comment = if opts.normalmap {
+        format!("Comment\0{} rendered with the clovers raytracing engine at {}x{} in normalmap mode. finished render in {}, using {} threads", opts.input, opts.width, opts.height, formatted_duration, threads)
+    } else {
+        format!("Comment\0{} rendered with the clovers raytracing engine at {}x{}, {} samples per pixel, {} max ray bounce depth. finished render in {}, using {} threads", opts.input, opts.width, opts.height, opts.samples, opts.max_depth, formatted_duration, threads)
+    };
+    let software = "Software\0https://github.com/walther/clovers".to_string();
+
+    for metadata in [comment, software] {
+        let bytes = metadata.as_bytes().to_owned();
+        let chunk = PngChunk::new([b't', b'E', b'X', b't'], bytes.into());
+        png.chunks_mut().push(chunk);
+    }
 
     let target = match opts.output {
         Some(filename) => filename,
@@ -150,7 +170,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             format!("renders/{}.png", timestamp)
         }
     };
-    img.save(&target)?;
+
+    let output = File::create(&target)?;
+    png.encoder().write_to(output)?;
+
     info!("Image saved to {}", target);
     println!("Image saved to: {}", target);
 
