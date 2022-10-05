@@ -6,6 +6,7 @@ use rand::Rng;
 
 /// Internal helper. Originally used for lambertian reflection with flaws
 #[must_use]
+#[inline]
 pub fn random_in_unit_sphere(rng: &mut SmallRng) -> Vec3 {
     let mut position: Vec3;
     // TODO: figure out a non-loop method
@@ -16,10 +17,9 @@ pub fn random_in_unit_sphere(rng: &mut SmallRng) -> Vec3 {
             rng.gen_range(-1.0..1.0),
             rng.gen_range(-1.0..1.0),
         );
-        if position.magnitude_squared() >= 1.0 {
-            continue;
+        if position.magnitude_squared() <= 1.0 {
+            return position;
         }
-        return position;
     }
 }
 
@@ -41,10 +41,9 @@ pub fn random_in_unit_disk(rng: &mut SmallRng) -> Vec3 {
             rng.gen_range(-1.0..1.0),
             0.0, // z component zero
         );
-        if position.magnitude_squared() >= 1.0 {
-            continue;
+        if position.magnitude_squared() <= 1.0 {
+            return position;
         }
-        return position;
     }
 }
 
