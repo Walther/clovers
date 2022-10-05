@@ -2,18 +2,21 @@
 
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
+#[cfg(feature = "stl")]
+use crate::objects::STL;
+
 use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
     materials::Material,
     objects::{
         Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
-        STL,
     },
     random::random_in_unit_sphere,
     ray::Ray,
     Float, Vec3,
 };
+
 use rand::rngs::SmallRng;
 
 /// Represents a ray-object intersection, with plenty of data about the intersection.
@@ -60,6 +63,7 @@ pub enum Hitable {
     Quad(Quad),
     RotateY(RotateY),
     Sphere(Sphere),
+    #[cfg(feature = "stl")]
     STL(STL),
     Translate(Translate),
     Triangle(Triangle),
@@ -88,6 +92,7 @@ impl Hitable {
             Hitable::Quad(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::RotateY(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Sphere(h) => h.hit(ray, distance_min, distance_max, rng),
+            #[cfg(feature = "stl")]
             Hitable::STL(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Translate(h) => h.hit(ray, distance_min, distance_max, rng),
             Hitable::Triangle(h) => h.hit(ray, distance_min, distance_max, rng),
@@ -106,6 +111,7 @@ impl Hitable {
             Hitable::Quad(h) => h.bounding_box(t0, t1),
             Hitable::RotateY(h) => h.bounding_box(t0, t1),
             Hitable::Sphere(h) => h.bounding_box(t0, t1),
+            #[cfg(feature = "stl")]
             Hitable::STL(h) => h.bounding_box(t0, t1),
             Hitable::Translate(h) => h.bounding_box(t0, t1),
             Hitable::Triangle(h) => h.bounding_box(t0, t1),
@@ -122,6 +128,7 @@ impl Hitable {
             Hitable::FlipFace(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
+            #[cfg(feature = "stl")]
             Hitable::STL(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Translate(h) => h.pdf_value(origin, vector, time, rng),
             Hitable::Triangle(h) => h.pdf_value(origin, vector, time, rng),
@@ -139,6 +146,7 @@ impl Hitable {
             Hitable::FlipFace(h) => h.random(origin, rng),
             Hitable::Quad(h) => h.random(origin, rng),
             Hitable::Sphere(h) => h.random(origin, rng),
+            #[cfg(feature = "stl")]
             Hitable::STL(h) => h.random(origin, rng),
             Hitable::Translate(h) => h.random(origin, rng),
             Hitable::Triangle(h) => h.random(origin, rng),
