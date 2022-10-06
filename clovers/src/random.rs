@@ -3,7 +3,7 @@
 use crate::{Float, Vec3, PI};
 use rand::rngs::SmallRng;
 use rand::Rng;
-use rand_distr::{Distribution, UnitBall, UnitDisc};
+use rand_distr::{Distribution, UnitBall, UnitDisc, UnitSphere};
 
 /// Internal helper. Originally used for lambertian reflection with flaws
 #[must_use]
@@ -15,7 +15,7 @@ pub fn random_in_unit_sphere(rng: &mut SmallRng) -> Vec3 {
 /// Internal helper. Use this for the more correct "True Lambertian" reflection
 #[must_use]
 pub fn random_unit_vector(rng: &mut SmallRng) -> Vec3 {
-    random_in_unit_sphere(rng).normalize()
+    UnitSphere.sample(rng).into()
 }
 
 /// Internal helper.
