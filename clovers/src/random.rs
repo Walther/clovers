@@ -1,6 +1,7 @@
 //! Various internal helper functions for getting specific kinds of random values.
 
 use crate::{Float, Vec3, PI};
+use rand::distributions::Uniform;
 use rand::rngs::SmallRng;
 use rand::Rng;
 
@@ -9,13 +10,13 @@ use rand::Rng;
 #[inline]
 pub fn random_in_unit_sphere(rng: &mut SmallRng) -> Vec3 {
     let mut position: Vec3;
-    // TODO: figure out a non-loop method
-    // See https://github.com/RayTracing/raytracing.github.io/issues/765
+    let distribution = Uniform::new(-1.0, 1.0);
+
     loop {
         position = Vec3::new(
-            rng.gen_range(-1.0..1.0),
-            rng.gen_range(-1.0..1.0),
-            rng.gen_range(-1.0..1.0),
+            rng.sample(distribution),
+            rng.sample(distribution),
+            rng.sample(distribution),
         );
         if position.magnitude_squared() <= 1.0 {
             return position;
@@ -33,12 +34,12 @@ pub fn random_unit_vector(rng: &mut SmallRng) -> Vec3 {
 #[must_use]
 pub fn random_in_unit_disk(rng: &mut SmallRng) -> Vec3 {
     let mut position: Vec3;
-    // TODO: figure out a non-loop method
-    // See https://github.com/RayTracing/raytracing.github.io/issues/765
+    let distribution = Uniform::new(-1.0, 1.0);
+
     loop {
         position = Vec3::new(
-            rng.gen_range(-1.0..1.0),
-            rng.gen_range(-1.0..1.0),
+            rng.sample(distribution),
+            rng.sample(distribution),
             0.0, // z component zero
         );
         if position.magnitude_squared() <= 1.0 {
