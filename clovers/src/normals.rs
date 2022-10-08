@@ -1,6 +1,8 @@
 //! Alternative render method to [colorize](crate::colorize::colorize).
 
-use crate::{color::Color, ray::Ray, scenes::Scene, Float, Vec3, EPSILON_SHADOW_ACNE};
+use crate::{
+    color::Color, hitable::HitableTrait, ray::Ray, scenes::Scene, Float, Vec3, EPSILON_SHADOW_ACNE,
+};
 use rand::rngs::SmallRng;
 
 /// Rendering function for getting a normal map in tangent space. Sends a [Ray] to the [Scene], sees what it hits, gets the normal at that point, and returns a color based on the normal mapping colorization. Wikipedia: [Normal mapping](https://en.wikipedia.org/wiki/Normal_mapping).

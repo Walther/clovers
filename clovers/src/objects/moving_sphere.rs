@@ -1,6 +1,12 @@
 //! A moving sphere object.
 
-use crate::{aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3, PI};
+use crate::{
+    aabb::AABB,
+    hitable::{HitRecord, HitableTrait},
+    materials::Material,
+    ray::Ray,
+    Float, Vec3, PI,
+};
 use rand::rngs::SmallRng;
 
 #[derive(Clone, Copy, Debug)]
@@ -90,10 +96,12 @@ impl MovingSphere {
         let v: Float = (theta + PI / 2.0) / PI;
         (u, v)
     }
+}
 
+impl HitableTrait for MovingSphere {
     /// Hit method for the [`MovingSphere`] object. First gets the interpolated center position at the given time, then follows the implementation of [Sphere](crate::objects::Sphere) object's hit method.
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -149,7 +157,17 @@ impl MovingSphere {
 
     /// Returns the axis-aligned bounding box of the [`MovingSphere`] object. This is the maximum possible bounding box of the entire span of the movement of the sphere, calculated from the two center positions and the radius.
     #[must_use]
-    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         Some(self.aabb)
+    }
+
+    fn pdf_value(&self, _origin: Vec3, _vector: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+        // TODO: fix
+        0.0
+    }
+
+    fn random(&self, _origin: Vec3, _rng: &mut SmallRng) -> Vec3 {
+        // TODO: fix
+        Vec3::new(1.0, 0.0, 0.0)
     }
 }

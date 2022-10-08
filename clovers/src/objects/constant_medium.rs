@@ -2,8 +2,9 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable},
+    hitable::{HitRecord, Hitable, HitableTrait},
     materials::{isotropic::Isotropic, Material},
+    random::random_unit_vector,
     ray::Ray,
     textures::Texture,
     Box, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
@@ -53,10 +54,12 @@ impl ConstantMedium {
             neg_inv_density: -1.0 / density,
         }
     }
+}
 
+impl HitableTrait for ConstantMedium {
     /// Hit function for the [`ConstantMedium`] object. Returns a [`HitRecord`] if hit. TODO: explain the math for the fog
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -109,11 +112,11 @@ impl ConstantMedium {
         let distance = rec1.distance + hit_distance / ray_length;
         let position = ray.evaluate(distance);
 
-        let normal: Vec3 = Vec3::new(1.0, 0.0, 0.0); // tutorial says: arbitrary
+        let normal: Vec3 = random_unit_vector(rng); // tutorial says: arbitrary
         let front_face: bool = true; // tutorial says: also arbitrary
 
-        let u: Float = 0.5; // TODO: should this be something sensible?
-        let v: Float = 0.5; // TODO: should this be something sensible?
+        let u = rec1.u;
+        let v = rec1.v;
 
         Some(HitRecord {
             distance,
@@ -128,20 +131,20 @@ impl ConstantMedium {
 
     /// Returns the axis-aligned bounding box [AABB] of the defining `boundary` object for the fog.
     #[must_use]
-    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         self.boundary.bounding_box(t0, t1)
     }
 
     /// Returns a probability density function value based on the boundary object
     #[must_use]
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         self.boundary.pdf_value(origin, vector, time, rng)
     }
 
     /// Returns a random point on the surface of the boundary of the fog
     // TODO: should this return a random point inside the volume instead?
     #[must_use]
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         self.boundary.random(origin, rng)
     }
 }

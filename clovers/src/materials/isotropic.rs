@@ -1,12 +1,12 @@
 //! Isotropic material.
 
-use super::{MaterialType, ScatterRecord};
+use super::{MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
     color::Color,
     hitable::HitRecord,
     pdf::{SpherePDF, PDF},
     ray::Ray,
-    textures::Texture,
+    textures::{Texture, TextureTrait},
     Float, PI,
 };
 use rand::prelude::SmallRng;
@@ -19,21 +19,15 @@ pub struct Isotropic {
     albedo: Texture,
 }
 
-impl<'a> Isotropic {
-    /// Creates a new [Isotropic] material with an albedo of the given [Texture].
-    #[must_use]
-    pub fn new(emission: Texture) -> Self {
-        Isotropic { albedo: emission }
-    }
-
+impl MaterialTrait for Isotropic {
     /// Returns a [`ScatterRecord`] based on the [`HitRecord`] coordinates and the given [Texture], or [None] if the ray did not hit the material.
     #[must_use]
-    pub fn scatter(
+    fn scatter(
         self,
         _ray: &Ray,
         hit_record: &HitRecord,
         _rng: &mut SmallRng,
-    ) -> Option<ScatterRecord<'a>> {
+    ) -> Option<ScatterRecord> {
         let albedo: Color = self
             .albedo
             .color(hit_record.u, hit_record.v, hit_record.position);
@@ -49,7 +43,7 @@ impl<'a> Isotropic {
     /// Returns the scattering probability density function for the [Isotropic] material
     #[allow(clippy::unused_self)]
     #[must_use]
-    pub fn scattering_pdf(
+    fn scattering_pdf(
         self,
         _ray: &Ray,
         _hit_record: &HitRecord,
@@ -57,5 +51,13 @@ impl<'a> Isotropic {
         _rng: &mut SmallRng,
     ) -> Option<Float> {
         Some(1.0 / (4.0 * PI))
+    }
+}
+
+impl Isotropic {
+    /// Creates a new [Isotropic] material with an albedo of the given [Texture].
+    #[must_use]
+    pub fn new(emission: Texture) -> Self {
+        Isotropic { albedo: emission }
     }
 }

@@ -2,8 +2,9 @@
 
 use crate::{
     color::Color,
-    materials::MaterialType,
-    pdf::{HitablePDF, MixturePDF, PDF},
+    hitable::HitableTrait,
+    materials::{MaterialTrait, MaterialType},
+    pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
     ray::Ray,
     scenes::Scene,
     Float, EPSILON_SHADOW_ACNE,
@@ -65,7 +66,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
             // Use a probability density function to figure out where to scatter a new ray
             // TODO: this weighed priority sampling should be adjusted or removed - doesn't feel ideal.
             let light_ptr = PDF::HitablePDF(HitablePDF::new(
-                &scene.priority_objects,
+                scene.priority_objects.clone(), // TODO: remove clone
                 hit_record.position,
             ));
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);

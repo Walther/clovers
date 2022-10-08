@@ -1,8 +1,12 @@
 //! A sphere object.
 
 use crate::{
-    aabb::AABB, hitable::HitRecord, materials::Material, onb::ONB, ray::Ray, Float, Vec3,
-    EPSILON_SHADOW_ACNE, PI,
+    aabb::AABB,
+    hitable::{HitRecord, HitableTrait},
+    materials::Material,
+    onb::ONB,
+    ray::Ray,
+    Float, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use rand::{rngs::SmallRng, Rng};
 
@@ -55,10 +59,12 @@ impl Sphere {
         let v: Float = (theta + PI / 2.0) / PI;
         (u, v)
     }
+}
 
+impl HitableTrait for Sphere {
     /// Hit method for the [Sphere] object. Returns a [`HitRecord`] if the given [Ray] intersects with the sphere at the given distance interval.
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -115,13 +121,13 @@ impl Sphere {
 
     /// Returns the axis-aligned bounding box [AABB] for the sphere.
     #[must_use]
-    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         Some(self.aabb)
     }
 
     /// Returns the probability density function for the sphere? TODO: what does this do again and how
     #[must_use]
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
             EPSILON_SHADOW_ACNE,
@@ -143,7 +149,7 @@ impl Sphere {
     // TODO: understand, document
     /// Utility function from Ray Tracing: The Rest of Your Life. TODO: understand, document
     #[must_use]
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         let direction: Vec3 = self.center - origin;
         let distance_squared: Float = direction.norm_squared();
         let uvw = ONB::build_from_w(direction);

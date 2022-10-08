@@ -9,7 +9,7 @@ use std::fs::OpenOptions;
 use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
-    hitable::{HitRecord, Hitable},
+    hitable::{HitRecord, Hitable, HitableTrait},
     materials::Material,
     objects::Triangle,
     ray::Ray,
@@ -43,10 +43,12 @@ impl STL {
             aabb,
         }
     }
+}
 
+impl HitableTrait for STL {
     /// Hit method for the STL object
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: f32,
@@ -58,19 +60,19 @@ impl STL {
 
     /// Return the axis-aligned bounding box for the object
     #[must_use]
-    pub fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<AABB> {
+    fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<AABB> {
         Some(self.aabb)
     }
 
     /// Returns a probability density function value based on the object
     #[must_use]
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         self.bvhnode.pdf_value(origin, vector, time, rng)
     }
 
     /// Returns a random point on the ssurface of the object
     #[must_use]
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         self.bvhnode.random(origin, rng)
     }
 }

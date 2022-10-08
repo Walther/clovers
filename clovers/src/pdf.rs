@@ -2,41 +2,33 @@
 
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
-use crate::random::random_in_unit_sphere;
-use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Box, Float, Vec3, PI};
+use crate::{
+    hitable::{Hitable, HitableTrait},
+    onb::ONB,
+    random::{random_cosine_direction, random_in_unit_sphere},
+    Box, Float, Vec3, PI,
+};
+use enum_dispatch::enum_dispatch;
 use rand::rngs::SmallRng;
 use rand::Rng;
 
+#[enum_dispatch(PDFTrait)]
 #[derive(Debug)]
-pub enum PDF<'a> {
+pub enum PDF {
     CosinePDF(CosinePDF),
     SpherePDF(SpherePDF),
-    HitablePDF(HitablePDF<'a>),
-    MixturePDF(MixturePDF<'a>),
+    HitablePDF(HitablePDF),
+    MixturePDF(MixturePDF),
     ZeroPDF(ZeroPDF),
 }
 
-impl<'a> PDF<'a> {
+#[enum_dispatch]
+pub(crate) trait PDFTrait {
     #[must_use]
-    pub fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        match self {
-            PDF::CosinePDF(p) => p.value(direction, time, rng),
-            PDF::SpherePDF(p) => p.value(direction, time, rng),
-            PDF::HitablePDF(p) => p.value(direction, time, rng),
-            PDF::MixturePDF(p) => p.value(direction, time, rng),
-            PDF::ZeroPDF(p) => p.value(direction, time, rng),
-        }
-    }
+    fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float;
+
     #[must_use]
-    pub fn generate(&self, rng: &mut SmallRng) -> Vec3 {
-        match self {
-            PDF::CosinePDF(p) => p.generate(rng),
-            PDF::SpherePDF(p) => p.generate(rng),
-            PDF::HitablePDF(p) => p.generate(rng),
-            PDF::MixturePDF(p) => p.generate(rng),
-            PDF::ZeroPDF(p) => p.generate(rng),
-        }
-    }
+    fn generate(&self, rng: &mut SmallRng) -> Vec3;
 }
 
 #[derive(Debug)]
@@ -51,9 +43,11 @@ impl CosinePDF {
             uvw: ONB::build_from_w(w),
         }
     }
+}
 
+impl PDFTrait for CosinePDF {
     #[must_use]
-    pub fn value(&self, direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+    fn value(&self, direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
         let cosine = direction.normalize().dot(&self.uvw.w);
         if cosine <= 0.0 {
             0.0
@@ -63,57 +57,61 @@ impl CosinePDF {
     }
 
     #[must_use]
-    pub fn generate(&self, rng: &mut SmallRng) -> Vec3 {
+    fn generate(&self, rng: &mut SmallRng) -> Vec3 {
         self.uvw.local(random_cosine_direction(rng))
     }
 }
 
 #[derive(Debug)]
-pub struct HitablePDF<'a> {
+pub struct HitablePDF {
     origin: Vec3,
-    hitable: &'a Hitable,
+    hitable: Hitable,
 }
 
-impl<'a> HitablePDF<'a> {
+impl HitablePDF {
     #[must_use]
-    pub fn new(hitable: &'a Hitable, origin: Vec3) -> Self {
+    pub fn new(hitable: Hitable, origin: Vec3) -> Self {
         HitablePDF { origin, hitable }
     }
+}
 
+impl PDFTrait for HitablePDF {
     #[must_use]
-    pub fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         self.hitable.pdf_value(self.origin, direction, time, rng)
     }
 
     #[must_use]
-    pub fn generate(&self, rng: &mut SmallRng) -> Vec3 {
+    fn generate(&self, rng: &mut SmallRng) -> Vec3 {
         self.hitable.random(self.origin, rng)
     }
 }
 
 #[derive(Debug)]
-pub struct MixturePDF<'a> {
+pub struct MixturePDF {
     // Box to prevent infinite size
-    pdf1: Box<PDF<'a>>,
-    pdf2: Box<PDF<'a>>,
+    pdf1: Box<PDF>,
+    pdf2: Box<PDF>,
 }
 
-impl<'a> MixturePDF<'a> {
+impl MixturePDF {
     #[must_use]
-    pub fn new(pdf1: PDF<'a>, pdf2: PDF<'a>) -> Self {
+    pub fn new(pdf1: PDF, pdf2: PDF) -> Self {
         MixturePDF {
             pdf1: Box::new(pdf1),
             pdf2: Box::new(pdf2),
         }
     }
+}
 
+impl PDFTrait for MixturePDF {
     #[must_use]
-    pub fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         0.5 * self.pdf1.value(direction, time, rng) + 0.5 * self.pdf2.value(direction, time, rng)
     }
 
     #[must_use]
-    pub fn generate(&self, rng: &mut SmallRng) -> Vec3 {
+    fn generate(&self, rng: &mut SmallRng) -> Vec3 {
         if rng.gen::<bool>() {
             self.pdf1.generate(rng)
         } else {
@@ -130,16 +128,16 @@ impl SpherePDF {
     pub fn new() -> Self {
         SpherePDF {}
     }
+}
 
-    #[allow(clippy::unused_self)]
+impl PDFTrait for SpherePDF {
     #[must_use]
-    pub fn value(&self, _direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+    fn value(&self, _direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
         1.0 / (4.0 * PI)
     }
 
-    #[allow(clippy::unused_self)]
     #[must_use]
-    pub fn generate(&self, rng: &mut SmallRng) -> Vec3 {
+    fn generate(&self, rng: &mut SmallRng) -> Vec3 {
         random_in_unit_sphere(rng)
     }
 }
@@ -153,16 +151,16 @@ impl ZeroPDF {
     pub fn new() -> Self {
         ZeroPDF {}
     }
+}
 
-    #[allow(clippy::unused_self)]
+impl PDFTrait for ZeroPDF {
     #[must_use]
-    pub fn value(&self, _direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+    fn value(&self, _direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
         0.0
     }
 
-    #[allow(clippy::unused_self)]
     #[must_use]
-    pub fn generate(&self, _rng: &mut SmallRng) -> Vec3 {
+    fn generate(&self, _rng: &mut SmallRng) -> Vec3 {
         Vec3::new(1.0, 0.0, 0.0)
     }
 }

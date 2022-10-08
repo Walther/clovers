@@ -1,6 +1,7 @@
 //! A quadrilateral object.
 // TODO: better docs
 
+use crate::hitable::HitableTrait;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
@@ -75,10 +76,12 @@ impl Quad {
             aabb,
         }
     }
+}
 
+impl HitableTrait for Quad {
     /// Hit method for the quad rectangle
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -126,13 +129,13 @@ impl Quad {
 
     /// Returns the bounding box of the quad
     #[must_use]
-    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         Some(self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
     #[must_use]
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self.hit(
             &Ray::new(origin, vector, time),
             EPSILON_SHADOW_ACNE,
@@ -152,7 +155,7 @@ impl Quad {
 
     /// Returns a random point on the quadrilateral surface
     #[must_use]
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         let point: Vec3 = self.q + (rng.gen::<Float>() * self.u) + (rng.gen::<Float>() * self.v);
         point - origin
     }

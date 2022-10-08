@@ -1,11 +1,11 @@
 //! Lambertian material. This is the default material with a smooth, matte surface.
 
-use super::{MaterialType, ScatterRecord};
+use super::{MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
     hitable::HitRecord,
     pdf::{CosinePDF, PDF},
     ray::Ray,
-    textures::Texture,
+    textures::{Texture, TextureTrait},
     Float, PI,
 };
 use rand::prelude::SmallRng;
@@ -18,15 +18,15 @@ pub struct Lambertian {
     albedo: Texture,
 }
 
-impl<'a> Lambertian {
+impl MaterialTrait for Lambertian {
     /// Returns None, if ray is absorbed. Otherwise, returns a ray, albedo of what was hit, and (?) a value used for probability density function based sampling
     #[must_use]
-    pub fn scatter(
+    fn scatter(
         self,
         _ray: &Ray,
         hit_record: &HitRecord,
         _rng: &mut SmallRng,
-    ) -> Option<ScatterRecord<'a>> {
+    ) -> Option<ScatterRecord> {
         Some(ScatterRecord {
             material_type: MaterialType::Diffuse,
             specular_ray: None,
@@ -40,7 +40,7 @@ impl<'a> Lambertian {
     /// Returns the scattering probability density function for the [Lambertian] material. TODO: explain the math
     #[allow(clippy::unused_self)] // TODO:
     #[must_use]
-    pub fn scattering_pdf(
+    fn scattering_pdf(
         self,
         _ray: &Ray,
         hit_record: &HitRecord,
@@ -55,7 +55,9 @@ impl<'a> Lambertian {
             Some(cosine / PI)
         }
     }
+}
 
+impl Lambertian {
     /// Creates a new instance of the [Lambertian] material with an albedo of the given [Texture].
     #[must_use]
     pub fn new(albedo: impl Into<Texture>) -> Self {

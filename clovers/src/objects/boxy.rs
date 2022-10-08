@@ -3,7 +3,7 @@
 use super::Quad;
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable},
+    hitable::{HitRecord, Hitable, HitableTrait},
     materials::Material,
     ray::Ray,
     Box, Float, Vec3,
@@ -76,10 +76,12 @@ impl Boxy {
             aabb,
         }
     }
+}
 
+impl HitableTrait for Boxy {
     /// The main `hit` function for a [Boxy]. Given a [Ray](crate::ray::Ray), and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the object during that interval.
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -100,13 +102,13 @@ impl Boxy {
 
     /// Returns the axis-aligned bounding box [AABB] of the object.
     #[must_use]
-    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         Some(self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
     #[must_use]
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         let mut sum = 0.0;
 
         self.sides.iter().for_each(|object| {
@@ -118,7 +120,7 @@ impl Boxy {
 
     /// Returns a random point on the box
     #[must_use]
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         let index: usize = rng.gen_range(0..6);
         self.sides[index].random(origin, rng)
     }
