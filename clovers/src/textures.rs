@@ -1,11 +1,13 @@
 //! Textures enable different surface textures for colorizing objects in various ways.
 
-pub mod checkered;
 pub mod solid_color;
+pub mod spatial_checker;
+pub mod surface_checker;
 
-pub use checkered::*;
 use enum_dispatch::enum_dispatch;
 pub use solid_color::*;
+pub use spatial_checker::*;
+pub use surface_checker::*;
 
 use crate::{color::Color, Float, Vec3};
 
