@@ -9,11 +9,43 @@ pub mod metal;
 
 pub use dielectric::*;
 pub use diffuse_light::*;
+use enum_dispatch::enum_dispatch;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
 use rand::prelude::SmallRng;
 
+#[enum_dispatch]
+pub(crate) trait MaterialTrait {
+    fn scatter(
+        self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        rng: &mut SmallRng,
+    ) -> Option<ScatterRecord>;
+
+    fn scattering_pdf(
+        self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        scattered: &Ray,
+        rng: &mut SmallRng,
+    ) -> Option<Float>;
+
+    fn emit(
+        &self,
+        _ray: &Ray,
+        _hit_record: &HitRecord,
+        _u: Float,
+        _v: Float,
+        _position: Vec3,
+    ) -> Color {
+        // Most materials don't emit, override when needed
+        Color::new(0.0, 0.0, 0.0)
+    }
+}
+
+#[enum_dispatch(MaterialTrait)]
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
@@ -37,59 +69,6 @@ impl Default for Material {
     }
 }
 
-impl Material {
-    /// Scatters a ray from the material
-    #[must_use]
-    pub fn scatter(
-        &self,
-        ray: &Ray,
-        hit_record: &HitRecord,
-        rng: &mut SmallRng,
-    ) -> Option<ScatterRecord> {
-        match *self {
-            Material::Dielectric(d) => Dielectric::scatter(d, ray, hit_record, rng),
-            Material::DiffuseLight(d) => DiffuseLight::scatter(d, ray, hit_record, rng),
-            Material::Isotropic(i) => Isotropic::scatter(i, ray, hit_record, rng),
-            Material::Lambertian(l) => Lambertian::scatter(l, ray, hit_record, rng),
-            Material::Metal(m) => Metal::scatter(m, ray, hit_record, rng),
-        }
-    }
-
-    /// Returns a probability? TODO: understand
-    #[must_use]
-    pub fn scattering_pdf(
-        &self,
-        ray: &Ray,
-        hit_record: &HitRecord,
-        scattered: &Ray,
-        rng: &mut SmallRng,
-    ) -> Option<Float> {
-        match *self {
-            Material::Dielectric(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
-            Material::DiffuseLight(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
-            Material::Isotropic(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
-            Material::Lambertian(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
-            Material::Metal(m) => m.scattering_pdf(ray, hit_record, scattered, rng),
-        }
-    }
-
-    /// Returns the amount of light the material emits. By default, materials do not emit light, returning black.
-    #[must_use]
-    pub fn emit(
-        &self,
-        ray: &Ray,
-        hit_record: &HitRecord,
-        u: Float,
-        v: Float,
-        position: Vec3,
-    ) -> Color {
-        match *self {
-            Material::DiffuseLight(d) => d.emit(ray, hit_record, u, v, position),
-            _ => Color::new(0.0, 0.0, 0.0),
-        }
-    }
-}
-
 #[derive(Debug)]
 /// Enum for the types of materials: Diffuse and Specular (i.e., matte and shiny)
 pub enum MaterialType {
@@ -101,7 +80,7 @@ pub enum MaterialType {
 
 #[derive(Debug)]
 /// A record of an scattering event of a [Ray] on a [Material].
-pub struct ScatterRecord<'a> {
+pub struct ScatterRecord {
     /// The material type that was scattered on
     pub material_type: MaterialType,
     /// Direction of a generated specular ray
@@ -110,7 +89,7 @@ pub struct ScatterRecord<'a> {
     pub attenuation: Color,
     /// Probability density function to use with the [ScatterRecord].
     // TODO: understand & explain
-    pub pdf_ptr: PDF<'a>,
+    pub pdf_ptr: PDF,
 }
 
 // TODO: are these up to date / correct?

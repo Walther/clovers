@@ -1,6 +1,6 @@
 //! A diffuse light material.
 
-use super::ScatterRecord;
+use super::{MaterialTrait, ScatterRecord};
 use crate::{
     color::Color,
     hitable::HitRecord,
@@ -26,23 +26,23 @@ impl Default for DiffuseLight {
     }
 }
 
-impl<'a> DiffuseLight {
+impl MaterialTrait for DiffuseLight {
     /// Scatter method for the [`DiffuseLight`] material. Always returns `None`, as diffuse light does not scatter.
     #[allow(clippy::unused_self)]
     #[must_use]
-    pub fn scatter(
+    fn scatter(
         self,
         _ray: &Ray,
         _hit_record: &HitRecord,
         _rng: &mut SmallRng,
-    ) -> Option<ScatterRecord<'a>> {
+    ) -> Option<ScatterRecord> {
         None
     }
 
     /// Scattering probability density function for the [`DiffuseLight`] material. Always returns 0, as diffuse light does not scatter.
     #[allow(clippy::unused_self)] // TODO:
     #[must_use]
-    pub fn scattering_pdf(
+    fn scattering_pdf(
         self,
         _ray: &Ray,
         _hit_record: &HitRecord,
@@ -54,8 +54,8 @@ impl<'a> DiffuseLight {
 
     /// Emission function for [`DiffuseLight`]. If the given [`HitRecord`] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.
     #[must_use]
-    pub fn emit(
-        self,
+    fn emit(
+        &self,
         _ray: &Ray,
         hit_record: &HitRecord,
         u: Float,
@@ -68,7 +68,9 @@ impl<'a> DiffuseLight {
             Color::new(0.0, 0.0, 0.0)
         }
     }
+}
 
+impl DiffuseLight {
     /// Creates a new [`DiffuseLight`] material with the given [Texture].
     #[must_use]
     pub fn new(emission: Texture) -> Self {

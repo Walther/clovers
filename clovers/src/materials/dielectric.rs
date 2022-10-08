@@ -1,6 +1,6 @@
 //! A dielectric material. This resembles glass and other transparent and reflective materials.
 
-use super::{reflect, refract, schlick, MaterialType, ScatterRecord};
+use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
     color::Color,
     hitable::HitRecord,
@@ -31,15 +31,15 @@ fn default_color() -> Color {
     Color::new(1.0, 1.0, 1.0)
 }
 
-impl<'a> Dielectric {
+impl MaterialTrait for Dielectric {
     /// Scatter method for the Dielectric material. Given a `ray` and a `hit_record`, evaluate a [`ScatterRecord`] based on possible reflection or refraction.
     #[must_use]
-    pub fn scatter(
+    fn scatter(
         self,
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
-    ) -> Option<ScatterRecord<'a>> {
+    ) -> Option<ScatterRecord> {
         let albedo = self.color;
         let specular_ray: Ray;
 
@@ -76,7 +76,7 @@ impl<'a> Dielectric {
     /// Scattering probability density function for Dielectric material. NOTE: not implemented!
     #[allow(clippy::unused_self)] // TODO
     #[must_use]
-    pub fn scattering_pdf(
+    fn scattering_pdf(
         self,
         _ray: &Ray,
         _hit_record: &HitRecord,
@@ -85,10 +85,12 @@ impl<'a> Dielectric {
     ) -> Option<Float> {
         None // TODO: should a dielectric material scatter? how much?
     }
+}
 
+impl Dielectric {
     /// Creates a new [Dielectric] material with the given refractive index and color.
     #[must_use]
-    pub fn new(refractive_index: Float, color: Color) -> Self {
+    fn new(refractive_index: Float, color: Color) -> Self {
         Dielectric {
             refractive_index,
             color,

@@ -8,15 +8,15 @@ use rand::rngs::SmallRng;
 use rand::Rng;
 
 #[derive(Debug)]
-pub enum PDF<'a> {
+pub enum PDF {
     CosinePDF(CosinePDF),
     SpherePDF(SpherePDF),
-    HitablePDF(HitablePDF<'a>),
-    MixturePDF(MixturePDF<'a>),
+    HitablePDF(HitablePDF),
+    MixturePDF(MixturePDF),
     ZeroPDF(ZeroPDF),
 }
 
-impl<'a> PDF<'a> {
+impl PDF {
     #[must_use]
     pub fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         match self {
@@ -69,14 +69,14 @@ impl CosinePDF {
 }
 
 #[derive(Debug)]
-pub struct HitablePDF<'a> {
+pub struct HitablePDF {
     origin: Vec3,
-    hitable: &'a Hitable,
+    hitable: Hitable,
 }
 
-impl<'a> HitablePDF<'a> {
+impl HitablePDF {
     #[must_use]
-    pub fn new(hitable: &'a Hitable, origin: Vec3) -> Self {
+    pub fn new(hitable: Hitable, origin: Vec3) -> Self {
         HitablePDF { origin, hitable }
     }
 
@@ -92,15 +92,15 @@ impl<'a> HitablePDF<'a> {
 }
 
 #[derive(Debug)]
-pub struct MixturePDF<'a> {
+pub struct MixturePDF {
     // Box to prevent infinite size
-    pdf1: Box<PDF<'a>>,
-    pdf2: Box<PDF<'a>>,
+    pdf1: Box<PDF>,
+    pdf2: Box<PDF>,
 }
 
-impl<'a> MixturePDF<'a> {
+impl MixturePDF {
     #[must_use]
-    pub fn new(pdf1: PDF<'a>, pdf2: PDF<'a>) -> Self {
+    pub fn new(pdf1: PDF, pdf2: PDF) -> Self {
         MixturePDF {
             pdf1: Box::new(pdf1),
             pdf2: Box::new(pdf2),
