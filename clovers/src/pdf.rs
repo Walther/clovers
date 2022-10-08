@@ -2,8 +2,12 @@
 
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
-use crate::random::random_in_unit_sphere;
-use crate::{hitable::Hitable, onb::ONB, random::random_cosine_direction, Box, Float, Vec3, PI};
+use crate::{
+    hitable::{Hitable, HitableTrait},
+    onb::ONB,
+    random::{random_cosine_direction, random_in_unit_sphere},
+    Box, Float, Vec3, PI,
+};
 use enum_dispatch::enum_dispatch;
 use rand::rngs::SmallRng;
 use rand::Rng;

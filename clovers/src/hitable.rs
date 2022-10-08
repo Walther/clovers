@@ -12,11 +12,11 @@ use crate::{
     objects::{
         Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
     },
-    random::random_in_unit_sphere,
     ray::Ray,
     Float, Vec3,
 };
 
+use enum_dispatch::enum_dispatch;
 use rand::rngs::SmallRng;
 
 /// Represents a ray-object intersection, with plenty of data about the intersection.
@@ -51,8 +51,7 @@ impl<'a> HitRecord<'a> {
 }
 
 /// An abstraction for things that can be hit by [Rays](crate::ray::Ray).
-///
-/// TODO: ideally, for cleaner abstraction, this could be a Trait. However, the performance implications might need deeper investigation and consideration...
+#[enum_dispatch(HitableTrait)]
 #[derive(Debug, Clone)]
 pub enum Hitable {
     Boxy(Boxy),
@@ -74,88 +73,50 @@ pub enum Hitable {
 #[derive(Debug, Clone)]
 pub struct Empty {}
 
-impl Hitable {
+impl HitableTrait for Empty {
+    fn hit(
+        &self,
+        _ray: &Ray,
+        _distance_min: Float,
+        _distance_max: Float,
+        _rng: &mut SmallRng,
+    ) -> Option<HitRecord> {
+        None
+    }
+
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+        None
+    }
+
+    fn pdf_value(&self, _origin: Vec3, _vector: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+        0.0
+    }
+
+    fn random(&self, _origin: Vec3, _rng: &mut SmallRng) -> Vec3 {
+        // TODO: fix
+        Vec3::new(1.0, 0.0, 0.0)
+    }
+}
+
+#[enum_dispatch]
+pub(crate) trait HitableTrait {
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
-        match self {
-            Hitable::Boxy(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::BVHNode(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::ConstantMedium(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::FlipFace(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::MovingSphere(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::Quad(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::RotateY(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::Sphere(h) => h.hit(ray, distance_min, distance_max, rng),
-            #[cfg(feature = "stl")]
-            Hitable::STL(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::Translate(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::Triangle(h) => h.hit(ray, distance_min, distance_max, rng),
-            Hitable::Empty(_) => None,
-        }
-    }
+    ) -> Option<HitRecord>;
 
     #[must_use]
-    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
-        match self {
-            Hitable::Boxy(h) => h.bounding_box(t0, t1),
-            Hitable::BVHNode(h) => h.bounding_box(t0, t1),
-            Hitable::ConstantMedium(h) => h.bounding_box(t0, t1),
-            Hitable::FlipFace(h) => h.bounding_box(t0, t1),
-            Hitable::MovingSphere(h) => h.bounding_box(t0, t1),
-            Hitable::Quad(h) => h.bounding_box(t0, t1),
-            Hitable::RotateY(h) => h.bounding_box(t0, t1),
-            Hitable::Sphere(h) => h.bounding_box(t0, t1),
-            #[cfg(feature = "stl")]
-            Hitable::STL(h) => h.bounding_box(t0, t1),
-            Hitable::Translate(h) => h.bounding_box(t0, t1),
-            Hitable::Triangle(h) => h.bounding_box(t0, t1),
-            Hitable::Empty(_) => None,
-        }
-    }
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB>;
 
     #[must_use]
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        match self {
-            Hitable::Boxy(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::BVHNode(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::ConstantMedium(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::FlipFace(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::Quad(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::Sphere(h) => h.pdf_value(origin, vector, time, rng),
-            #[cfg(feature = "stl")]
-            Hitable::STL(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::Translate(h) => h.pdf_value(origin, vector, time, rng),
-            Hitable::Triangle(h) => h.pdf_value(origin, vector, time, rng),
-            // TODO: create pdf_value functions for all objects
-            Hitable::Empty(_) | Hitable::MovingSphere(_) | Hitable::RotateY(_) => 0.0,
-        }
-    }
+    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float;
 
     #[must_use]
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        match self {
-            Hitable::Boxy(h) => h.random(origin, rng),
-            Hitable::BVHNode(h) => h.random(origin, rng),
-            Hitable::ConstantMedium(h) => h.random(origin, rng),
-            Hitable::FlipFace(h) => h.random(origin, rng),
-            Hitable::Quad(h) => h.random(origin, rng),
-            Hitable::Sphere(h) => h.random(origin, rng),
-            #[cfg(feature = "stl")]
-            Hitable::STL(h) => h.random(origin, rng),
-            Hitable::Translate(h) => h.random(origin, rng),
-            Hitable::Triangle(h) => h.random(origin, rng),
-            // TODO: create random point functions for all objects
-            Hitable::Empty(_) | Hitable::MovingSphere(_) | Hitable::RotateY(_) => {
-                random_in_unit_sphere(rng)
-            }
-        }
-    }
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3;
 }
 
 /// Returns a tuple of `(front_face, normal)`. Used in lieu of `set_face_normal` in the Ray Tracing for the Rest Of Your Life book.

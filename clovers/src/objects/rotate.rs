@@ -2,7 +2,7 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable},
+    hitable::{HitRecord, Hitable, HitableTrait},
     ray::Ray,
     Box, Float, Vec3,
 };
@@ -98,10 +98,12 @@ impl RotateY {
             aabb: Some(AABB::new_from_coords(min, max)),
         }
     }
+}
 
+impl HitableTrait for RotateY {
     /// Hit method for the [`RotateY`] object. Finds the rotation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -155,7 +157,17 @@ impl RotateY {
 
     /// Bounding box method for the [`RotateY`] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for rotation.
     #[must_use]
-    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         self.aabb
+    }
+
+    fn pdf_value(&self, _origin: Vec3, _vector: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+        // TODO: fix
+        0.0
+    }
+
+    fn random(&self, _origin: Vec3, _rng: &mut SmallRng) -> Vec3 {
+        // TODO: fix
+        Vec3::new(1.0, 0.0, 0.0)
     }
 }

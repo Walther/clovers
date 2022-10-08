@@ -2,7 +2,7 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable},
+    hitable::{HitRecord, Hitable, HitableTrait},
     ray::Ray,
     Box, Float, Vec3,
 };
@@ -34,10 +34,12 @@ impl FlipFace {
             object: Box::new(object),
         }
     }
+}
 
+impl HitableTrait for FlipFace {
     /// Hit function for the [`FlipFace`] object. Considering this is a utility object that wraps an internal `object`, it returns a [`HitRecord`] with the `front_face` property flipped, if the given [Ray] hits the object.
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -54,19 +56,19 @@ impl FlipFace {
 
     /// Returns the axis-aligned bounding box [AABB] of the [`FlipFace`] object. Considering this is a utility object that wraps an internal `object`, it returns the bounding box of the internal object.
     #[must_use]
-    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         self.object.bounding_box(t0, t1)
     }
 
     /// Returns a probability density function value based on the inner object
     #[must_use]
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         self.object.pdf_value(origin, vector, time, rng)
     }
 
     /// Returns a random point on the surface of the inner object
     #[must_use]
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         self.object.random(origin, rng)
     }
 }

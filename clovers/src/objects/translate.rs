@@ -2,7 +2,7 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable},
+    hitable::{HitRecord, Hitable, HitableTrait},
     ray::Ray,
     Box, Float, Vec3,
 };
@@ -33,10 +33,12 @@ impl Translate {
     pub fn new(object: Box<Hitable>, offset: Vec3) -> Self {
         Translate { object, offset }
     }
+}
 
+impl HitableTrait for Translate {
     /// Hit method for the [Translate] object. Finds the translation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -59,7 +61,7 @@ impl Translate {
 
     /// Bounding box method for the [Translate] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for translation.
     #[must_use]
-    pub fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
         // TODO: cached into self.aabb ?
         let aabb = self.object.bounding_box(t0, t1);
         aabb.map(|b| b + self.offset)
@@ -67,7 +69,7 @@ impl Translate {
 
     /// Returns a probability density function value based on the inner object
     #[must_use]
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         // TODO: is this correct?
         self.object
             .pdf_value(origin + self.offset, vector, time, rng)
@@ -75,7 +77,7 @@ impl Translate {
 
     /// Returns a random point on the surface of the moved object
     #[must_use]
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         self.object.random(origin, rng) + self.offset
     }
 }

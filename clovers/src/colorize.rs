@@ -2,6 +2,7 @@
 
 use crate::{
     color::Color,
+    hitable::HitableTrait,
     materials::{MaterialTrait, MaterialType},
     pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
     ray::Ray,

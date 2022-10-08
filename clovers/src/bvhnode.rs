@@ -6,7 +6,7 @@ use rand::{rngs::SmallRng, Rng};
 
 use crate::{
     aabb::AABB,
-    hitable::{Empty, HitRecord, Hitable},
+    hitable::{Empty, HitRecord, Hitable, HitableTrait},
     ray::Ray,
     Box, Float, Vec, Vec3,
 };
@@ -129,9 +129,26 @@ impl BVHNode {
         }
     }
 
+    #[must_use]
+    /// Returns the count of the nodes in the tree
+    pub fn count(&self) -> usize {
+        let leftsum = match &*self.left {
+            Hitable::BVHNode(b) => b.count(),
+            _ => 1,
+        };
+        let rightsum = match &*self.right {
+            Hitable::BVHNode(b) => b.count(),
+            _ => 1,
+        };
+
+        leftsum + rightsum
+    }
+}
+
+impl HitableTrait for BVHNode {
     /// The main `hit` function for a [`BVHNode`]. Given a [Ray](crate::ray::Ray), and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the encased objects during that interval.
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -162,30 +179,15 @@ impl BVHNode {
         }
     }
 
-    #[must_use]
-    /// Returns the count of the nodes in the tree
-    pub fn count(&self) -> usize {
-        let leftsum = match &*self.left {
-            Hitable::BVHNode(b) => b.count(),
-            _ => 1,
-        };
-        let rightsum = match &*self.right {
-            Hitable::BVHNode(b) => b.count(),
-            _ => 1,
-        };
-
-        leftsum + rightsum
-    }
-
     /// Returns the axis-aligned bounding box [AABB] of the objects within this [`BVHNode`].
     #[must_use]
-    pub fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
         Some(self.bounding_box)
     }
 
     /// Returns a probability density function value based on the children
     #[must_use]
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: f32, rng: &mut SmallRng) -> f32 {
+    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: f32, rng: &mut SmallRng) -> f32 {
         (self.left.pdf_value(origin, vector, time, rng)
             + self.right.pdf_value(origin, vector, time, rng))
             / 2.0
@@ -193,7 +195,7 @@ impl BVHNode {
 
     /// Returns a random point on the surface of one of the children
     #[must_use]
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         if rng.gen::<bool>() {
             self.left.random(origin, rng)
         } else {

@@ -1,6 +1,7 @@
 //! A triangle object. Almost exact copy of [Quad](crate::objects::Quad), with an adjusted `hit_ab` method.
 // TODO: better docs
 
+use crate::hitable::HitableTrait;
 use crate::interval::Interval;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
@@ -104,10 +105,12 @@ impl Triangle {
         let v: Vec3 = c - q;
         Triangle::new(q, u, v, material)
     }
+}
 
+impl HitableTrait for Triangle {
     /// Hit method for the triangle
     #[must_use]
-    pub fn hit(
+    fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
@@ -155,7 +158,7 @@ impl Triangle {
 
     /// Returns the bounding box of the triangle
     #[must_use]
-    pub fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         // TODO: this is from quad and not updated!
         // although i guess a triangle's aabb is the same as the quad's aabb in worst case
         Some(self.aabb)
@@ -163,7 +166,7 @@ impl Triangle {
 
     /// Returns a probability density function value? // TODO: understand & explain
     #[must_use]
-    pub fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         // TODO: this is from quad and not updated!
         match self.hit(
             &Ray::new(origin, vector, time),
@@ -184,7 +187,7 @@ impl Triangle {
 
     /// Returns a random point on the triangle surface
     #[must_use]
-    pub fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
         let mut a = rng.gen::<Float>();
         let mut b = rng.gen::<Float>();
         if a + b > 1.0 {
