@@ -2,6 +2,8 @@
 
 use crate::{color::Color, Float, Vec3, PI};
 
+use super::TextureTrait;
+
 #[derive(Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A standard checkered texture based on spatial 3D texturing.
@@ -49,10 +51,12 @@ impl SpatialChecker {
             density,
         }
     }
+}
 
+impl TextureTrait for SpatialChecker {
     /// Evaluates the color at the given spatial position coordinate. Note that the `SpatialChecker` is spatial - surface coordinates are ignored.
     #[must_use]
-    pub fn color(self, _u: Float, _v: Float, position: Vec3) -> Color {
+    fn color(&self, _u: Float, _v: Float, position: Vec3) -> Color {
         // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;
         let sines = 1.0 // cosmetic 1 for readability of following lines :)
@@ -90,10 +94,12 @@ impl SurfaceChecker {
             density,
         }
     }
+}
 
+impl TextureTrait for SurfaceChecker {
     /// Evaluates the color at the given surface position coordinates. Note that `SurfaceChecker` is surface-based, and thus ignores the spatial position coordinate.
     #[must_use]
-    pub fn color(self, u: Float, v: Float, _position: Vec3) -> Color {
+    fn color(&self, u: Float, v: Float, _position: Vec3) -> Color {
         // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;
         let sines = 1.0 // cosmetic 1 for readability of following lines :)

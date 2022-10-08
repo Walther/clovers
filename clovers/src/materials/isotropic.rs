@@ -6,7 +6,7 @@ use crate::{
     hitable::HitRecord,
     pdf::{SpherePDF, PDF},
     ray::Ray,
-    textures::Texture,
+    textures::{Texture, TextureTrait},
     Float, PI,
 };
 use rand::prelude::SmallRng;

@@ -5,7 +5,7 @@ use crate::{
     color::Color,
     hitable::HitRecord,
     ray::Ray,
-    textures::{SolidColor, Texture},
+    textures::{SolidColor, Texture, TextureTrait},
     Float, Vec3,
 };
 use rand::prelude::SmallRng;

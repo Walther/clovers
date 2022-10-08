@@ -6,7 +6,7 @@ use crate::{
     pdf::{ZeroPDF, PDF},
     random::random_in_unit_sphere,
     ray::Ray,
-    textures::Texture,
+    textures::{Texture, TextureTrait},
     Float, Vec3,
 };
 use rand::prelude::SmallRng;
