@@ -3,7 +3,7 @@
 use crate::{
     color::Color,
     materials::{MaterialTrait, MaterialType},
-    pdf::{HitablePDF, MixturePDF, PDF},
+    pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
     ray::Ray,
     scenes::Scene,
     Float, EPSILON_SHADOW_ACNE,
