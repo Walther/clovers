@@ -166,8 +166,8 @@ impl HitableTrait for RotateY {
         0.0
     }
 
-    fn random(&self, _origin: Vec3, _rng: &mut SmallRng) -> Vec3 {
-        // TODO: fix
-        Vec3::new(1.0, 0.0, 0.0)
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+        // TODO: fix, take rotation into account
+        self.object.random(origin, rng)
     }
 }

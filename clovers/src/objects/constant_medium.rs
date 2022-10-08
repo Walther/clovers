@@ -4,6 +4,7 @@ use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable, HitableTrait},
     materials::{isotropic::Isotropic, Material},
+    random::random_unit_vector,
     ray::Ray,
     textures::Texture,
     Box, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
@@ -111,11 +112,11 @@ impl HitableTrait for ConstantMedium {
         let distance = rec1.distance + hit_distance / ray_length;
         let position = ray.evaluate(distance);
 
-        let normal: Vec3 = Vec3::new(1.0, 0.0, 0.0); // tutorial says: arbitrary
+        let normal: Vec3 = random_unit_vector(rng); // tutorial says: arbitrary
         let front_face: bool = true; // tutorial says: also arbitrary
 
-        let u: Float = 0.5; // TODO: should this be something sensible?
-        let v: Float = 0.5; // TODO: should this be something sensible?
+        let u = rec1.u;
+        let v = rec1.v;
 
         Some(HitRecord {
             distance,
