@@ -7,7 +7,7 @@ use crate::{
     aabb::AABB,
     hitable::{get_orientation, HitRecord, HitableTrait},
     interval::Interval,
-    materials::Material,
+    materials::{gltf::GLTFMaterial, Material},
     ray::Ray,
     Float, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
@@ -31,7 +31,7 @@ pub struct GLTFTriangle {
 impl GLTFTriangle {
     #[must_use]
     /// Initialize a new GLTF object
-    pub fn new(triangle: &[Vec3; 3], _material: &gltf::Material) -> Self {
+    pub fn new(triangle: &[Vec3; 3], material: &gltf::Material) -> Self {
         // TODO: mostly adapted from Triangle, verify correctness!
 
         let [a, b, c] = *triangle;
@@ -55,8 +55,7 @@ impl GLTFTriangle {
         // Compared to quad, triangle has half the area
         let area = n.magnitude() / 2.0;
 
-        // let material: Material = Material::GLTF(GLTFMaterial::new(&material));
-        let material = Material::default();
+        let material: Material = Material::GLTF(GLTFMaterial::new(material));
 
         GLTFTriangle {
             aabb,

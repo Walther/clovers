@@ -106,6 +106,19 @@ impl From<[u8; 3]> for Color {
     }
 }
 
+impl From<[Float; 3]> for Color {
+    fn from(rgb: [Float; 3]) -> Self {
+        Color::new(rgb[0], rgb[1], rgb[2])
+    }
+}
+
+impl From<[Float; 4]> for Color {
+    // TODO: ignores alpha
+    fn from(rgb: [Float; 4]) -> Self {
+        Color::new(rgb[0], rgb[1], rgb[2])
+    }
+}
+
 impl From<Color> for Vec3 {
     fn from(color: Color) -> Vec3 {
         Vec3::new(color.r, color.g, color.b)
