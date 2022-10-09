@@ -104,6 +104,8 @@ fn parse_mesh(mesh: Mesh, objects: &mut Vec<Hitable>, buffers: &[Data]) {
         debug!("found primitive");
         match primitive.mode() {
             gltf::mesh::Mode::Triangles => {
+                let mut trianglelist: Vec<Hitable> = Vec::new();
+
                 let reader = primitive.reader(|buffer| Some(&buffers[buffer.index()]));
                 let mut all_positions: Vec<Vec3> = Vec::new();
                 if let Some(iter) = reader.read_positions() {
@@ -127,10 +129,13 @@ fn parse_mesh(mesh: Mesh, objects: &mut Vec<Hitable>, buffers: &[Data]) {
                             all_positions[indices[i + 2]],
                         ];
                         let gltf_triangle = GLTFTriangle::new(&triangle, &primitive.material());
-                        objects.push(Hitable::GLTFTriangle(gltf_triangle));
+                        trianglelist.push(Hitable::GLTFTriangle(gltf_triangle));
                         i += 3;
                     }
                 }
+
+                let bvh: BVHNode = BVHNode::from_list(trianglelist, 0.0, 1.0);
+                objects.push(Hitable::BVHNode(bvh));
             }
             _ => unimplemented!(),
         }
