@@ -35,7 +35,7 @@ impl MaterialTrait for Dielectric {
     /// Scatter method for the Dielectric material. Given a `ray` and a `hit_record`, evaluate a [`ScatterRecord`] based on possible reflection or refraction.
     #[must_use]
     fn scatter(
-        self,
+        &self,
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
@@ -77,7 +77,7 @@ impl MaterialTrait for Dielectric {
     #[allow(clippy::unused_self)] // TODO
     #[must_use]
     fn scattering_pdf(
-        self,
+        &self,
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,

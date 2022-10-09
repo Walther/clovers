@@ -9,7 +9,7 @@ use crate::{
 };
 use rand::rngs::SmallRng;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `SphereInit` structure describes the necessary data for constructing a [`Sphere`](super::Sphere). Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 pub struct MovingSphereInit {

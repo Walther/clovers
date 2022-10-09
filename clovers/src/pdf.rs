@@ -13,7 +13,7 @@ use rand::rngs::SmallRng;
 use rand::Rng;
 
 #[enum_dispatch(PDFTrait)]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum PDF {
     CosinePDF(CosinePDF),
     SpherePDF(SpherePDF),
@@ -31,7 +31,7 @@ pub(crate) trait PDFTrait {
     fn generate(&self, rng: &mut SmallRng) -> Vec3;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CosinePDF {
     uvw: ONB,
 }
@@ -62,7 +62,7 @@ impl PDFTrait for CosinePDF {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HitablePDF {
     origin: Vec3,
     hitable: Hitable,
@@ -87,7 +87,7 @@ impl PDFTrait for HitablePDF {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MixturePDF {
     // Box to prevent infinite size
     pdf1: Box<PDF>,
@@ -120,7 +120,7 @@ impl PDFTrait for MixturePDF {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct SpherePDF {}
 
 impl SpherePDF {
@@ -143,7 +143,7 @@ impl PDFTrait for SpherePDF {
 }
 
 // TODO: this is an ugly hack due to tutorial saying `srec.pdf_ptr = 0;` in 12.2 Handling Specular for Metal
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ZeroPDF {}
 
 impl ZeroPDF {

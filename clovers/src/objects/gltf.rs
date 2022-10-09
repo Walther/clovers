@@ -1,86 +1,78 @@
-//! A quadrilateral object.
-// TODO: better docs
+//! GLTF format support for the renderer
 
-use crate::hitable::HitableTrait;
-use crate::EPSILON_SHADOW_ACNE;
-use crate::{
-    aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
-    Vec3, EPSILON_RECT_THICKNESS,
-};
 use rand::rngs::SmallRng;
 use rand::Rng;
 
-/// Initialization structure for a Quad object.
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct QuadInit {
-    /// Corner point
-    pub q: Vec3,
-    /// Vector describing the u side
-    pub u: Vec3,
-    /// Vector describing the v side
-    pub v: Vec3,
-    /// Material of the surface
-    #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material,
-}
+use crate::{
+    aabb::AABB,
+    hitable::{get_orientation, HitRecord, HitableTrait},
+    interval::Interval,
+    materials::Material,
+    ray::Ray,
+    Float, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
+};
 
-/// Quadrilateral shape. This can be an arbitrary parallelogram, not just a rectangle.
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct Quad {
-    /// Corner point
-    pub q: Vec3,
-    /// Vector describing the u side
-    pub u: Vec3,
-    /// Vector describing the v side
-    pub v: Vec3,
-    /// Material of the surface
-    #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material,
-    /// Area of the surface
-    pub area: Float,
-    /// Normal vector of the surface
-    pub normal: Vec3,
-    /// What is this? // TODO: understand, explain
-    pub d: Float,
-    /// What is this? // TODO: understand, explain
-    pub w: Vec3,
-    /// Bounding box of the surface
+/// Internal GLTF object representation after initialization.
+#[derive(Debug, Clone)]
+pub struct GLTFTriangle {
+    /// Axis-aligned bounding box of the object
     pub aabb: AABB,
+    /// Material of the object
+    pub material: Material,
+    q: Vec3,
+    u: Vec3,
+    v: Vec3,
+    d: Float,
+    w: Vec3,
+    area: Float,
+    normal: Vec3,
 }
 
-impl Quad {
-    /// Creates a new quad
+impl GLTFTriangle {
     #[must_use]
-    pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Quad {
+    /// Initialize a new GLTF object
+    pub fn new(triangle: &[Vec3; 3], _material: &gltf::Material) -> Self {
+        // TODO: mostly adapted from Triangle, verify correctness!
+
+        let [a, b, c] = *triangle;
+        let interval_x = Interval::new(a[0].min(b[0]).min(c[0]), a[0].max(b[0]).max(c[0]));
+        let interval_y = Interval::new(a[1].min(b[1]).min(c[1]), a[1].max(b[1]).max(c[1]));
+        let interval_z = Interval::new(a[2].min(b[2]).min(c[2]), a[2].max(b[2]).max(c[2]));
+        let mut aabb: AABB = AABB::new(interval_x, interval_y, interval_z);
+        aabb.pad();
+
+        // TODO: Check orientation and make into a corner + edge vectors triangle
+        let q = a;
+        let u = b - a;
+        let v = c - a;
+
         let n: Vec3 = u.cross(&v);
         let normal: Vec3 = n.normalize();
         // TODO: what is this?
         let d = -(normal.dot(&q));
         // TODO: what is this?
         let w: Vec3 = n / n.dot(&n);
-        let area = n.magnitude();
-        let mut aabb = AABB::new_from_coords(q, q + u + v);
-        aabb.pad();
+        // Compared to quad, triangle has half the area
+        let area = n.magnitude() / 2.0;
 
-        Quad {
+        // let material: Material = Material::GLTF(GLTFMaterial::new(&material));
+        let material = Material::default();
+
+        GLTFTriangle {
+            aabb,
+            material,
             q,
             u,
             v,
-            material,
-            area,
-            normal,
             d,
             w,
-            aabb,
+            area,
+            normal,
         }
     }
 }
 
-impl HitableTrait for Quad {
-    /// Hit method for the quad rectangle
-    #[must_use]
+impl HitableTrait for GLTFTriangle {
     fn hit(
         &self,
         ray: &Ray,
@@ -88,6 +80,8 @@ impl HitableTrait for Quad {
         distance_max: Float,
         _rng: &mut SmallRng,
     ) -> Option<HitRecord> {
+        // TODO: mostly adapted from Triangle, verify correctness!
+
         let denom = self.normal.dot(&ray.direction);
 
         // No hit if the ray is parallel to the plane.
@@ -127,15 +121,12 @@ impl HitableTrait for Quad {
         })
     }
 
-    /// Returns the bounding box of the quad
-    #[must_use]
     fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
         Some(self.aabb)
     }
 
-    /// Returns a probability density function value? // TODO: understand & explain
-    #[must_use]
     fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+        // TODO: this is from quad and not updated!
         match self.hit(
             &Ray::new(origin, vector, time),
             EPSILON_SHADOW_ACNE,
@@ -153,10 +144,16 @@ impl HitableTrait for Quad {
         }
     }
 
-    /// Returns a random point on the quadrilateral surface
-    #[must_use]
     fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        let point: Vec3 = self.q + (rng.gen::<Float>() * self.u) + (rng.gen::<Float>() * self.v);
+        let mut a = rng.gen::<Float>();
+        let mut b = rng.gen::<Float>();
+        if a + b > 1.0 {
+            a = 1.0 - a;
+            b = 1.0 - b;
+        }
+
+        let point: Vec3 = self.q + (a * self.u) + (b * self.v);
+
         point - origin
     }
 }
@@ -165,5 +162,6 @@ impl HitableTrait for Quad {
 fn hit_ab(a: Float, b: Float) -> bool {
     // Given the hit point in plane coordinates, return false if it is outside the
     // primitive, otherwise return true.
-    (0.0..=1.0).contains(&a) && (0.0..=1.0).contains(&b)
+    // Triangle: a+b must be <=1.0
+    (0.0..=1.0).contains(&a) && (0.0..=1.0).contains(&b) && (a + b <= 1.0)
 }

@@ -10,7 +10,8 @@ use humantime::format_duration;
 use image::{ImageBuffer, ImageOutputFormat, Rgb, RgbImage};
 use img_parts::png::{Png, PngChunk};
 use std::fs::File;
-use std::io::{Cursor, Read};
+use std::io::Cursor;
+use std::path::Path;
 use std::{error::Error, fs, time::Instant};
 use time::OffsetDateTime;
 use tracing::{debug, info, Level};
@@ -19,7 +20,8 @@ use tracing_subscriber::fmt::time::UtcTime;
 // Internal imports
 use clovers::*;
 mod draw_cpu;
-use scenes::*;
+mod gltf_scene;
+mod json_scene;
 
 // Configure CLI parameters
 #[derive(Parser)]
@@ -101,14 +103,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     let threads = std::thread::available_parallelism()?;
 
     info!("Reading the scene file");
-    let mut file = File::open(&opts.input)?;
-    let mut contents: String = String::new();
-    file.read_to_string(&mut contents)?;
-    info!("Parsing the scene file");
-    let scene_file: SceneFile = serde_json::from_str(&contents)?;
-    info!("Initializing the scene");
-    let scene: Scene = scenes::initialize(scene_file, opts.width, opts.height);
-    info!("Count of nodes in the BVH tree: {}", scene.objects.count());
+    let path = Path::new(&opts.input);
+    let scene = match path.extension() {
+        Some(ext) => match &ext.to_str() {
+            Some("json") => json_scene::initialize(path, &opts),
+            Some("gltf") => gltf_scene::initialize(path, &opts),
+            _ => panic!("Unknown file type"),
+        },
+        None => panic!("Unknown file type"),
+    }?;
 
     info!("Calling draw()");
     let start = Instant::now();

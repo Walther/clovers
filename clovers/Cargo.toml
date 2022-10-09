@@ -18,6 +18,7 @@ traces = ["tracing"]
 
 [dependencies]
 enum_dispatch = "0.3.8"
+gltf = "1.0.0"
 nalgebra = { version = "0.31.1", features = ["libm"], default-features = false }
 rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
 rand_distr = "0.4.3"

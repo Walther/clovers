@@ -31,7 +31,7 @@ impl MaterialTrait for DiffuseLight {
     #[allow(clippy::unused_self)]
     #[must_use]
     fn scatter(
-        self,
+        &self,
         _ray: &Ray,
         _hit_record: &HitRecord,
         _rng: &mut SmallRng,
@@ -43,7 +43,7 @@ impl MaterialTrait for DiffuseLight {
     #[allow(clippy::unused_self)] // TODO:
     #[must_use]
     fn scattering_pdf(
-        self,
+        &self,
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,

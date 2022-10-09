@@ -27,7 +27,7 @@ pub struct TriangleInit {
 }
 
 /// Triangle shape. Heavily based on [Quad](crate::objects::Quad) and may contain inaccuracies
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct Triangle {
     /// Corner point

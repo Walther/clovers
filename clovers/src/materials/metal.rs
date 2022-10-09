@@ -25,7 +25,7 @@ impl MaterialTrait for Metal {
     /// Scatter function for the [Metal] material. Metal always reflects, and a specular ray is calculated with some randomness adjusted by the `fuzz` factor. This means the metal can be made more shiny or more matte. The returned [`ScatterRecord`] will have a probability density function of [`ZeroPDF`] and material type of [`MaterialType::Specular`]
     #[must_use]
     fn scatter(
-        self,
+        &self,
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
@@ -49,7 +49,7 @@ impl MaterialTrait for Metal {
     #[allow(clippy::unused_self)] // TODO:
     #[must_use]
     fn scattering_pdf(
-        self,
+        &self,
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,

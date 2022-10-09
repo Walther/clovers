@@ -5,6 +5,7 @@ use crate::{bvhnode::BVHNode, hitable::Hitable, Box};
 pub mod boxy; // avoid keyword
 pub mod constant_medium;
 pub mod flip_face;
+pub mod gltf;
 pub mod moving_sphere;
 pub mod quad;
 pub mod rotate;

@@ -10,7 +10,8 @@ use crate::{
     bvhnode::BVHNode,
     materials::Material,
     objects::{
-        Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
+        gltf::GLTFTriangle, Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere,
+        Translate, Triangle,
     },
     ray::Ray,
     Float, Vec3,
@@ -67,6 +68,7 @@ pub enum Hitable {
     Translate(Translate),
     Triangle(Triangle),
     Empty(Empty),
+    GLTFTriangle(GLTFTriangle),
 }
 
 // TODO: remove horrible hack

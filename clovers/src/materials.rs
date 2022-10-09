@@ -3,6 +3,7 @@
 use crate::{color::Color, hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
 pub mod dielectric;
 pub mod diffuse_light;
+pub mod gltf;
 pub mod isotropic;
 pub mod lambertian;
 pub mod metal;
@@ -15,17 +16,19 @@ pub use lambertian::*;
 pub use metal::*;
 use rand::prelude::SmallRng;
 
+use self::gltf::GLTFMaterial;
+
 #[enum_dispatch]
 pub(crate) trait MaterialTrait {
     fn scatter(
-        self,
+        &self,
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord>;
 
     fn scattering_pdf(
-        self,
+        &self,
         ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
@@ -46,7 +49,7 @@ pub(crate) trait MaterialTrait {
 }
 
 #[enum_dispatch(MaterialTrait)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
@@ -61,6 +64,8 @@ pub enum Material {
     Metal(Metal),
     /// Isotropic material
     Isotropic(Isotropic),
+    /// GLTF material
+    GLTF(GLTFMaterial),
 }
 
 impl Default for Material {
@@ -69,7 +74,7 @@ impl Default for Material {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Enum for the types of materials: Diffuse and Specular (i.e., matte and shiny)
 pub enum MaterialType {
     /// A matte material that does not reflect rays
@@ -78,7 +83,7 @@ pub enum MaterialType {
     Specular,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// A record of an scattering event of a [Ray] on a [Material].
 pub struct ScatterRecord {
     /// The material type that was scattered on
