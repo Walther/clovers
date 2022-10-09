@@ -106,28 +106,30 @@ fn parse_mesh(mesh: Mesh, objects: &mut Vec<Hitable>, buffers: &[Data]) {
             gltf::mesh::Mode::Triangles => {
                 let reader = primitive.reader(|buffer| Some(&buffers[buffer.index()]));
                 let mut all_positions: Vec<Vec3> = Vec::new();
-                let mut all_normals: Vec<Vec3> = Vec::new();
                 if let Some(iter) = reader.read_positions() {
                     for vertex_position in iter {
                         all_positions.push(vertex_position.into());
                     }
                 }
-                if let Some(iter) = reader.read_normals() {
-                    for normal in iter {
-                        all_normals.push(normal.into())
-                    }
-                }
 
-                // Go through all the vertex positions in groups of three
-                for (_index, triangle) in all_positions.chunks_exact(3).enumerate() {
-                    // NOTE: gLTF format uses absolute vertex positions for all three corners of the triangle
-                    // NOTE: internal representation uses triangle origin q, and relative u,v edge vectors
-                    // let normal = all_normals[index];
-                    let gltf_triangle = GLTFTriangle::new(
-                        &[triangle[0], triangle[1], triangle[2]],
-                        &primitive.material(),
-                    );
-                    objects.push(Hitable::GLTFTriangle(gltf_triangle));
+                // Note that in the GLTF format the same positions can be re-used for multiple triangles, as a sort of a compression method
+                // Read the indices array in order to assemble triangles from positions
+                if let Some(accessor) = reader.read_indices() {
+                    let accessor = accessor.into_u32();
+                    let len = accessor.len();
+                    let indices: Vec<u32> = accessor.collect();
+                    let indices: Vec<usize> = indices.iter().map(|&x| x as usize).collect();
+                    let mut i = 0;
+                    while i < len {
+                        let triangle = [
+                            all_positions[indices[i]],
+                            all_positions[indices[i + 1]],
+                            all_positions[indices[i + 2]],
+                        ];
+                        let gltf_triangle = GLTFTriangle::new(&triangle, &primitive.material());
+                        objects.push(Hitable::GLTFTriangle(gltf_triangle));
+                        i += 3;
+                    }
                 }
             }
             _ => unimplemented!(),

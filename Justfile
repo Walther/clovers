@@ -24,7 +24,7 @@ all-scenes:
 
 # Temporary helper for experimental gltf rendering
 gltf scene *ARGS:
-  just cli --input ~/git/glTF-Sample-Models/2.0/{{scene}}/glTF/{{scene}}.gltf --output renders/{{scene}}.png {{ARGS}}
+  just cli --input ~/git/glTF-Sample-Models/2.0/{{scene}}/glTF/{{scene}}.gltf {{ARGS}}
 
 # Temporary helper for experimental gltf rendering
 gltf-list:

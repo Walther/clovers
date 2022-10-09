@@ -43,8 +43,8 @@ impl GLTFTriangle {
 
         // TODO: Check orientation and make into a corner + edge vectors triangle
         let q = a;
-        let u = b - a;
-        let v = c - a;
+        let u = b - q;
+        let v = c - q;
 
         let n: Vec3 = u.cross(&v);
         let normal: Vec3 = n.normalize();
