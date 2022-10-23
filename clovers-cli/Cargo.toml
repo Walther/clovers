@@ -25,4 +25,4 @@ serde_json = { version = "1.0", features = ["alloc"], default-features = false }
 time = { version = "0.3.14", default-features = false }
 tracing = "0.1.36"
 tracing-subscriber = { version = "0.3.15", features = ["time"] }
-gltf = "1.0.0"
+gltf = { version = "1.0.0", features = ["import"] }

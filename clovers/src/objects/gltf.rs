@@ -1,5 +1,6 @@
 //! GLTF format support for the renderer
 
+use gltf::image::Data;
 use rand::rngs::SmallRng;
 use rand::Rng;
 
@@ -31,10 +32,15 @@ pub struct GLTFTriangle {
 impl GLTFTriangle {
     #[must_use]
     /// Initialize a new GLTF object
-    pub fn new(triangle: &[Vec3; 3], material: &gltf::Material) -> Self {
+    pub fn new(
+        triangle: [Vec3; 3],
+        tex_coords: [[Float; 2]; 3],
+        material: &gltf::Material,
+        images: &[Data],
+    ) -> Self {
         // TODO: mostly adapted from Triangle, verify correctness!
 
-        let [a, b, c] = *triangle;
+        let [a, b, c] = triangle;
         let interval_x = Interval::new(a[0].min(b[0]).min(c[0]), a[0].max(b[0]).max(c[0]));
         let interval_y = Interval::new(a[1].min(b[1]).min(c[1]), a[1].max(b[1]).max(c[1]));
         let interval_z = Interval::new(a[2].min(b[2]).min(c[2]), a[2].max(b[2]).max(c[2]));
@@ -55,7 +61,7 @@ impl GLTFTriangle {
         // Compared to quad, triangle has half the area
         let area = n.magnitude() / 2.0;
 
-        let material: Material = Material::GLTF(GLTFMaterial::new(material));
+        let material: Material = Material::GLTF(GLTFMaterial::new(material, tex_coords, images));
 
         GLTFTriangle {
             aabb,

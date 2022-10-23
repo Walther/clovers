@@ -7,8 +7,7 @@ use clovers::objects::gltf::GLTFTriangle;
 use clovers::objects::{Object, QuadInit};
 use clovers::scenes::Scene;
 use clovers::textures::{SolidColor, Texture};
-use clovers::Vec3;
-use gltf::buffer::Data;
+use clovers::{Float, Vec3};
 use gltf::{Mesh, Node};
 use tracing::debug;
 
@@ -49,12 +48,12 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
     let mut hitables: Vec<Hitable> = objects.iter().map(|o| o.clone().into()).collect();
 
     // Go through the objects in the gltf file
-    let (document, buffers, _images) = gltf::import(path)?;
+    let (document, buffers, images) = gltf::import(path)?;
     for scene in document.scenes() {
         debug!("found scene");
         for node in scene.nodes() {
             debug!("found node");
-            parse_node(node, &mut hitables, &buffers);
+            parse_node(node, &mut hitables, &buffers, &images);
         }
     }
     debug!("hitable count: {}", &hitables.len());
@@ -68,7 +67,7 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
 
     // Example hardcoded camera
     let camera = Camera::new(
-        Vec3::new(4.0, 2.0, 4.0),
+        Vec3::new(2.0, 2.0, 2.0),
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(0.0, 1.0, 0.0),
         40.0,
@@ -87,18 +86,28 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
     })
 }
 
-fn parse_node(node: Node, objects: &mut Vec<Hitable>, buffers: &Vec<Data>) {
+fn parse_node(
+    node: Node,
+    objects: &mut Vec<Hitable>,
+    buffers: &Vec<gltf::buffer::Data>,
+    images: &Vec<gltf::image::Data>,
+) {
     // Handle direct meshes
     if let Some(mesh) = node.mesh() {
-        parse_mesh(mesh, objects, buffers);
+        parse_mesh(mesh, objects, buffers, images);
     }
     // Handle nesting
     for child in node.children() {
-        parse_node(child, objects, buffers);
+        parse_node(child, objects, buffers, images);
     }
 }
 
-fn parse_mesh(mesh: Mesh, objects: &mut Vec<Hitable>, buffers: &[Data]) {
+fn parse_mesh(
+    mesh: Mesh,
+    objects: &mut Vec<Hitable>,
+    buffers: &[gltf::buffer::Data],
+    images: &[gltf::image::Data],
+) {
     debug!("found mesh");
     for primitive in mesh.primitives() {
         debug!("found primitive");
@@ -122,13 +131,31 @@ fn parse_mesh(mesh: Mesh, objects: &mut Vec<Hitable>, buffers: &[Data]) {
                     let indices: Vec<u32> = accessor.collect();
                     let indices: Vec<usize> = indices.iter().map(|&x| x as usize).collect();
                     let mut i = 0;
+                    let material = primitive.material();
+                    let coordset = material
+                        .pbr_metallic_roughness()
+                        .base_color_texture()
+                        .unwrap()
+                        .tex_coord();
+                    let all_tex_coords: Vec<[Float; 2]> = reader
+                        .read_tex_coords(coordset)
+                        .unwrap()
+                        .into_f32()
+                        .collect();
+
                     while i < len {
                         let triangle = [
                             all_positions[indices[i]],
                             all_positions[indices[i + 1]],
                             all_positions[indices[i + 2]],
                         ];
-                        let gltf_triangle = GLTFTriangle::new(&triangle, &primitive.material());
+                        let tex_coords: [[Float; 2]; 3] = [
+                            all_tex_coords[indices[i]],
+                            all_tex_coords[indices[i + 1]],
+                            all_tex_coords[indices[i + 2]],
+                        ];
+                        let gltf_triangle =
+                            GLTFTriangle::new(triangle, tex_coords, &material, images);
                         trianglelist.push(Hitable::GLTFTriangle(gltf_triangle));
                         i += 3;
                     }
