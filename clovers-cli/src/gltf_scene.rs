@@ -49,11 +49,13 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
 
     // Go through the objects in the gltf file
     let (document, buffers, images) = gltf::import(path)?;
+    let images: &'static Vec<gltf::image::Data> = Box::leak(Box::new(images));
+
     for scene in document.scenes() {
         debug!("found scene");
         for node in scene.nodes() {
             debug!("found node");
-            parse_node(node, &mut hitables, &buffers, &images);
+            parse_node(node, &mut hitables, &buffers, images);
         }
     }
     debug!("hitable count: {}", &hitables.len());
@@ -90,7 +92,7 @@ fn parse_node(
     node: Node,
     objects: &mut Vec<Hitable>,
     buffers: &Vec<gltf::buffer::Data>,
-    images: &Vec<gltf::image::Data>,
+    images: &'static Vec<gltf::image::Data>,
 ) {
     // Handle direct meshes
     if let Some(mesh) = node.mesh() {
@@ -106,7 +108,7 @@ fn parse_mesh(
     mesh: Mesh,
     objects: &mut Vec<Hitable>,
     buffers: &[gltf::buffer::Data],
-    images: &[gltf::image::Data],
+    images: &'static [gltf::image::Data],
 ) {
     debug!("found mesh");
     for primitive in mesh.primitives() {

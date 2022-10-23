@@ -25,7 +25,7 @@ pub struct GLTFMaterial {
     base_color_factor: Color,
     emissive_factor: Color,
     #[cfg_attr(feature = "serde-derive", serde(skip))]
-    base_color_texture: Option<Data>,
+    base_color_texture: Option<&'static Data>,
     #[cfg_attr(feature = "serde-derive", serde(skip))]
     tex_coords: [[Float; 2]; 3],
 }
@@ -39,7 +39,7 @@ impl Default for GLTFMaterial {
 impl GLTFMaterial {
     /// Initialize a new GLTF material wrapper
     #[must_use]
-    pub fn new(material: &Material, tex_coords: [[Float; 2]; 3], images: &[Data]) -> Self {
+    pub fn new(material: &Material, tex_coords: [[Float; 2]; 3], images: &'static [Data]) -> Self {
         let metallic_factor = material.pbr_metallic_roughness().metallic_factor();
         let roughness_factor = material.pbr_metallic_roughness().roughness_factor();
         let base_color_factor = material.pbr_metallic_roughness().base_color_factor().into();
@@ -47,7 +47,7 @@ impl GLTFMaterial {
         let base_color_texture =
             if let Some(info) = material.pbr_metallic_roughness().base_color_texture() {
                 let index = info.texture().index();
-                Some(images[index].clone())
+                Some(&images[index])
             } else {
                 None
             };
