@@ -72,33 +72,26 @@ impl MaterialTrait for GLTFMaterial {
     ) -> Option<ScatterRecord> {
         // TODO: borrowed from metal, should this be different?
         let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
+        let direction = reflected + self.roughness_factor * random_in_unit_sphere(rng);
 
         // TODO: proper fully correct coloring
-        let attenuation = match &self.base_color_texture {
+        let base_color = match &self.base_color_texture {
             Some(image) => {
                 match image.format {
+                    // TODO: deduplicate
                     gltf::image::Format::R8G8B8 => {
-                        // Find the correct texture coordinates
-                        let tex_corner0 =
-                            Vec3::from([self.tex_coords[0][0], self.tex_coords[0][1], 0.0]);
-                        let tex_corner1 =
-                            Vec3::from([self.tex_coords[1][0], self.tex_coords[1][1], 0.0]);
-                        let tex_corner2 =
-                            Vec3::from([self.tex_coords[2][0], self.tex_coords[2][1], 0.0]);
-                        let tex_u = tex_corner1 - tex_corner0;
-                        let tex_v = tex_corner2 - tex_corner0;
-                        let coord = tex_corner0 + hit_record.u * tex_u + hit_record.v * tex_v;
-                        let x = coord[0];
-                        let y = coord[1];
-
-                        // TODO: other wrapping modes etc
-                        let x = x.fract();
-                        let y = y.fract();
-                        let x = x * (image.width as f32);
-                        let y = y * (image.height as f32);
-                        let x = x as usize;
-                        let y = y as usize;
+                        let (x, y) = self.get_texture_coords(hit_record, image);
                         let index = 3 * (x + image.width as usize * y);
+
+                        let r = image.pixels[index];
+                        let g = image.pixels[index + 1];
+                        let b = image.pixels[index + 2];
+                        let color = Color::from([r, g, b]);
+                        self.base_color_factor * color
+                    }
+                    gltf::image::Format::R8G8B8A8 => {
+                        let (x, y) = self.get_texture_coords(hit_record, image);
+                        let index = 4 * (x + image.width as usize * y);
 
                         let r = image.pixels[index];
                         let g = image.pixels[index + 1];
@@ -112,16 +105,11 @@ impl MaterialTrait for GLTFMaterial {
             None => self.base_color_factor,
         };
 
+        // Combine
+        let attenuation = self.emissive_factor + base_color;
+
         Some(ScatterRecord {
-            specular_ray: Some(Ray::new(
-                hit_record.position,
-                reflected + self.roughness_factor * random_in_unit_sphere(rng),
-                ray.time,
-            )),
-            // attenuation: self
-            //     .albedo
-            //     .color(hit_record.u, hit_record.v, hit_record.position),
-            // TODO: fetch from texture
+            specular_ray: Some(Ray::new(hit_record.position, direction, ray.time)),
             attenuation,
             material_type: MaterialType::Specular,
             pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()),
@@ -137,5 +125,27 @@ impl MaterialTrait for GLTFMaterial {
     ) -> Option<Float> {
         // TODO: what should this be for GLTF materials?
         todo!()
+    }
+}
+
+impl GLTFMaterial {
+    fn get_texture_coords(&self, hit_record: &HitRecord, image: &&Data) -> (usize, usize) {
+        // Find the correct texture coordinates
+        let tex_corner0 = Vec3::from([self.tex_coords[0][0], self.tex_coords[0][1], 0.0]);
+        let tex_corner1 = Vec3::from([self.tex_coords[1][0], self.tex_coords[1][1], 0.0]);
+        let tex_corner2 = Vec3::from([self.tex_coords[2][0], self.tex_coords[2][1], 0.0]);
+        let tex_u = tex_corner1 - tex_corner0;
+        let tex_v = tex_corner2 - tex_corner0;
+        let coord = tex_corner0 + hit_record.u * tex_u + hit_record.v * tex_v;
+        let x = coord[0];
+        let y = coord[1];
+        // TODO: other wrapping modes, this is "repeat"
+        let x = x.fract();
+        let y = y.fract();
+        let x = x * (image.width as f32);
+        let y = y * (image.height as f32);
+        let x = x as usize;
+        let y = y as usize;
+        (x, y)
     }
 }
