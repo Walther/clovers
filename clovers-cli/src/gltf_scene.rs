@@ -72,7 +72,7 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
         Vec3::new(2.0, 2.0, 2.0),
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(0.0, 1.0, 0.0),
-        40.0,
+        60.0,
         1.0,
         0.0,
         10.0,
@@ -151,7 +151,7 @@ fn parse_mesh(
                             all_positions[indices[i + 1]],
                             all_positions[indices[i + 2]],
                         ];
-                        let tex_coords: [[Float; 2]; 3] = [
+                        let tex_coords = [
                             all_tex_coords[indices[i]],
                             all_tex_coords[indices[i + 1]],
                             all_tex_coords[indices[i + 2]],
