@@ -108,7 +108,7 @@ impl GLTFMaterial {
             .material
             .pbr_metallic_roughness()
             .base_color_texture()
-            .map(|info| &self.images[info.texture().index()]);
+            .map(|info| &self.images[info.texture().source().index()]);
         // TODO: proper fully correct coloring
         let base_color = match &base_color_texture {
             Some(texture) => {
@@ -130,7 +130,7 @@ impl GLTFMaterial {
         let emissive_texture = self
             .material
             .emissive_texture()
-            .map(|info| &self.images[info.texture().index()]);
+            .map(|info| &self.images[info.texture().source().index()]);
         // TODO: proper fully correct coloring
         let emissive = match &emissive_texture {
             Some(texture) => {
@@ -149,7 +149,7 @@ impl GLTFMaterial {
             .material
             .pbr_metallic_roughness()
             .metallic_roughness_texture()
-            .map(|info| &self.images[info.texture().index()]);
+            .map(|info| &self.images[info.texture().source().index()]);
         let (metalness, roughness) = match &metallic_roughness_texture {
             Some(texture) => {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
@@ -169,7 +169,7 @@ impl GLTFMaterial {
         let normal_texture = self
             .material
             .normal_texture()
-            .map(|info| &self.images[info.texture().index()]);
+            .map(|info| &self.images[info.texture().source().index()]);
         let texture_normal = match &normal_texture {
             Some(texture) => {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
@@ -189,7 +189,7 @@ impl GLTFMaterial {
     }
 
     /// Find the correct texture coordinates in pixel space
-    fn sample_texture_coords(&self, hit_record: &HitRecord, image: &&Data) -> (usize, usize) {
+    fn sample_texture_coords(&self, hit_record: &HitRecord, image: &Data) -> (usize, usize) {
         // Full triangle coordinates on the full texture file
         let tex_corner0: Vec2 = Vec2::from(self.tex_coords[0]);
         let tex_corner1: Vec2 = Vec2::from(self.tex_coords[1]);
