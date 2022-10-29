@@ -2,9 +2,9 @@ use clovers::bvhnode::BVHNode;
 use clovers::camera::Camera;
 use clovers::color::Color;
 use clovers::hitable::Hitable;
-use clovers::materials::{DiffuseLight, Lambertian, Material};
+use clovers::materials::{DiffuseLight, Material};
 use clovers::objects::gltf::GLTFTriangle;
-use clovers::objects::{Object, QuadInit};
+use clovers::objects::{Object, SphereInit};
 use clovers::scenes::Scene;
 use clovers::textures::{SolidColor, Texture};
 use clovers::{Float, Vec3};
@@ -16,46 +16,51 @@ use std::error::Error;
 use std::path::Path;
 
 pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Error>> {
-    let background_color = Color::new(0.0, 0.0, 0.0);
     let mut objects: Vec<Object> = Vec::new();
     let mut priority_objects: Vec<Object> = Vec::new();
 
-    // Add a default lamp to have some lighting in the scene
+    // Tinted background color for ambient lighting
+    let background_color = Color::new(0.3, 0.3, 0.3);
+
+    // Example hardcoded camera and light
+    let position = Vec3::new(2.0, 2.0, 2.0);
+    let camera = Camera::new(
+        position,
+        position - Vec3::new(2.0, 2.0, 2.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        60.0,
+        1.0,
+        0.0,
+        10.0,
+        0.0,
+        1.0,
+    );
     let light = DiffuseLight::new(Texture::SolidColor(SolidColor::new(Color::new(
-        10.0, 10.0, 10.0,
+        1.0, 1.0, 1.0,
     ))));
-    let lamp = Object::Quad(QuadInit {
-        q: Vec3::new(-2.0, 4.0, -2.0),
-        u: Vec3::new(4.0, 0.0, 0.0),
-        v: Vec3::new(0.0, 0.0, 4.0),
+    let lamp = Object::Sphere(SphereInit {
+        center: position + Vec3::new(0.0, 12.0, 0.0),
+        radius: 10.0,
         material: Material::DiffuseLight(light),
     });
     objects.push(lamp.clone());
     priority_objects.push(lamp);
 
-    // Add a floor for letting the light bounce a bit
-    let floor_mat =
-        Material::Lambertian(Lambertian::new(SolidColor::new(Color::new(0.7, 0.7, 0.7))));
-    let floor = Object::Quad(QuadInit {
-        q: Vec3::new(-100.0, -4.0, -100.0),
-        u: Vec3::new(200.0, 0.0, 0.0),
-        v: Vec3::new(0.0, 0.0, 200.0),
-        material: floor_mat,
-    });
-    objects.push(floor);
-
     // Switch the type to Hitable to be able to add GLTF Hitables
     let mut hitables: Vec<Hitable> = objects.iter().map(|o| o.clone().into()).collect();
 
-    // Go through the objects in the gltf file
+    // Go through the objects in the gltf file, allocate to static memory
     let (document, buffers, images) = gltf::import(path)?;
+    let document: &'static gltf::Document = Box::leak(Box::new(document));
     let images: &'static Vec<gltf::image::Data> = Box::leak(Box::new(images));
+    let materials: &'static Vec<gltf::Material> =
+        Box::leak(Box::new(document.materials().collect()));
 
     for scene in document.scenes() {
         debug!("found scene");
         for node in scene.nodes() {
             debug!("found node");
-            parse_node(node, &mut hitables, &buffers, images);
+            parse_node(node, &mut hitables, &buffers, materials, images);
         }
     }
     debug!("hitable count: {}", &hitables.len());
@@ -66,19 +71,6 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
         priority_objects.iter().map(|o| o.clone().into()).collect();
     let priority_objects: Hitable =
         Hitable::BVHNode(BVHNode::from_list(priority_objects, 0.0, 1.0));
-
-    // Example hardcoded camera
-    let camera = Camera::new(
-        Vec3::new(2.0, 2.0, 2.0),
-        Vec3::new(0.0, 0.0, 0.0),
-        Vec3::new(0.0, 1.0, 0.0),
-        60.0,
-        1.0,
-        0.0,
-        10.0,
-        0.0,
-        1.0,
-    );
 
     Ok(Scene {
         objects,
@@ -92,15 +84,16 @@ fn parse_node(
     node: Node,
     objects: &mut Vec<Hitable>,
     buffers: &Vec<gltf::buffer::Data>,
+    materials: &'static Vec<gltf::Material>,
     images: &'static Vec<gltf::image::Data>,
 ) {
     // Handle direct meshes
     if let Some(mesh) = node.mesh() {
-        parse_mesh(mesh, objects, buffers, images);
+        parse_mesh(mesh, objects, buffers, materials, images);
     }
     // Handle nesting
     for child in node.children() {
-        parse_node(child, objects, buffers, images);
+        parse_node(child, objects, buffers, materials, images);
     }
 }
 
@@ -108,6 +101,7 @@ fn parse_mesh(
     mesh: Mesh,
     objects: &mut Vec<Hitable>,
     buffers: &[gltf::buffer::Data],
+    materials: &'static [gltf::Material],
     images: &'static [gltf::image::Data],
 ) {
     debug!("found mesh");
@@ -134,6 +128,7 @@ fn parse_mesh(
                     let indices: Vec<usize> = indices.iter().map(|&x| x as usize).collect();
                     let mut i = 0;
                     let material = primitive.material();
+                    let material_index = material.index().unwrap();
                     let coordset = material
                         .pbr_metallic_roughness()
                         .base_color_texture()
@@ -156,8 +151,12 @@ fn parse_mesh(
                             all_tex_coords[indices[i + 1]],
                             all_tex_coords[indices[i + 2]],
                         ];
-                        let gltf_triangle =
-                            GLTFTriangle::new(triangle, tex_coords, &material, images);
+                        let gltf_triangle = GLTFTriangle::new(
+                            triangle,
+                            tex_coords,
+                            &materials[material_index],
+                            images,
+                        );
                         trianglelist.push(Hitable::GLTFTriangle(gltf_triangle));
                         i += 3;
                     }

@@ -35,7 +35,7 @@ impl GLTFTriangle {
     pub fn new(
         triangle: [Vec3; 3],
         tex_coords: [[Float; 2]; 3],
-        material: &gltf::Material,
+        material: &'static gltf::Material,
         images: &'static [Data],
     ) -> Self {
         // TODO: mostly adapted from Triangle, verify correctness!

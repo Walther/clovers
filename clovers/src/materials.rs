@@ -65,6 +65,7 @@ pub enum Material {
     /// Isotropic material
     Isotropic(Isotropic),
     /// GLTF material
+    #[cfg_attr(feature = "serde-derive", serde(skip))]
     GLTF(GLTFMaterial),
 }
 
