@@ -129,11 +129,10 @@ fn parse_mesh(
                     let mut i = 0;
                     let material = primitive.material();
                     let material_index = material.index().unwrap();
-                    let coordset = material
-                        .pbr_metallic_roughness()
-                        .base_color_texture()
-                        .unwrap()
-                        .tex_coord();
+                    let coordset = match material.pbr_metallic_roughness().base_color_texture() {
+                        Some(texture) => texture.tex_coord(),
+                        None => 0,
+                    };
                     let all_tex_coords: Vec<[Float; 2]> = reader
                         .read_tex_coords(coordset)
                         .unwrap()

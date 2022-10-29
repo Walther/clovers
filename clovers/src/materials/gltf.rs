@@ -11,7 +11,7 @@ use crate::{
     pdf::{ZeroPDF, PDF},
     random::random_in_unit_sphere,
     ray::Ray,
-    Float, Vec3, PI,
+    Float, Vec2, Vec3, PI,
 };
 
 use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
@@ -112,20 +112,9 @@ impl GLTFMaterial {
         // TODO: proper fully correct coloring
         let base_color = match &base_color_texture {
             Some(texture) => {
-                match texture.format {
-                    // TODO: deduplicate
-                    gltf::image::Format::R8G8B8 => {
-                        let (x, y) = self.sample_texture_coords(hit_record, texture);
-                        let index = 3 * (x + texture.width as usize * y);
-                        get_color_rgb(texture, index)
-                    }
-                    gltf::image::Format::R8G8B8A8 => {
-                        let (x, y) = self.sample_texture_coords(hit_record, texture);
-                        let index = 4 * (x + texture.width as usize * y);
-                        get_color_rgb(texture, index)
-                    }
-                    _ => todo!("Unsupported gltf::image::Format"),
-                }
+                let (x, y) = self.sample_texture_coords(hit_record, texture);
+                let index = get_texture_index(texture, x, y);
+                get_color_rgb(texture, index)
             }
             None => Color::new(1.0, 1.0, 1.0),
         };
@@ -153,20 +142,9 @@ impl GLTFMaterial {
         };
         let (metalness, roughness) = match &metallic_roughness_texture {
             Some(texture) => {
-                let sampled_color = match texture.format {
-                    // TODO: deduplicate
-                    gltf::image::Format::R8G8B8 => {
-                        let (x, y) = self.sample_texture_coords(hit_record, texture);
-                        let index = 3 * (x + texture.width as usize * y);
-                        get_color_rgb(texture, index)
-                    }
-                    gltf::image::Format::R8G8B8A8 => {
-                        let (x, y) = self.sample_texture_coords(hit_record, texture);
-                        let index = 4 * (x + texture.width as usize * y);
-                        get_color_rgb(texture, index)
-                    }
-                    _ => todo!("Unsupported gltf::image::Format"),
-                };
+                let (x, y) = self.sample_texture_coords(hit_record, texture);
+                let index = get_texture_index(texture, x, y);
+                let sampled_color = get_color_rgb(texture, index);
                 let roughness = sampled_color.g;
                 let metalness = sampled_color.b;
                 (metalness, roughness)
@@ -189,20 +167,9 @@ impl GLTFMaterial {
         };
         let texture_normal = match &normal_texture {
             Some(texture) => {
-                let sampled_color = match texture.format {
-                    // TODO: deduplicate
-                    gltf::image::Format::R8G8B8 => {
-                        let (x, y) = self.sample_texture_coords(hit_record, texture);
-                        let index = 3 * (x + texture.width as usize * y);
-                        get_color_rgb(texture, index)
-                    }
-                    gltf::image::Format::R8G8B8A8 => {
-                        let (x, y) = self.sample_texture_coords(hit_record, texture);
-                        let index = 4 * (x + texture.width as usize * y);
-                        get_color_rgb(texture, index)
-                    }
-                    _ => todo!("Unsupported gltf::image::Format"),
-                };
+                let (x, y) = self.sample_texture_coords(hit_record, texture);
+                let index = get_texture_index(texture, x, y);
+                let sampled_color = get_color_rgb(texture, index);
                 // Convert from Color to Vec 0..1, scale and move to -1..1
                 let normal: Vec3 = sampled_color.into();
                 let normal = normal * 2.0 - Vec3::new(1.0, 1.0, 1.0);
@@ -218,6 +185,14 @@ impl GLTFMaterial {
     }
 }
 
+fn get_texture_index(texture: &&Data, x: usize, y: usize) -> usize {
+    match texture.format {
+        gltf::image::Format::R8G8B8 => 3 * (x + texture.width as usize * y),
+        gltf::image::Format::R8G8B8A8 => 4 * (x + texture.width as usize * y),
+        _ => todo!("Unsupported gltf::image::Format"),
+    }
+}
+
 /// Given a reference to a texture and a starting index, return a new Color based on the next three u8 values
 fn get_color_rgb(texture: &&Data, index: usize) -> Color {
     let r = texture.pixels[index];
@@ -227,23 +202,25 @@ fn get_color_rgb(texture: &&Data, index: usize) -> Color {
 }
 
 impl GLTFMaterial {
+    /// Find the correct texture coordinates in pixel space
     fn sample_texture_coords(&self, hit_record: &HitRecord, image: &&Data) -> (usize, usize) {
-        // Find the correct texture coordinates
-        let tex_corner0 = Vec3::from([self.tex_coords[0][0], self.tex_coords[0][1], 0.0]);
-        let tex_corner1 = Vec3::from([self.tex_coords[1][0], self.tex_coords[1][1], 0.0]);
-        let tex_corner2 = Vec3::from([self.tex_coords[2][0], self.tex_coords[2][1], 0.0]);
+        // Full triangle coordinates on the full texture file
+        let tex_corner0 = Vec2::from([self.tex_coords[0][0], self.tex_coords[0][1]]);
+        let tex_corner1 = Vec2::from([self.tex_coords[1][0], self.tex_coords[1][1]]);
+        let tex_corner2 = Vec2::from([self.tex_coords[2][0], self.tex_coords[2][1]]);
+        // Side vectors on the texture triangle
         let tex_u = tex_corner1 - tex_corner0;
         let tex_v = tex_corner2 - tex_corner0;
+        // Specific surface space coordinate for hit point
         let coord = tex_corner0 + hit_record.u * tex_u + hit_record.v * tex_v;
         let x = coord[0];
         let y = coord[1];
         // TODO: other wrapping modes, this is "repeat"
         let x = x.fract();
         let y = y.fract();
-        let x = x * (image.width as f32);
-        let y = y * (image.height as f32);
-        let x = x as usize;
-        let y = y as usize;
-        (x, y)
+        // Pixel space coordinates on the texture
+        let x = x * (image.width as Float);
+        let y = y * (image.height as Float);
+        (x as usize, y as usize)
     }
 }
