@@ -190,9 +190,9 @@ impl GLTFMaterial {
     /// Find the correct texture coordinates in pixel space
     fn sample_texture_coords(&self, hit_record: &HitRecord, image: &&Data) -> (usize, usize) {
         // Full triangle coordinates on the full texture file
-        let tex_corner0: Vec2 = Vec2::from([self.tex_coords[0][0], self.tex_coords[0][1]]);
-        let tex_corner1: Vec2 = Vec2::from([self.tex_coords[1][0], self.tex_coords[1][1]]);
-        let tex_corner2: Vec2 = Vec2::from([self.tex_coords[2][0], self.tex_coords[2][1]]);
+        let tex_corner0: Vec2 = Vec2::from(self.tex_coords[0]);
+        let tex_corner1: Vec2 = Vec2::from(self.tex_coords[1]);
+        let tex_corner2: Vec2 = Vec2::from(self.tex_coords[2]);
         // Side vectors on the texture triangle
         let tex_u: Vec2 = tex_corner1 - tex_corner0;
         let tex_v: Vec2 = tex_corner2 - tex_corner0;
@@ -201,11 +201,15 @@ impl GLTFMaterial {
         let x = coord[0];
         let y = coord[1];
         // TODO: other wrapping modes, this is "repeat"
-        let x = x.fract();
-        let y = y.fract();
+        let x = if x < 0.0 { 1.0 + x.fract() } else { x.fract() };
+        let y = if y < 0.0 { 1.0 + y.fract() } else { y.fract() };
         // Pixel space coordinates on the texture
         let x = x * (image.width as Float);
-        let y = y * (image.height as Float);
-        (x as usize, y as usize)
+        let y = y * ((image.height - 1) as Float); // TODO: fix overflows better
+
+        // Cast
+        let x = x.floor() as usize;
+        let y = y.floor() as usize;
+        (x, y)
     }
 }
