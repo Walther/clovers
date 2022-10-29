@@ -102,19 +102,16 @@ impl MaterialTrait for GLTFMaterial {
 
 impl GLTFMaterial {
     fn sample_base_color(&self, hit_record: &HitRecord) -> Color {
-        let base_color_texture =
-            if let Some(info) = self.material.pbr_metallic_roughness().base_color_texture() {
-                let index = info.texture().index();
-                Some(&self.images[index])
-            } else {
-                None
-            };
+        let base_color_texture = self
+            .material
+            .pbr_metallic_roughness()
+            .base_color_texture()
+            .map(|info| &self.images[info.texture().index()]);
         // TODO: proper fully correct coloring
         let base_color = match &base_color_texture {
             Some(texture) => {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
-                let index = get_texture_index(texture, x, y);
-                get_color_rgb(texture, index)
+                get_color_rgb(texture, x, y)
             }
             None => Color::new(1.0, 1.0, 1.0),
         };
@@ -130,21 +127,15 @@ impl GLTFMaterial {
 
 impl GLTFMaterial {
     fn sample_metalness_roughness(&self, hit_record: &HitRecord) -> (Float, Float) {
-        let metallic_roughness_texture = if let Some(info) = self
+        let metallic_roughness_texture = self
             .material
             .pbr_metallic_roughness()
             .metallic_roughness_texture()
-        {
-            let index = info.texture().index();
-            Some(&self.images[index])
-        } else {
-            None
-        };
+            .map(|info| &self.images[info.texture().index()]);
         let (metalness, roughness) = match &metallic_roughness_texture {
             Some(texture) => {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
-                let index = get_texture_index(texture, x, y);
-                let sampled_color = get_color_rgb(texture, index);
+                let sampled_color = get_color_rgb(texture, x, y);
                 let roughness = sampled_color.g;
                 let metalness = sampled_color.b;
                 (metalness, roughness)
@@ -159,17 +150,14 @@ impl GLTFMaterial {
 
 impl GLTFMaterial {
     fn sample_normal(&self, hit_record: &HitRecord) -> Vec3 {
-        let normal_texture = if let Some(info) = self.material.normal_texture() {
-            let index = info.texture().index();
-            Some(&self.images[index])
-        } else {
-            None
-        };
+        let normal_texture = self
+            .material
+            .normal_texture()
+            .map(|info| &self.images[info.texture().index()]);
         let texture_normal = match &normal_texture {
             Some(texture) => {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
-                let index = get_texture_index(texture, x, y);
-                let sampled_color = get_color_rgb(texture, index);
+                let sampled_color = get_color_rgb(texture, x, y);
                 // Convert from Color to Vec 0..1, scale and move to -1..1
                 let normal: Vec3 = sampled_color.into();
                 let normal = normal * 2.0 - Vec3::new(1.0, 1.0, 1.0);
@@ -185,16 +173,13 @@ impl GLTFMaterial {
     }
 }
 
-fn get_texture_index(texture: &&Data, x: usize, y: usize) -> usize {
-    match texture.format {
+/// Given a reference to a texture and pixel space coordinates, returns the color at that pixel
+fn get_color_rgb(texture: &&Data, x: usize, y: usize) -> Color {
+    let index = match texture.format {
         gltf::image::Format::R8G8B8 => 3 * (x + texture.width as usize * y),
         gltf::image::Format::R8G8B8A8 => 4 * (x + texture.width as usize * y),
         _ => todo!("Unsupported gltf::image::Format"),
-    }
-}
-
-/// Given a reference to a texture and a starting index, return a new Color based on the next three u8 values
-fn get_color_rgb(texture: &&Data, index: usize) -> Color {
+    };
     let r = texture.pixels[index];
     let g = texture.pixels[index + 1];
     let b = texture.pixels[index + 2];
@@ -205,14 +190,14 @@ impl GLTFMaterial {
     /// Find the correct texture coordinates in pixel space
     fn sample_texture_coords(&self, hit_record: &HitRecord, image: &&Data) -> (usize, usize) {
         // Full triangle coordinates on the full texture file
-        let tex_corner0 = Vec2::from([self.tex_coords[0][0], self.tex_coords[0][1]]);
-        let tex_corner1 = Vec2::from([self.tex_coords[1][0], self.tex_coords[1][1]]);
-        let tex_corner2 = Vec2::from([self.tex_coords[2][0], self.tex_coords[2][1]]);
+        let tex_corner0: Vec2 = Vec2::from([self.tex_coords[0][0], self.tex_coords[0][1]]);
+        let tex_corner1: Vec2 = Vec2::from([self.tex_coords[1][0], self.tex_coords[1][1]]);
+        let tex_corner2: Vec2 = Vec2::from([self.tex_coords[2][0], self.tex_coords[2][1]]);
         // Side vectors on the texture triangle
-        let tex_u = tex_corner1 - tex_corner0;
-        let tex_v = tex_corner2 - tex_corner0;
+        let tex_u: Vec2 = tex_corner1 - tex_corner0;
+        let tex_v: Vec2 = tex_corner2 - tex_corner0;
         // Specific surface space coordinate for hit point
-        let coord = tex_corner0 + hit_record.u * tex_u + hit_record.v * tex_v;
+        let coord: Vec2 = tex_corner0 + hit_record.u * tex_u + hit_record.v * tex_v;
         let x = coord[0];
         let y = coord[1];
         // TODO: other wrapping modes, this is "repeat"
