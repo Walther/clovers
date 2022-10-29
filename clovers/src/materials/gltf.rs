@@ -55,10 +55,12 @@ impl MaterialTrait for GLTFMaterial {
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
         let base_color = self.sample_base_color(hit_record);
+        let emissive = self.sample_emissive(hit_record);
         let (metalness, roughness) = self.sample_metalness_roughness(hit_record);
         let normal = self.sample_normal(hit_record);
+
         // TODO: full color model
-        let attenuation = base_color;
+        let attenuation = emissive + base_color;
 
         // TODO: better metalness model
         if metalness > 0.0 {
@@ -123,9 +125,25 @@ impl GLTFMaterial {
 
         base_color * base_color_factor
     }
-}
 
-impl GLTFMaterial {
+    fn sample_emissive(&self, hit_record: &HitRecord) -> Color {
+        let emissive_texture = self
+            .material
+            .emissive_texture()
+            .map(|info| &self.images[info.texture().index()]);
+        // TODO: proper fully correct coloring
+        let emissive = match &emissive_texture {
+            Some(texture) => {
+                let (x, y) = self.sample_texture_coords(hit_record, texture);
+                get_color_rgb(texture, x, y)
+            }
+            None => Color::new(1.0, 1.0, 1.0),
+        };
+        let emissive_factor: Color = self.material.emissive_factor().into();
+
+        emissive * emissive_factor
+    }
+
     fn sample_metalness_roughness(&self, hit_record: &HitRecord) -> (Float, Float) {
         let metallic_roughness_texture = self
             .material
@@ -146,9 +164,7 @@ impl GLTFMaterial {
         let roughness = roughness * self.material.pbr_metallic_roughness().roughness_factor();
         (metalness, roughness)
     }
-}
 
-impl GLTFMaterial {
     fn sample_normal(&self, hit_record: &HitRecord) -> Vec3 {
         let normal_texture = self
             .material
@@ -171,22 +187,7 @@ impl GLTFMaterial {
         // fallback to triangle normal, no details
         // hit_record.normal
     }
-}
 
-/// Given a reference to a texture and pixel space coordinates, returns the color at that pixel
-fn get_color_rgb(texture: &&Data, x: usize, y: usize) -> Color {
-    let index = match texture.format {
-        gltf::image::Format::R8G8B8 => 3 * (x + texture.width as usize * y),
-        gltf::image::Format::R8G8B8A8 => 4 * (x + texture.width as usize * y),
-        _ => todo!("Unsupported gltf::image::Format"),
-    };
-    let r = texture.pixels[index];
-    let g = texture.pixels[index + 1];
-    let b = texture.pixels[index + 2];
-    Color::from([r, g, b])
-}
-
-impl GLTFMaterial {
     /// Find the correct texture coordinates in pixel space
     fn sample_texture_coords(&self, hit_record: &HitRecord, image: &&Data) -> (usize, usize) {
         // Full triangle coordinates on the full texture file
@@ -212,4 +213,17 @@ impl GLTFMaterial {
         let y = y.floor() as usize;
         (x, y)
     }
+}
+
+/// Given a reference to a texture and pixel space coordinates, returns the color at that pixel
+fn get_color_rgb(texture: &&Data, x: usize, y: usize) -> Color {
+    let index = match texture.format {
+        gltf::image::Format::R8G8B8 => 3 * (x + texture.width as usize * y),
+        gltf::image::Format::R8G8B8A8 => 4 * (x + texture.width as usize * y),
+        _ => todo!("Unsupported gltf::image::Format"),
+    };
+    let r = texture.pixels[index];
+    let g = texture.pixels[index + 1];
+    let b = texture.pixels[index + 2];
+    Color::from([r, g, b])
 }
