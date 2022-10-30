@@ -35,6 +35,7 @@ impl GLTFTriangle {
     pub fn new(
         triangle: [Vec3; 3],
         tex_coords: [[Float; 2]; 3],
+        tangents: Option<[[Float; 4]; 3]>,
         material: &'static gltf::Material,
         images: &'static [Data],
     ) -> Self {
@@ -61,7 +62,8 @@ impl GLTFTriangle {
         // Compared to quad, triangle has half the area
         let area = n.magnitude() / 2.0;
 
-        let material: Material = Material::GLTF(GLTFMaterial::new(material, tex_coords, images));
+        let material: Material =
+            Material::GLTF(GLTFMaterial::new(material, tex_coords, tangents, images));
 
         GLTFTriangle {
             aabb,

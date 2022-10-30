@@ -23,6 +23,7 @@ pub struct GLTFMaterial {
     material: &'static Material<'static>,
     tex_coords: [[Float; 2]; 3],
     images: &'static [Data],
+    tangents: Option<[[Float; 4]; 3]>,
 }
 
 impl Default for GLTFMaterial {
@@ -37,11 +38,13 @@ impl GLTFMaterial {
     pub fn new(
         material: &'static Material,
         tex_coords: [[Float; 2]; 3],
+        tangents: Option<[[Float; 4]; 3]>,
         images: &'static [Data],
     ) -> Self {
         Self {
             material,
             tex_coords,
+            tangents,
             images,
         }
     }
@@ -166,6 +169,16 @@ impl GLTFMaterial {
     }
 
     fn sample_normal(&self, hit_record: &HitRecord) -> Vec3 {
+        // TODO: is there a situation where a triangle would have differing tangents for each vertex? Could I just store one?
+        let tangents = match self.tangents {
+            Some(t) => t,
+            None => {
+                // If we don't have tangents, early return with the triangle normal
+                // TODO: compute normals here or at construction time as per gltf spec
+                return hit_record.normal;
+            }
+        };
+
         let normal_texture = self
             .material
             .normal_texture()
@@ -176,16 +189,20 @@ impl GLTFMaterial {
                 let sampled_color = get_color_rgb(texture, x, y);
                 // Convert from Color to Vec 0..1, scale and move to -1..1
                 let normal: Vec3 = sampled_color.into();
-                let normal = normal * 2.0 - Vec3::new(1.0, 1.0, 1.0);
+                let normal: Vec3 = normal * 2.0 - Vec3::new(1.0, 1.0, 1.0);
                 normal.normalize()
             }
-            None => hit_record.normal,
+            // If we don't have a normal texture, early return with the triangle normal
+            None => return hit_record.normal,
         };
 
-        // TODO: this is wrong, take into account the tangent space
-        texture_normal * 1.0
-        // fallback to triangle normal, no details
-        // hit_record.normal
+        // TODO: is this correct?
+        let tangent: Vec3 = Vec3::new(tangents[0][0], tangents[0][1], tangents[0][2]);
+        let bitangent: Vec3 = hit_record.normal.cross(&tangent);
+        let matrix: nalgebra::Matrix3<Float> =
+            nalgebra::Matrix3::from_columns(&[tangent, bitangent, hit_record.normal]);
+
+        (matrix * texture_normal).normalize()
     }
 
     /// Find the correct texture coordinates in pixel space

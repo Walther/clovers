@@ -26,7 +26,7 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
     let position = Vec3::new(2.0, 2.0, 2.0);
     let camera = Camera::new(
         position,
-        position - Vec3::new(2.0, 2.0, 2.0),
+        Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(0.0, 1.0, 0.0),
         60.0,
         1.0,
@@ -139,6 +139,8 @@ fn parse_mesh(
                         .into_f32()
                         .collect();
 
+                    let all_tangents: Option<Vec<_>> = reader.read_tangents().map(|t| t.collect());
+
                     while i < len {
                         let triangle = [
                             all_positions[indices[i]],
@@ -150,9 +152,18 @@ fn parse_mesh(
                             all_tex_coords[indices[i + 1]],
                             all_tex_coords[indices[i + 2]],
                         ];
+                        let tangents = all_tangents.as_ref().map(|tangents| {
+                            [
+                                tangents[indices[i]],
+                                tangents[indices[i + 1]],
+                                tangents[indices[i + 2]],
+                            ]
+                        });
+
                         let gltf_triangle = GLTFTriangle::new(
                             triangle,
                             tex_coords,
+                            tangents,
                             &materials[material_index],
                             images,
                         );
