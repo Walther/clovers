@@ -24,6 +24,7 @@ pub struct GLTFMaterial {
     tex_coords: [[Float; 2]; 3],
     images: &'static [Data],
     tangents: Option<[[Float; 4]; 3]>,
+    normals: Option<[[Float; 3]; 3]>,
 }
 
 impl Default for GLTFMaterial {
@@ -38,12 +39,14 @@ impl GLTFMaterial {
     pub fn new(
         material: &'static Material,
         tex_coords: [[Float; 2]; 3],
+        normals: Option<[[Float; 3]; 3]>,
         tangents: Option<[[Float; 4]; 3]>,
         images: &'static [Data],
     ) -> Self {
         Self {
             material,
             tex_coords,
+            normals,
             tangents,
             images,
         }
@@ -169,15 +172,23 @@ impl GLTFMaterial {
     }
 
     fn sample_normal(&self, hit_record: &HitRecord) -> Vec3 {
-        // TODO: is there a situation where a triangle would have differing tangents for each vertex? Could I just store one?
+        let normals = match self.normals {
+            Some(ns) => ns.map(Vec3::from),
+            None => {
+                // If we don't have normals, early return with the triangle normal
+                return hit_record.normal;
+            }
+        };
+
         let tangents = match self.tangents {
-            Some(t) => t,
+            Some(ts) => ts.map(|t| Vec3::new(t[0], t[1], t[2])),
             None => {
                 // If we don't have tangents, early return with the triangle normal
                 // TODO: compute normals here or at construction time as per gltf spec
                 return hit_record.normal;
             }
         };
+        let ws = self.tangents.unwrap().map(|t| t[3]);
 
         let normal_texture = self
             .material
@@ -188,20 +199,36 @@ impl GLTFMaterial {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
                 let sampled_color = get_color_rgb(texture, x, y);
                 // Convert from Color to Vec 0..1, scale and move to -1..1
-                let normal: Vec3 = sampled_color.into();
-                let normal: Vec3 = normal * 2.0 - Vec3::new(1.0, 1.0, 1.0);
+                let normal: Vec3 = Vec3::from(sampled_color) * 2.0 - Vec3::new(1.0, 1.0, 1.0);
                 normal.normalize()
             }
             // If we don't have a normal texture, early return with the triangle normal
             None => return hit_record.normal,
         };
 
-        // TODO: is this correct?
-        let tangent: Vec3 = Vec3::new(tangents[0][0], tangents[0][1], tangents[0][2]);
-        let bitangent: Vec3 = hit_record.normal.cross(&tangent);
-        let matrix: nalgebra::Matrix3<Float> =
-            nalgebra::Matrix3::from_columns(&[tangent, bitangent, hit_record.normal]);
+        // Barycentric coordinates and interpolation on the triangle surface
+        let bitangents: [Vec3; 3] = [
+            normals[0].cross(&tangents[0]) * ws[0],
+            normals[1].cross(&tangents[1]) * ws[1],
+            normals[2].cross(&tangents[2]) * ws[2],
+        ];
+        let normal = (hit_record.u * normals[1]
+            + hit_record.v * normals[2]
+            + (1.0 - hit_record.u - hit_record.v) * normals[0])
+            .normalize();
+        let tangent = (hit_record.u * tangents[1]
+            + hit_record.v * tangents[2]
+            + (1.0 - hit_record.u - hit_record.v) * tangents[0])
+            .normalize();
+        let bitangent = (hit_record.u * bitangents[1]
+            + hit_record.v * bitangents[2]
+            + (1.0 - hit_record.u - hit_record.v) * bitangents[0])
+            .normalize();
 
+        let matrix: nalgebra::Matrix3<Float> =
+            nalgebra::Matrix3::from_columns(&[tangent, bitangent, normal]);
+
+        // Transform the texture normal from tangent space to world space
         (matrix * texture_normal).normalize()
     }
 

@@ -20,7 +20,7 @@ pub(crate) fn initialize(path: &Path, _opts: &Opts) -> Result<Scene, Box<dyn Err
     let mut priority_objects: Vec<Object> = Vec::new();
 
     // Tinted background color for ambient lighting
-    let background_color = Color::new(0.3, 0.3, 0.3);
+    let background_color = Color::new(0.1, 0.1, 0.1);
 
     // Example hardcoded camera and light
     let position = Vec3::new(2.0, 2.0, 2.0);
@@ -138,7 +138,7 @@ fn parse_mesh(
                         .unwrap()
                         .into_f32()
                         .collect();
-
+                    let all_normals: Option<Vec<_>> = reader.read_normals().map(|n| n.collect());
                     let all_tangents: Option<Vec<_>> = reader.read_tangents().map(|t| t.collect());
 
                     while i < len {
@@ -152,6 +152,13 @@ fn parse_mesh(
                             all_tex_coords[indices[i + 1]],
                             all_tex_coords[indices[i + 2]],
                         ];
+                        let normals = all_normals.as_ref().map(|normals| {
+                            [
+                                normals[indices[i]],
+                                normals[indices[i + 1]],
+                                normals[indices[i + 2]],
+                            ]
+                        });
                         let tangents = all_tangents.as_ref().map(|tangents| {
                             [
                                 tangents[indices[i]],
@@ -163,6 +170,7 @@ fn parse_mesh(
                         let gltf_triangle = GLTFTriangle::new(
                             triangle,
                             tex_coords,
+                            normals,
                             tangents,
                             &materials[material_index],
                             images,
