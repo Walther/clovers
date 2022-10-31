@@ -90,7 +90,7 @@ impl MaterialTrait for Dielectric {
 impl Dielectric {
     /// Creates a new [Dielectric] material with the given refractive index and color.
     #[must_use]
-    fn new(refractive_index: Float, color: Color) -> Self {
+    pub fn new(refractive_index: Float, color: Color) -> Self {
         Dielectric {
             refractive_index,
             color,
