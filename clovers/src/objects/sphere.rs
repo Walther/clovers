@@ -23,7 +23,7 @@ pub struct SphereInit {
     pub material: Material,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A sphere object.
 pub struct Sphere {
