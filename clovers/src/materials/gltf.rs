@@ -64,9 +64,10 @@ impl MaterialTrait for GLTFMaterial {
         let emissive = self.sample_emissive(hit_record);
         let (metalness, roughness) = self.sample_metalness_roughness(hit_record);
         let normal = self.sample_normal(hit_record);
+        let occlusion = self.sample_occlusion(hit_record);
 
         // TODO: full color model
-        let attenuation = emissive + base_color;
+        let attenuation = emissive + base_color * occlusion;
 
         // TODO: better metalness model
         if metalness > 0.0 {
@@ -169,6 +170,23 @@ impl GLTFMaterial {
         let metalness = metalness * self.material.pbr_metallic_roughness().metallic_factor();
         let roughness = roughness * self.material.pbr_metallic_roughness().roughness_factor();
         (metalness, roughness)
+    }
+
+    fn sample_occlusion(&self, hit_record: &HitRecord) -> Float {
+        let occlusion_texture = self
+            .material
+            .occlusion_texture()
+            .map(|info| &self.images[info.texture().source().index()]);
+
+        match &occlusion_texture {
+            Some(texture) => {
+                let (x, y) = self.sample_texture_coords(hit_record, texture);
+                let sampled_color = get_color_rgb(texture, x, y);
+                // Only the red channel is taken into account
+                sampled_color.r
+            }
+            None => 1.0,
+        }
     }
 
     fn sample_normal(&self, hit_record: &HitRecord) -> Vec3 {
