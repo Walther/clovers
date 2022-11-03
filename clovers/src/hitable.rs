@@ -2,18 +2,17 @@
 
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
-#[cfg(feature = "gl_tf")]
-use crate::objects::GLTF;
 #[cfg(feature = "stl")]
 use crate::objects::STL;
+#[cfg(feature = "gl_tf")]
+use crate::objects::{GLTFTriangle, GLTF};
 
 use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
     materials::Material,
     objects::{
-        gltf::GLTFTriangle, Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere,
-        Translate, Triangle,
+        Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
     },
     ray::Ray,
     Float, Vec3,
@@ -72,6 +71,7 @@ pub enum Hitable {
     Translate(Translate),
     Triangle(Triangle),
     Empty(Empty),
+    #[cfg(feature = "gl_tf")]
     GLTFTriangle(GLTFTriangle),
 }
 

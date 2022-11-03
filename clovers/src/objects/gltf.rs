@@ -3,6 +3,7 @@
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
+#[cfg(feature = "gl_tf")]
 use gltf::{image::Data, Mesh, Node};
 use rand::rngs::SmallRng;
 use rand::Rng;
