@@ -16,6 +16,7 @@ pub use lambertian::*;
 pub use metal::*;
 use rand::prelude::SmallRng;
 
+#[cfg(feature = "gl_tf")]
 use self::gltf::GLTFMaterial;
 
 #[enum_dispatch]
@@ -49,7 +50,7 @@ pub(crate) trait MaterialTrait {
 }
 
 #[enum_dispatch(MaterialTrait)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
@@ -65,6 +66,7 @@ pub enum Material {
     /// Isotropic material
     Isotropic(Isotropic),
     /// GLTF material
+    #[cfg(feature = "gl_tf")]
     #[cfg_attr(feature = "serde-derive", serde(skip))]
     GLTF(GLTFMaterial),
 }
@@ -75,7 +77,7 @@ impl Default for Material {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 /// Enum for the types of materials: Diffuse and Specular (i.e., matte and shiny)
 pub enum MaterialType {
     /// A matte material that does not reflect rays

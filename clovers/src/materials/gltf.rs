@@ -16,7 +16,7 @@ use crate::{
 
 use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 // #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// GLTF Material wrapper type
 pub struct GLTFMaterial {
