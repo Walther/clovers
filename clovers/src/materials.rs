@@ -3,6 +3,7 @@
 use crate::{color::Color, hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
 pub mod dielectric;
 pub mod diffuse_light;
+#[cfg(feature = "gl_tf")]
 pub mod gltf;
 pub mod isotropic;
 pub mod lambertian;

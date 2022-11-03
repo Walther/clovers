@@ -2,6 +2,7 @@
 
 #![allow(clippy::pedantic)]
 
+#[cfg(feature = "gl_tf")]
 use gltf::{image::Data, Material};
 use rand::rngs::SmallRng;
 
