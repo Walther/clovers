@@ -70,9 +70,8 @@ extern crate alloc;
 pub use alloc::boxed::Box;
 pub use alloc::vec::Vec;
 
-use nalgebra::Vector2;
 // Externals
-use nalgebra::base::Vector3;
+use nalgebra::base::{Vector2, Vector3};
 
 // Internals
 pub mod aabb;
