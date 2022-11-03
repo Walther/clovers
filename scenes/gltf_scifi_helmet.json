@@ -1,0 +1,45 @@
+{
+  "time_0": 0,
+  "time_1": 1,
+  "camera": {
+    "look_from": [2.0, 2.0, 2.0],
+    "look_at": [0.0, 0.0, 0.0],
+    "up": [0, 1, 0],
+    "vertical_fov": 60.0,
+    "aperture": 0,
+    "focus_distance": 10.0
+  },
+  "background_color": [0.1, 0.1, 0.1],
+  "objects": [
+    {
+      "kind": "GLTF",
+      "path": "gltf/SciFiHelmet/glTF/SciFiHelmet.gltf"
+    },
+    {
+      "kind": "Sphere",
+      "center": [2.0, 14.0, 2.0],
+      "radius": 12.0,
+      "material": {
+        "kind": "DiffuseLight",
+        "emit": {
+          "kind": "SolidColor",
+          "color": [2.0, 2.0, 2.0]
+        }
+      }
+    }
+  ],
+  "priority_objects": [
+    {
+      "kind": "Sphere",
+      "center": [2.0, 14.0, 2.0],
+      "radius": 12.0,
+      "material": {
+        "kind": "DiffuseLight",
+        "emit": {
+          "kind": "SolidColor",
+          "color": [2.0, 2.0, 2.0]
+        }
+      }
+    }
+  ]
+}
