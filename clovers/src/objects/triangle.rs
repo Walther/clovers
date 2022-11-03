@@ -12,7 +12,7 @@ use rand::rngs::SmallRng;
 use rand::Rng;
 
 /// Initialization structure for a triangle primitive
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct TriangleInit {
     /// Corner point
@@ -27,7 +27,7 @@ pub struct TriangleInit {
 }
 
 /// Triangle shape. Heavily based on [Quad](crate::objects::Quad) and may contain inaccuracies
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct Triangle {
     /// Corner point

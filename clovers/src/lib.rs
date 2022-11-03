@@ -92,7 +92,7 @@ pub mod scenes;
 pub mod textures;
 
 /// Rendering options struct
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct RenderOpts {
     /// Width of the render in pixels
