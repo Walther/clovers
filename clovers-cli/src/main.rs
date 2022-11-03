@@ -20,7 +20,6 @@ use tracing_subscriber::fmt::time::UtcTime;
 // Internal imports
 use clovers::*;
 mod draw_cpu;
-mod gltf_scene;
 mod json_scene;
 
 // Configure CLI parameters
@@ -107,7 +106,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let scene = match path.extension() {
         Some(ext) => match &ext.to_str() {
             Some("json") => json_scene::initialize(path, &opts),
-            Some("gltf") => gltf_scene::initialize(path, &opts),
             _ => panic!("Unknown file type"),
         },
         None => panic!("Unknown file type"),

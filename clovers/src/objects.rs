@@ -15,6 +15,8 @@ pub mod stl;
 pub mod translate;
 pub mod triangle;
 
+#[cfg(feature = "gl_tf")]
+pub use self::gltf::*;
 use alloc::vec::Vec;
 pub use boxy::*; // avoid keyword
 pub use constant_medium::*;
@@ -62,6 +64,9 @@ pub enum Object {
     #[cfg(feature = "stl")]
     /// STL object initializer
     STL(STLInit),
+    #[cfg(feature = "gl_tf")]
+    /// GLTF object initializer
+    GLTF(GLTFInit),
     /// Translate object initializer
     Translate(TranslateInit),
     /// Triangle object initializer
@@ -107,6 +112,11 @@ impl From<Object> for Hitable {
             Object::STL(x) => {
                 // TODO: time
                 Hitable::STL(STL::new(x, 0.0, 1.0))
+            }
+            #[cfg(feature = "gl_tf")]
+            Object::GLTF(x) => {
+                // TODO: time
+                Hitable::GLTF(GLTF::new(x, 0.0, 1.0))
             }
             Object::Translate(x) => {
                 let obj = *x.object;

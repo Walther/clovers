@@ -21,11 +21,3 @@ all-scenes:
   for scene in $(ls scenes/ |grep json); \
   do just cli -s 1 --input scenes/$scene --output renders/$DATE/${scene%.json}.png; \
   done;
-
-# Temporary helper for experimental gltf rendering
-gltf scene *ARGS:
-  just cli --input ~/git/glTF-Sample-Models/2.0/{{scene}}/glTF/{{scene}}.gltf {{ARGS}}
-
-# Temporary helper for experimental gltf rendering
-gltf-list:
-  ls ~/git/glTF-Sample-Models/2.0/

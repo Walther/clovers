@@ -2,6 +2,8 @@
 
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
+#[cfg(feature = "gl_tf")]
+use crate::objects::GLTF;
 #[cfg(feature = "stl")]
 use crate::objects::STL;
 
@@ -65,6 +67,8 @@ pub enum Hitable {
     Sphere(Sphere),
     #[cfg(feature = "stl")]
     STL(STL),
+    #[cfg(feature = "gl_tf")]
+    GLTF(GLTF),
     Translate(Translate),
     Triangle(Triangle),
     Empty(Empty),
