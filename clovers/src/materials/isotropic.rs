@@ -23,7 +23,7 @@ impl MaterialTrait for Isotropic {
     /// Returns a [`ScatterRecord`] based on the [`HitRecord`] coordinates and the given [Texture], or [None] if the ray did not hit the material.
     #[must_use]
     fn scatter(
-        self,
+        &self,
         _ray: &Ray,
         hit_record: &HitRecord,
         _rng: &mut SmallRng,
@@ -44,7 +44,7 @@ impl MaterialTrait for Isotropic {
     #[allow(clippy::unused_self)]
     #[must_use]
     fn scattering_pdf(
-        self,
+        &self,
         _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,

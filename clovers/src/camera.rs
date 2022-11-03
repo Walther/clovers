@@ -33,7 +33,7 @@ pub struct Camera {
     pub w: Vec3,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// Represents the fields that can be described in a Scene file. Some other fields the main Camera struct requires (such as `aspect_ratio`) are derived from other info (such as width, height)
 pub struct CameraInit {

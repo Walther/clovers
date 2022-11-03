@@ -2,7 +2,7 @@
 
 use crate::Vec3;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// An orthonormal basis structure.
 pub struct ONB {
     /// U

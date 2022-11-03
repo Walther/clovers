@@ -13,11 +13,13 @@ crate-type = ["lib"]
 [features]
 serde-derive = ["serde/derive", "nalgebra/serde-serialize"]
 stl = ["stl_io", "std"]
+gl_tf = ["gltf"]
 std = []
 traces = ["tracing"]
 
 [dependencies]
 enum_dispatch = "0.3.8"
+gltf = { version = "1.0.0", optional = true }
 nalgebra = { version = "0.31.1", features = ["libm"], default-features = false }
 rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
 rand_distr = "0.4.3"

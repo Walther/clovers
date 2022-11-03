@@ -3,6 +3,8 @@
 use crate::{color::Color, hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
 pub mod dielectric;
 pub mod diffuse_light;
+#[cfg(feature = "gl_tf")]
+pub mod gltf;
 pub mod isotropic;
 pub mod lambertian;
 pub mod metal;
@@ -15,17 +17,20 @@ pub use lambertian::*;
 pub use metal::*;
 use rand::prelude::SmallRng;
 
+#[cfg(feature = "gl_tf")]
+use self::gltf::GLTFMaterial;
+
 #[enum_dispatch]
 pub(crate) trait MaterialTrait {
     fn scatter(
-        self,
+        &self,
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord>;
 
     fn scattering_pdf(
-        self,
+        &self,
         ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
@@ -61,6 +66,10 @@ pub enum Material {
     Metal(Metal),
     /// Isotropic material
     Isotropic(Isotropic),
+    /// GLTF material
+    #[cfg(feature = "gl_tf")]
+    #[cfg_attr(feature = "serde-derive", serde(skip))]
+    GLTF(GLTFMaterial),
 }
 
 impl Default for Material {
@@ -69,7 +78,7 @@ impl Default for Material {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 /// Enum for the types of materials: Diffuse and Specular (i.e., matte and shiny)
 pub enum MaterialType {
     /// A matte material that does not reflect rays
@@ -78,7 +87,7 @@ pub enum MaterialType {
     Specular,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// A record of an scattering event of a [Ray] on a [Material].
 pub struct ScatterRecord {
     /// The material type that was scattered on

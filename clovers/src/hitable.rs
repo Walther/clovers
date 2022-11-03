@@ -4,6 +4,8 @@
 
 #[cfg(feature = "stl")]
 use crate::objects::STL;
+#[cfg(feature = "gl_tf")]
+use crate::objects::{GLTFTriangle, GLTF};
 
 use crate::{
     aabb::AABB,
@@ -64,9 +66,13 @@ pub enum Hitable {
     Sphere(Sphere),
     #[cfg(feature = "stl")]
     STL(STL),
+    #[cfg(feature = "gl_tf")]
+    GLTF(GLTF),
     Translate(Translate),
     Triangle(Triangle),
     Empty(Empty),
+    #[cfg(feature = "gl_tf")]
+    GLTFTriangle(GLTFTriangle),
 }
 
 // TODO: remove horrible hack

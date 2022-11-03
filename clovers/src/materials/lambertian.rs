@@ -22,7 +22,7 @@ impl MaterialTrait for Lambertian {
     /// Returns None, if ray is absorbed. Otherwise, returns a ray, albedo of what was hit, and (?) a value used for probability density function based sampling
     #[must_use]
     fn scatter(
-        self,
+        &self,
         _ray: &Ray,
         hit_record: &HitRecord,
         _rng: &mut SmallRng,
@@ -41,7 +41,7 @@ impl MaterialTrait for Lambertian {
     #[allow(clippy::unused_self)] // TODO:
     #[must_use]
     fn scattering_pdf(
-        self,
+        &self,
         _ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
