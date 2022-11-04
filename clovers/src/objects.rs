@@ -126,7 +126,7 @@ impl From<Object> for Hitable {
             }
             Object::Triangle(x) => {
                 let material: &'static Material = Box::leak(Box::new(x.material));
-                Hitable::Triangle(Triangle::new(x.q, x.u, x.v, &material))
+                Hitable::Triangle(Triangle::new(x.q, x.u, x.v, material))
             }
         }
     }

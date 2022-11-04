@@ -149,7 +149,7 @@ impl HitableTrait for Triangle {
             normal,
             u: alpha,
             v: beta,
-            material: &self.material,
+            material: self.material,
             front_face,
         })
     }
@@ -227,7 +227,7 @@ mod tests {
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(1.0, 0.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),
-            &material,
+            material,
         );
 
         let ray = Ray::new(
@@ -273,7 +273,7 @@ mod tests {
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),
             Vec3::new(1.0, 0.0, 0.0),
-            &material,
+            material,
         );
 
         let ray = Ray::new(
@@ -319,7 +319,7 @@ mod tests {
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(-1.0, 0.0, 0.0),
             Vec3::new(0.0, -1.0, 0.0),
-            &material,
+            material,
         );
 
         let ray = Ray::new(
