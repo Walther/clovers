@@ -196,6 +196,7 @@ impl HitableTrait for BVHNode {
     /// Returns a random point on the surface of one of the children
     #[must_use]
     fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+        // TODO: only return a point on an existing child
         if rng.gen::<bool>() {
             self.left.random(origin, rng)
         } else {
@@ -246,12 +247,10 @@ fn vec_bounding_box(vec: &Vec<Hitable>, t0: Float, t1: Float) -> Option<AABB> {
     // Go through all the objects, and expand the AABB
     for object in vec.iter() {
         // Check if the object has a box
-        let bounding = match object.bounding_box(t0, t1) {
+        let Some(bounding) = object.bounding_box(t0, t1) else {
             // No box found for the object, early return.
             // Having even one unbounded object in a list makes the entire list unbounded!
-            None => return None,
-            // Box found
-            Some(bounding) => bounding,
+            return None
         };
 
         // Do we have an output_box already saved?
