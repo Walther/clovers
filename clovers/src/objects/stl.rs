@@ -31,7 +31,7 @@ impl STL {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
     pub fn new(stl_init: STLInit, time_0: Float, time_1: Float) -> Self {
-        let material = stl_init.material.clone();
+        let material = stl_init.material;
         let triangles: Vec<Hitable> = stl_init.into();
         let bvhnode = BVHNode::from_list(triangles, time_0, time_1);
         // TODO: remove unwrap
@@ -125,7 +125,7 @@ impl From<STLInit> for Vec<Hitable> {
             let b: Vec3 = b * stl_init.scale + stl_init.center;
             let c: Vec3 = c * stl_init.scale + stl_init.center;
 
-            let triangle = Triangle::from_coordinates(a, b, c, stl_init.material.clone());
+            let triangle = Triangle::from_coordinates(a, b, c, stl_init.material);
             hitable_list.push(Hitable::Triangle(triangle));
         }
 
