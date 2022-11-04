@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
       - name: Build
         run: cargo build --verbose
       - name: Run tests
@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: extractions/setup-just@v1
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
       - name: Build release
         run: cargo build --release --verbose
       - name: Render all test images
