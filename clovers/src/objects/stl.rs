@@ -102,6 +102,7 @@ impl From<STLInit> for Vec<Hitable> {
         let mesh = stl_io::read_stl(&mut file).unwrap();
         let triangles = mesh.vertices;
         let mut hitable_list = Vec::new();
+        let material: &'static Material = Box::leak(Box::new(stl_init.material));
         for face in mesh.faces {
             // TODO: verify if this is the correct order / makes sense / gets correct directions and normals
             let a = triangles[face.vertices[0]];
@@ -125,7 +126,7 @@ impl From<STLInit> for Vec<Hitable> {
             let b: Vec3 = b * stl_init.scale + stl_init.center;
             let c: Vec3 = c * stl_init.scale + stl_init.center;
 
-            let triangle = Triangle::from_coordinates(a, b, c, stl_init.material);
+            let triangle = Triangle::from_coordinates(a, b, c, material);
             hitable_list.push(Hitable::Triangle(triangle));
         }
 
