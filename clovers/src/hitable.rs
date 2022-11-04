@@ -14,7 +14,6 @@ use crate::{
     objects::{
         Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
     },
-    random::random_in_unit_sphere,
     ray::Ray,
     Float, Vec3,
 };
@@ -99,8 +98,8 @@ impl HitableTrait for Empty {
         0.0
     }
 
-    fn random(&self, _origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        random_in_unit_sphere(rng)
+    fn random(&self, _origin: Vec3, _rng: &mut SmallRng) -> Vec3 {
+        panic!("Hitable::Empty::random called!")
     }
 }
 
