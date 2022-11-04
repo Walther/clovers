@@ -71,7 +71,7 @@ pub use alloc::boxed::Box;
 pub use alloc::vec::Vec;
 
 // Externals
-use nalgebra::base::{Vector2, Vector3};
+use nalgebra::base::{Vector2, Vector3, Vector4};
 
 // Internals
 pub mod aabb;
@@ -121,6 +121,8 @@ pub const PI: Float = core::f32::consts::PI;
 pub type Vec2 = Vector2<Float>;
 /// Internal type alias: a nalgebra [Vector3](nalgebra::Vector3) which is a vector with three dimensions, containing three of our internal [Float] types
 pub type Vec3 = Vector3<Float>;
+/// Internal type alias: a nalgebra [Vector4](nalgebra::Vector4) which is a vector with four dimensions, containing four of our internal [Float] types
+pub type Vec4 = Vector4<Float>;
 /// Internal const: epsilon used for avoiding "shadow acne". This is mostly used for the initial minimum distance for ray hits after reflecting or scattering from a surface.
 pub const EPSILON_SHADOW_ACNE: Float = 0.001;
 /// Internal const: epsilon used for having a finitely-sized thickness for the bounding box of an infinitely-thin rectangle. Shouldn't be too small.

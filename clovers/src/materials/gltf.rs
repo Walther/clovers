@@ -12,7 +12,7 @@ use crate::{
     pdf::{ZeroPDF, PDF},
     random::random_in_unit_sphere,
     ray::Ray,
-    Float, Vec2, Vec3, PI,
+    Float, Vec2, Vec3, Vec4, PI,
 };
 
 use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
@@ -24,8 +24,9 @@ pub struct GLTFMaterial {
     material: &'static Material<'static>,
     tex_coords: [[Float; 2]; 3],
     images: &'static [Data],
-    tangents: Option<[[Float; 4]; 3]>,
-    normals: Option<[[Float; 3]; 3]>,
+    tangents: Option<[Vec3; 3]>,
+    normals: Option<[Vec3; 3]>,
+    bitangents: Option<[Vec3; 3]>,
 }
 
 impl Default for GLTFMaterial {
@@ -44,11 +45,33 @@ impl GLTFMaterial {
         tangents: Option<[[Float; 4]; 3]>,
         images: &'static [Data],
     ) -> Self {
+        let normals: Option<[Vec3; 3]> = normals.map(|ns| ns.map(Vec3::from));
+        let tangents: Option<[Vec4; 3]> = tangents.map(|ns| ns.map(Vec4::from));
+        let ws: Option<[Float; 3]> = tangents.map(|ts| ts.map(|t| t[3]));
+        let tangents: Option<[Vec3; 3]> = tangents.map(|ts| ts.map(|t| Vec4::xyz(&t)));
+        // TODO: fix this horrendous mess
+        let bitangents = if let Some(normals) = normals {
+            if let Some(tangents) = tangents {
+                ws.map(|ws| {
+                    [
+                        normals[0].cross(&tangents[0]) * ws[0],
+                        normals[1].cross(&tangents[1]) * ws[1],
+                        normals[2].cross(&tangents[2]) * ws[2],
+                    ]
+                })
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
         Self {
             material,
             tex_coords,
             normals,
             tangents,
+            bitangents,
             images,
         }
     }
@@ -191,23 +214,20 @@ impl GLTFMaterial {
     }
 
     fn sample_normal(&self, hit_record: &HitRecord) -> Vec3 {
-        let normals = match self.normals {
-            Some(ns) => ns.map(Vec3::from),
-            None => {
-                // If we don't have normals, early return with the triangle normal
-                return hit_record.normal;
-            }
+        let Some(normals) = self.normals else {
+            // If we don't have normals, early return with the triangle normal
+            return hit_record.normal;
         };
 
-        let tangents = match self.tangents {
-            Some(ts) => ts.map(|t| Vec3::new(t[0], t[1], t[2])),
-            None => {
-                // If we don't have tangents, early return with the triangle normal
-                // TODO: compute normals here or at construction time as per gltf spec
-                return hit_record.normal;
-            }
+        let Some(tangents) = self.tangents else {
+            // If we don't have tangents, early return with the triangle normal
+            // TODO: compute normals here or at construction time as per gltf spec
+            return hit_record.normal;
         };
-        let ws = self.tangents.unwrap().map(|t| t[3]);
+
+        let Some(bitangents) = self.bitangents else {
+            return hit_record.normal;
+        };
 
         let normal_texture = self
             .material
@@ -226,11 +246,6 @@ impl GLTFMaterial {
         };
 
         // Barycentric coordinates and interpolation on the triangle surface
-        let bitangents: [Vec3; 3] = [
-            normals[0].cross(&tangents[0]) * ws[0],
-            normals[1].cross(&tangents[1]) * ws[1],
-            normals[2].cross(&tangents[2]) * ws[2],
-        ];
         let normal = (hit_record.u * normals[1]
             + hit_record.v * normals[2]
             + (1.0 - hit_record.u - hit_record.v) * normals[0])
