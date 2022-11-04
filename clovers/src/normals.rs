@@ -9,11 +9,9 @@ use rand::rngs::SmallRng;
 // TODO: better name
 #[must_use]
 pub fn normal_map(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> Color {
-    let hit_record = match scene.objects.hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng) {
+    let Some(hit_record) = scene.objects.hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng) else {
         // If the ray hits nothing, early return black
-        None => return Color::new(0.0, 0.0, 0.0),
-        // Hit something, continue
-        Some(hit_record) => hit_record,
+        return Color::new(0.0, 0.0, 0.0);
     };
 
     let normal: Vec3 = hit_record.normal;

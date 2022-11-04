@@ -23,11 +23,9 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
 
     // Send the ray to the scene, and see if it hits anything.
     // distance_min is set to an epsilon to avoid "shadow acne" that can happen when set to zero
-    let hit_record = match scene.objects.hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng) {
+    let Some(hit_record) = scene.objects.hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng) else {
         // If the ray hits nothing, early return the background color.
-        None => return scene.background_color,
-        // Hit something, continue
-        Some(hit_record) => hit_record,
+        return scene.background_color;
     };
 
     // Get the emitted color from the surface that we just hit
@@ -40,11 +38,9 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
     );
 
     // Do we scatter?
-    let scatter_record = match hit_record.material.scatter(ray, &hit_record, rng) {
+    let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
         // No scatter, early return the emitted color only
-        None => return emitted,
-        // Got a scatter, continue
-        Some(scatter_record) => scatter_record,
+        return emitted;
     };
 
     // We have scattered, check material type and recurse accordingly
@@ -79,22 +75,23 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
             }
 
             // Calculate the PDF weighting for the scatter // TODO: understand the literature for this, and explain
-            if let Some(scattering_pdf) =
+            let Some(scattering_pdf) =
                 hit_record
                     .material
                     .scattering_pdf(ray, &hit_record, &scatter_ray, rng)
-            {
-                // Recurse for the scattering ray
-                let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
-                // Weight it according to the PDF
-                let scattered = scatter_record.attenuation * scattering_pdf * recurse / pdf_val;
-                // Ensure positive color
-                let scattered = scattered.non_negative();
-                // Blend it all together
-                return emitted + scattered;
-            }
-            // No scatter, only emit
-            emitted
+            else {
+                // No scatter, only emit
+                return emitted
+            };
+
+            // Recurse for the scattering ray
+            let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
+            // Weight it according to the PDF
+            let scattered = scatter_record.attenuation * scattering_pdf * recurse / pdf_val;
+            // Ensure positive color
+            let scattered = scattered.non_negative();
+            // Blend it all together
+            emitted + scattered
         }
     }
 }
