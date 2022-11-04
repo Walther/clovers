@@ -17,6 +17,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
+          toolchain: stable
           profile: minimal
       - uses: Swatinem/rust-cache@v2
       - name: Build
@@ -30,6 +31,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
+          toolchain: stable
           profile: minimal
       - uses: extractions/setup-just@v1
       - uses: Swatinem/rust-cache@v2
@@ -48,6 +50,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
+          toolchain: stable
           profile: minimal
       - uses: EmbarkStudios/cargo-deny-action@v1
   lint: # inspired by https://github.com/EmbarkStudios/rust-gpu/blob/main/.github/workflows/ci.yaml
