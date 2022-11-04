@@ -60,6 +60,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
+          toolchain: stable
           profile: minimal
           components: rustfmt, rust-src
       - name: Install rust-toolchain # cargo version is a random command that forces the installation of rust-toolchain
