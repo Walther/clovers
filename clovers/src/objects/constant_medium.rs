@@ -68,22 +68,21 @@ impl HitableTrait for ConstantMedium {
     ) -> Option<HitRecord> {
         // TODO: explain how the fog works.
 
-        let mut rec1 = match self
-            .boundary
-            .hit(ray, Float::NEG_INFINITY, Float::INFINITY, rng)
-        {
-            Some(record) => record,
-            None => return None,
+        let Some(mut rec1) = self
+                    .boundary
+                    .hit(ray, Float::NEG_INFINITY, Float::INFINITY, rng)
+        else {
+            return None
         };
 
-        let mut rec2 = match self.boundary.hit(
-            ray,
-            rec1.distance + EPSILON_CONSTANT_MEDIUM,
-            Float::INFINITY,
-            rng,
-        ) {
-            Some(record) => record,
-            None => return None,
+        let Some(mut rec2) = self.boundary.hit(
+                    ray,
+                    rec1.distance + EPSILON_CONSTANT_MEDIUM,
+                    Float::INFINITY,
+                    rng,
+                )
+        else {
+            return None
         };
 
         if rec1.distance < distance_min {

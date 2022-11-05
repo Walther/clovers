@@ -1,6 +1,6 @@
 //! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
 
-use crate::{bvhnode::BVHNode, hitable::Hitable, Box};
+use crate::{bvhnode::BVHNode, hitable::Hitable, materials::Material, Box};
 
 pub mod boxy; // avoid keyword
 pub mod constant_medium;
@@ -124,7 +124,10 @@ impl From<Object> for Hitable {
                 let obj: Hitable = obj.into();
                 Hitable::Translate(Translate::new(Box::new(obj), x.offset))
             }
-            Object::Triangle(x) => Hitable::Triangle(Triangle::new(x.q, x.u, x.v, x.material)),
+            Object::Triangle(x) => {
+                let material: &'static Material = Box::leak(Box::new(x.material));
+                Hitable::Triangle(Triangle::new(x.q, x.u, x.v, material))
+            }
         }
     }
 }

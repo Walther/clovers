@@ -121,11 +121,9 @@ impl HitableTrait for RotateY {
 
         let rotated_r: Ray = Ray::new(origin, direction, ray.time);
 
-        let hit_record = match self.object.hit(&rotated_r, distance_min, distance_max, rng) {
+        let Some(hit_record) = self.object.hit(&rotated_r, distance_min, distance_max, rng) else {
             // Did not hit rotated object, early return None
-            None => return None,
-            // Hit the rotated object, continue evaluating
-            Some(hit_record) => hit_record,
+            return None
         };
 
         // Determine where the intersection is

@@ -55,47 +55,17 @@ impl Boxy {
 
         let sides: [Hitable; 6] = [
             // front
-            Hitable::Quad(Quad::new(
-                Vec3::new(min.x, min.y, max.z),
-                dx,
-                dy,
-                material.clone(),
-            )),
+            Hitable::Quad(Quad::new(Vec3::new(min.x, min.y, max.z), dx, dy, material)),
             // right
-            Hitable::Quad(Quad::new(
-                Vec3::new(max.x, min.y, max.z),
-                -dz,
-                dy,
-                material.clone(),
-            )),
+            Hitable::Quad(Quad::new(Vec3::new(max.x, min.y, max.z), -dz, dy, material)),
             // back
-            Hitable::Quad(Quad::new(
-                Vec3::new(max.x, min.y, min.z),
-                -dx,
-                dy,
-                material.clone(),
-            )),
+            Hitable::Quad(Quad::new(Vec3::new(max.x, min.y, min.z), -dx, dy, material)),
             // left
-            Hitable::Quad(Quad::new(
-                Vec3::new(min.x, min.y, min.z),
-                dz,
-                dy,
-                material.clone(),
-            )),
+            Hitable::Quad(Quad::new(Vec3::new(min.x, min.y, min.z), dz, dy, material)),
             // top
-            Hitable::Quad(Quad::new(
-                Vec3::new(min.x, max.y, max.z),
-                dx,
-                -dz,
-                material.clone(),
-            )),
+            Hitable::Quad(Quad::new(Vec3::new(min.x, max.y, max.z), dx, -dz, material)),
             // bottom
-            Hitable::Quad(Quad::new(
-                Vec3::new(min.x, min.y, min.z),
-                dx,
-                dz,
-                material.clone(),
-            )),
+            Hitable::Quad(Quad::new(Vec3::new(min.x, min.y, min.z), dx, dz, material)),
         ];
         // AABB
         let aabb = AABB::new_from_coords(corner_0, corner_1);

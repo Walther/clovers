@@ -6,6 +6,7 @@
 
 // External imports
 use clap::Parser;
+use human_format::Formatter;
 use humantime::format_duration;
 use image::{ImageBuffer, ImageOutputFormat, Rgb, RgbImage};
 use img_parts::png::{Png, PngChunk};
@@ -80,13 +81,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Pretty printing output, unless in quiet mode
     if !opts.quiet {
         println!("clovers 🍀    ray tracing in rust 🦀");
-        println!("width:        {}", opts.width);
-        println!("height:       {}", opts.height);
-        println!("samples:      {}", opts.samples);
-        println!("max depth:    {}", opts.max_depth);
+        println!("width:          {}", opts.width);
+        println!("height:         {}", opts.height);
+        println!("samples:        {}", opts.samples);
+        println!("max depth:      {}", opts.max_depth);
         let rays: u64 =
             opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
-        println!("approx. rays: {}", rays);
+        println!("max total rays: {}", Formatter::new().format(rays as f64));
         println!(); // Empty line before progress bar
     }
 

@@ -188,18 +188,30 @@ impl HitableTrait for BVHNode {
     /// Returns a probability density function value based on the children
     #[must_use]
     fn pdf_value(&self, origin: Vec3, vector: Vec3, time: f32, rng: &mut SmallRng) -> f32 {
-        (self.left.pdf_value(origin, vector, time, rng)
-            + self.right.pdf_value(origin, vector, time, rng))
-            / 2.0
+        match (&*self.left, &*self.right) {
+            (_, Hitable::Empty(_)) => self.left.pdf_value(origin, vector, time, rng),
+            (Hitable::Empty(_), _) => self.right.pdf_value(origin, vector, time, rng),
+            (_, _) => {
+                (self.left.pdf_value(origin, vector, time, rng)
+                    + self.right.pdf_value(origin, vector, time, rng))
+                    / 2.0
+            }
+        }
     }
 
     /// Returns a random point on the surface of one of the children
     #[must_use]
     fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        if rng.gen::<bool>() {
-            self.left.random(origin, rng)
-        } else {
-            self.right.random(origin, rng)
+        match (&*self.left, &*self.right) {
+            (_, Hitable::Empty(_)) => self.left.random(origin, rng),
+            (Hitable::Empty(_), _) => self.right.random(origin, rng),
+            (_, _) => {
+                if rng.gen::<bool>() {
+                    self.left.random(origin, rng)
+                } else {
+                    self.right.random(origin, rng)
+                }
+            }
         }
     }
 }
@@ -246,12 +258,10 @@ fn vec_bounding_box(vec: &Vec<Hitable>, t0: Float, t1: Float) -> Option<AABB> {
     // Go through all the objects, and expand the AABB
     for object in vec.iter() {
         // Check if the object has a box
-        let bounding = match object.bounding_box(t0, t1) {
+        let Some(bounding) = object.bounding_box(t0, t1) else {
             // No box found for the object, early return.
             // Having even one unbounded object in a list makes the entire list unbounded!
-            None => return None,
-            // Box found
-            Some(bounding) => bounding,
+            return None
         };
 
         // Do we have an output_box already saved?

@@ -4,6 +4,7 @@ use crate::{
     aabb::AABB,
     hitable::{HitRecord, HitableTrait},
     materials::Material,
+    random::random_in_unit_sphere,
     ray::Ray,
     Float, Vec3, PI,
 };
@@ -166,8 +167,7 @@ impl HitableTrait for MovingSphere {
         0.0
     }
 
-    fn random(&self, _origin: Vec3, _rng: &mut SmallRng) -> Vec3 {
-        // TODO: fix
-        Vec3::new(1.0, 0.0, 0.0)
+    fn random(&self, _origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+        random_in_unit_sphere(rng)
     }
 }

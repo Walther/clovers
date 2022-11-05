@@ -99,8 +99,7 @@ impl HitableTrait for Empty {
     }
 
     fn random(&self, _origin: Vec3, _rng: &mut SmallRng) -> Vec3 {
-        // TODO: fix
-        Vec3::new(1.0, 0.0, 0.0)
+        panic!("Hitable::Empty::random called!")
     }
 }
 
