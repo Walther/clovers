@@ -13,3 +13,6 @@ Cargo.lock
 
 # oh macos
 .DS_Store
+
+# some scene files are not checked into version control
+local_scenes
