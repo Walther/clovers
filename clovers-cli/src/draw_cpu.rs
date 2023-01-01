@@ -6,7 +6,7 @@ use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 use scenes::Scene;
 
-/// The main drawing function, returns a Vec<Color> as a pixelbuffer.
+/// The main drawing function, returns a `Vec<Color>` as a pixelbuffer.
 pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
     // Progress bar
     let pixels = (opts.width * opts.height) as u64;
