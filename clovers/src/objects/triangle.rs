@@ -220,7 +220,7 @@ mod tests {
     fn xy_unit_triangle() {
         let time_0 = 0.0;
         let time_1 = 1.0;
-        let material: &'static Material = Box::leak(Box::new(Material::default()));
+        let material: &'static Material = Box::leak(Box::default());
 
         // Unit triangle at origin
         let xy_unit_triangle = Triangle::new(
@@ -266,7 +266,7 @@ mod tests {
     fn yx_unit_triangle() {
         let time_0 = 0.0;
         let time_1 = 1.0;
-        let material: &'static Material = Box::leak(Box::new(Material::default()));
+        let material: &'static Material = Box::leak(Box::default());
 
         // Unit triangle at origin, u and v coords swapped
         let xy_unit_triangle = Triangle::new(
@@ -312,7 +312,7 @@ mod tests {
     fn neg_xy_unit_triangle() {
         let time_0 = 0.0;
         let time_1 = 1.0;
-        let material: &'static Material = Box::leak(Box::new(Material::default()));
+        let material: &'static Material = Box::leak(Box::default());
 
         // Unit triangle at origin, u and v coords swapped
         let neg_xy_unit_triangle = Triangle::new(

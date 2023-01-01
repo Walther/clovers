@@ -143,7 +143,7 @@ impl AABB {
             0 => self.x,
             1 => self.y,
             2 => self.z,
-            _ => panic!("AABB::axis called with invalid parameter: {:?}", n),
+            _ => panic!("AABB::axis called with invalid parameter: {n:?}"),
         }
     }
 }
