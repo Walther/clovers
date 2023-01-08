@@ -13,7 +13,7 @@ path = "src/main.rs"
 clovers = { path = "../clovers", features = ["serde-derive", "stl", "traces", "gl_tf"], default-features = false }
 
 # External
-clap = { version = "4.0.29", features = ["std", "derive"], default-features = false  }
+clap = { version = "4.0.32", features = ["std", "derive"], default-features = false  }
 human_format = "1.0.3"
 humantime = "2.1.0"
 image = { version =  "0.24.5", features = ["png"], default-features = false }
@@ -21,7 +21,7 @@ img-parts = "0.3.0"
 indicatif = { git = "https://github.com/console-rs/indicatif", rev = "2954b1a24ac5f1900a7861992e4825bff643c9e2", features = ["rayon"], default-features = false }
 rand = { version = "0.8.5", features = ["small_rng", "getrandom"], default-features = false }
 rayon = "1.6.1"
-serde = { version = "1.0.150", features = ["derive"], default-features = false }
+serde = { version = "1.0.152", features = ["derive"], default-features = false }
 serde_json = { version = "1.0", features = ["alloc"], default-features = false }
 time = { version = "0.3.17", default-features = false }
 tracing = "0.1.37"
