@@ -13,7 +13,13 @@ use rand::rngs::SmallRng;
 
 /// The main coloring function. Sends a [Ray] to the [Scene], sees if it hits anything, and eventually returns a [Color]. Taking into account the [Material](crate::materials::Material) that is hit, the method recurses with various adjustments, with a new [Ray] started from the location that was hit.
 #[must_use]
-pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut SmallRng) -> Color {
+pub fn colorize(
+    ray: &Ray,
+    scene: &'static Scene,
+    depth: u32,
+    max_depth: u32,
+    rng: &mut SmallRng,
+) -> Color {
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
         // Ray bounce limit reached, early return background_color
@@ -62,7 +68,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
             // Use a probability density function to figure out where to scatter a new ray
             // TODO: this weighed priority sampling should be adjusted or removed - doesn't feel ideal.
             let light_ptr = PDF::HitablePDF(HitablePDF::new(
-                scene.priority_objects.clone(), // TODO: remove clone
+                &scene.priority_objects,
                 hit_record.position,
             ));
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
