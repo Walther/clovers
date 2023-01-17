@@ -8,7 +8,7 @@ use scenes::Scene;
 use std::time::Duration;
 
 /// The main drawing function, returns a `Vec<Color>` as a pixelbuffer.
-pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
+pub fn draw(opts: RenderOpts, scene: &'static Scene) -> Vec<Color> {
     // Progress bar
     let pixels = (opts.width * opts.height) as u64;
     let bar = ProgressBar::new(pixels);
@@ -47,7 +47,7 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
                 let u = x / width;
                 let v = y / height;
                 let ray: Ray = scene.camera.get_ray(u, v, &mut rng);
-                color = normal_map(&ray, &scene, &mut rng);
+                color = normal_map(&ray, scene, &mut rng);
                 *pixel = color;
                 return;
             }
@@ -55,7 +55,7 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
 
             // Multisampling for antialiasing
             for _sample in 0..opts.samples {
-                if let Some(s) = sample(&scene, x, y, width, height, &mut rng, opts.max_depth) {
+                if let Some(s) = sample(scene, x, y, width, height, &mut rng, opts.max_depth) {
                     color += s
                 }
             }
@@ -73,7 +73,7 @@ pub fn draw(opts: RenderOpts, scene: Scene) -> Vec<Color> {
 
 /// Get a single sample for a single pixel in the scene. Has slight jitter for antialiasing when multisampling.
 fn sample(
-    scene: &Scene,
+    scene: &'static Scene,
     x: Float,
     y: Float,
     width: Float,

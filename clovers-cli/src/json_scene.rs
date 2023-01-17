@@ -6,7 +6,7 @@ use std::io::Read;
 use std::path::Path;
 use tracing::info;
 
-pub(crate) fn initialize(path: &Path, opts: &Opts) -> Result<Scene, Box<dyn Error>> {
+pub(crate) fn initialize(path: &Path, opts: &Opts) -> Result<&'static Scene, Box<dyn Error>> {
     let mut file = File::open(path)?;
     let mut contents: String = String::new();
     file.read_to_string(&mut contents)?;
@@ -15,5 +15,5 @@ pub(crate) fn initialize(path: &Path, opts: &Opts) -> Result<Scene, Box<dyn Erro
     info!("Initializing the scene");
     let scene: Scene = scenes::initialize(scene_file, opts.width, opts.height);
     info!("Count of nodes in the BVH tree: {}", scene.objects.count());
-    Ok(scene)
+    Ok(Box::leak(Box::new(scene)))
 }

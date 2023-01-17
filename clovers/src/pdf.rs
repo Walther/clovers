@@ -65,12 +65,12 @@ impl PDFTrait for CosinePDF {
 #[derive(Debug, Clone)]
 pub struct HitablePDF {
     origin: Vec3,
-    hitable: Hitable,
+    hitable: &'static Hitable,
 }
 
 impl HitablePDF {
     #[must_use]
-    pub fn new(hitable: Hitable, origin: Vec3) -> Self {
+    pub fn new(hitable: &'static Hitable, origin: Vec3) -> Self {
         HitablePDF { origin, hitable }
     }
 }
