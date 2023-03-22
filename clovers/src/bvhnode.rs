@@ -122,10 +122,7 @@ impl BVHNode {
                 bounding_box,
             }
         } else {
-            panic!(
-                "No bounding box in bvh_node constructor. {:?} {:?}",
-                box_left, box_right
-            );
+            panic!("No bounding box in bvh_node constructor. {box_left:?} {box_right:?}");
         }
     }
 

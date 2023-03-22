@@ -44,7 +44,6 @@ impl MaterialTrait for DiffuseLight {
     #[must_use]
     fn scattering_pdf(
         &self,
-        _ray: &Ray,
         _hit_record: &HitRecord,
         _scattered: &Ray,
         _rng: &mut SmallRng,

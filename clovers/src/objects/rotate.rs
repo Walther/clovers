@@ -42,20 +42,14 @@ impl RotateY {
         let bounding_box: Option<AABB> = object.bounding_box(time_0, time_1);
 
         // Does our object have a bounding box?
-        let bbox = match bounding_box {
-            // No bounding box for object, give up and return early
-            // TODO: is this even correct? How could it be?
-            None => {
+        let Some(bbox) = bounding_box else {
                 return RotateY {
                     object,
                     sin_theta,
                     cos_theta,
                     aabb: None,
                 }
-            }
-            // Got a bounding box
-            Some(bbox) => bbox,
-        };
+            };
 
         // Start with infinite bounds
         let mut min: Vec3 = Vec3::new(Float::INFINITY, Float::INFINITY, Float::INFINITY);
