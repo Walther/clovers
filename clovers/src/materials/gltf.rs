@@ -117,7 +117,6 @@ impl MaterialTrait for GLTFMaterial {
 
     fn scattering_pdf(
         &self,
-        _ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
         _rng: &mut SmallRng,

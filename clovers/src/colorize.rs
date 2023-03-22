@@ -84,7 +84,7 @@ pub fn colorize(
             let Some(scattering_pdf) =
                 hit_record
                     .material
-                    .scattering_pdf(ray, &hit_record, &scatter_ray, rng)
+                    .scattering_pdf(&hit_record, &scatter_ray, rng)
             else {
                 // No scatter, only emit
                 return emitted

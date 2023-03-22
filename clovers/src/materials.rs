@@ -31,7 +31,6 @@ pub(crate) trait MaterialTrait {
 
     fn scattering_pdf(
         &self,
-        ray: &Ray,
         hit_record: &HitRecord,
         scattered: &Ray,
         rng: &mut SmallRng,
