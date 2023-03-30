@@ -15,16 +15,16 @@ use crate::{
 ///
 /// A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also `BVHNode`s. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 #[derive(Debug, Clone)]
-pub struct BVHNode {
+pub struct BVHNode<'scene> {
     /// Left child of the BVHNode
-    pub left: Box<Hitable>,
+    pub left: Box<Hitable<'scene>>,
     /// Right child of the BVHNode
-    pub right: Box<Hitable>,
+    pub right: Box<Hitable<'scene>>,
     /// Bounding box containing both of the child nodes
     pub bounding_box: AABB,
 }
 
-impl BVHNode {
+impl<'scene> BVHNode<'scene> {
     /// Create a new `BVHNode` tree from a given list of [Object](crate::objects::Object)s
     #[must_use]
     pub fn from_list(mut objects: Vec<Hitable>, time_0: Float, time_1: Float) -> BVHNode {
@@ -142,7 +142,7 @@ impl BVHNode {
     }
 }
 
-impl HitableTrait for BVHNode {
+impl<'scene> HitableTrait for BVHNode<'scene> {
     /// The main `hit` function for a [`BVHNode`]. Given a [Ray](crate::ray::Ray), and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the encased objects during that interval.
     #[must_use]
     fn hit(

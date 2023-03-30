@@ -35,7 +35,7 @@ pub struct HitRecord<'a> {
     /// V surface coordinate of the hitpoint
     pub v: Float,
     /// Reference to the material at the hitpoint
-    pub material: &'a Material,
+    pub material: &'a Material<'a>,
     /// Is the hitpoint at the front of the surface
     pub front_face: bool,
 }
@@ -55,24 +55,24 @@ impl<'a> HitRecord<'a> {
 /// An abstraction for things that can be hit by [Rays](crate::ray::Ray).
 #[enum_dispatch(HitableTrait)]
 #[derive(Debug, Clone)]
-pub enum Hitable {
-    Boxy(Boxy),
-    BVHNode(BVHNode),
-    ConstantMedium(ConstantMedium),
-    FlipFace(FlipFace),
-    MovingSphere(MovingSphere),
-    Quad(Quad),
-    RotateY(RotateY),
-    Sphere(Sphere),
+pub enum Hitable<'scene> {
+    Boxy(Boxy<'scene>),
+    BVHNode(BVHNode<'scene>),
+    ConstantMedium(ConstantMedium<'scene>),
+    FlipFace(FlipFace<'scene>),
+    MovingSphere(MovingSphere<'scene>),
+    Quad(Quad<'scene>),
+    RotateY(RotateY<'scene>),
+    Sphere(Sphere<'scene>),
     #[cfg(feature = "stl")]
-    STL(STL),
+    STL(STL<'scene>),
     #[cfg(feature = "gl_tf")]
-    GLTF(GLTF),
-    Translate(Translate),
-    Triangle(Triangle),
+    GLTF(GLTF<'scene>),
+    Translate(Translate<'scene>),
+    Triangle(Triangle<'scene>),
     Empty(Empty),
     #[cfg(feature = "gl_tf")]
-    GLTFTriangle(GLTFTriangle),
+    GLTFTriangle(GLTFTriangle<'scene>),
 }
 
 // TODO: remove horrible hack

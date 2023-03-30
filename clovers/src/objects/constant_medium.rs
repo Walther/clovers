@@ -17,9 +17,9 @@ use super::Object;
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `ConstantMediumInit` structure describes the necessary data for constructing a [`ConstantMedium`]. Used with [serde] when importing [`SceneFiles`](crate::scenes::SceneFile).
-pub struct ConstantMediumInit {
+pub struct ConstantMediumInit<'scene> {
     /// The boundary object for the constant medium. This determines the size and shape of the fog object.
-    pub boundary: Box<Object>,
+    pub boundary: Box<Object<'scene>>,
     #[cfg_attr(feature = "serde-derive", serde(default = "default_density"))]
     /// Density of the fog. TODO: example good value range?
     pub density: Float,
@@ -38,16 +38,16 @@ fn default_density() -> Float {
 
 #[derive(Debug, Clone)]
 /// `ConstantMedium` object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
-pub struct ConstantMedium {
-    boundary: Box<Hitable>,
-    phase_function: Material,
+pub struct ConstantMedium<'scene> {
+    boundary: Box<Hitable<'scene>>,
+    phase_function: Material<'scene>,
     neg_inv_density: Float,
 }
 
-impl ConstantMedium {
+impl<'scene> ConstantMedium<'scene> {
     /// Creates a new [`ConstantMedium`] with a known size, shape and density.
     #[must_use]
-    pub fn new(boundary: Box<Hitable>, density: Float, texture: Texture) -> Self {
+    pub fn new(boundary: Box<Hitable<'scene>>, density: Float, texture: Texture) -> Self {
         ConstantMedium {
             boundary,
             phase_function: Material::Isotropic(Isotropic::new(texture)),
@@ -56,7 +56,7 @@ impl ConstantMedium {
     }
 }
 
-impl HitableTrait for ConstantMedium {
+impl<'scene> HitableTrait for ConstantMedium<'scene> {
     /// Hit function for the [`ConstantMedium`] object. Returns a [`HitRecord`] if hit. TODO: explain the math for the fog
     #[must_use]
     fn hit(

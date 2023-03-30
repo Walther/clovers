@@ -18,19 +18,19 @@ use crate::{
 
 /// Internal STL object representation after initialization. Contains the material for all triangles in it to avoid having n copies.
 #[derive(Debug, Clone)]
-pub struct STL {
+pub struct STL<'scene> {
     /// Bounding Volume Hierarchy tree for the object
-    pub bvhnode: BVHNode,
+    pub bvhnode: BVHNode<'scene>,
     /// Material for the object
-    pub material: Material,
+    pub material: Material<'scene>,
     /// Axis-aligned bounding box of the object
     pub aabb: AABB,
 }
 
-impl STL {
+impl<'scene> STL<'scene> {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
-    pub fn new(stl_init: STLInit, time_0: Float, time_1: Float) -> Self {
+    pub fn new(stl_init: STLInit<'scene>, time_0: Float, time_1: Float) -> Self {
         let material = stl_init.material;
         let triangles: Vec<Hitable> = stl_init.into();
         let bvhnode = BVHNode::from_list(triangles, time_0, time_1);
@@ -45,7 +45,7 @@ impl STL {
     }
 }
 
-impl HitableTrait for STL {
+impl<'scene> HitableTrait for STL<'scene> {
     /// Hit method for the STL object
     #[must_use]
     fn hit(
@@ -80,12 +80,12 @@ impl HitableTrait for STL {
 /// STL structure. This gets converted into an internal representation using [Triangles](crate::objects::Triangle)
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct STLInit {
+pub struct STLInit<'scene> {
     /// Path of the .stl file
     pub path: String,
     /// Material to use for the .stl object
     #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material,
+    pub material: Material<'scene>,
     /// Scaling factor for the object
     pub scale: Float,
     /// Location of the object in the rendered scene
@@ -94,15 +94,17 @@ pub struct STLInit {
     pub rotation: Vec3,
 }
 
-impl From<STLInit> for Vec<Hitable> {
+impl<'scene> From<STLInit<'scene>> for Vec<Hitable<'scene>> {
     #[must_use]
-    fn from(stl_init: STLInit) -> Self {
+    fn from(stl_init: STLInit<'scene>) -> Self {
         // TODO: error handling!
         let mut file = OpenOptions::new().read(true).open(stl_init.path).unwrap();
         let mesh = stl_io::read_stl(&mut file).unwrap();
         let triangles = mesh.vertices;
         let mut hitable_list = Vec::new();
-        let material: &'static Material = Box::leak(Box::new(stl_init.material));
+        // TODO: do not leak memory
+        let material: &'scene Material = Box::leak(Box::new(stl_init.material));
+
         for face in mesh.faces {
             // TODO: verify if this is the correct order / makes sense / gets correct directions and normals
             let a = triangles[face.vertices[0]];

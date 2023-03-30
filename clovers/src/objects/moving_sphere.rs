@@ -13,7 +13,7 @@ use rand::rngs::SmallRng;
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `SphereInit` structure describes the necessary data for constructing a [`Sphere`](super::Sphere). Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
-pub struct MovingSphereInit {
+pub struct MovingSphereInit<'scene> {
     /// Center point of the sphere at time_0
     pub center_0: Vec3,
     /// Center point of the sphere at time_1
@@ -22,13 +22,13 @@ pub struct MovingSphereInit {
     pub radius: Float,
     #[cfg_attr(feature = "serde-derive", serde(default))]
     /// Material of the sphere.
-    pub material: Material,
+    pub material: Material<'scene>,
 }
 
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A moving sphere object. This is represented by one `radius`, two center points `center_0` `center_1`, two times `time_0` `time_1`, and a [Material]. Any [Rays](Ray) hitting the object will also have an internal `time` value, which will be used for determining the interpolated position of the sphere at that time. With lots of rays hitting every pixel but at randomized times, we get temporal multiplexing and an approximation of perceived motion blur.
-pub struct MovingSphere {
+pub struct MovingSphere<'scene> {
     /// Center point of the sphere at time_0
     pub center_0: Vec3,
     /// Center point of the sphere at time_1
@@ -41,12 +41,12 @@ pub struct MovingSphere {
     pub radius: Float,
     /// Material of the sphere
     #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material,
+    pub material: Material<'scene>,
     /// Axis-aligned bounding box
     pub aabb: AABB,
 }
 
-impl MovingSphere {
+impl<'scene> MovingSphere<'scene> {
     /// Creates a new `MovingSphere` object. See the struct documentation for more information: [`MovingSphere`].
     #[must_use]
     pub fn new(
@@ -55,7 +55,7 @@ impl MovingSphere {
         time_0: Float,
         time_1: Float,
         radius: Float,
-        material: Material,
+        material: Material<'scene>,
     ) -> Self {
         let box0: AABB = AABB::new_from_coords(
             center_0 - Vec3::new(radius, radius, radius),
@@ -99,7 +99,7 @@ impl MovingSphere {
     }
 }
 
-impl HitableTrait for MovingSphere {
+impl<'scene> HitableTrait for MovingSphere<'scene> {
     /// Hit method for the [`MovingSphere`] object. First gets the interpolated center position at the given time, then follows the implementation of [Sphere](crate::objects::Sphere) object's hit method.
     #[must_use]
     fn hit(

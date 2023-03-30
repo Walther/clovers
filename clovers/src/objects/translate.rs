@@ -13,29 +13,29 @@ use super::Object;
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `TranslateInit` structure describes the necessary data for constructing a [Translate] object. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
-pub struct TranslateInit {
+pub struct TranslateInit<'scene> {
     /// The encased [Object] to translate i.e. move
-    pub object: Box<Object>,
+    pub object: Box<Object<'scene>>,
     /// The vector describing the movement of the object
     pub offset: Vec3,
 }
 
 #[derive(Debug, Clone)]
 /// Translate object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `offset` given.
-pub struct Translate {
-    object: Box<Hitable>,
+pub struct Translate<'scene> {
+    object: Box<Hitable<'scene>>,
     offset: Vec3,
 }
 
-impl Translate {
+impl<'scene> Translate<'scene> {
     /// Creates a new `Translate` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `offset` given.
     #[must_use]
-    pub fn new(object: Box<Hitable>, offset: Vec3) -> Self {
+    pub fn new(object: Box<Hitable<'scene>>, offset: Vec3) -> Self {
         Translate { object, offset }
     }
 }
 
-impl HitableTrait for Translate {
+impl<'scene> HitableTrait for Translate<'scene> {
     /// Hit method for the [Translate] object. Finds the translation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
     #[must_use]
     fn hit(

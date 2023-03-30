@@ -13,30 +13,30 @@ use super::Object;
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `FlipFaceInit` structure describes the necessary data for constructing a [`FlipFace`]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
-pub struct FlipFaceInit {
+pub struct FlipFaceInit<'scene> {
     /// The object to wrap with the face flipping feature.
-    pub object: Box<Object>,
+    pub object: Box<Object<'scene>>,
 }
 
 #[derive(Debug, Clone)]
 /// An utility object that can be used to flip the face of the object. TODO: possibly deprecated?
-pub struct FlipFace {
-    object: Box<Hitable>,
+pub struct FlipFace<'scene> {
+    object: Box<Hitable<'scene>>,
 }
 
-impl FlipFace {
+impl<'scene> FlipFace<'scene> {
     // TODO: possibly deprecate / remove?
 
     /// Creates a new instance of a [`FlipFace`]
     #[must_use]
-    pub fn new(object: Hitable) -> Self {
+    pub fn new(object: Hitable<'scene>) -> Self {
         FlipFace {
             object: Box::new(object),
         }
     }
 }
 
-impl HitableTrait for FlipFace {
+impl<'scene> HitableTrait for FlipFace<'scene> {
     /// Hit function for the [`FlipFace`] object. Considering this is a utility object that wraps an internal `object`, it returns a [`HitRecord`] with the `front_face` property flipped, if the given [Ray] hits the object.
     #[must_use]
     fn hit(

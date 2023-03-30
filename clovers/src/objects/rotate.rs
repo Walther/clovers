@@ -13,26 +13,26 @@ use super::Object;
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `RotateInit` structure describes the necessary data for constructing a [`RotateY`]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
-pub struct RotateInit {
+pub struct RotateInit<'scene> {
     /// The encased [Object] to rotate
-    pub object: Box<Object>,
+    pub object: Box<Object<'scene>>,
     /// Angle to rotate the object, in degrees
     pub angle: Float,
 }
 
 #[derive(Debug, Clone)]
 /// `RotateY` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
-pub struct RotateY {
-    object: Box<Hitable>,
+pub struct RotateY<'scene> {
+    object: Box<Hitable<'scene>>,
     sin_theta: Float,
     cos_theta: Float,
     aabb: Option<AABB>,
 }
 
-impl RotateY {
+impl<'scene> RotateY<'scene> {
     /// Creates a new `RotateY` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
     #[must_use]
-    pub fn new(object: Box<Hitable>, angle: Float) -> Self {
+    pub fn new(object: Box<Hitable<'scene>>, angle: Float) -> Self {
         // TODO: add proper time support
         let time_0: Float = 0.0;
         let time_1: Float = 1.0;
@@ -94,7 +94,7 @@ impl RotateY {
     }
 }
 
-impl HitableTrait for RotateY {
+impl<'scene> HitableTrait for RotateY<'scene> {
     /// Hit method for the [`RotateY`] object. Finds the rotation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
     #[must_use]
     fn hit(

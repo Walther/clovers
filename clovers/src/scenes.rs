@@ -14,28 +14,28 @@ use tracing::info;
 
 #[derive(Debug)]
 /// A representation of the scene that is being rendered.
-pub struct Scene {
+pub struct Scene<'scene> {
     /// Bounding-volume hierarchy of [Hitable] objects in the scene. This could, as currently written, be any [Hitable] - in practice, we place the root of the [BVHNode](crate::bvhnode::BVHNode) tree here.
-    pub objects: BVHNode,
+    pub objects: BVHNode<'scene>,
     /// The camera object used for rendering the scene.
     pub camera: Camera,
     /// The background color to use when the rays do not hit anything in the scene.
     pub background_color: Color, // TODO: make into Texture or something?
     /// A [BVHNode](crate::bvhnode::BVHNode) tree of prioritized objects - e.g. glass items or lights - that affect the biased sampling of the scene. Wrapped into a [Hitable] for convenience reasons (see various PDF functions).
-    pub priority_objects: Hitable,
+    pub priority_objects: Hitable<'scene>,
 }
 
-impl Scene {
+impl<'scene> Scene<'scene> {
     /// Creates a new [Scene] with the given parameters.
     #[must_use]
     pub fn new(
         time_0: Float,
         time_1: Float,
         camera: Camera,
-        objects: Vec<Hitable>,
-        priority_objects: Vec<Hitable>,
+        objects: Vec<Hitable<'scene>>,
+        priority_objects: Vec<Hitable<'scene>>,
         background_color: Color,
-    ) -> Scene {
+    ) -> Scene<'scene> {
         Scene {
             objects: BVHNode::from_list(objects, time_0, time_1),
             camera,
@@ -53,13 +53,13 @@ impl Scene {
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A serialized representation of a [Scene].
-pub struct SceneFile {
+pub struct SceneFile<'scene> {
     time_0: Float,
     time_1: Float,
     background_color: Color,
     camera: CameraInit,
-    objects: Vec<Object>,
-    priority_objects: Vec<Object>,
+    objects: Vec<Object<'scene>>,
+    priority_objects: Vec<Object<'scene>>,
 }
 
 /// Initializes a new [Scene] instance by parsing the contents of a [`SceneFile`] structure and then using those details to construct the [Scene].

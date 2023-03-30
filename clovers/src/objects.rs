@@ -36,47 +36,47 @@ pub use triangle::*;
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A list of objects. Allows multiple objects to be used e.g. in a Rotate or Translate object as the target.
-pub struct ObjectList {
+pub struct ObjectList<'scene> {
     /// The encased [Object] list
-    pub objects: Vec<Object>,
+    pub objects: Vec<Object<'scene>>,
 }
 
 #[derive(Clone, Debug)]
 /// An object enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
-pub enum Object {
+pub enum Object<'scene> {
     /// Boxy object initializer
-    Boxy(BoxyInit),
+    Boxy(BoxyInit<'scene>),
     /// ConstantMedium object initializer
-    ConstantMedium(ConstantMediumInit),
+    ConstantMedium(ConstantMediumInit<'scene>),
     /// FlipFace object initializer
-    FlipFace(FlipFaceInit),
+    FlipFace(FlipFaceInit<'scene>),
     /// MovingSphere object initializer
-    MovingSphere(MovingSphereInit),
+    MovingSphere(MovingSphereInit<'scene>),
     /// ObjectList object initializer
-    ObjectList(ObjectList),
+    ObjectList(ObjectList<'scene>),
     /// Quad object initializer
-    Quad(QuadInit),
+    Quad(QuadInit<'scene>),
     /// RotateY object initializer
-    RotateY(RotateInit),
+    RotateY(RotateInit<'scene>),
     /// Sphere object initializer
-    Sphere(SphereInit),
+    Sphere(SphereInit<'scene>),
     #[cfg(feature = "stl")]
     /// STL object initializer
-    STL(STLInit),
+    STL(STLInit<'scene>),
     #[cfg(feature = "gl_tf")]
     /// GLTF object initializer
     GLTF(GLTFInit),
     /// Translate object initializer
-    Translate(TranslateInit),
+    Translate(TranslateInit<'scene>),
     /// Triangle object initializer
-    Triangle(TriangleInit),
+    Triangle(TriangleInit<'scene>),
 }
 
-impl From<Object> for Hitable {
+impl<'scene> From<Object<'scene>> for Hitable<'scene> {
     #[must_use]
-    fn from(obj: Object) -> Hitable {
+    fn from(obj: Object<'scene>) -> Hitable<'scene> {
         match obj {
             Object::Boxy(x) => Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, x.material)),
             Object::ConstantMedium(x) => {
@@ -125,7 +125,8 @@ impl From<Object> for Hitable {
                 Hitable::Translate(Translate::new(Box::new(obj), x.offset))
             }
             Object::Triangle(x) => {
-                let material: &'static Material = Box::leak(Box::new(x.material));
+                // TODO: do not leak memory
+                let material: &'scene Material = Box::leak(Box::new(x.material));
                 Hitable::Triangle(Triangle::new(x.q, x.u, x.v, material))
             }
         }

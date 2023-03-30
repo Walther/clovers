@@ -54,7 +54,7 @@ pub(crate) trait MaterialTrait {
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
-pub enum Material {
+pub enum Material<'scene> {
     /// Dielectric material
     Dielectric(Dielectric),
     /// Lambertian material
@@ -68,10 +68,10 @@ pub enum Material {
     /// GLTF material
     #[cfg(feature = "gl_tf")]
     #[cfg_attr(feature = "serde-derive", serde(skip))]
-    GLTF(GLTFMaterial),
+    GLTF(GLTFMaterial<'scene>),
 }
 
-impl Default for Material {
+impl<'scene> Default for Material<'scene> {
     fn default() -> Self {
         Self::Lambertian(Lambertian::default())
     }

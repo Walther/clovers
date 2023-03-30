@@ -65,7 +65,7 @@ impl PDFTrait for CosinePDF {
 #[derive(Debug, Clone)]
 pub struct HitablePDF<'scene> {
     origin: Vec3,
-    hitable: &'scene Hitable,
+    hitable: &'scene Hitable<'scene>,
 }
 
 impl<'scene> HitablePDF<'scene> {

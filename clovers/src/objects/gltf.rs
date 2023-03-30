@@ -1,6 +1,5 @@
 //! GLTF format support for the renderer
 
-use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
 #[cfg(feature = "gl_tf")]
@@ -28,11 +27,11 @@ pub struct GLTFInit {
     pub path: String,
 }
 
-impl From<GLTFInit> for Vec<Hitable> {
+impl<'scene> From<GLTFInit> for Vec<Hitable<'scene>> {
     fn from(gltf: GLTFInit) -> Self {
         let mut hitables: Vec<Hitable> = Vec::new();
 
-        // Go through the objects in the gltf file, allocate to static memory
+        // Go through the objects in the gltf file
         let (document, buffers, images) = gltf::import(gltf.path).unwrap();
         let document: &'static gltf::Document = Box::leak(Box::new(document));
         let images: &'static Vec<Data> = Box::leak(Box::new(images));
@@ -54,14 +53,14 @@ impl From<GLTFInit> for Vec<Hitable> {
 
 /// Internal GLTF object representation after initialization.
 #[derive(Debug, Clone)]
-pub struct GLTF {
+pub struct GLTF<'scene> {
     /// Bounding Volume Hierarchy tree for the object
-    pub bvhnode: BVHNode,
+    pub bvhnode: BVHNode<'scene>,
     /// Axis-aligned bounding box of the object
     pub aabb: AABB,
 }
 
-impl GLTF {
+impl<'scene> GLTF<'scene> {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
     pub fn new(gltf_init: GLTFInit, time_0: Float, time_1: Float) -> Self {
@@ -74,7 +73,7 @@ impl GLTF {
     }
 }
 
-impl HitableTrait for GLTF {
+impl<'scene> HitableTrait for GLTF<'scene> {
     /// Hit method for the GLTF object
     #[must_use]
     fn hit(
@@ -153,8 +152,9 @@ fn parse_mesh(
                     let indices: Vec<u32> = accessor.collect();
                     let indices: Vec<usize> = indices.iter().map(|&x| x as usize).collect();
                     let mut i = 0;
-                    let material = primitive.material();
-                    let material_index = material.index().unwrap();
+                    let material_index = primitive.material().index().unwrap();
+                    let material = &materials[material_index];
+
                     let coordset = match material.pbr_metallic_roughness().base_color_texture() {
                         Some(texture) => texture.tex_coord(),
                         None => 0,
@@ -195,14 +195,12 @@ fn parse_mesh(
                             ]
                         });
 
-                        let gltf_triangle = GLTFTriangle::new(
-                            triangle,
-                            tex_coords,
-                            normals,
-                            tangents,
-                            &materials[material_index],
-                            images,
-                        );
+                        // TODO: don't leak memory
+                        let material: &'static Material = Box::leak(Box::new(Material::GLTF(
+                            GLTFMaterial::new(material, tex_coords, normals, tangents, images),
+                        )));
+
+                        let gltf_triangle = GLTFTriangle::new(triangle, material);
                         trianglelist.push(Hitable::GLTFTriangle(gltf_triangle));
                         i += 3;
                     }
@@ -218,11 +216,11 @@ fn parse_mesh(
 
 /// Internal GLTF object representation after initialization.
 #[derive(Debug, Clone)]
-pub struct GLTFTriangle {
+pub struct GLTFTriangle<'scene> {
     /// Axis-aligned bounding box of the object
     pub aabb: AABB,
     /// Material of the object
-    pub material: Material,
+    pub material: &'scene Material<'scene>,
     q: Vec3,
     u: Vec3,
     v: Vec3,
@@ -232,17 +230,10 @@ pub struct GLTFTriangle {
     normal: Vec3,
 }
 
-impl GLTFTriangle {
+impl<'scene> GLTFTriangle<'scene> {
     #[must_use]
     /// Initialize a new GLTF object
-    pub fn new(
-        triangle: [Vec3; 3],
-        tex_coords: [[Float; 2]; 3],
-        normals: Option<[[Float; 3]; 3]>,
-        tangents: Option<[[Float; 4]; 3]>,
-        material: &'static gltf::Material,
-        images: &'static [Data],
-    ) -> Self {
+    pub fn new(triangle: [Vec3; 3], material: &'scene Material) -> Self {
         // TODO: mostly adapted from Triangle, verify correctness!
 
         let [a, b, c] = triangle;
@@ -266,10 +257,6 @@ impl GLTFTriangle {
         // Compared to quad, triangle has half the area
         let area = n.magnitude() / 2.0;
 
-        let material: Material = Material::GLTF(GLTFMaterial::new(
-            material, tex_coords, normals, tangents, images,
-        ));
-
         GLTFTriangle {
             aabb,
             material,
@@ -284,7 +271,7 @@ impl GLTFTriangle {
     }
 }
 
-impl HitableTrait for GLTFTriangle {
+impl<'scene> HitableTrait for GLTFTriangle<'scene> {
     fn hit(
         &self,
         ray: &Ray,
@@ -328,7 +315,7 @@ impl HitableTrait for GLTFTriangle {
             normal,
             u: alpha,
             v: beta,
-            material: &self.material,
+            material: self.material,
             front_face,
         })
     }

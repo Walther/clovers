@@ -13,7 +13,7 @@ use rand::Rng;
 /// Initialization structure for a Quad object.
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct QuadInit {
+pub struct QuadInit<'scene> {
     /// Corner point
     pub q: Vec3,
     /// Vector describing the u side
@@ -22,13 +22,13 @@ pub struct QuadInit {
     pub v: Vec3,
     /// Material of the surface
     #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material,
+    pub material: Material<'scene>,
 }
 
 /// Quadrilateral shape. This can be an arbitrary parallelogram, not just a rectangle.
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct Quad {
+pub struct Quad<'scene> {
     /// Corner point
     pub q: Vec3,
     /// Vector describing the u side
@@ -37,7 +37,7 @@ pub struct Quad {
     pub v: Vec3,
     /// Material of the surface
     #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material,
+    pub material: Material<'scene>,
     /// Area of the surface
     pub area: Float,
     /// Normal vector of the surface
@@ -50,7 +50,7 @@ pub struct Quad {
     pub aabb: AABB,
 }
 
-impl Quad {
+impl<'scene> Quad<'scene> {
     /// Creates a new quad
     #[must_use]
     pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Quad {
@@ -78,7 +78,7 @@ impl Quad {
     }
 }
 
-impl HitableTrait for Quad {
+impl<'scene> HitableTrait for Quad<'scene> {
     /// Hit method for the quad rectangle
     #[must_use]
     fn hit(
