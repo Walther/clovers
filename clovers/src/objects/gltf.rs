@@ -33,9 +33,9 @@ impl<'scene> From<GLTFInit> for Vec<Hitable<'scene>> {
 
         // Go through the objects in the gltf file
         let (document, buffers, images) = gltf::import(gltf.path).unwrap();
-        let document: &'static gltf::Document = Box::leak(Box::new(document));
-        let images: &'static Vec<Data> = Box::leak(Box::new(images));
-        let materials: &'static Vec<gltf::Material> =
+        let document: &'scene gltf::Document = Box::leak(Box::new(document));
+        let images: &'scene Vec<Data> = Box::leak(Box::new(images));
+        let materials: &'scene Vec<gltf::Material> =
             Box::leak(Box::new(document.materials().collect()));
 
         for scene in document.scenes() {
@@ -105,12 +105,12 @@ impl<'scene> HitableTrait for GLTF<'scene> {
     }
 }
 
-fn parse_node(
+fn parse_node<'scene>(
     node: &Node,
-    objects: &mut Vec<Hitable>,
+    objects: &mut Vec<Hitable<'scene>>,
     buffers: &Vec<gltf::buffer::Data>,
-    materials: &'static Vec<gltf::Material>,
-    images: &'static Vec<Data>,
+    materials: &'scene Vec<gltf::Material>,
+    images: &'scene Vec<Data>,
 ) {
     // Handle direct meshes
     if let Some(mesh) = node.mesh() {
@@ -122,12 +122,12 @@ fn parse_node(
     }
 }
 
-fn parse_mesh(
+fn parse_mesh<'scene>(
     mesh: &Mesh,
-    objects: &mut Vec<Hitable>,
+    objects: &mut Vec<Hitable<'scene>>,
     buffers: &[gltf::buffer::Data],
-    materials: &'static [gltf::Material],
-    images: &'static [Data],
+    materials: &'scene [gltf::Material],
+    images: &'scene [Data],
 ) {
     debug!("found mesh");
     for primitive in mesh.primitives() {
@@ -196,7 +196,7 @@ fn parse_mesh(
                         });
 
                         // TODO: don't leak memory
-                        let material: &'static Material = Box::leak(Box::new(Material::GLTF(
+                        let material: &'scene Material = Box::leak(Box::new(Material::GLTF(
                             GLTFMaterial::new(material, tex_coords, normals, tangents, images),
                         )));
 
