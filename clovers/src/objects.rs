@@ -112,6 +112,8 @@ impl<'scene> From<Object<'scene>> for Hitable<'scene> {
             #[cfg(feature = "stl")]
             Object::STL(x) => {
                 // TODO: time
+                // TODO: do not leak memory
+                let x: &'scene STLInit = Box::leak(Box::new(x));
                 Hitable::STL(STL::new(x, 0.0, 1.0))
             }
             #[cfg(feature = "gl_tf")]

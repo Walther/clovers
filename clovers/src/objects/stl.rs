@@ -30,7 +30,7 @@ pub struct STL<'scene> {
 impl<'scene> STL<'scene> {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
-    pub fn new(stl_init: STLInit<'scene>, time_0: Float, time_1: Float) -> Self {
+    pub fn new(stl_init: &'scene STLInit<'scene>, time_0: Float, time_1: Float) -> Self {
         let material = stl_init.material;
         let triangles: Vec<Hitable> = stl_init.into();
         let bvhnode = BVHNode::from_list(triangles, time_0, time_1);
@@ -94,16 +94,18 @@ pub struct STLInit<'scene> {
     pub rotation: Vec3,
 }
 
-impl<'scene> From<STLInit<'scene>> for Vec<Hitable<'scene>> {
+impl<'scene> From<&'scene STLInit<'scene>> for Vec<Hitable<'scene>> {
     #[must_use]
-    fn from(stl_init: STLInit<'scene>) -> Self {
+    fn from(stl_init: &'scene STLInit<'scene>) -> Self {
         // TODO: error handling!
-        let mut file = OpenOptions::new().read(true).open(stl_init.path).unwrap();
+        let mut file = OpenOptions::new()
+            .read(true)
+            .open(stl_init.path.clone())
+            .unwrap();
         let mesh = stl_io::read_stl(&mut file).unwrap();
         let triangles = mesh.vertices;
         let mut hitable_list = Vec::new();
-        // TODO: do not leak memory
-        let material: &'scene Material = Box::leak(Box::new(stl_init.material));
+        let material = &stl_init.material;
 
         for face in mesh.faces {
             // TODO: verify if this is the correct order / makes sense / gets correct directions and normals
