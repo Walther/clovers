@@ -5,6 +5,7 @@
 #![deny(clippy::all)]
 
 // External imports
+use bumpalo::Bump;
 use clap::Parser;
 use human_format::Formatter;
 use humantime::format_duration;
@@ -102,11 +103,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     };
     let threads = std::thread::available_parallelism()?;
 
+    // Bump allocated arena
+    let bump = Bump::new();
+
     info!("Reading the scene file");
     let path = Path::new(&opts.input);
     let scene = match path.extension() {
         Some(ext) => match &ext.to_str() {
-            Some("json") => json_scene::initialize(path, &opts),
+            Some("json") => json_scene::initialize(path, &opts, &bump),
             _ => panic!("Unknown file type"),
         },
         None => panic!("Unknown file type"),
@@ -116,7 +120,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let start = Instant::now();
     let pixelbuffer = match opts.gpu {
         // Note: live progress bar printed within draw_cpu::draw
-        false => draw_cpu::draw(renderopts, scene),
+        false => draw_cpu::draw(renderopts, &scene),
         true => unimplemented!("GPU accelerated rendering is currently unimplemented"),
     };
     info!("Drawing a pixelbuffer finished");
