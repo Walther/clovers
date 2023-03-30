@@ -11,7 +11,7 @@ use rand::rngs::SmallRng;
 use rand::Rng;
 
 /// Initialization structure for a Quad object.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct QuadInit<'scene> {
     /// Corner point
@@ -26,8 +26,7 @@ pub struct QuadInit<'scene> {
 }
 
 /// Quadrilateral shape. This can be an arbitrary parallelogram, not just a rectangle.
-#[derive(Clone, Copy, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Clone, Debug)]
 pub struct Quad<'scene> {
     /// Corner point
     pub q: Vec3,
@@ -36,8 +35,7 @@ pub struct Quad<'scene> {
     /// Vector describing the v side
     pub v: Vec3,
     /// Material of the surface
-    #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material<'scene>,
+    pub material: &'scene Material<'scene>,
     /// Area of the surface
     pub area: Float,
     /// Normal vector of the surface
@@ -53,7 +51,7 @@ pub struct Quad<'scene> {
 impl<'scene> Quad<'scene> {
     /// Creates a new quad
     #[must_use]
-    pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Quad {
+    pub fn new(q: Vec3, u: Vec3, v: Vec3, material: &'scene Material) -> Quad<'scene> {
         let n: Vec3 = u.cross(&v);
         let normal: Vec3 = n.normalize();
         // TODO: what is this?
@@ -122,7 +120,7 @@ impl<'scene> HitableTrait for Quad<'scene> {
             normal,
             u: alpha,
             v: beta,
-            material: &self.material,
+            material: self.material,
             front_face,
         })
     }

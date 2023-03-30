@@ -12,7 +12,7 @@ use rand::rngs::SmallRng;
 use rand::Rng;
 
 /// Initialization structure for a triangle primitive
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct TriangleInit<'scene> {
     /// Corner point

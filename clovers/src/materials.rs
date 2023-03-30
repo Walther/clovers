@@ -50,7 +50,7 @@ pub(crate) trait MaterialTrait {
 }
 
 #[enum_dispatch(MaterialTrait)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]

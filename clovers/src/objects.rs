@@ -78,7 +78,11 @@ impl<'scene> From<Object<'scene>> for Hitable<'scene> {
     #[must_use]
     fn from(obj: Object<'scene>) -> Hitable<'scene> {
         match obj {
-            Object::Boxy(x) => Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, x.material)),
+            Object::Boxy(x) => {
+                // TODO: do not leak memory
+                let material: &'scene Material = Box::leak(Box::new(x.material));
+                Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, material))
+            }
             Object::ConstantMedium(x) => {
                 let obj = *x.boundary;
                 let obj: Hitable = obj.into();
@@ -102,7 +106,11 @@ impl<'scene> From<Object<'scene>> for Hitable<'scene> {
                 let bvh = BVHNode::from_list(objects, 0.0, 1.0);
                 Hitable::BVHNode(bvh)
             }
-            Object::Quad(x) => Hitable::Quad(Quad::new(x.q, x.u, x.v, x.material)),
+            Object::Quad(x) => {
+                // TODO: do not leak memory
+                let material: &'scene Material = Box::leak(Box::new(x.material));
+                Hitable::Quad(Quad::new(x.q, x.u, x.v, material))
+            }
             Object::RotateY(x) => {
                 let obj = *x.object;
                 let obj: Hitable = obj.into();

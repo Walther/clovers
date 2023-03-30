@@ -22,7 +22,7 @@ pub struct STL<'scene> {
     /// Bounding Volume Hierarchy tree for the object
     pub bvhnode: BVHNode<'scene>,
     /// Material for the object
-    pub material: Material<'scene>,
+    pub material: &'scene Material<'scene>,
     /// Axis-aligned bounding box of the object
     pub aabb: AABB,
 }
@@ -31,7 +31,7 @@ impl<'scene> STL<'scene> {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
     pub fn new(stl_init: &'scene STLInit<'scene>, time_0: Float, time_1: Float) -> Self {
-        let material = stl_init.material;
+        let material = &stl_init.material;
         let triangles: Vec<Hitable> = stl_init.into();
         let bvhnode = BVHNode::from_list(triangles, time_0, time_1);
         // TODO: remove unwrap

@@ -10,7 +10,7 @@ use crate::{
 };
 use rand::rngs::SmallRng;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `SphereInit` structure describes the necessary data for constructing a [`Sphere`](super::Sphere). Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 pub struct MovingSphereInit<'scene> {
@@ -25,7 +25,7 @@ pub struct MovingSphereInit<'scene> {
     pub material: Material<'scene>,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A moving sphere object. This is represented by one `radius`, two center points `center_0` `center_1`, two times `time_0` `time_1`, and a [Material]. Any [Rays](Ray) hitting the object will also have an internal `time` value, which will be used for determining the interpolated position of the sphere at that time. With lots of rays hitting every pixel but at randomized times, we get temporal multiplexing and an approximation of perceived motion blur.
 pub struct MovingSphere<'scene> {
