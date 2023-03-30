@@ -56,7 +56,7 @@ impl<'scene> BVHNode<'scene> {
             // TODO: can this hack be removed?
             left = Box::new(objects[0].clone());
             right = Box::new(Hitable::Empty(Empty {}));
-            let bounding_box = left.bounding_box(time_0, time_1).unwrap(); // TODO: remove unwrap
+            let bounding_box = left.bounding_box(time_0, time_1).unwrap().clone(); // TODO: remove unwrap
             return BVHNode {
                 left,
                 right,
@@ -122,7 +122,7 @@ impl<'scene> BVHNode<'scene> {
                 bounding_box,
             }
         } else {
-            panic!("No bounding box in bvh_node constructor. {box_left:?} {box_right:?}");
+            panic!("No bounding box in bvh_node constructor");
         }
     }
 
@@ -178,8 +178,8 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] of the objects within this [`BVHNode`].
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
-        Some(self.bounding_box)
+    fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<&AABB> {
+        Some(&self.bounding_box)
     }
 
     /// Returns a probability density function value based on the children
@@ -215,8 +215,8 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
 
 fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
     // TODO: proper time support?
-    let box_a: Option<AABB> = a.bounding_box(0.0, 1.0);
-    let box_b: Option<AABB> = b.bounding_box(0.0, 1.0);
+    let box_a: Option<&AABB> = a.bounding_box(0.0, 1.0);
+    let box_b: Option<&AABB> = b.bounding_box(0.0, 1.0);
 
     if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
         if box_a.axis(axis).min < box_b.axis(axis).min {
@@ -265,11 +265,11 @@ fn vec_bounding_box(vec: &Vec<Hitable>, t0: Float, t1: Float) -> Option<AABB> {
         match output_box {
             // If we do, expand it & recurse
             Some(old_box) => {
-                output_box = Some(AABB::surrounding_box(old_box, bounding));
+                output_box = Some(AABB::surrounding_box(&old_box, bounding));
             }
             // Otherwise, set output box to be the newly-found box
             None => {
-                output_box = Some(bounding);
+                output_box = Some(bounding.clone());
             }
         }
     }

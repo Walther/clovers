@@ -67,7 +67,7 @@ impl<'scene> GLTF<'scene> {
         let triangles: Vec<Hitable> = gltf_init.into();
         let bvhnode = BVHNode::from_list(triangles, time_0, time_1);
         // TODO: remove unwrap
-        let aabb = bvhnode.bounding_box(time_0, time_1).unwrap();
+        let aabb = bvhnode.bounding_box(time_0, time_1).unwrap().clone();
 
         GLTF { bvhnode, aabb }
     }
@@ -88,8 +88,8 @@ impl<'scene> HitableTrait for GLTF<'scene> {
 
     /// Return the axis-aligned bounding box for the object
     #[must_use]
-    fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     /// Returns a probability density function value based on the object
@@ -320,8 +320,8 @@ impl<'scene> HitableTrait for GLTFTriangle<'scene> {
         })
     }
 
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {

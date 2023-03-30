@@ -56,7 +56,7 @@ impl<'scene> HitableTrait for FlipFace<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] of the [`FlipFace`] object. Considering this is a utility object that wraps an internal `object`, it returns the bounding box of the internal object.
     #[must_use]
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<&AABB> {
         self.object.bounding_box(t0, t1)
     }
 

@@ -77,7 +77,7 @@ impl<'scene> Default for Material<'scene> {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 /// Enum for the types of materials: Diffuse and Specular (i.e., matte and shiny)
 pub enum MaterialType {
     /// A matte material that does not reflect rays

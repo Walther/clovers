@@ -35,7 +35,7 @@ impl<'scene> STL<'scene> {
         let triangles: Vec<Hitable> = stl_init.into();
         let bvhnode = BVHNode::from_list(triangles, time_0, time_1);
         // TODO: remove unwrap
-        let aabb = bvhnode.bounding_box(time_0, time_1).unwrap();
+        let aabb = bvhnode.bounding_box(time_0, time_1).unwrap().clone();
 
         STL {
             bvhnode,
@@ -60,8 +60,8 @@ impl<'scene> HitableTrait for STL<'scene> {
 
     /// Return the axis-aligned bounding box for the object
     #[must_use]
-    fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     /// Returns a probability density function value based on the object

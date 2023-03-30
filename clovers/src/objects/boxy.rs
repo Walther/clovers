@@ -102,8 +102,8 @@ impl<'scene> HitableTrait for Boxy<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] of the object.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain

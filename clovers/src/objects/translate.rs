@@ -25,13 +25,20 @@ pub struct TranslateInit<'scene> {
 pub struct Translate<'scene> {
     object: Box<Hitable<'scene>>,
     offset: Vec3,
+    aabb: AABB,
 }
 
 impl<'scene> Translate<'scene> {
     /// Creates a new `Translate` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `offset` given.
     #[must_use]
     pub fn new(object: Box<Hitable<'scene>>, offset: Vec3) -> Self {
-        Translate { object, offset }
+        // TODO: time
+        let aabb = object.bounding_box(0.0, 1.0).unwrap().clone() + offset;
+        Translate {
+            object,
+            offset,
+            aabb,
+        }
     }
 }
 
@@ -61,10 +68,8 @@ impl<'scene> HitableTrait for Translate<'scene> {
 
     /// Bounding box method for the [Translate] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for translation.
     #[must_use]
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
-        // TODO: cached into self.aabb ?
-        let aabb = self.object.bounding_box(t0, t1);
-        aabb.map(|b| b + self.offset)
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     /// Returns a probability density function value based on the inner object

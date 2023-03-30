@@ -11,7 +11,7 @@ use crate::{
 };
 use rand::prelude::SmallRng;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A metal material. The amount of reflection can be adjusted with the `fuzz` parameter.
 pub struct Metal {

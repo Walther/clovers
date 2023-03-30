@@ -161,10 +161,10 @@ impl<'scene> HitableTrait for Triangle<'scene> {
 
     /// Returns the bounding box of the triangle
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
         // TODO: this is from quad and not updated!
         // although i guess a triangle's aabb is the same as the quad's aabb in worst case
-        Some(self.aabb)
+        Some(&self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
@@ -253,7 +253,7 @@ mod tests {
             Interval::new(0.0, 0.0).expand(EPSILON_RECT_THICKNESS),
         );
 
-        assert_eq!(aabb, expected_aabb);
+        assert_eq!(aabb, &expected_aabb);
 
         let boxhit = aabb.hit(&ray, time_0, time_1);
         assert!(boxhit);
@@ -299,7 +299,7 @@ mod tests {
             Interval::new(0.0, 0.0).expand(EPSILON_RECT_THICKNESS),
         );
 
-        assert_eq!(aabb, expected_aabb);
+        assert_eq!(aabb, &expected_aabb);
 
         let boxhit = aabb.hit(&ray, time_0, time_1);
         assert!(boxhit);
@@ -345,7 +345,7 @@ mod tests {
             Interval::new(0.0, 0.0).expand(EPSILON_RECT_THICKNESS),
         );
 
-        assert_eq!(aabb, expected_aabb);
+        assert_eq!(aabb, &expected_aabb);
 
         let boxhit = aabb.hit(&ray, time_0, time_1);
         assert!(boxhit);

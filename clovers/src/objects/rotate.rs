@@ -39,7 +39,7 @@ impl<'scene> RotateY<'scene> {
         let radians: Float = angle.to_radians();
         let sin_theta: Float = radians.sin();
         let cos_theta: Float = radians.cos();
-        let bounding_box: Option<AABB> = object.bounding_box(time_0, time_1);
+        let bounding_box: Option<&AABB> = object.bounding_box(time_0, time_1);
 
         // Does our object have a bounding box?
         let Some(bbox) = bounding_box else {
@@ -149,8 +149,8 @@ impl<'scene> HitableTrait for RotateY<'scene> {
 
     /// Bounding box method for the [`RotateY`] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for rotation.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        self.aabb
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        self.aabb.as_ref()
     }
 
     fn pdf_value(&self, _origin: Vec3, _vector: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {

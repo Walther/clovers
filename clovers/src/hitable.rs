@@ -90,7 +90,7 @@ impl HitableTrait for Empty {
         None
     }
 
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
         None
     }
 
@@ -115,7 +115,7 @@ pub(crate) trait HitableTrait {
     ) -> Option<HitRecord>;
 
     #[must_use]
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB>;
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<&AABB>;
 
     #[must_use]
     fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float;

@@ -127,8 +127,8 @@ impl<'scene> HitableTrait for Quad<'scene> {
 
     /// Returns the bounding box of the quad
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain

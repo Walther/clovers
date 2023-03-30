@@ -7,7 +7,7 @@ use crate::{interval::Interval, ray::Ray, Float, Vec3, EPSILON_RECT_THICKNESS};
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
 /// This is useful for creating bounding volume hierarchies, which is an optimization for reducing the time spent on calculating ray-object intersections.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct AABB {
     /// The bounding interval on the X axis
@@ -104,7 +104,7 @@ impl AABB {
 
     /// Given two axis-aligned bounding boxes, return a new [AABB] that contains both.
     #[must_use]
-    pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
+    pub fn surrounding_box(box0: &AABB, box1: &AABB) -> AABB {
         AABB {
             x: Interval::new_from_intervals(box0.x, box1.x),
             y: Interval::new_from_intervals(box0.y, box1.y),
@@ -138,7 +138,7 @@ impl AABB {
     /// Returns the interval of the given axis.
     // TODO: this api is kind of annoying
     #[must_use]
-    pub fn axis(self, n: usize) -> Interval {
+    pub fn axis(&self, n: usize) -> Interval {
         match n {
             0 => self.x,
             1 => self.y,

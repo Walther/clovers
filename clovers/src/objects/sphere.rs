@@ -121,8 +121,8 @@ impl<'scene> HitableTrait for Sphere<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] for the sphere.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     /// Returns the probability density function for the sphere? TODO: what does this do again and how

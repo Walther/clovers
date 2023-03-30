@@ -66,7 +66,7 @@ impl<'scene> MovingSphere<'scene> {
             center_1 + Vec3::new(radius, radius, radius),
         );
 
-        let aabb = AABB::surrounding_box(box0, box1);
+        let aabb = AABB::surrounding_box(&box0, &box1);
 
         MovingSphere {
             center_0,
@@ -158,8 +158,8 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
 
     /// Returns the axis-aligned bounding box of the [`MovingSphere`] object. This is the maximum possible bounding box of the entire span of the movement of the sphere, calculated from the two center positions and the radius.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     fn pdf_value(&self, _origin: Vec3, _vector: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
