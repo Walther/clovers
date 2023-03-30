@@ -4,9 +4,15 @@ use std::error::Error;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
+
+use bumpalo::{boxed::Box, Bump};
 use tracing::info;
 
-pub(crate) fn initialize(path: &Path, opts: &Opts) -> Result<&'static Scene, Box<dyn Error>> {
+pub(crate) fn initialize<'scene>(
+    path: &Path,
+    opts: &Opts,
+    bump: &'scene Bump,
+) -> Result<Box<'scene, Scene>, std::boxed::Box<dyn Error>> {
     let mut file = File::open(path)?;
     let mut contents: String = String::new();
     file.read_to_string(&mut contents)?;
@@ -15,5 +21,5 @@ pub(crate) fn initialize(path: &Path, opts: &Opts) -> Result<&'static Scene, Box
     info!("Initializing the scene");
     let scene: Scene = scenes::initialize(scene_file, opts.width, opts.height);
     info!("Count of nodes in the BVH tree: {}", scene.objects.count());
-    Ok(Box::leak(Box::new(scene)))
+    Ok(Box::new_in(scene, bump))
 }
