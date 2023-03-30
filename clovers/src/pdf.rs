@@ -14,11 +14,11 @@ use rand::Rng;
 
 #[enum_dispatch(PDFTrait)]
 #[derive(Debug, Clone)]
-pub enum PDF {
+pub enum PDF<'scene> {
     CosinePDF(CosinePDF),
     SpherePDF(SpherePDF),
-    HitablePDF(HitablePDF),
-    MixturePDF(MixturePDF),
+    HitablePDF(HitablePDF<'scene>),
+    MixturePDF(MixturePDF<'scene>),
     ZeroPDF(ZeroPDF),
 }
 
@@ -63,19 +63,19 @@ impl PDFTrait for CosinePDF {
 }
 
 #[derive(Debug, Clone)]
-pub struct HitablePDF {
+pub struct HitablePDF<'scene> {
     origin: Vec3,
-    hitable: &'static Hitable,
+    hitable: &'scene Hitable,
 }
 
-impl HitablePDF {
+impl<'scene> HitablePDF<'scene> {
     #[must_use]
-    pub fn new(hitable: &'static Hitable, origin: Vec3) -> Self {
+    pub fn new(hitable: &'scene Hitable, origin: Vec3) -> Self {
         HitablePDF { origin, hitable }
     }
 }
 
-impl PDFTrait for HitablePDF {
+impl<'scene> PDFTrait for HitablePDF<'scene> {
     #[must_use]
     fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         self.hitable.pdf_value(self.origin, direction, time, rng)
@@ -88,15 +88,15 @@ impl PDFTrait for HitablePDF {
 }
 
 #[derive(Debug, Clone)]
-pub struct MixturePDF {
+pub struct MixturePDF<'scene> {
     // Box to prevent infinite size
-    pdf1: Box<PDF>,
-    pdf2: Box<PDF>,
+    pdf1: Box<PDF<'scene>>,
+    pdf2: Box<PDF<'scene>>,
 }
 
-impl MixturePDF {
+impl<'scene> MixturePDF<'scene> {
     #[must_use]
-    pub fn new(pdf1: PDF, pdf2: PDF) -> Self {
+    pub fn new(pdf1: PDF<'scene>, pdf2: PDF<'scene>) -> Self {
         MixturePDF {
             pdf1: Box::new(pdf1),
             pdf2: Box::new(pdf2),
@@ -104,7 +104,7 @@ impl MixturePDF {
     }
 }
 
-impl PDFTrait for MixturePDF {
+impl<'scene> PDFTrait for MixturePDF<'scene> {
     #[must_use]
     fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
         0.5 * self.pdf1.value(direction, time, rng) + 0.5 * self.pdf2.value(direction, time, rng)

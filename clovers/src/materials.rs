@@ -88,7 +88,7 @@ pub enum MaterialType {
 
 #[derive(Debug, Clone)]
 /// A record of an scattering event of a [Ray] on a [Material].
-pub struct ScatterRecord {
+pub struct ScatterRecord<'ray> {
     /// The material type that was scattered on
     pub material_type: MaterialType,
     /// Direction of a generated specular ray
@@ -97,7 +97,7 @@ pub struct ScatterRecord {
     pub attenuation: Color,
     /// Probability density function to use with the [ScatterRecord].
     // TODO: understand & explain
-    pub pdf_ptr: PDF,
+    pub pdf_ptr: PDF<'ray>,
 }
 
 // TODO: are these up to date / correct?
