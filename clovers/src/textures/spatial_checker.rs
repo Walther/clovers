@@ -5,7 +5,7 @@
 use super::TextureTrait;
 use crate::{color::Color, Float, Vec3, PI};
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A standard checkered texture based on spatial 3D texturing.
 pub struct SpatialChecker {

@@ -10,7 +10,7 @@ use crate::{
 };
 use rand::rngs::SmallRng;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `SphereInit` structure describes the necessary data for constructing a [`Sphere`](super::Sphere). Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 pub struct MovingSphereInit {
@@ -25,10 +25,9 @@ pub struct MovingSphereInit {
     pub material: Material,
 }
 
-#[derive(Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Debug, Clone)]
 /// A moving sphere object. This is represented by one `radius`, two center points `center_0` `center_1`, two times `time_0` `time_1`, and a [Material]. Any [Rays](Ray) hitting the object will also have an internal `time` value, which will be used for determining the interpolated position of the sphere at that time. With lots of rays hitting every pixel but at randomized times, we get temporal multiplexing and an approximation of perceived motion blur.
-pub struct MovingSphere {
+pub struct MovingSphere<'scene> {
     /// Center point of the sphere at time_0
     pub center_0: Vec3,
     /// Center point of the sphere at time_1
@@ -40,13 +39,12 @@ pub struct MovingSphere {
     /// Radius of the sphere
     pub radius: Float,
     /// Material of the sphere
-    #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material,
+    pub material: &'scene Material,
     /// Axis-aligned bounding box
     pub aabb: AABB,
 }
 
-impl MovingSphere {
+impl<'scene> MovingSphere<'scene> {
     /// Creates a new `MovingSphere` object. See the struct documentation for more information: [`MovingSphere`].
     #[must_use]
     pub fn new(
@@ -55,7 +53,7 @@ impl MovingSphere {
         time_0: Float,
         time_1: Float,
         radius: Float,
-        material: Material,
+        material: &'scene Material,
     ) -> Self {
         let box0: AABB = AABB::new_from_coords(
             center_0 - Vec3::new(radius, radius, radius),
@@ -66,7 +64,7 @@ impl MovingSphere {
             center_1 + Vec3::new(radius, radius, radius),
         );
 
-        let aabb = AABB::surrounding_box(box0, box1);
+        let aabb = AABB::surrounding_box(&box0, &box1);
 
         MovingSphere {
             center_0,
@@ -99,7 +97,7 @@ impl MovingSphere {
     }
 }
 
-impl HitableTrait for MovingSphere {
+impl<'scene> HitableTrait for MovingSphere<'scene> {
     /// Hit method for the [`MovingSphere`] object. First gets the interpolated center position at the given time, then follows the implementation of [Sphere](crate::objects::Sphere) object's hit method.
     #[must_use]
     fn hit(
@@ -128,7 +126,7 @@ impl HitableTrait for MovingSphere {
                     normal: outward_normal,
                     u,
                     v,
-                    material: &self.material,
+                    material: self.material,
                     front_face: false, // TODO: fix having to declare it before calling face_normal
                 };
                 record.set_face_normal(ray, outward_normal);
@@ -146,7 +144,7 @@ impl HitableTrait for MovingSphere {
                     normal: outward_normal,
                     u,
                     v,
-                    material: &self.material,
+                    material: self.material,
                     front_face: false, // TODO: fix having to declare it before calling face_normal
                 };
                 record.set_face_normal(ray, outward_normal);
@@ -158,8 +156,8 @@ impl HitableTrait for MovingSphere {
 
     /// Returns the axis-aligned bounding box of the [`MovingSphere`] object. This is the maximum possible bounding box of the entire span of the movement of the sphere, calculated from the two center positions and the radius.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     fn pdf_value(&self, _origin: Vec3, _vector: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {

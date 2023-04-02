@@ -18,24 +18,24 @@ use crate::{
 
 /// Internal STL object representation after initialization. Contains the material for all triangles in it to avoid having n copies.
 #[derive(Debug, Clone)]
-pub struct STL {
+pub struct STL<'scene> {
     /// Bounding Volume Hierarchy tree for the object
-    pub bvhnode: BVHNode,
+    pub bvhnode: BVHNode<'scene>,
     /// Material for the object
-    pub material: Material,
+    pub material: &'scene Material,
     /// Axis-aligned bounding box of the object
     pub aabb: AABB,
 }
 
-impl STL {
+impl<'scene> STL<'scene> {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
-    pub fn new(stl_init: STLInit, time_0: Float, time_1: Float) -> Self {
-        let material = stl_init.material;
+    pub fn new(stl_init: &'scene STLInit, time_0: Float, time_1: Float) -> Self {
+        let material = &stl_init.material;
         let triangles: Vec<Hitable> = stl_init.into();
         let bvhnode = BVHNode::from_list(triangles, time_0, time_1);
         // TODO: remove unwrap
-        let aabb = bvhnode.bounding_box(time_0, time_1).unwrap();
+        let aabb = bvhnode.bounding_box(time_0, time_1).unwrap().clone();
 
         STL {
             bvhnode,
@@ -45,7 +45,7 @@ impl STL {
     }
 }
 
-impl HitableTrait for STL {
+impl<'scene> HitableTrait for STL<'scene> {
     /// Hit method for the STL object
     #[must_use]
     fn hit(
@@ -60,8 +60,8 @@ impl HitableTrait for STL {
 
     /// Return the axis-aligned bounding box for the object
     #[must_use]
-    fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     /// Returns a probability density function value based on the object
@@ -94,15 +94,19 @@ pub struct STLInit {
     pub rotation: Vec3,
 }
 
-impl From<STLInit> for Vec<Hitable> {
+impl<'scene> From<&'scene STLInit> for Vec<Hitable<'scene>> {
     #[must_use]
-    fn from(stl_init: STLInit) -> Self {
+    fn from(stl_init: &'scene STLInit) -> Self {
         // TODO: error handling!
-        let mut file = OpenOptions::new().read(true).open(stl_init.path).unwrap();
+        let mut file = OpenOptions::new()
+            .read(true)
+            .open(stl_init.path.clone())
+            .unwrap();
         let mesh = stl_io::read_stl(&mut file).unwrap();
         let triangles = mesh.vertices;
         let mut hitable_list = Vec::new();
-        let material: &'static Material = Box::leak(Box::new(stl_init.material));
+        let material = &stl_init.material;
+
         for face in mesh.faces {
             // TODO: verify if this is the correct order / makes sense / gets correct directions and normals
             let a = triangles[face.vertices[0]];

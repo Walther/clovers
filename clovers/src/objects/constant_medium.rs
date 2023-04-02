@@ -38,16 +38,16 @@ fn default_density() -> Float {
 
 #[derive(Debug, Clone)]
 /// `ConstantMedium` object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
-pub struct ConstantMedium {
-    boundary: Box<Hitable>,
+pub struct ConstantMedium<'scene> {
+    boundary: Box<Hitable<'scene>>,
     phase_function: Material,
     neg_inv_density: Float,
 }
 
-impl ConstantMedium {
+impl<'scene> ConstantMedium<'scene> {
     /// Creates a new [`ConstantMedium`] with a known size, shape and density.
     #[must_use]
-    pub fn new(boundary: Box<Hitable>, density: Float, texture: Texture) -> Self {
+    pub fn new(boundary: Box<Hitable<'scene>>, density: Float, texture: Texture) -> Self {
         ConstantMedium {
             boundary,
             phase_function: Material::Isotropic(Isotropic::new(texture)),
@@ -56,7 +56,7 @@ impl ConstantMedium {
     }
 }
 
-impl HitableTrait for ConstantMedium {
+impl<'scene> HitableTrait for ConstantMedium<'scene> {
     /// Hit function for the [`ConstantMedium`] object. Returns a [`HitRecord`] if hit. TODO: explain the math for the fog
     #[must_use]
     fn hit(
@@ -130,7 +130,7 @@ impl HitableTrait for ConstantMedium {
 
     /// Returns the axis-aligned bounding box [AABB] of the defining `boundary` object for the fog.
     #[must_use]
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<&AABB> {
         self.boundary.bounding_box(t0, t1)
     }
 

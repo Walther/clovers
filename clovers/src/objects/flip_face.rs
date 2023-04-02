@@ -20,23 +20,23 @@ pub struct FlipFaceInit {
 
 #[derive(Debug, Clone)]
 /// An utility object that can be used to flip the face of the object. TODO: possibly deprecated?
-pub struct FlipFace {
-    object: Box<Hitable>,
+pub struct FlipFace<'scene> {
+    object: Box<Hitable<'scene>>,
 }
 
-impl FlipFace {
+impl<'scene> FlipFace<'scene> {
     // TODO: possibly deprecate / remove?
 
     /// Creates a new instance of a [`FlipFace`]
     #[must_use]
-    pub fn new(object: Hitable) -> Self {
+    pub fn new(object: Hitable<'scene>) -> Self {
         FlipFace {
             object: Box::new(object),
         }
     }
 }
 
-impl HitableTrait for FlipFace {
+impl<'scene> HitableTrait for FlipFace<'scene> {
     /// Hit function for the [`FlipFace`] object. Considering this is a utility object that wraps an internal `object`, it returns a [`HitRecord`] with the `front_face` property flipped, if the given [Ray] hits the object.
     #[must_use]
     fn hit(
@@ -56,7 +56,7 @@ impl HitableTrait for FlipFace {
 
     /// Returns the axis-aligned bounding box [AABB] of the [`FlipFace`] object. Considering this is a utility object that wraps an internal `object`, it returns the bounding box of the internal object.
     #[must_use]
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, t0: Float, t1: Float) -> Option<&AABB> {
         self.object.bounding_box(t0, t1)
     }
 

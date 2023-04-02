@@ -74,11 +74,15 @@ pub enum Object {
     Triangle(TriangleInit),
 }
 
-impl From<Object> for Hitable {
+impl<'scene> From<Object> for Hitable<'scene> {
     #[must_use]
-    fn from(obj: Object) -> Hitable {
+    fn from(obj: Object) -> Hitable<'scene> {
         match obj {
-            Object::Boxy(x) => Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, x.material)),
+            Object::Boxy(x) => {
+                // TODO: do not leak memory
+                let material: &'scene Material = Box::leak(Box::new(x.material));
+                Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, material))
+            }
             Object::ConstantMedium(x) => {
                 let obj = *x.boundary;
                 let obj: Hitable = obj.into();
@@ -89,10 +93,14 @@ impl From<Object> for Hitable {
                 let obj: Hitable = obj.into();
                 Hitable::FlipFace(FlipFace::new(obj))
             }
-            Object::MovingSphere(x) => Hitable::MovingSphere(MovingSphere::new(
-                // TODO: time
-                x.center_0, x.center_1, 0.0, 1.0, x.radius, x.material,
-            )),
+            Object::MovingSphere(x) => {
+                // TODO: do not leak memory
+                let material: &'scene Material = Box::leak(Box::new(x.material));
+                Hitable::MovingSphere(MovingSphere::new(
+                    // TODO: time
+                    x.center_0, x.center_1, 0.0, 1.0, x.radius, material,
+                ))
+            }
             Object::ObjectList(x) => {
                 let objects: Vec<Hitable> = x
                     .objects
@@ -102,16 +110,26 @@ impl From<Object> for Hitable {
                 let bvh = BVHNode::from_list(objects, 0.0, 1.0);
                 Hitable::BVHNode(bvh)
             }
-            Object::Quad(x) => Hitable::Quad(Quad::new(x.q, x.u, x.v, x.material)),
+            Object::Quad(x) => {
+                // TODO: do not leak memory
+                let material: &'scene Material = Box::leak(Box::new(x.material));
+                Hitable::Quad(Quad::new(x.q, x.u, x.v, material))
+            }
             Object::RotateY(x) => {
                 let obj = *x.object;
                 let obj: Hitable = obj.into();
                 Hitable::RotateY(RotateY::new(Box::new(obj), x.angle))
             }
-            Object::Sphere(x) => Hitable::Sphere(Sphere::new(x.center, x.radius, x.material)),
+            Object::Sphere(x) => {
+                // TODO: do not leak memory
+                let material: &'scene Material = Box::leak(Box::new(x.material));
+                Hitable::Sphere(Sphere::new(x.center, x.radius, material))
+            }
             #[cfg(feature = "stl")]
             Object::STL(x) => {
                 // TODO: time
+                // TODO: do not leak memory
+                let x: &'scene STLInit = Box::leak(Box::new(x));
                 Hitable::STL(STL::new(x, 0.0, 1.0))
             }
             #[cfg(feature = "gl_tf")]
@@ -125,7 +143,8 @@ impl From<Object> for Hitable {
                 Hitable::Translate(Translate::new(Box::new(obj), x.offset))
             }
             Object::Triangle(x) => {
-                let material: &'static Material = Box::leak(Box::new(x.material));
+                // TODO: do not leak memory
+                let material: &'scene Material = Box::leak(Box::new(x.material));
                 Hitable::Triangle(Triangle::new(x.q, x.u, x.v, material))
             }
         }

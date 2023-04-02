@@ -6,7 +6,7 @@ use crate::Float;
 use crate::Vec3;
 use crate::PI;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A standard checkered texture based on 2D surface UV coordinates.
 pub struct SurfaceChecker {

@@ -11,7 +11,7 @@ use crate::{
 use rand::{rngs::SmallRng, Rng};
 
 /// `BoxyInit` structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct BoxyInit {
     /// First corner for the box
@@ -25,18 +25,18 @@ pub struct BoxyInit {
 
 /// A box or a cuboid object: a parallelepiped with six rectangular faces. Named [Boxy] to avoid clashing with [Box].
 #[derive(Debug, Clone)]
-pub struct Boxy {
-    sides: Box<[Hitable; 6]>,
+pub struct Boxy<'scene> {
+    sides: Box<[Hitable<'scene>; 6]>,
     /// The material of the box
-    pub material: Material,
+    pub material: &'scene Material,
     /// Axis-aligned bounding box
     pub aabb: AABB,
 }
 
-impl Boxy {
+impl<'scene> Boxy<'scene> {
     /// Initializes a new instance of a box, given two opposing [Vec3] corners `corner_0` and `corner_1`, and a [Material] `material`.
     #[must_use]
-    pub fn new(corner_0: Vec3, corner_1: Vec3, material: Material) -> Self {
+    pub fn new(corner_0: Vec3, corner_1: Vec3, material: &'scene Material) -> Self {
         // Construct the two opposite vertices with the minimum and maximum coordinates.
         let min: Vec3 = Vec3::new(
             corner_0.x.min(corner_1.x),
@@ -78,7 +78,7 @@ impl Boxy {
     }
 }
 
-impl HitableTrait for Boxy {
+impl<'scene> HitableTrait for Boxy<'scene> {
     /// The main `hit` function for a [Boxy]. Given a [Ray](crate::ray::Ray), and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the object during that interval.
     #[must_use]
     fn hit(
@@ -102,8 +102,8 @@ impl HitableTrait for Boxy {
 
     /// Returns the axis-aligned bounding box [AABB] of the object.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain

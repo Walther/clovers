@@ -14,28 +14,28 @@ use tracing::info;
 
 #[derive(Debug)]
 /// A representation of the scene that is being rendered.
-pub struct Scene {
+pub struct Scene<'scene> {
     /// Bounding-volume hierarchy of [Hitable] objects in the scene. This could, as currently written, be any [Hitable] - in practice, we place the root of the [BVHNode](crate::bvhnode::BVHNode) tree here.
-    pub objects: BVHNode,
+    pub objects: BVHNode<'scene>,
     /// The camera object used for rendering the scene.
     pub camera: Camera,
     /// The background color to use when the rays do not hit anything in the scene.
     pub background_color: Color, // TODO: make into Texture or something?
     /// A [BVHNode](crate::bvhnode::BVHNode) tree of prioritized objects - e.g. glass items or lights - that affect the biased sampling of the scene. Wrapped into a [Hitable] for convenience reasons (see various PDF functions).
-    pub priority_objects: Hitable,
+    pub priority_objects: Hitable<'scene>,
 }
 
-impl Scene {
+impl<'scene> Scene<'scene> {
     /// Creates a new [Scene] with the given parameters.
     #[must_use]
     pub fn new(
         time_0: Float,
         time_1: Float,
         camera: Camera,
-        objects: Vec<Hitable>,
-        priority_objects: Vec<Hitable>,
+        objects: Vec<Hitable<'scene>>,
+        priority_objects: Vec<Hitable<'scene>>,
         background_color: Color,
-    ) -> Scene {
+    ) -> Scene<'scene> {
         Scene {
             objects: BVHNode::from_list(objects, time_0, time_1),
             camera,
@@ -64,7 +64,7 @@ pub struct SceneFile {
 
 /// Initializes a new [Scene] instance by parsing the contents of a [`SceneFile`] structure and then using those details to construct the [Scene].
 #[must_use]
-pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
+pub fn initialize<'scene>(scene_file: SceneFile, width: u32, height: u32) -> Scene<'scene> {
     let time_0 = scene_file.time_0;
     let time_1 = scene_file.time_1;
     let background_color = scene_file.background_color;
@@ -98,7 +98,7 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
 }
 
 #[must_use]
-fn objects_to_hitables(objects: Vec<Object>) -> Vec<Hitable> {
+fn objects_to_hitables<'scene>(objects: Vec<Object>) -> Vec<Hitable<'scene>> {
     let mut hitables = Vec::new();
     for obj in objects {
         hitables.push(obj.into());

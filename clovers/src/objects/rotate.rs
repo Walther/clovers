@@ -22,24 +22,24 @@ pub struct RotateInit {
 
 #[derive(Debug, Clone)]
 /// `RotateY` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
-pub struct RotateY {
-    object: Box<Hitable>,
+pub struct RotateY<'scene> {
+    object: Box<Hitable<'scene>>,
     sin_theta: Float,
     cos_theta: Float,
     aabb: Option<AABB>,
 }
 
-impl RotateY {
+impl<'scene> RotateY<'scene> {
     /// Creates a new `RotateY` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `angle` given.
     #[must_use]
-    pub fn new(object: Box<Hitable>, angle: Float) -> Self {
+    pub fn new(object: Box<Hitable<'scene>>, angle: Float) -> Self {
         // TODO: add proper time support
         let time_0: Float = 0.0;
         let time_1: Float = 1.0;
         let radians: Float = angle.to_radians();
         let sin_theta: Float = radians.sin();
         let cos_theta: Float = radians.cos();
-        let bounding_box: Option<AABB> = object.bounding_box(time_0, time_1);
+        let bounding_box: Option<&AABB> = object.bounding_box(time_0, time_1);
 
         // Does our object have a bounding box?
         let Some(bbox) = bounding_box else {
@@ -94,7 +94,7 @@ impl RotateY {
     }
 }
 
-impl HitableTrait for RotateY {
+impl<'scene> HitableTrait for RotateY<'scene> {
     /// Hit method for the [`RotateY`] object. Finds the rotation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
     #[must_use]
     fn hit(
@@ -149,8 +149,8 @@ impl HitableTrait for RotateY {
 
     /// Bounding box method for the [`RotateY`] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for rotation.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        self.aabb
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        self.aabb.as_ref()
     }
 
     fn pdf_value(&self, _origin: Vec3, _vector: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {

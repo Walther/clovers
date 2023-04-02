@@ -12,7 +12,7 @@ pub use surface_checker::*;
 use crate::{color::Color, Float, Vec3};
 
 #[enum_dispatch(TextureTrait)]
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A texture enum.
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]

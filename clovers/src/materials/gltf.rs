@@ -17,33 +17,33 @@ use crate::{
 
 use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 // #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// GLTF Material wrapper type
-pub struct GLTFMaterial {
-    material: &'static Material<'static>,
+pub struct GLTFMaterial<'scene> {
+    material: &'scene Material<'scene>,
     tex_coords: [[Float; 2]; 3],
-    images: &'static [Data],
+    images: &'scene [Data],
     tangents: Option<[Vec3; 3]>,
     normals: Option<[Vec3; 3]>,
     bitangents: Option<[Vec3; 3]>,
 }
 
-impl Default for GLTFMaterial {
+impl<'scene> Default for GLTFMaterial<'scene> {
     fn default() -> Self {
         todo!()
     }
 }
 
-impl GLTFMaterial {
+impl<'scene> GLTFMaterial<'scene> {
     /// Initialize a new GLTF material wrapper
     #[must_use]
     pub fn new(
-        material: &'static Material,
+        material: &'scene Material,
         tex_coords: [[Float; 2]; 3],
         normals: Option<[[Float; 3]; 3]>,
         tangents: Option<[[Float; 4]; 3]>,
-        images: &'static [Data],
+        images: &'scene [Data],
     ) -> Self {
         let normals: Option<[Vec3; 3]> = normals.map(|ns| ns.map(Vec3::from));
         let tangents: Option<[Vec4; 3]> = tangents.map(|ns| ns.map(Vec4::from));
@@ -77,7 +77,7 @@ impl GLTFMaterial {
     }
 }
 
-impl MaterialTrait for GLTFMaterial {
+impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
     fn scatter(
         &self,
         ray: &Ray,
@@ -132,7 +132,7 @@ impl MaterialTrait for GLTFMaterial {
     }
 }
 
-impl GLTFMaterial {
+impl<'scene> GLTFMaterial<'scene> {
     fn sample_base_color(&self, hit_record: &HitRecord) -> Color {
         let base_color_texture = self
             .material

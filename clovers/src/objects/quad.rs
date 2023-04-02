@@ -11,7 +11,7 @@ use rand::rngs::SmallRng;
 use rand::Rng;
 
 /// Initialization structure for a Quad object.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct QuadInit {
     /// Corner point
@@ -26,9 +26,8 @@ pub struct QuadInit {
 }
 
 /// Quadrilateral shape. This can be an arbitrary parallelogram, not just a rectangle.
-#[derive(Clone, Copy, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct Quad {
+#[derive(Clone, Debug)]
+pub struct Quad<'scene> {
     /// Corner point
     pub q: Vec3,
     /// Vector describing the u side
@@ -36,8 +35,7 @@ pub struct Quad {
     /// Vector describing the v side
     pub v: Vec3,
     /// Material of the surface
-    #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material,
+    pub material: &'scene Material,
     /// Area of the surface
     pub area: Float,
     /// Normal vector of the surface
@@ -50,10 +48,10 @@ pub struct Quad {
     pub aabb: AABB,
 }
 
-impl Quad {
+impl<'scene> Quad<'scene> {
     /// Creates a new quad
     #[must_use]
-    pub fn new(q: Vec3, u: Vec3, v: Vec3, material: Material) -> Quad {
+    pub fn new(q: Vec3, u: Vec3, v: Vec3, material: &'scene Material) -> Quad<'scene> {
         let n: Vec3 = u.cross(&v);
         let normal: Vec3 = n.normalize();
         // TODO: what is this?
@@ -78,7 +76,7 @@ impl Quad {
     }
 }
 
-impl HitableTrait for Quad {
+impl<'scene> HitableTrait for Quad<'scene> {
     /// Hit method for the quad rectangle
     #[must_use]
     fn hit(
@@ -122,15 +120,15 @@ impl HitableTrait for Quad {
             normal,
             u: alpha,
             v: beta,
-            material: &self.material,
+            material: self.material,
             front_face,
         })
     }
 
     /// Returns the bounding box of the quad
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain

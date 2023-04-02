@@ -11,7 +11,7 @@ use crate::{
 use rand::rngs::SmallRng;
 use rand::Rng;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A dielectric material. This resembles glass and other transparent and reflective materials.
 pub struct Dielectric {

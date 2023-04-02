@@ -15,16 +15,16 @@ use crate::{
 ///
 /// A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also `BVHNode`s. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 #[derive(Debug, Clone)]
-pub struct BVHNode {
+pub struct BVHNode<'scene> {
     /// Left child of the BVHNode
-    pub left: Box<Hitable>,
+    pub left: Box<Hitable<'scene>>,
     /// Right child of the BVHNode
-    pub right: Box<Hitable>,
+    pub right: Box<Hitable<'scene>>,
     /// Bounding box containing both of the child nodes
     pub bounding_box: AABB,
 }
 
-impl BVHNode {
+impl<'scene> BVHNode<'scene> {
     /// Create a new `BVHNode` tree from a given list of [Object](crate::objects::Object)s
     #[must_use]
     pub fn from_list(mut objects: Vec<Hitable>, time_0: Float, time_1: Float) -> BVHNode {
@@ -56,7 +56,7 @@ impl BVHNode {
             // TODO: can this hack be removed?
             left = Box::new(objects[0].clone());
             right = Box::new(Hitable::Empty(Empty {}));
-            let bounding_box = left.bounding_box(time_0, time_1).unwrap(); // TODO: remove unwrap
+            let bounding_box = left.bounding_box(time_0, time_1).unwrap().clone(); // TODO: remove unwrap
             return BVHNode {
                 left,
                 right,
@@ -122,7 +122,7 @@ impl BVHNode {
                 bounding_box,
             }
         } else {
-            panic!("No bounding box in bvh_node constructor. {box_left:?} {box_right:?}");
+            panic!("No bounding box in bvh_node constructor");
         }
     }
 
@@ -142,7 +142,7 @@ impl BVHNode {
     }
 }
 
-impl HitableTrait for BVHNode {
+impl<'scene> HitableTrait for BVHNode<'scene> {
     /// The main `hit` function for a [`BVHNode`]. Given a [Ray](crate::ray::Ray), and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the encased objects during that interval.
     #[must_use]
     fn hit(
@@ -178,8 +178,8 @@ impl HitableTrait for BVHNode {
 
     /// Returns the axis-aligned bounding box [AABB] of the objects within this [`BVHNode`].
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<AABB> {
-        Some(self.bounding_box)
+    fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<&AABB> {
+        Some(&self.bounding_box)
     }
 
     /// Returns a probability density function value based on the children
@@ -215,8 +215,8 @@ impl HitableTrait for BVHNode {
 
 fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
     // TODO: proper time support?
-    let box_a: Option<AABB> = a.bounding_box(0.0, 1.0);
-    let box_b: Option<AABB> = b.bounding_box(0.0, 1.0);
+    let box_a: Option<&AABB> = a.bounding_box(0.0, 1.0);
+    let box_b: Option<&AABB> = b.bounding_box(0.0, 1.0);
 
     if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
         if box_a.axis(axis).min < box_b.axis(axis).min {
@@ -265,11 +265,11 @@ fn vec_bounding_box(vec: &Vec<Hitable>, t0: Float, t1: Float) -> Option<AABB> {
         match output_box {
             // If we do, expand it & recurse
             Some(old_box) => {
-                output_box = Some(AABB::surrounding_box(old_box, bounding));
+                output_box = Some(AABB::surrounding_box(&old_box, bounding));
             }
             // Otherwise, set output box to be the newly-found box
             None => {
-                output_box = Some(bounding);
+                output_box = Some(bounding.clone());
             }
         }
     }

@@ -10,7 +10,7 @@ use crate::{
 };
 use rand::{rngs::SmallRng, Rng};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `SphereInit` structure describes the necessary data for constructing a [Sphere]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 pub struct SphereInit {
@@ -23,20 +23,19 @@ pub struct SphereInit {
     pub material: Material,
 }
 
-#[derive(Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Debug, Clone)]
 /// A sphere object.
-pub struct Sphere {
+pub struct Sphere<'scene> {
     center: Vec3,
     radius: Float,
-    material: Material,
+    material: &'scene Material,
     aabb: AABB,
 }
 
-impl Sphere {
+impl<'scene> Sphere<'scene> {
     /// Creates a new `Sphere` object with the given center, radius and material.
     #[must_use]
-    pub fn new(center: Vec3, radius: Float, material: Material) -> Self {
+    pub fn new(center: Vec3, radius: Float, material: &'scene Material) -> Self {
         let aabb = AABB::new_from_coords(
             center - Vec3::new(radius, radius, radius),
             center + Vec3::new(radius, radius, radius),
@@ -61,7 +60,7 @@ impl Sphere {
     }
 }
 
-impl HitableTrait for Sphere {
+impl<'scene> HitableTrait for Sphere<'scene> {
     /// Hit method for the [Sphere] object. Returns a [`HitRecord`] if the given [Ray] intersects with the sphere at the given distance interval.
     #[must_use]
     fn hit(
@@ -91,7 +90,7 @@ impl HitableTrait for Sphere {
                     normal: outward_normal,
                     u,
                     v,
-                    material: &self.material,
+                    material: self.material,
                     front_face: false, // TODO: fix having to declare it before calling face_normal
                 };
                 record.set_face_normal(ray, outward_normal);
@@ -109,7 +108,7 @@ impl HitableTrait for Sphere {
                     normal: outward_normal,
                     u,
                     v,
-                    material: &self.material,
+                    material: self.material,
                     front_face: false, // TODO: fix having to declare it before calling face_normal
                 };
                 record.set_face_normal(ray, outward_normal);
@@ -121,8 +120,8 @@ impl HitableTrait for Sphere {
 
     /// Returns the axis-aligned bounding box [AABB] for the sphere.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
-        Some(self.aabb)
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+        Some(&self.aabb)
     }
 
     /// Returns the probability density function for the sphere? TODO: what does this do again and how

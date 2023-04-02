@@ -12,7 +12,7 @@ use rand::rngs::SmallRng;
 use rand::Rng;
 
 /// Initialization structure for a triangle primitive
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct TriangleInit {
     /// Corner point
@@ -27,8 +27,8 @@ pub struct TriangleInit {
 }
 
 /// Triangle shape. Heavily based on [Quad](crate::objects::Quad) and may contain inaccuracies
-#[derive(Clone, Copy, Debug)]
-pub struct Triangle {
+#[derive(Clone, Debug)]
+pub struct Triangle<'scene> {
     /// Corner point
     pub q: Vec3,
     /// Vector describing the u side
@@ -36,7 +36,7 @@ pub struct Triangle {
     /// Vector describing the v side
     pub v: Vec3,
     /// Material of the surface
-    pub material: &'static Material,
+    pub material: &'scene Material,
     /// Area of the surface
     pub area: Float,
     /// Normal vector of the surface
@@ -49,10 +49,10 @@ pub struct Triangle {
     pub aabb: AABB,
 }
 
-impl Triangle {
+impl<'scene> Triangle<'scene> {
     /// Creates a new triangle from a coordinate point and two side vectors relative to the point
     #[must_use]
-    pub fn new(q: Vec3, u: Vec3, v: Vec3, material: &'static Material) -> Triangle {
+    pub fn new(q: Vec3, u: Vec3, v: Vec3, material: &'scene Material) -> Triangle<'scene> {
         let n: Vec3 = u.cross(&v);
         let normal: Vec3 = n.normalize();
         // TODO: what is this?
@@ -96,7 +96,12 @@ impl Triangle {
 
     /// Creates a new triangle from three Cartesian space coordinates
     #[must_use]
-    pub fn from_coordinates(a: Vec3, b: Vec3, c: Vec3, material: &'static Material) -> Triangle {
+    pub fn from_coordinates(
+        a: Vec3,
+        b: Vec3,
+        c: Vec3,
+        material: &'scene Material,
+    ) -> Triangle<'scene> {
         // Coordinate transform: from absolute coordinates to relative coordinates
         let q: Vec3 = a;
         let u: Vec3 = b - q;
@@ -105,7 +110,7 @@ impl Triangle {
     }
 }
 
-impl HitableTrait for Triangle {
+impl<'scene> HitableTrait for Triangle<'scene> {
     /// Hit method for the triangle
     #[must_use]
     fn hit(
@@ -156,10 +161,10 @@ impl HitableTrait for Triangle {
 
     /// Returns the bounding box of the triangle
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<AABB> {
+    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
         // TODO: this is from quad and not updated!
         // although i guess a triangle's aabb is the same as the quad's aabb in worst case
-        Some(self.aabb)
+        Some(&self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
@@ -220,14 +225,14 @@ mod tests {
     fn xy_unit_triangle() {
         let time_0 = 0.0;
         let time_1 = 1.0;
-        let material: &'static Material = Box::leak(Box::default());
+        let material = Box::default();
 
         // Unit triangle at origin
         let xy_unit_triangle = Triangle::new(
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(1.0, 0.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),
-            material,
+            &material,
         );
 
         let ray = Ray::new(
@@ -248,7 +253,7 @@ mod tests {
             Interval::new(0.0, 0.0).expand(EPSILON_RECT_THICKNESS),
         );
 
-        assert_eq!(aabb, expected_aabb);
+        assert_eq!(aabb, &expected_aabb);
 
         let boxhit = aabb.hit(&ray, time_0, time_1);
         assert!(boxhit);
@@ -266,14 +271,14 @@ mod tests {
     fn yx_unit_triangle() {
         let time_0 = 0.0;
         let time_1 = 1.0;
-        let material: &'static Material = Box::leak(Box::default());
+        let material = Box::default();
 
         // Unit triangle at origin, u and v coords swapped
         let xy_unit_triangle = Triangle::new(
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),
             Vec3::new(1.0, 0.0, 0.0),
-            material,
+            &material,
         );
 
         let ray = Ray::new(
@@ -294,7 +299,7 @@ mod tests {
             Interval::new(0.0, 0.0).expand(EPSILON_RECT_THICKNESS),
         );
 
-        assert_eq!(aabb, expected_aabb);
+        assert_eq!(aabb, &expected_aabb);
 
         let boxhit = aabb.hit(&ray, time_0, time_1);
         assert!(boxhit);
@@ -312,14 +317,14 @@ mod tests {
     fn neg_xy_unit_triangle() {
         let time_0 = 0.0;
         let time_1 = 1.0;
-        let material: &'static Material = Box::leak(Box::default());
+        let material: Box<Material> = Box::default();
 
         // Unit triangle at origin, u and v coords swapped
         let neg_xy_unit_triangle = Triangle::new(
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(-1.0, 0.0, 0.0),
             Vec3::new(0.0, -1.0, 0.0),
-            material,
+            &material,
         );
 
         let ray = Ray::new(
@@ -340,7 +345,7 @@ mod tests {
             Interval::new(0.0, 0.0).expand(EPSILON_RECT_THICKNESS),
         );
 
-        assert_eq!(aabb, expected_aabb);
+        assert_eq!(aabb, &expected_aabb);
 
         let boxhit = aabb.hit(&ray, time_0, time_1);
         assert!(boxhit);

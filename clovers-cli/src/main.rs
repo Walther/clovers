@@ -5,7 +5,6 @@
 #![deny(clippy::all)]
 
 // External imports
-use bumpalo::Bump;
 use clap::Parser;
 use human_format::Formatter;
 use humantime::format_duration;
@@ -103,14 +102,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     };
     let threads = std::thread::available_parallelism()?;
 
-    // Bump allocated arena
-    let bump = Bump::new();
-
     info!("Reading the scene file");
     let path = Path::new(&opts.input);
     let scene = match path.extension() {
         Some(ext) => match &ext.to_str() {
-            Some("json") => json_scene::initialize(path, &opts, &bump),
+            Some("json") => json_scene::initialize(path, &opts),
             _ => panic!("Unknown file type"),
         },
         None => panic!("Unknown file type"),
