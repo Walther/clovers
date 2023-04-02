@@ -22,7 +22,7 @@ pub struct STL<'scene> {
     /// Bounding Volume Hierarchy tree for the object
     pub bvhnode: BVHNode<'scene>,
     /// Material for the object
-    pub material: &'scene Material<'scene>,
+    pub material: &'scene Material,
     /// Axis-aligned bounding box of the object
     pub aabb: AABB,
 }
@@ -30,7 +30,7 @@ pub struct STL<'scene> {
 impl<'scene> STL<'scene> {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
-    pub fn new(stl_init: &'scene STLInit<'scene>, time_0: Float, time_1: Float) -> Self {
+    pub fn new(stl_init: &'scene STLInit, time_0: Float, time_1: Float) -> Self {
         let material = &stl_init.material;
         let triangles: Vec<Hitable> = stl_init.into();
         let bvhnode = BVHNode::from_list(triangles, time_0, time_1);
@@ -80,12 +80,12 @@ impl<'scene> HitableTrait for STL<'scene> {
 /// STL structure. This gets converted into an internal representation using [Triangles](crate::objects::Triangle)
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct STLInit<'scene> {
+pub struct STLInit {
     /// Path of the .stl file
     pub path: String,
     /// Material to use for the .stl object
     #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material<'scene>,
+    pub material: Material,
     /// Scaling factor for the object
     pub scale: Float,
     /// Location of the object in the rendered scene
@@ -94,9 +94,9 @@ pub struct STLInit<'scene> {
     pub rotation: Vec3,
 }
 
-impl<'scene> From<&'scene STLInit<'scene>> for Vec<Hitable<'scene>> {
+impl<'scene> From<&'scene STLInit> for Vec<Hitable<'scene>> {
     #[must_use]
-    fn from(stl_init: &'scene STLInit<'scene>) -> Self {
+    fn from(stl_init: &'scene STLInit) -> Self {
         // TODO: error handling!
         let mut file = OpenOptions::new()
             .read(true)

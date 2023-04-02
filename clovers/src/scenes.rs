@@ -53,18 +53,18 @@ impl<'scene> Scene<'scene> {
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A serialized representation of a [Scene].
-pub struct SceneFile<'scene> {
+pub struct SceneFile {
     time_0: Float,
     time_1: Float,
     background_color: Color,
     camera: CameraInit,
-    objects: Vec<Object<'scene>>,
-    priority_objects: Vec<Object<'scene>>,
+    objects: Vec<Object>,
+    priority_objects: Vec<Object>,
 }
 
 /// Initializes a new [Scene] instance by parsing the contents of a [`SceneFile`] structure and then using those details to construct the [Scene].
 #[must_use]
-pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
+pub fn initialize<'scene>(scene_file: SceneFile, width: u32, height: u32) -> Scene<'scene> {
     let time_0 = scene_file.time_0;
     let time_1 = scene_file.time_1;
     let background_color = scene_file.background_color;
@@ -98,7 +98,7 @@ pub fn initialize(scene_file: SceneFile, width: u32, height: u32) -> Scene {
 }
 
 #[must_use]
-fn objects_to_hitables(objects: Vec<Object>) -> Vec<Hitable> {
+fn objects_to_hitables<'scene>(objects: Vec<Object>) -> Vec<Hitable<'scene>> {
     let mut hitables = Vec::new();
     for obj in objects {
         hitables.push(obj.into());

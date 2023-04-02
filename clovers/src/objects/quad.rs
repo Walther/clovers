@@ -13,7 +13,7 @@ use rand::Rng;
 /// Initialization structure for a Quad object.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct QuadInit<'scene> {
+pub struct QuadInit {
     /// Corner point
     pub q: Vec3,
     /// Vector describing the u side
@@ -22,7 +22,7 @@ pub struct QuadInit<'scene> {
     pub v: Vec3,
     /// Material of the surface
     #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material<'scene>,
+    pub material: Material,
 }
 
 /// Quadrilateral shape. This can be an arbitrary parallelogram, not just a rectangle.
@@ -35,7 +35,7 @@ pub struct Quad<'scene> {
     /// Vector describing the v side
     pub v: Vec3,
     /// Material of the surface
-    pub material: &'scene Material<'scene>,
+    pub material: &'scene Material,
     /// Area of the surface
     pub area: Float,
     /// Normal vector of the surface

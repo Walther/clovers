@@ -14,7 +14,7 @@ use crate::{
     bvhnode::BVHNode,
     hitable::{get_orientation, HitRecord, Hitable, HitableTrait},
     interval::Interval,
-    materials::{gltf::GLTFMaterial, Material},
+    materials::gltf::GLTFMaterial,
     ray::Ray,
     Float, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
@@ -196,9 +196,9 @@ fn parse_mesh<'scene>(
                         });
 
                         // TODO: don't leak memory
-                        let material: &'scene Material = Box::leak(Box::new(Material::GLTF(
+                        let material: &'scene GLTFMaterial = Box::leak(Box::new(
                             GLTFMaterial::new(material, tex_coords, normals, tangents, images),
-                        )));
+                        ));
 
                         let gltf_triangle = GLTFTriangle::new(triangle, material);
                         trianglelist.push(Hitable::GLTFTriangle(gltf_triangle));
@@ -220,7 +220,7 @@ pub struct GLTFTriangle<'scene> {
     /// Axis-aligned bounding box of the object
     pub aabb: AABB,
     /// Material of the object
-    pub material: &'scene Material<'scene>,
+    pub material: &'scene GLTFMaterial<'scene>,
     q: Vec3,
     u: Vec3,
     v: Vec3,
@@ -233,7 +233,7 @@ pub struct GLTFTriangle<'scene> {
 impl<'scene> GLTFTriangle<'scene> {
     #[must_use]
     /// Initialize a new GLTF object
-    pub fn new(triangle: [Vec3; 3], material: &'scene Material) -> Self {
+    pub fn new(triangle: [Vec3; 3], material: &'scene GLTFMaterial<'scene>) -> Self {
         // TODO: mostly adapted from Triangle, verify correctness!
 
         let [a, b, c] = triangle;

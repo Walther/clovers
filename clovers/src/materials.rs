@@ -1,5 +1,7 @@
 //! Materials enable different behaviors of light on objects.
 
+use core::fmt::Debug;
+
 use crate::{color::Color, hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
 pub mod dielectric;
 pub mod diffuse_light;
@@ -17,11 +19,10 @@ pub use lambertian::*;
 pub use metal::*;
 use rand::prelude::SmallRng;
 
-#[cfg(feature = "gl_tf")]
-use self::gltf::GLTFMaterial;
-
 #[enum_dispatch]
-pub(crate) trait MaterialTrait {
+/// Trait for materials. Requires three function implementations: `scatter`, `scattering_pdf`, and `emit`.
+pub trait MaterialTrait: Debug {
+    /// Given a ray and a hitrecord, return the possible `ScatterRecord`.
     fn scatter(
         &self,
         ray: &Ray,
@@ -29,6 +30,7 @@ pub(crate) trait MaterialTrait {
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord>;
 
+    /// TODO: explain
     fn scattering_pdf(
         &self,
         hit_record: &HitRecord,
@@ -36,6 +38,7 @@ pub(crate) trait MaterialTrait {
         rng: &mut SmallRng,
     ) -> Option<Float>;
 
+    /// Returns the emissivity of the material at the given position.
     fn emit(
         &self,
         _ray: &Ray,
@@ -54,7 +57,7 @@ pub(crate) trait MaterialTrait {
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
-pub enum Material<'scene> {
+pub enum Material {
     /// Dielectric material
     Dielectric(Dielectric),
     /// Lambertian material
@@ -65,13 +68,9 @@ pub enum Material<'scene> {
     Metal(Metal),
     /// Isotropic material
     Isotropic(Isotropic),
-    /// GLTF material
-    #[cfg(feature = "gl_tf")]
-    #[cfg_attr(feature = "serde-derive", serde(skip))]
-    GLTF(GLTFMaterial<'scene>),
 }
 
-impl<'scene> Default for Material<'scene> {
+impl Default for Material {
     fn default() -> Self {
         Self::Lambertian(Lambertian::default())
     }

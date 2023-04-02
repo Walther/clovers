@@ -10,7 +10,7 @@ use crate::objects::{GLTFTriangle, GLTF};
 use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
-    materials::Material,
+    materials::MaterialTrait,
     objects::{
         Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
     },
@@ -35,7 +35,7 @@ pub struct HitRecord<'a> {
     /// V surface coordinate of the hitpoint
     pub v: Float,
     /// Reference to the material at the hitpoint
-    pub material: &'a Material<'a>,
+    pub material: &'a dyn MaterialTrait,
     /// Is the hitpoint at the front of the surface
     pub front_face: bool,
 }

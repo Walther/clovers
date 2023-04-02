@@ -17,9 +17,9 @@ use super::Object;
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `ConstantMediumInit` structure describes the necessary data for constructing a [`ConstantMedium`]. Used with [serde] when importing [`SceneFiles`](crate::scenes::SceneFile).
-pub struct ConstantMediumInit<'scene> {
+pub struct ConstantMediumInit {
     /// The boundary object for the constant medium. This determines the size and shape of the fog object.
-    pub boundary: Box<Object<'scene>>,
+    pub boundary: Box<Object>,
     #[cfg_attr(feature = "serde-derive", serde(default = "default_density"))]
     /// Density of the fog. TODO: example good value range?
     pub density: Float,
@@ -40,7 +40,7 @@ fn default_density() -> Float {
 /// `ConstantMedium` object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 pub struct ConstantMedium<'scene> {
     boundary: Box<Hitable<'scene>>,
-    phase_function: Material<'scene>,
+    phase_function: Material,
     neg_inv_density: Float,
 }
 

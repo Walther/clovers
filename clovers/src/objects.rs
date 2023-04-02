@@ -36,47 +36,47 @@ pub use triangle::*;
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A list of objects. Allows multiple objects to be used e.g. in a Rotate or Translate object as the target.
-pub struct ObjectList<'scene> {
+pub struct ObjectList {
     /// The encased [Object] list
-    pub objects: Vec<Object<'scene>>,
+    pub objects: Vec<Object>,
 }
 
 #[derive(Clone, Debug)]
 /// An object enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
-pub enum Object<'scene> {
+pub enum Object {
     /// Boxy object initializer
-    Boxy(BoxyInit<'scene>),
+    Boxy(BoxyInit),
     /// ConstantMedium object initializer
-    ConstantMedium(ConstantMediumInit<'scene>),
+    ConstantMedium(ConstantMediumInit),
     /// FlipFace object initializer
-    FlipFace(FlipFaceInit<'scene>),
+    FlipFace(FlipFaceInit),
     /// MovingSphere object initializer
-    MovingSphere(MovingSphereInit<'scene>),
+    MovingSphere(MovingSphereInit),
     /// ObjectList object initializer
-    ObjectList(ObjectList<'scene>),
+    ObjectList(ObjectList),
     /// Quad object initializer
-    Quad(QuadInit<'scene>),
+    Quad(QuadInit),
     /// RotateY object initializer
-    RotateY(RotateInit<'scene>),
+    RotateY(RotateInit),
     /// Sphere object initializer
-    Sphere(SphereInit<'scene>),
+    Sphere(SphereInit),
     #[cfg(feature = "stl")]
     /// STL object initializer
-    STL(STLInit<'scene>),
+    STL(STLInit),
     #[cfg(feature = "gl_tf")]
     /// GLTF object initializer
     GLTF(GLTFInit),
     /// Translate object initializer
-    Translate(TranslateInit<'scene>),
+    Translate(TranslateInit),
     /// Triangle object initializer
-    Triangle(TriangleInit<'scene>),
+    Triangle(TriangleInit),
 }
 
-impl<'scene> From<Object<'scene>> for Hitable<'scene> {
+impl<'scene> From<Object> for Hitable<'scene> {
     #[must_use]
-    fn from(obj: Object<'scene>) -> Hitable<'scene> {
+    fn from(obj: Object) -> Hitable<'scene> {
         match obj {
             Object::Boxy(x) => {
                 // TODO: do not leak memory
@@ -93,10 +93,14 @@ impl<'scene> From<Object<'scene>> for Hitable<'scene> {
                 let obj: Hitable = obj.into();
                 Hitable::FlipFace(FlipFace::new(obj))
             }
-            Object::MovingSphere(x) => Hitable::MovingSphere(MovingSphere::new(
-                // TODO: time
-                x.center_0, x.center_1, 0.0, 1.0, x.radius, x.material,
-            )),
+            Object::MovingSphere(x) => {
+                // TODO: do not leak memory
+                let material: &'scene Material = Box::leak(Box::new(x.material));
+                Hitable::MovingSphere(MovingSphere::new(
+                    // TODO: time
+                    x.center_0, x.center_1, 0.0, 1.0, x.radius, material,
+                ))
+            }
             Object::ObjectList(x) => {
                 let objects: Vec<Hitable> = x
                     .objects
@@ -116,7 +120,11 @@ impl<'scene> From<Object<'scene>> for Hitable<'scene> {
                 let obj: Hitable = obj.into();
                 Hitable::RotateY(RotateY::new(Box::new(obj), x.angle))
             }
-            Object::Sphere(x) => Hitable::Sphere(Sphere::new(x.center, x.radius, x.material)),
+            Object::Sphere(x) => {
+                // TODO: do not leak memory
+                let material: &'scene Material = Box::leak(Box::new(x.material));
+                Hitable::Sphere(Sphere::new(x.center, x.radius, material))
+            }
             #[cfg(feature = "stl")]
             Object::STL(x) => {
                 // TODO: time

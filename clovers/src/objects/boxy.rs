@@ -13,14 +13,14 @@ use rand::{rngs::SmallRng, Rng};
 /// `BoxyInit` structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct BoxyInit<'scene> {
+pub struct BoxyInit {
     /// First corner for the box
     pub corner_0: Vec3,
     /// Second, opposing corner for the box
     pub corner_1: Vec3,
     #[cfg_attr(feature = "serde-derive", serde(default))]
     /// Material used for the box
-    pub material: Material<'scene>,
+    pub material: Material,
 }
 
 /// A box or a cuboid object: a parallelepiped with six rectangular faces. Named [Boxy] to avoid clashing with [Box].
@@ -28,7 +28,7 @@ pub struct BoxyInit<'scene> {
 pub struct Boxy<'scene> {
     sides: Box<[Hitable<'scene>; 6]>,
     /// The material of the box
-    pub material: &'scene Material<'scene>,
+    pub material: &'scene Material,
     /// Axis-aligned bounding box
     pub aabb: AABB,
 }
@@ -36,7 +36,7 @@ pub struct Boxy<'scene> {
 impl<'scene> Boxy<'scene> {
     /// Initializes a new instance of a box, given two opposing [Vec3] corners `corner_0` and `corner_1`, and a [Material] `material`.
     #[must_use]
-    pub fn new(corner_0: Vec3, corner_1: Vec3, material: &'scene Material<'scene>) -> Self {
+    pub fn new(corner_0: Vec3, corner_1: Vec3, material: &'scene Material) -> Self {
         // Construct the two opposite vertices with the minimum and maximum coordinates.
         let min: Vec3 = Vec3::new(
             corner_0.x.min(corner_1.x),

@@ -13,9 +13,9 @@ use super::Object;
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `FlipFaceInit` structure describes the necessary data for constructing a [`FlipFace`]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
-pub struct FlipFaceInit<'scene> {
+pub struct FlipFaceInit {
     /// The object to wrap with the face flipping feature.
-    pub object: Box<Object<'scene>>,
+    pub object: Box<Object>,
 }
 
 #[derive(Debug, Clone)]

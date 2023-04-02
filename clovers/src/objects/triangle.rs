@@ -14,7 +14,7 @@ use rand::Rng;
 /// Initialization structure for a triangle primitive
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct TriangleInit<'scene> {
+pub struct TriangleInit {
     /// Corner point
     pub q: Vec3,
     /// Vector describing the u side
@@ -23,7 +23,7 @@ pub struct TriangleInit<'scene> {
     pub v: Vec3,
     /// Material of the surface
     #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material<'scene>,
+    pub material: Material,
 }
 
 /// Triangle shape. Heavily based on [Quad](crate::objects::Quad) and may contain inaccuracies
@@ -36,7 +36,7 @@ pub struct Triangle<'scene> {
     /// Vector describing the v side
     pub v: Vec3,
     /// Material of the surface
-    pub material: &'scene Material<'scene>,
+    pub material: &'scene Material,
     /// Area of the surface
     pub area: Float,
     /// Normal vector of the surface
