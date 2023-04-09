@@ -43,7 +43,7 @@ struct Opts {
     #[clap(short, long, default_value = "100")]
     samples: u32,
     /// Maximum evaluated bounce depth for each ray
-    #[clap(short, long, default_value = "100")]
+    #[clap(short = 'd', long, default_value = "100")]
     max_depth: u32,
     /// Gamma correction value
     #[clap(short, long, default_value = "2.0")]
