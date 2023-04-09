@@ -13,7 +13,7 @@ path = "src/main.rs"
 clovers = { path = "../clovers", features = ["serde-derive", "stl", "traces", "gl_tf"], default-features = false }
 
 # External
-clap = { version = "4.2.1", features = ["std", "derive"], default-features = false  }
+clap = { version = "4.2.1", features = ["std", "derive"] }
 human_format = "1.0.3"
 humantime = "2.1.0"
 image = { version =  "0.24.6", features = ["png"], default-features = false }
