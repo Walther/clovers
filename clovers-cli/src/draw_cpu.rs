@@ -19,7 +19,6 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Color> {
         bar.set_style(ProgressStyle::default_bar().template(
             "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
         ).unwrap());
-        bar.enable_steady_tick(Duration::from_millis(100));
     }
 
     let black = Color::new(0.0, 0.0, 0.0);
