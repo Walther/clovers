@@ -253,12 +253,12 @@ fn vec_bounding_box(vec: &Vec<Hitable>, t0: Float, t1: Float) -> Option<AABB> {
     let mut output_box: Option<AABB> = None;
 
     // Go through all the objects, and expand the AABB
-    for object in vec.iter() {
+    for object in vec {
         // Check if the object has a box
         let Some(bounding) = object.bounding_box(t0, t1) else {
             // No box found for the object, early return.
             // Having even one unbounded object in a list makes the entire list unbounded!
-            return None
+            return None;
         };
 
         // Do we have an output_box already saved?
