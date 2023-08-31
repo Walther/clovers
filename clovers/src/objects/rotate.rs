@@ -43,13 +43,13 @@ impl<'scene> RotateY<'scene> {
 
         // Does our object have a bounding box?
         let Some(bbox) = bounding_box else {
-                return RotateY {
-                    object,
-                    sin_theta,
-                    cos_theta,
-                    aabb: None,
-                }
+            return RotateY {
+                object,
+                sin_theta,
+                cos_theta,
+                aabb: None,
             };
+        };
 
         // Start with infinite bounds
         let mut min: Vec3 = Vec3::new(Float::INFINITY, Float::INFINITY, Float::INFINITY);
@@ -117,7 +117,7 @@ impl<'scene> HitableTrait for RotateY<'scene> {
 
         let Some(hit_record) = self.object.hit(&rotated_r, distance_min, distance_max, rng) else {
             // Did not hit rotated object, early return None
-            return None
+            return None;
         };
 
         // Determine where the intersection is
