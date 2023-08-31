@@ -69,20 +69,19 @@ impl<'scene> HitableTrait for ConstantMedium<'scene> {
         // TODO: explain how the fog works.
 
         let Some(mut rec1) = self
-                    .boundary
-                    .hit(ray, Float::NEG_INFINITY, Float::INFINITY, rng)
+            .boundary
+            .hit(ray, Float::NEG_INFINITY, Float::INFINITY, rng)
         else {
-            return None
+            return None;
         };
 
         let Some(mut rec2) = self.boundary.hit(
-                    ray,
-                    rec1.distance + EPSILON_CONSTANT_MEDIUM,
-                    Float::INFINITY,
-                    rng,
-                )
-        else {
-            return None
+            ray,
+            rec1.distance + EPSILON_CONSTANT_MEDIUM,
+            Float::INFINITY,
+            rng,
+        ) else {
+            return None;
         };
 
         if rec1.distance < distance_min {

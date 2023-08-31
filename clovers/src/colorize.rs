@@ -81,7 +81,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
                     .scattering_pdf(&hit_record, &scatter_ray, rng)
             else {
                 // No scatter, only emit
-                return emitted
+                return emitted;
             };
 
             // Recurse for the scattering ray

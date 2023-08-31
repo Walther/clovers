@@ -91,7 +91,7 @@ impl<'scene> HitableTrait for Boxy<'scene> {
         // start with an empty hit_record, hit all sides, return closest
         let mut hit_record: Option<HitRecord> = None;
         let mut closest = distance_max;
-        for hitable in self.sides.iter() {
+        for hitable in &*self.sides {
             if let Some(record) = hitable.hit(ray, distance_min, closest, rng) {
                 closest = record.distance;
                 hit_record = Some(record);
