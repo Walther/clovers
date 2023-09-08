@@ -1,6 +1,11 @@
 //! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
 
-use crate::{bvhnode::BVHNode, hitable::Hitable, materials::Material, Box};
+use crate::{
+    bvhnode::BVHNode,
+    hitable::Hitable,
+    materials::{Material, MaterialInit, SharedMaterial},
+    Box,
+};
 
 pub mod boxy; // avoid keyword
 pub mod constant_medium;
@@ -74,79 +79,121 @@ pub enum Object {
     Triangle(TriangleInit),
 }
 
-impl<'scene> From<Object> for Hitable<'scene> {
-    #[must_use]
-    fn from(obj: Object) -> Hitable<'scene> {
-        match obj {
-            Object::Boxy(x) => {
-                // TODO: do not leak memory
-                let material: &'scene Material = Box::leak(Box::new(x.material));
-                Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, material))
-            }
-            Object::ConstantMedium(x) => {
-                let obj = *x.boundary;
-                let obj: Hitable = obj.into();
-                Hitable::ConstantMedium(ConstantMedium::new(Box::new(obj), x.density, x.texture))
-            }
-            Object::FlipFace(x) => {
-                let obj = *x.object;
-                let obj: Hitable = obj.into();
-                Hitable::FlipFace(FlipFace::new(obj))
-            }
-            Object::MovingSphere(x) => {
-                // TODO: do not leak memory
-                let material: &'scene Material = Box::leak(Box::new(x.material));
-                Hitable::MovingSphere(MovingSphere::new(
-                    // TODO: time
-                    x.center_0, x.center_1, 0.0, 1.0, x.radius, material,
-                ))
-            }
-            Object::ObjectList(x) => {
-                let objects: Vec<Hitable> = x
-                    .objects
-                    .iter()
-                    .map(|object| -> Hitable { object.clone().into() })
-                    .collect();
-                let bvh = BVHNode::from_list(objects, 0.0, 1.0);
-                Hitable::BVHNode(bvh)
-            }
-            Object::Quad(x) => {
-                // TODO: do not leak memory
-                let material: &'scene Material = Box::leak(Box::new(x.material));
-                Hitable::Quad(Quad::new(x.q, x.u, x.v, material))
-            }
-            Object::RotateY(x) => {
-                let obj = *x.object;
-                let obj: Hitable = obj.into();
-                Hitable::RotateY(RotateY::new(Box::new(obj), x.angle))
-            }
-            Object::Sphere(x) => {
-                // TODO: do not leak memory
-                let material: &'scene Material = Box::leak(Box::new(x.material));
-                Hitable::Sphere(Sphere::new(x.center, x.radius, material))
-            }
-            #[cfg(feature = "stl")]
-            Object::STL(x) => {
+#[must_use]
+/// Initializes an `Object` into a `Hitable`.
+pub fn object_to_hitable<'scene>(
+    obj: Object,
+    materials: &'scene [SharedMaterial],
+) -> Hitable<'scene> {
+    // TODO: reduce repetition!
+
+    match obj {
+        Object::Boxy(x) => {
+            let material: &Material = match x.material {
+                MaterialInit::Owned(m) => {
+                    // TODO: do not leak memory
+                    let material: &'scene Material = Box::leak(Box::new(m));
+                    material
+                }
+                MaterialInit::Shared(name) => {
+                    &materials.iter().find(|m| m.name == name).unwrap().material
+                }
+            };
+            Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, material))
+        }
+        Object::ConstantMedium(x) => {
+            let obj = *x.boundary;
+            let obj: Hitable = object_to_hitable(obj, materials);
+            Hitable::ConstantMedium(ConstantMedium::new(Box::new(obj), x.density, x.texture))
+        }
+        Object::FlipFace(x) => {
+            let obj = *x.object;
+            let obj: Hitable = object_to_hitable(obj, materials);
+            Hitable::FlipFace(FlipFace::new(obj))
+        }
+        Object::MovingSphere(x) => {
+            // TODO: do not leak memory
+            let material: &Material = match x.material {
+                MaterialInit::Owned(m) => {
+                    // TODO: do not leak memory
+                    let material: &'scene Material = Box::leak(Box::new(m));
+                    material
+                }
+                MaterialInit::Shared(name) => {
+                    &materials.iter().find(|m| m.name == name).unwrap().material
+                }
+            };
+            Hitable::MovingSphere(MovingSphere::new(
                 // TODO: time
-                // TODO: do not leak memory
-                let x: &'scene STLInit = Box::leak(Box::new(x));
-                Hitable::STL(STL::new(x, 0.0, 1.0))
-            }
-            #[cfg(feature = "gl_tf")]
-            Object::GLTF(x) => {
-                // TODO: time
-                Hitable::GLTF(GLTF::new(x, 0.0, 1.0))
-            }
-            Object::Translate(x) => {
-                let obj = *x.object;
-                let obj: Hitable = obj.into();
-                Hitable::Translate(Translate::new(Box::new(obj), x.offset))
-            }
-            Object::Triangle(x) => {
-                // TODO: do not leak memory
-                let material: &'scene Material = Box::leak(Box::new(x.material));
-                Hitable::Triangle(Triangle::new(x.q, x.u, x.v, material))
-            }
+                x.center_0, x.center_1, 0.0, 1.0, x.radius, material,
+            ))
+        }
+        Object::ObjectList(x) => {
+            let objects: Vec<Hitable> = x
+                .objects
+                .iter()
+                .map(|object| -> Hitable { object_to_hitable(object.clone(), materials) })
+                .collect();
+            let bvh = BVHNode::from_list(objects, 0.0, 1.0);
+            Hitable::BVHNode(bvh)
+        }
+        Object::Quad(x) => {
+            let material: &Material = match x.material {
+                MaterialInit::Owned(m) => {
+                    // TODO: do not leak memory
+                    let material: &'scene Material = Box::leak(Box::new(m));
+                    material
+                }
+                MaterialInit::Shared(name) => {
+                    &materials.iter().find(|m| m.name == name).unwrap().material
+                }
+            };
+            Hitable::Quad(Quad::new(x.q, x.u, x.v, material))
+        }
+        Object::RotateY(x) => {
+            let obj = *x.object;
+            let obj: Hitable = object_to_hitable(obj, materials);
+            Hitable::RotateY(RotateY::new(Box::new(obj), x.angle))
+        }
+        Object::Sphere(x) => {
+            // TODO: do not leak memory
+            let material: &Material = match x.material {
+                MaterialInit::Owned(m) => {
+                    // TODO: do not leak memory
+                    let material: &'scene Material = Box::leak(Box::new(m));
+                    material
+                }
+                MaterialInit::Shared(name) => {
+                    &materials.iter().find(|m| m.name == name).unwrap().material
+                }
+            };
+            Hitable::Sphere(Sphere::new(x.center, x.radius, material))
+        }
+        #[cfg(feature = "stl")]
+        Object::STL(stl_init) => Hitable::STL(initialize_stl(stl_init, materials)),
+        #[cfg(feature = "gl_tf")]
+        Object::GLTF(x) => {
+            // TODO: time
+            Hitable::GLTF(GLTF::new(x, 0.0, 1.0))
+        }
+        Object::Translate(x) => {
+            let obj = *x.object;
+            let obj: Hitable = object_to_hitable(obj, materials);
+            Hitable::Translate(Translate::new(Box::new(obj), x.offset))
+        }
+        Object::Triangle(x) => {
+            // TODO: do not leak memory
+            let material: &Material = match x.material {
+                MaterialInit::Owned(m) => {
+                    // TODO: do not leak memory
+                    let material: &'scene Material = Box::leak(Box::new(m));
+                    material
+                }
+                MaterialInit::Shared(name) => {
+                    &materials.iter().find(|m| m.name == name).unwrap().material
+                }
+            };
+            Hitable::Triangle(Triangle::new(x.q, x.u, x.v, material))
         }
     }
 }

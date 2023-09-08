@@ -5,7 +5,8 @@ use crate::{
     camera::{Camera, CameraInit},
     color::Color,
     hitable::Hitable,
-    objects::Object,
+    materials::SharedMaterial,
+    objects::{object_to_hitable, Object},
     Float, Vec,
 };
 
@@ -59,6 +60,8 @@ pub struct SceneFile {
     background_color: Color,
     camera: CameraInit,
     objects: Vec<Object>,
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    materials: Vec<SharedMaterial>,
     priority_objects: Vec<Object>,
 }
 
@@ -81,11 +84,15 @@ pub fn initialize<'scene>(scene_file: SceneFile, width: u32, height: u32) -> Sce
         time_0,
         time_1,
     );
+    let mut materials = scene_file.materials;
+    materials.push(SharedMaterial::default());
+    let materials = Box::leak(Box::new(materials));
 
     #[cfg(feature = "traces")]
     info!("Creating a flattened list from the objects");
-    let hitables: Vec<Hitable> = objects_to_hitables(scene_file.objects);
-    let priority_objects: Vec<Hitable> = objects_to_hitables(scene_file.priority_objects);
+    let hitables: Vec<Hitable> = objects_to_hitables(scene_file.objects, materials);
+    let priority_objects: Vec<Hitable> =
+        objects_to_hitables(scene_file.priority_objects, materials);
 
     Scene::new(
         time_0,
@@ -98,10 +105,10 @@ pub fn initialize<'scene>(scene_file: SceneFile, width: u32, height: u32) -> Sce
 }
 
 #[must_use]
-fn objects_to_hitables<'scene>(objects: Vec<Object>) -> Vec<Hitable<'scene>> {
+fn objects_to_hitables(objects: Vec<Object>, materials: &[SharedMaterial]) -> Vec<Hitable<'_>> {
     let mut hitables = Vec::new();
     for obj in objects {
-        hitables.push(obj.into());
+        hitables.push(object_to_hitable(obj, materials));
     }
 
     hitables
