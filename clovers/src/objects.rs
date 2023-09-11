@@ -164,6 +164,7 @@ fn initialize_material<'scene>(
             if let Some(m) = &materials.iter().find(|m| m.name == name) {
                 &m.material
             } else {
+                #[cfg(feature = "traces")]
                 warn!(
                     "shared material `{}` not found, using default material",
                     name
