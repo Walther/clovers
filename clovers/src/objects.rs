@@ -89,16 +89,7 @@ pub fn object_to_hitable<'scene>(
 
     match obj {
         Object::Boxy(x) => {
-            let material: &Material = match x.material {
-                MaterialInit::Owned(m) => {
-                    // TODO: do not leak memory
-                    let material: &'scene Material = Box::leak(Box::new(m));
-                    material
-                }
-                MaterialInit::Shared(name) => {
-                    &materials.iter().find(|m| m.name == name).unwrap().material
-                }
-            };
+            let material = initialize_material(x.material, materials);
             Hitable::Boxy(Boxy::new(x.corner_0, x.corner_1, material))
         }
         Object::ConstantMedium(x) => {
@@ -112,17 +103,7 @@ pub fn object_to_hitable<'scene>(
             Hitable::FlipFace(FlipFace::new(obj))
         }
         Object::MovingSphere(x) => {
-            // TODO: do not leak memory
-            let material: &Material = match x.material {
-                MaterialInit::Owned(m) => {
-                    // TODO: do not leak memory
-                    let material: &'scene Material = Box::leak(Box::new(m));
-                    material
-                }
-                MaterialInit::Shared(name) => {
-                    &materials.iter().find(|m| m.name == name).unwrap().material
-                }
-            };
+            let material = initialize_material(x.material, materials);
             Hitable::MovingSphere(MovingSphere::new(
                 // TODO: time
                 x.center_0, x.center_1, 0.0, 1.0, x.radius, material,
@@ -156,17 +137,7 @@ pub fn object_to_hitable<'scene>(
             Hitable::RotateY(RotateY::new(Box::new(obj), x.angle))
         }
         Object::Sphere(x) => {
-            // TODO: do not leak memory
-            let material: &Material = match x.material {
-                MaterialInit::Owned(m) => {
-                    // TODO: do not leak memory
-                    let material: &'scene Material = Box::leak(Box::new(m));
-                    material
-                }
-                MaterialInit::Shared(name) => {
-                    &materials.iter().find(|m| m.name == name).unwrap().material
-                }
-            };
+            let material = initialize_material(x.material, materials);
             Hitable::Sphere(Sphere::new(x.center, x.radius, material))
         }
         #[cfg(feature = "stl")]
@@ -182,18 +153,23 @@ pub fn object_to_hitable<'scene>(
             Hitable::Translate(Translate::new(Box::new(obj), x.offset))
         }
         Object::Triangle(x) => {
-            // TODO: do not leak memory
-            let material: &Material = match x.material {
-                MaterialInit::Owned(m) => {
-                    // TODO: do not leak memory
-                    let material: &'scene Material = Box::leak(Box::new(m));
-                    material
-                }
-                MaterialInit::Shared(name) => {
-                    &materials.iter().find(|m| m.name == name).unwrap().material
-                }
-            };
+            let material = initialize_material(x.material, materials);
             Hitable::Triangle(Triangle::new(x.q, x.u, x.v, material))
         }
     }
+}
+
+fn initialize_material<'scene>(
+    material_init: MaterialInit,
+    materials: &'scene [SharedMaterial],
+) -> &Material {
+    let material: &Material = match material_init {
+        MaterialInit::Owned(m) => {
+            // TODO: do not leak memory
+            let material: &'scene Material = Box::leak(Box::new(m));
+            material
+        }
+        MaterialInit::Shared(name) => &materials.iter().find(|m| m.name == name).unwrap().material,
+    };
+    material
 }
