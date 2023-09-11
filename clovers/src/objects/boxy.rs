@@ -4,7 +4,7 @@ use super::Quad;
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable, HitableTrait},
-    materials::Material,
+    materials::{Material, MaterialInit},
     ray::Ray,
     Box, Float, Vec3,
 };
@@ -20,7 +20,7 @@ pub struct BoxyInit {
     pub corner_1: Vec3,
     #[cfg_attr(feature = "serde-derive", serde(default))]
     /// Material used for the box
-    pub material: Material,
+    pub material: MaterialInit,
 }
 
 /// A box or a cuboid object: a parallelepiped with six rectangular faces. Named [Boxy] to avoid clashing with [Box].

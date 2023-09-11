@@ -19,6 +19,34 @@ pub use lambertian::*;
 pub use metal::*;
 use rand::prelude::SmallRng;
 
+/// Initialization structure for a `Material`. Either contains a `Material` by itself, or a String `name` to be found in a shared material list.
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", serde(untagged))]
+pub enum MaterialInit {
+    /// Name of the shared material
+    Shared(String),
+    /// Owned material structure
+    Owned(Material),
+}
+
+impl Default for MaterialInit {
+    fn default() -> Self {
+        Self::Shared(String::new())
+    }
+}
+
+/// A `Material` that can be referred to by name for reuse across multiple `Object`s
+#[derive(Default, Debug, Clone)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+pub struct SharedMaterial {
+    /// Name of the shared material
+    pub name: String,
+    /// The shared material itself
+    #[serde(flatten)]
+    pub material: Material,
+}
+
 #[enum_dispatch]
 /// Trait for materials. Requires three function implementations: `scatter`, `scattering_pdf`, and `emit`.
 pub trait MaterialTrait: Debug {

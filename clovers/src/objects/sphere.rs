@@ -3,7 +3,7 @@
 use crate::{
     aabb::AABB,
     hitable::{HitRecord, HitableTrait},
-    materials::Material,
+    materials::{Material, MaterialInit},
     onb::ONB,
     ray::Ray,
     Float, Vec3, EPSILON_SHADOW_ACNE, PI,
@@ -20,7 +20,7 @@ pub struct SphereInit {
     pub radius: Float,
     #[cfg_attr(feature = "serde-derive", serde(default))]
     /// Material of the sphere.
-    pub material: Material,
+    pub material: MaterialInit,
 }
 
 #[derive(Debug, Clone)]

@@ -3,6 +3,7 @@
 
 use crate::hitable::HitableTrait;
 use crate::interval::Interval;
+use crate::materials::MaterialInit;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
@@ -23,7 +24,7 @@ pub struct TriangleInit {
     pub v: Vec3,
     /// Material of the surface
     #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material,
+    pub material: MaterialInit,
 }
 
 /// Triangle shape. Heavily based on [Quad](crate::objects::Quad) and may contain inaccuracies

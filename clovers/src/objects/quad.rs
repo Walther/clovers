@@ -2,6 +2,7 @@
 // TODO: better docs
 
 use crate::hitable::HitableTrait;
+use crate::materials::MaterialInit;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
@@ -22,7 +23,7 @@ pub struct QuadInit {
     pub v: Vec3,
     /// Material of the surface
     #[cfg_attr(feature = "serde-derive", serde(default))]
-    pub material: Material,
+    pub material: MaterialInit,
 }
 
 /// Quadrilateral shape. This can be an arbitrary parallelogram, not just a rectangle.
