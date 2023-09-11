@@ -33,6 +33,7 @@ pub use rotate::*;
 pub use sphere::*;
 #[cfg(feature = "stl")]
 pub use stl::*;
+use tracing::warn;
 pub use translate::*;
 pub use triangle::*;
 
@@ -81,10 +82,7 @@ pub enum Object {
 
 #[must_use]
 /// Initializes an `Object` into a `Hitable`.
-pub fn object_to_hitable<'scene>(
-    obj: Object,
-    materials: &'scene [SharedMaterial],
-) -> Hitable<'scene> {
+pub fn object_to_hitable(obj: Object, materials: &[SharedMaterial]) -> Hitable<'_> {
     // TODO: reduce repetition!
 
     match obj {
@@ -119,16 +117,7 @@ pub fn object_to_hitable<'scene>(
             Hitable::BVHNode(bvh)
         }
         Object::Quad(x) => {
-            let material: &Material = match x.material {
-                MaterialInit::Owned(m) => {
-                    // TODO: do not leak memory
-                    let material: &'scene Material = Box::leak(Box::new(m));
-                    material
-                }
-                MaterialInit::Shared(name) => {
-                    &materials.iter().find(|m| m.name == name).unwrap().material
-                }
-            };
+            let material = initialize_material(x.material, materials);
             Hitable::Quad(Quad::new(x.q, x.u, x.v, material))
         }
         Object::RotateY(x) => {
@@ -169,7 +158,22 @@ fn initialize_material<'scene>(
             let material: &'scene Material = Box::leak(Box::new(m));
             material
         }
-        MaterialInit::Shared(name) => &materials.iter().find(|m| m.name == name).unwrap().material,
+        MaterialInit::Shared(name) => {
+            // Find material by name. If the name is not found, use the default material
+            if let Some(m) = &materials.iter().find(|m| m.name == name) {
+                &m.material
+            } else {
+                warn!(
+                    "shared material `{}` not found, using default material",
+                    name
+                );
+                &materials
+                    .iter()
+                    .find(|m| m.name.is_empty())
+                    .unwrap()
+                    .material
+            }
+        }
     };
     material
 }
