@@ -33,6 +33,7 @@ pub use rotate::*;
 pub use sphere::*;
 #[cfg(feature = "stl")]
 pub use stl::*;
+#[cfg(feature = "traces")]
 use tracing::warn;
 pub use translate::*;
 pub use triangle::*;
