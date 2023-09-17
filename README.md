@@ -31,3 +31,4 @@ This repository has some example model files for demonstrating triangle-based ob
 - Stanford Bunny model `bunny.stl` CC Attribution 3.0 Unported [Wikipedia](https://commons.wikimedia.org/wiki/File:Stanford_Bunny.stl)
 - Stanford Dragon model `dragon.stl` (stl converted version) CC Attribution [Thingiverse](https://www.thingiverse.com/thing:27666)
 - Rubber Duck model `duck.stl` CC0 1.0 Universal Public Domain [Thingiverse](https://www.thingiverse.com/thing:139894)
+- Triangular Prism model `prism.stl` Public Domain [Wikipedia](https://commons.wikimedia.org/wiki/File:Triangular_prism.stl)
