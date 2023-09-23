@@ -89,6 +89,7 @@ pub mod pdf;
 pub mod random;
 pub mod ray;
 pub mod scenes;
+pub mod spectral;
 pub mod textures;
 
 /// Rendering options struct
