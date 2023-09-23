@@ -47,6 +47,22 @@ impl Color {
         }
     }
 
+    /// Returns a new [Color] with the each channel limited to positive values.
+    #[must_use]
+    pub fn limit_one(&self) -> Color {
+        Color {
+            r: self.r.min(1.0),
+            g: self.g.min(1.0),
+            b: self.b.min(1.0),
+        }
+    }
+
+    /// Returns a new [Color] with each channel limited to the range between `0.0` and `1.0`.
+    #[must_use]
+    pub fn clamp(&self) -> Color {
+        self.non_negative().limit_one()
+    }
+
     /// Creates a new [Color] with random parameters between `0.0..1.0`.
     #[must_use]
     pub fn random(mut rng: SmallRng) -> Color {
