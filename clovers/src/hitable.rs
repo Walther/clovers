@@ -15,6 +15,7 @@ use crate::{
         Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
     },
     ray::Ray,
+    spectral::Wavelength,
     Float, Vec3,
 };
 
@@ -94,7 +95,14 @@ impl HitableTrait for Empty {
         None
     }
 
-    fn pdf_value(&self, _origin: Vec3, _vector: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+    fn pdf_value(
+        &self,
+        _origin: Vec3,
+        _vector: Vec3,
+        _wavelength: Wavelength,
+        _time: Float,
+        _rng: &mut SmallRng,
+    ) -> Float {
         0.0
     }
 
@@ -118,7 +126,14 @@ pub(crate) trait HitableTrait {
     fn bounding_box(&self, t0: Float, t1: Float) -> Option<&AABB>;
 
     #[must_use]
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float;
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float;
 
     #[must_use]
     fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3;

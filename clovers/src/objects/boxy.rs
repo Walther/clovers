@@ -6,6 +6,7 @@ use crate::{
     hitable::{HitRecord, Hitable, HitableTrait},
     materials::{Material, MaterialInit},
     ray::Ray,
+    spectral::Wavelength,
     Box, Float, Vec3,
 };
 use rand::{rngs::SmallRng, Rng};
@@ -108,11 +109,18 @@ impl<'scene> HitableTrait for Boxy<'scene> {
 
     /// Returns a probability density function value? // TODO: understand & explain
     #[must_use]
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
         let mut sum = 0.0;
 
         self.sides.iter().for_each(|object| {
-            sum += object.pdf_value(origin, vector, time, rng) / 6.0;
+            sum += object.pdf_value(origin, vector, wavelength, time, rng) / 6.0;
         });
 
         sum

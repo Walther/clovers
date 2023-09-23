@@ -32,11 +32,12 @@ impl MaterialTrait for Metal {
     ) -> Option<ScatterRecord> {
         let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
         Some(ScatterRecord {
-            specular_ray: Some(Ray::new(
-                hit_record.position,
-                reflected + self.fuzz * random_in_unit_sphere(rng),
-                ray.time,
-            )),
+            specular_ray: Some(Ray {
+                origin: hit_record.position,
+                direction: reflected + self.fuzz * random_in_unit_sphere(rng),
+                time: ray.time,
+                wavelength: ray.wavelength,
+            }),
             attenuation: self
                 .albedo
                 .color(hit_record.u, hit_record.v, hit_record.position),

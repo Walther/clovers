@@ -4,6 +4,7 @@ use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable, HitableTrait},
     ray::Ray,
+    spectral::Wavelength,
     Box, Float, Vec3,
 };
 use rand::rngs::SmallRng;
@@ -113,7 +114,12 @@ impl<'scene> HitableTrait for RotateY<'scene> {
         direction[0] = self.cos_theta * ray.direction[0] - self.sin_theta * ray.direction[2];
         direction[2] = self.sin_theta * ray.direction[0] + self.cos_theta * ray.direction[2];
 
-        let rotated_r: Ray = Ray::new(origin, direction, ray.time);
+        let rotated_r: Ray = Ray {
+            origin,
+            direction,
+            time: ray.time,
+            wavelength: ray.wavelength,
+        };
 
         let Some(hit_record) = self.object.hit(&rotated_r, distance_min, distance_max, rng) else {
             // Did not hit rotated object, early return None
@@ -153,7 +159,14 @@ impl<'scene> HitableTrait for RotateY<'scene> {
         self.aabb.as_ref()
     }
 
-    fn pdf_value(&self, _origin: Vec3, _vector: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+    fn pdf_value(
+        &self,
+        _origin: Vec3,
+        _vector: Vec3,
+        _wavelength: Wavelength,
+        _time: Float,
+        _rng: &mut SmallRng,
+    ) -> Float {
         // TODO: fix
         0.0
     }

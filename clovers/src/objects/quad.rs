@@ -3,6 +3,7 @@
 
 use crate::hitable::HitableTrait;
 use crate::materials::MaterialInit;
+use crate::spectral::Wavelength;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
@@ -134,13 +135,21 @@ impl<'scene> HitableTrait for Quad<'scene> {
 
     /// Returns a probability density function value? // TODO: understand & explain
     #[must_use]
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        match self.hit(
-            &Ray::new(origin, vector, time),
-            EPSILON_SHADOW_ACNE,
-            Float::INFINITY,
-            rng,
-        ) {
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
+        let ray = Ray {
+            origin,
+            direction: vector,
+            time,
+            wavelength,
+        };
+        match self.hit(&ray, EPSILON_SHADOW_ACNE, Float::INFINITY, rng) {
             Some(hit_record) => {
                 let distance_squared =
                     hit_record.distance * hit_record.distance * vector.norm_squared();

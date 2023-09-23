@@ -6,6 +6,7 @@ use crate::{
     materials::{isotropic::Isotropic, Material},
     random::random_unit_vector,
     ray::Ray,
+    spectral::Wavelength,
     textures::Texture,
     Box, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
 };
@@ -135,8 +136,16 @@ impl<'scene> HitableTrait for ConstantMedium<'scene> {
 
     /// Returns a probability density function value based on the boundary object
     #[must_use]
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        self.boundary.pdf_value(origin, vector, time, rng)
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
+        self.boundary
+            .pdf_value(origin, vector, wavelength, time, rng)
     }
 
     /// Returns a random point on the surface of the boundary of the fog

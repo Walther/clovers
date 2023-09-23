@@ -6,6 +6,7 @@ use crate::{
     hitable::{Hitable, HitableTrait},
     onb::ONB,
     random::{random_cosine_direction, random_in_unit_sphere},
+    spectral::Wavelength,
     Box, Float, Vec3, PI,
 };
 use enum_dispatch::enum_dispatch;
@@ -25,7 +26,13 @@ pub enum PDF<'scene> {
 #[enum_dispatch]
 pub(crate) trait PDFTrait {
     #[must_use]
-    fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float;
+    fn value(
+        &self,
+        direction: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float;
 
     #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Vec3;
@@ -47,7 +54,13 @@ impl CosinePDF {
 
 impl PDFTrait for CosinePDF {
     #[must_use]
-    fn value(&self, direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+    fn value(
+        &self,
+        direction: Vec3,
+        _wavelength: Wavelength,
+        _time: Float,
+        _rng: &mut SmallRng,
+    ) -> Float {
         let cosine = direction.normalize().dot(&self.uvw.w);
         if cosine <= 0.0 {
             0.0
@@ -77,8 +90,15 @@ impl<'scene> HitablePDF<'scene> {
 
 impl<'scene> PDFTrait for HitablePDF<'scene> {
     #[must_use]
-    fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        self.hitable.pdf_value(self.origin, direction, time, rng)
+    fn value(
+        &self,
+        direction: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
+        self.hitable
+            .pdf_value(self.origin, direction, wavelength, time, rng)
     }
 
     #[must_use]
@@ -106,8 +126,15 @@ impl<'scene> MixturePDF<'scene> {
 
 impl<'scene> PDFTrait for MixturePDF<'scene> {
     #[must_use]
-    fn value(&self, direction: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        0.5 * self.pdf1.value(direction, time, rng) + 0.5 * self.pdf2.value(direction, time, rng)
+    fn value(
+        &self,
+        direction: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
+        0.5 * self.pdf1.value(direction, wavelength, time, rng)
+            + 0.5 * self.pdf2.value(direction, wavelength, time, rng)
     }
 
     #[must_use]
@@ -132,7 +159,13 @@ impl SpherePDF {
 
 impl PDFTrait for SpherePDF {
     #[must_use]
-    fn value(&self, _direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+    fn value(
+        &self,
+        _direction: Vec3,
+        _wavelength: Wavelength,
+        _time: Float,
+        _rng: &mut SmallRng,
+    ) -> Float {
         1.0 / (4.0 * PI)
     }
 
@@ -155,13 +188,19 @@ impl ZeroPDF {
 
 impl PDFTrait for ZeroPDF {
     #[must_use]
-    fn value(&self, _direction: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+    fn value(
+        &self,
+        _direction: Vec3,
+        _wavelength: Wavelength,
+        _time: Float,
+        _rng: &mut SmallRng,
+    ) -> Float {
         0.0
     }
 
     #[must_use]
-    fn generate(&self, _rng: &mut SmallRng) -> Vec3 {
-        Vec3::new(1.0, 0.0, 0.0)
+    fn generate(&self, rng: &mut SmallRng) -> Vec3 {
+        random_in_unit_sphere(rng)
     }
 }
 

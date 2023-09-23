@@ -4,6 +4,7 @@ use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable, HitableTrait},
     ray::Ray,
+    spectral::Wavelength,
     Box, Float, Vec3,
 };
 use rand::rngs::SmallRng;
@@ -62,8 +63,15 @@ impl<'scene> HitableTrait for FlipFace<'scene> {
 
     /// Returns a probability density function value based on the inner object
     #[must_use]
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        self.object.pdf_value(origin, vector, time, rng)
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
+        self.object.pdf_value(origin, vector, wavelength, time, rng)
     }
 
     /// Returns a random point on the surface of the inner object

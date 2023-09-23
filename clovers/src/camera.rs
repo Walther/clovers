@@ -2,6 +2,7 @@
 
 #![allow(clippy::too_many_arguments)] // TODO: Camera::new() has a lot of arguments.
 
+use crate::spectral::random_wavelength;
 use crate::{random::random_in_unit_disk, ray::Ray, Float, Vec3, PI};
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -106,10 +107,15 @@ impl Camera {
         let offset: Vec3 = self.u * rd.x + self.v * rd.y;
         // Randomized time used for motion blur
         let time: Float = rng.gen_range(self.time_0..self.time_1);
-        Ray::new(
-            self.origin + offset,
-            self.lower_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset,
+        // Random wavelength for spectral rendering
+        let wavelength = random_wavelength(rng);
+        Ray {
+            origin: self.origin + offset,
+            direction: self.lower_left_corner + s * self.horizontal + t * self.vertical
+                - self.origin
+                - offset,
             time,
-        )
+            wavelength,
+        }
     }
 }

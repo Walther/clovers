@@ -13,6 +13,7 @@ use crate::{
     materials::{Material, MaterialInit, SharedMaterial},
     objects::Triangle,
     ray::Ray,
+    spectral::Wavelength,
     Float, Vec3,
 };
 
@@ -48,8 +49,16 @@ impl<'scene> HitableTrait for STL<'scene> {
 
     /// Returns a probability density function value based on the object
     #[must_use]
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        self.bvhnode.pdf_value(origin, vector, time, rng)
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
+        self.bvhnode
+            .pdf_value(origin, vector, wavelength, time, rng)
     }
 
     /// Returns a random point on the ssurface of the object

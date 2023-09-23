@@ -100,7 +100,12 @@ impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
             let direction = reflected + roughness * random_in_unit_sphere(rng);
 
             Some(ScatterRecord {
-                specular_ray: Some(Ray::new(hit_record.position, direction, ray.time)),
+                specular_ray: Some(Ray {
+                    origin: hit_record.position,
+                    direction,
+                    time: ray.time,
+                    wavelength: ray.wavelength,
+                }),
                 attenuation,
                 material_type: MaterialType::Specular,
                 pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()),

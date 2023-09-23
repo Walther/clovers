@@ -28,8 +28,11 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
         return scene.background_color;
     };
 
+    // Spectral rendering: compute a tint based on the current ray's wavelength
+    let tint: Color = ray.wavelength.into();
+
     // Get the emitted color from the surface that we just hit
-    let emitted: Color = hit_record.material.emit(
+    let mut emitted: Color = hit_record.material.emit(
         ray,
         &hit_record,
         hit_record.u,
@@ -37,26 +40,33 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
         hit_record.position,
     );
 
+    // Tint the emitted light based on the wavelength. Emissive values do not need to be clamped, as they do not need to be energy-conserving.
+    emitted = emitted * tint;
+
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
         // No scatter, early return the emitted color only
         return emitted;
     };
+    // We have scattered, and received an attenuation from the material.
+    // Tint based on the wavelength. Reflective values need to be clamped to ensure the reflections are energy-conserving.
+    // TODO: verify correctness!
+    let attenuation = scatter_record.attenuation * tint;
+    let attenuation = attenuation.clamp();
 
-    // We have scattered, check material type and recurse accordingly
+    // Check the material type and recurse accordingly:
     match scatter_record.material_type {
         MaterialType::Specular => {
-            // If we hit a specular material, generate a specular ray, and multiply it with the value of the scatter_record.
-            // Note that the `emitted` value from earlier is not used, as the scatter_record.attenuation has an appropriately adjusted color
-            scatter_record.attenuation
-                * colorize(
-                    // a scatter_record from a specular material should always have this ray
-                    &scatter_record.specular_ray.unwrap(),
-                    scene,
-                    depth + 1,
-                    max_depth,
-                    rng,
-                )
+            // If we hit a specular material, generate a specular ray, and multiply it with the attenuation
+            let specular = colorize(
+                // a scatter_record from a specular material should always have this ray
+                &scatter_record.specular_ray.unwrap(),
+                scene,
+                depth + 1,
+                max_depth,
+                rng,
+            );
+            specular * attenuation
         }
         MaterialType::Diffuse => {
             // Use a probability density function to figure out where to scatter a new ray
@@ -66,8 +76,13 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
                 hit_record.position,
             ));
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
-            let scatter_ray = Ray::new(hit_record.position, mixture_pdf.generate(rng), ray.time);
-            let pdf_val = mixture_pdf.value(scatter_ray.direction, ray.time, rng);
+            let scatter_ray = Ray {
+                origin: hit_record.position,
+                direction: mixture_pdf.generate(rng),
+                time: ray.time,
+                wavelength: ray.wavelength,
+            };
+            let pdf_val = mixture_pdf.value(scatter_ray.direction, ray.wavelength, ray.time, rng);
             if pdf_val <= 0.0 {
                 // scattering impossible, prevent division by zero below
                 // for more ctx, see https://github.com/RayTracing/raytracing.github.io/issues/979#issuecomment-1034517236
@@ -86,8 +101,8 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
 
             // Recurse for the scattering ray
             let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
-            // Weight it according to the PDF
-            let scattered = scatter_record.attenuation * scattering_pdf * recurse / pdf_val;
+            // Tint and weight it according to the PDF
+            let scattered = attenuation * scattering_pdf * recurse / pdf_val;
             // Ensure positive color
             let scattered = scattered.non_negative();
             // Blend it all together

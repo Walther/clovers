@@ -8,6 +8,7 @@ use crate::{
     aabb::AABB,
     hitable::{Empty, HitRecord, Hitable, HitableTrait},
     ray::Ray,
+    spectral::Wavelength,
     Box, Float, Vec, Vec3,
 };
 
@@ -184,13 +185,20 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
 
     /// Returns a probability density function value based on the children
     #[must_use]
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: f32, rng: &mut SmallRng) -> f32 {
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
         match (&*self.left, &*self.right) {
-            (_, Hitable::Empty(_)) => self.left.pdf_value(origin, vector, time, rng),
-            (Hitable::Empty(_), _) => self.right.pdf_value(origin, vector, time, rng),
+            (_, Hitable::Empty(_)) => self.left.pdf_value(origin, vector, wavelength, time, rng),
+            (Hitable::Empty(_), _) => self.right.pdf_value(origin, vector, wavelength, time, rng),
             (_, _) => {
-                (self.left.pdf_value(origin, vector, time, rng)
-                    + self.right.pdf_value(origin, vector, time, rng))
+                (self.left.pdf_value(origin, vector, wavelength, time, rng)
+                    + self.right.pdf_value(origin, vector, wavelength, time, rng))
                     / 2.0
             }
         }
