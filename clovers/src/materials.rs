@@ -3,6 +3,7 @@
 use core::fmt::Debug;
 
 use crate::{color::Color, hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
+pub mod cone_light;
 pub mod dielectric;
 pub mod diffuse_light;
 pub mod dispersive;
@@ -12,6 +13,7 @@ pub mod isotropic;
 pub mod lambertian;
 pub mod metal;
 
+pub use cone_light::*;
 pub use dielectric::*;
 pub use diffuse_light::*;
 pub use dispersive::*;
@@ -93,6 +95,8 @@ pub enum Material {
     Dispersive(Dispersive),
     /// Lambertian material
     Lambertian(Lambertian),
+    /// ConeLight material
+    ConeLight(ConeLight),
     /// DiffuseLight material
     DiffuseLight(DiffuseLight),
     /// Metal material

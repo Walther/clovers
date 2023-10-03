@@ -2,10 +2,10 @@
   "time_0": 0,
   "time_1": 1,
   "camera": {
-    "look_from": [-150, 278, -800],
-    "look_at": [450, 275, 555],
+    "look_from": [-600, 310, -400],
+    "look_at": [0, 310, 0],
     "up": [0, 1, 0],
-    "vertical_fov": 40,
+    "vertical_fov": 35,
     "aperture": 0,
     "focus_distance": 10
   },
@@ -21,55 +21,23 @@
     },
     {
       "kind": "Quad",
-      "q": [0, 0, 0],
-      "u": [555, 0, 0],
-      "v": [0, 0, 555],
-      "material": "grey wall",
-      "comment": "floor"
+      "q": [113, 555, 127],
+      "u": [330, 0, 0],
+      "v": [0, 0, 305],
+      "material": "big lamp",
+      "comment": "big ceiling light"
     },
     {
       "kind": "Quad",
-      "q": [0, 555, 0],
-      "u": [555, 0, 0],
-      "v": [0, 0, 555],
-      "material": "grey wall",
-      "comment": "ceiling"
-    },
-    {
-      "kind": "Quad",
-      "q": [277, 554, 120],
-      "u": [2, 0, 0],
-      "v": [0, 0, 200],
-      "material": "strong lamp",
+      "q": [277, 554, 140],
+      "u": [10, 0, 0],
+      "v": [0, 0, 278],
+      "material": "narrow lamp",
       "comment": "narrow ceiling light"
     },
     {
-      "kind": "Quad",
-      "q": [279, 554, 120],
-      "u": [0, -40, 0],
-      "v": [0, 0, 200],
-      "material": "grey wall",
-      "comment": "light guide, left"
-    },
-    {
-      "kind": "Quad",
-      "q": [277, 554, 120],
-      "u": [0, -40, 0],
-      "v": [0, 0, 200],
-      "material": "grey wall",
-      "comment": "light guide, right"
-    },
-    {
-      "kind": "Quad",
-      "q": [0, 0, 555],
-      "u": [555, 0, 0],
-      "v": [0, 555, 0],
-      "material": "grey wall",
-      "comment": "back wall"
-    },
-    {
       "kind": "STL",
-      "center": [300, 350, 250],
+      "center": [300, 350, 278],
       "scale": 20,
       "rotation": [0, 0, -30],
       "path": "stl/prism.stl",
@@ -80,15 +48,23 @@
   "priority_objects": [
     {
       "kind": "Quad",
-      "q": [277, 554, 120],
-      "u": [2, 0, 0],
-      "v": [0, 0, 200],
-      "material": "strong lamp",
+      "q": [113, 555, 127],
+      "u": [330, 0, 0],
+      "v": [0, 0, 305],
+      "material": "big lamp",
+      "comment": "big ceiling light"
+    },
+    {
+      "kind": "Quad",
+      "q": [277, 554, 140],
+      "u": [10, 0, 0],
+      "v": [0, 0, 278],
+      "material": "narrow lamp",
       "comment": "narrow ceiling light"
     },
     {
       "kind": "STL",
-      "center": [300, 350, 250],
+      "center": [300, 350, 278],
       "scale": 20,
       "rotation": [0, 0, -30],
       "path": "stl/prism.stl",
@@ -146,19 +122,20 @@
       "cauchy_b": 0.5
     },
     {
-      "name": "weak lamp",
+      "name": "big lamp",
       "kind": "DiffuseLight",
       "emit": {
         "kind": "SolidColor",
-        "color": [10, 10, 10]
+        "color": [2, 2, 2]
       }
     },
     {
-      "name": "strong lamp",
-      "kind": "DiffuseLight",
+      "name": "narrow lamp",
+      "kind": "ConeLight",
+      "spread": 2.0,
       "emit": {
         "kind": "SolidColor",
-        "color": [1000, 1000, 1000]
+        "color": [500, 500, 500]
       }
     },
     {
