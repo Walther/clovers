@@ -1,9 +1,9 @@
 //! A quadrilateral object.
 // TODO: better docs
 
+use crate::colors::Wavelength;
 use crate::hitable::HitableTrait;
 use crate::materials::MaterialInit;
-use crate::spectral::Wavelength;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,

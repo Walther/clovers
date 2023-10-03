@@ -3,10 +3,10 @@
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
 use crate::{
+    colors::Wavelength,
     hitable::{Hitable, HitableTrait},
     onb::ONB,
     random::{random_cosine_direction, random_in_unit_sphere},
-    spectral::Wavelength,
     Box, Float, Vec3, PI,
 };
 use enum_dispatch::enum_dispatch;

@@ -2,6 +2,7 @@
 
 // TODO: more flexible colors?
 
+use crate::colors::sRGB;
 use crate::{Float, Vec3};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 use rand::rngs::SmallRng;
@@ -198,5 +199,13 @@ impl Div<Float> for Color {
     type Output = Color;
     fn div(self, rhs: Float) -> Color {
         Color::new(self.r / rhs, self.g / rhs, self.b / rhs)
+    }
+}
+
+impl From<sRGB> for Color {
+    fn from(value: sRGB) -> Self {
+        // TODO: verify correctness / possibly remove the simplistic `Color` type
+        let sRGB { r, g, b } = value;
+        Color { r, g, b }
     }
 }

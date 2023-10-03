@@ -2,9 +2,9 @@
 
 use crate::{
     aabb::AABB,
+    colors::Wavelength,
     hitable::{HitRecord, Hitable, HitableTrait},
     ray::Ray,
-    spectral::Wavelength,
     Box, Float, Vec3,
 };
 use rand::rngs::SmallRng;

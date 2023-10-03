@@ -46,7 +46,7 @@ struct Opts {
     #[clap(short = 'd', long, default_value = "100")]
     max_depth: u32,
     /// Gamma correction value
-    #[clap(short, long, default_value = "2.0")]
+    #[clap(short, long, default_value = "2.2")]
     gamma: Float,
     /// Suppress most of the text output
     #[clap(short, long)]

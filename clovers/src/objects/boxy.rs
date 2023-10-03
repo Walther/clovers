@@ -3,10 +3,10 @@
 use super::Quad;
 use crate::{
     aabb::AABB,
+    colors::Wavelength,
     hitable::{HitRecord, Hitable, HitableTrait},
     materials::{Material, MaterialInit},
     ray::Ray,
-    spectral::Wavelength,
     Box, Float, Vec3,
 };
 use rand::{rngs::SmallRng, Rng};

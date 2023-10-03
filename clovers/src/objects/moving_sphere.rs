@@ -2,11 +2,11 @@
 
 use crate::{
     aabb::AABB,
+    colors::Wavelength,
     hitable::{HitRecord, HitableTrait},
     materials::{Material, MaterialInit},
     random::random_in_unit_sphere,
     ray::Ray,
-    spectral::Wavelength,
     Float, Vec3, PI,
 };
 use rand::rngs::SmallRng;

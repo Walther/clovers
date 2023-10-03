@@ -17,10 +17,10 @@ use rand::{rngs::SmallRng, Rng};
 
 use crate::{
     color::Color,
+    colors::Wavelength,
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     ray::Ray,
-    spectral::Wavelength,
     Float, Vec3,
 };
 

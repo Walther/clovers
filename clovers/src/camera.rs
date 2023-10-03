@@ -2,7 +2,7 @@
 
 #![allow(clippy::too_many_arguments)] // TODO: Camera::new() has a lot of arguments.
 
-use crate::spectral::random_wavelength;
+use crate::colors::random_wavelength;
 use crate::{random::random_in_unit_disk, ray::Ray, Float, Vec3, PI};
 use rand::rngs::SmallRng;
 use rand::Rng;

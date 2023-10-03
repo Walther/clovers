@@ -1,6 +1,6 @@
 //! The very core of the ray tracing rendering itself: the [Ray](crate::ray::Ray)
 
-use crate::{spectral::Wavelength, Float, Vec3};
+use crate::{colors::Wavelength, Float, Vec3};
 
 /// A Ray has an origin and a direction, as well as an instant in time it exists in. Motion blur is achieved by creating multiple rays with slightly different times.
 #[derive(Clone, Debug, PartialEq)]

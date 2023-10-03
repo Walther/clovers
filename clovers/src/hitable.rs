@@ -10,12 +10,12 @@ use crate::objects::{GLTFTriangle, GLTF};
 use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
+    colors::Wavelength,
     materials::MaterialTrait,
     objects::{
         Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
     },
     ray::Ray,
-    spectral::Wavelength,
     Float, Vec3,
 };
 

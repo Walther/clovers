@@ -2,11 +2,11 @@
 
 use crate::{
     aabb::AABB,
+    colors::Wavelength,
     hitable::{HitRecord, Hitable, HitableTrait},
     materials::{isotropic::Isotropic, Material},
     random::random_unit_vector,
     ray::Ray,
-    spectral::Wavelength,
     textures::Texture,
     Box, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
 };

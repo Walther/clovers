@@ -2,6 +2,7 @@
 
 use crate::{
     color::Color,
+    colors::{sRGB, sRGB_Linear, XYZ_Normalized, XYZ_Tristimulus},
     hitable::HitableTrait,
     materials::MaterialType,
     pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
@@ -29,7 +30,12 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
     };
 
     // Spectral rendering: compute a tint based on the current ray's wavelength
-    let tint: Color = ray.wavelength.into();
+    // TODO: all color handling in XYZ space?
+    let tint: XYZ_Tristimulus = ray.wavelength.into();
+    let tint: XYZ_Normalized = tint.into();
+    let tint: sRGB_Linear = tint.into();
+    let tint: sRGB = tint.into();
+    let tint: Color = tint.into();
 
     // Get the emitted color from the surface that we just hit
     let mut emitted: Color = hit_record.material.emit(

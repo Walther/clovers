@@ -2,11 +2,11 @@
 
 use crate::{
     aabb::AABB,
+    colors::Wavelength,
     hitable::{HitRecord, HitableTrait},
     materials::{Material, MaterialInit},
     onb::ONB,
     ray::Ray,
-    spectral::Wavelength,
     Float, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use rand::{rngs::SmallRng, Rng};

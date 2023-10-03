@@ -12,11 +12,11 @@ use tracing::debug;
 use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
+    colors::Wavelength,
     hitable::{get_orientation, HitRecord, Hitable, HitableTrait},
     interval::Interval,
     materials::gltf::GLTFMaterial,
     ray::Ray,
-    spectral::Wavelength,
     Float, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
 

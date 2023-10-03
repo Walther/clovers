@@ -79,6 +79,7 @@ pub mod bvhnode;
 pub mod camera;
 pub mod color;
 pub mod colorize;
+pub mod colors;
 pub mod hitable;
 pub mod interval;
 pub mod materials;
@@ -89,7 +90,6 @@ pub mod pdf;
 pub mod random;
 pub mod ray;
 pub mod scenes;
-pub mod spectral;
 pub mod textures;
 
 /// Rendering options struct
