@@ -4,6 +4,7 @@
 
 use crate::colors::sRGB;
 use crate::{Float, Vec3};
+use core::iter::Sum;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -154,6 +155,19 @@ impl AddAssign<Color> for Color {
         self.r += other.r;
         self.g += other.g;
         self.b += other.b;
+    }
+}
+
+impl Sum for Color {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(
+            Color {
+                r: 0.0,
+                g: 0.0,
+                b: 0.0,
+            },
+            |a, b| a + b,
+        )
     }
 }
 
