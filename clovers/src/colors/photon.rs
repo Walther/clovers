@@ -32,7 +32,20 @@ pub fn random_wavelength(rng: &mut SmallRng) -> Wavelength {
 #[must_use]
 pub fn rotate_wavelength(hero: Wavelength) -> [Wavelength; WAVE_SAMPLE_COUNT] {
     from_fn(|j| {
-        (hero - MIN_WAVELENGTH + ((1 + j) / WAVE_SAMPLE_COUNT) * SPECTRUM_SIZE)
-            % (SPECTRUM_SIZE + MIN_WAVELENGTH)
+        (hero - MIN_WAVELENGTH + (j * SPECTRUM_SIZE / WAVE_SAMPLE_COUNT)) % SPECTRUM_SIZE
+            + MIN_WAVELENGTH
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rotate_wavelength_spread() {
+        let hero = 380;
+        let rotations = rotate_wavelength(hero);
+        let expected = [380, 480, 580, 680];
+        assert_eq!(rotations, expected);
+    }
 }
