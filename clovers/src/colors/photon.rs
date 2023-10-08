@@ -17,11 +17,16 @@ pub struct Photon {
 /// Wavelength in nanometers
 pub type Wavelength = usize;
 
-const MIN_WAVELENGTH: Wavelength = 380;
-const MAX_WAVELENGTH: Wavelength = 780;
-const SPECTRUM: Range<Wavelength> = MIN_WAVELENGTH..MAX_WAVELENGTH;
-const SPECTRUM_SIZE: usize = MAX_WAVELENGTH - MIN_WAVELENGTH;
-const WAVE_SAMPLE_COUNT: usize = 4;
+/// The lower bound for the wavelengths, inclusive
+pub const MIN_WAVELENGTH: Wavelength = 380;
+/// The upper bound for the wavelenghts, exclusive
+pub const MAX_WAVELENGTH: Wavelength = 780;
+/// The range of wavelenghts used, inclusive low, exclusive high
+pub const SPECTRUM: Range<Wavelength> = MIN_WAVELENGTH..MAX_WAVELENGTH;
+/// The length of the wavelength spectrum used
+pub const SPECTRUM_SIZE: usize = MAX_WAVELENGTH - MIN_WAVELENGTH;
+/// The count of wavelenghts used per ray in Hero Wavelength Sampling
+pub const WAVE_SAMPLE_COUNT: usize = 4;
 
 /// Return a random wavelength, sampled uniformly from the visible spectrum.
 pub fn random_wavelength(rng: &mut SmallRng) -> Wavelength {
