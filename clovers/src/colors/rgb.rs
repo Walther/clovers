@@ -1,11 +1,11 @@
 //! RGB colorspace utilities.
 
-use crate::Float;
+use crate::{color::Color, Float};
 
 use super::XYZ_Normalized;
 
 /// Linear `sRGB` color based on three [Floats](crate::Float) values.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 #[allow(non_camel_case_types)]
 pub struct sRGB_Linear {
@@ -46,7 +46,7 @@ pub fn color_component_transfer(c: Float) -> Float {
 }
 
 /// Gamma-corrected `sRGB` color based on three [Floats](crate::Float) values.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 #[allow(non_camel_case_types)]
 pub struct sRGB {
@@ -58,6 +58,23 @@ pub struct sRGB {
     pub b: Float,
 }
 
+impl sRGB {
+    /// Transforms the [`sRGB`] into a 24-bit, 3 x `u8` representation.
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::cast_sign_loss)]
+    pub fn to_bytes(&self) -> [u8; 3] {
+        [self.r, self.g, self.b].map(|mut component| {
+            if component.is_nan() {
+                component = 0.0;
+            }
+            component = component.clamp(0.0, 1.0);
+            // TODO: why 255.99?
+            (255.99 * component).floor() as u8
+        })
+    }
+}
+
 impl From<sRGB_Linear> for sRGB {
     fn from(value: sRGB_Linear) -> Self {
         let sRGB_Linear { r, g, b } = value;
@@ -66,5 +83,59 @@ impl From<sRGB_Linear> for sRGB {
             g: color_component_transfer(g),
             b: color_component_transfer(b),
         }
+    }
+}
+
+impl From<Color> for sRGB_Linear {
+    fn from(value: Color) -> Self {
+        // TODO: verify correctness / possibly remove the simplistic `Color` type
+        let Color { r, g, b } = value;
+        sRGB_Linear { r, g, b }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::colors::{sRGB, XYZ_Normalized, XYZ_Tristimulus};
+
+    use super::sRGB_Linear;
+
+    #[test]
+    fn xyz_black_to_srgb() {
+        let original: XYZ_Tristimulus = XYZ_Tristimulus {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        };
+        let converted: XYZ_Normalized = original.into();
+        let converted: sRGB_Linear = converted.into();
+        let expected = sRGB_Linear {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+        };
+        assert_eq!(converted, expected);
+    }
+
+    #[test]
+    fn xyz_white_to_srgb() {
+        // D65 standard illuminant white point
+        let original: XYZ_Tristimulus = XYZ_Tristimulus {
+            x: 0.9504,
+            y: 1.0000,
+            z: 1.0888,
+        };
+        let converted: XYZ_Normalized = original.into();
+        let converted: sRGB_Linear = converted.into();
+        let converted: sRGB = converted.into();
+        // NOTE: if using floats in the expected, precision errors ensue. Womp womp.
+        // let expected = sRGB {
+        //     r: 1.0,
+        //     g: 1.0,
+        //     b: 1.0,
+        // };
+        let converted: [u8; 3] = converted.to_bytes();
+        let expected = [255, 255, 255];
+        assert_eq!(converted, expected);
     }
 }

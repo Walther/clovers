@@ -2,7 +2,7 @@
 
 // TODO: more flexible colors?
 
-use crate::colors::sRGB;
+use crate::colors::{sRGB, sRGB_Linear, XYZ_Normalized, XYZ_Tristimulus};
 use crate::{Float, Vec3};
 use core::iter::Sum;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
@@ -65,6 +65,12 @@ impl Color {
         self.non_negative().limit_one()
     }
 
+    /// Returns `true` if all components are real and finite. Returns false if any component is `NaN` or `Infinity`.
+    #[must_use]
+    pub fn is_finite(&self) -> bool {
+        self.r.is_finite() && self.g.is_finite() && self.b.is_finite()
+    }
+
     /// Creates a new [Color] with random parameters between `0.0..1.0`.
     #[must_use]
     pub fn random(mut rng: SmallRng) -> Color {
@@ -108,6 +114,7 @@ impl Color {
                 component = 0.0;
             }
             component = component.clamp(0.0, 1.0);
+            // TODO: why 255.99?
             (255.99 * component).floor() as u8
         })
     }
@@ -117,9 +124,9 @@ impl From<[u8; 3]> for Color {
     fn from(rgb: [u8; 3]) -> Self {
         #[allow(clippy::cast_lossless)]
         Color::new(
-            (rgb[0] as Float) / 255.99,
-            (rgb[1] as Float) / 255.99,
-            (rgb[2] as Float) / 255.99,
+            (rgb[0] as Float) / 255.0,
+            (rgb[1] as Float) / 255.0,
+            (rgb[2] as Float) / 255.0,
         )
     }
 }
@@ -216,10 +223,58 @@ impl Div<Float> for Color {
     }
 }
 
+// TODO: one of these is not correct
 impl From<sRGB> for Color {
     fn from(value: sRGB) -> Self {
         // TODO: verify correctness / possibly remove the simplistic `Color` type
         let sRGB { r, g, b } = value;
         Color { r, g, b }
+    }
+}
+
+// TODO: one of these is not correct
+impl From<sRGB_Linear> for Color {
+    fn from(value: sRGB_Linear) -> Self {
+        // TODO: verify correctness / possibly remove the simplistic `Color` type
+        let sRGB_Linear { r, g, b } = value;
+        Color { r, g, b }
+    }
+}
+
+impl From<XYZ_Tristimulus> for Color {
+    fn from(value: XYZ_Tristimulus) -> Self {
+        let value: XYZ_Normalized = value.into();
+        let value: sRGB_Linear = value.into();
+        let value: Color = value.into();
+        value
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::color::Color;
+
+    #[test]
+    fn black_to_bytes() {
+        let original: Color = Color {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+        };
+        let converted: [u8; 3] = original.to_rgb_u8();
+        let expected = [0, 0, 0];
+        assert_eq!(converted, expected);
+    }
+
+    #[test]
+    fn white_to_bytes() {
+        let original: Color = Color {
+            r: 1.0,
+            g: 1.0,
+            b: 1.0,
+        };
+        let converted: [u8; 3] = original.to_rgb_u8();
+        let expected = [255, 255, 255];
+        assert_eq!(converted, expected);
     }
 }
