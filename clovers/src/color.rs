@@ -108,7 +108,7 @@ impl Color {
     #[must_use]
     #[allow(clippy::cast_possible_truncation)]
     #[allow(clippy::cast_sign_loss)]
-    pub fn to_rgb_u8(&self) -> [u8; 3] {
+    pub fn to_bytes(&self) -> [u8; 3] {
         [self.r, self.g, self.b].map(|mut component| {
             if component.is_nan() {
                 component = 0.0;
@@ -261,7 +261,7 @@ mod tests {
             g: 0.0,
             b: 0.0,
         };
-        let converted: [u8; 3] = original.to_rgb_u8();
+        let converted: [u8; 3] = original.to_bytes();
         let expected = [0, 0, 0];
         assert_eq!(converted, expected);
     }
@@ -273,7 +273,7 @@ mod tests {
             g: 1.0,
             b: 1.0,
         };
-        let converted: [u8; 3] = original.to_rgb_u8();
+        let converted: [u8; 3] = original.to_bytes();
         let expected = [255, 255, 255];
         assert_eq!(converted, expected);
     }
