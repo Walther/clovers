@@ -85,9 +85,8 @@ fn sample(
     let v = (y + rng.gen::<Float>()) / height;
     let ray: Ray = scene.camera.get_ray(u, v, rng);
     let new_color = colorize(&ray, scene, 0, max_depth, rng);
-    // skip NaN and Infinity
-    if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
-        return Some(new_color);
+    if new_color.is_finite() {
+        return Some(new_color.into());
     }
     None
 }
