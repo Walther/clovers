@@ -97,11 +97,7 @@
       "kind": "Sphere",
       "center": [190, 90, 190],
       "radius": 90,
-      "material": {
-        "kind": "Dielectric",
-        "refractive_index": 1.5,
-        "color": [1, 1, 1]
-      },
+      "material": "glass",
       "comment": "glass sphere"
     }
   ],
