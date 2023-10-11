@@ -88,6 +88,15 @@ impl XYZ_Tristimulus {
     pub fn is_finite(&self) -> bool {
         self.x.is_finite() && self.y.is_finite() && self.z.is_finite()
     }
+
+    /// Returns the cromaticity tuple `(x,y)` by scaling the `X` and `Y` appropriately to unity brightness.
+    #[must_use]
+    pub fn chromaticity(&self) -> (Float, Float) {
+        let &Self { x, y, z } = self;
+        let chroma_x = x / (x + y + z);
+        let chroma_y = y / (x + y + z);
+        (chroma_x, chroma_y)
+    }
 }
 
 impl Mul<Float> for XYZ_Normalized {
