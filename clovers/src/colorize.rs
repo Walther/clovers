@@ -2,12 +2,13 @@
 
 use crate::{
     color::Color,
-    colors::{sRGB, sRGB_Linear, XYZ_Normalized, XYZ_Tristimulus},
+    colors::XYZ_Tristimulus,
     hitable::HitableTrait,
     materials::MaterialType,
     pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
     ray::Ray,
     scenes::Scene,
+    spectrum::spectrum_xyz_to_p,
     Float, EPSILON_SHADOW_ACNE,
 };
 use rand::rngs::SmallRng;
@@ -29,25 +30,17 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
         return scene.background_color;
     };
 
-    // Spectral rendering: compute a tint based on the current ray's wavelength
-    // TODO: all color handling in XYZ space?
-    let tint: XYZ_Tristimulus = ray.wavelength.into();
-    let tint: XYZ_Normalized = tint.into();
-    let tint: sRGB_Linear = tint.into();
-    let tint: sRGB = tint.into();
-    let tint: Color = tint.into();
-
     // Get the emitted color from the surface that we just hit
-    let mut emitted: Color = hit_record.material.emit(
+    let emitted: Color = hit_record.material.emit(
         ray,
         &hit_record,
         hit_record.u,
         hit_record.v,
         hit_record.position,
     );
-
-    // Tint the emitted light based on the wavelength. Emissive values do not need to be clamped, as they do not need to be energy-conserving.
-    emitted = emitted * tint;
+    let tint: XYZ_Tristimulus = ray.wavelength.into();
+    let tint: Color = tint.into();
+    let emitted = tint * emitted;
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
@@ -55,10 +48,10 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
         return emitted;
     };
     // We have scattered, and received an attenuation from the material.
-    // Tint based on the wavelength. Reflective values need to be clamped to ensure the reflections are energy-conserving.
-    // TODO: verify correctness!
-    let attenuation = scatter_record.attenuation * tint;
-    let attenuation = attenuation.clamp();
+    let attenuation: XYZ_Tristimulus = scatter_record.attenuation.into();
+    let attenuation = attenuation * spectrum_xyz_to_p(ray.wavelength, attenuation);
+    let attenuation = attenuation.non_negative();
+    let attenuation: Color = attenuation.into();
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {
