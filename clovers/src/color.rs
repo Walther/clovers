@@ -2,7 +2,7 @@
 
 // TODO: more flexible colors?
 
-use crate::colors::{sRGB, sRGB_Linear, XYZ_Normalized, XYZ_Tristimulus};
+use crate::colors::{sRGB, sRGB_Linear, XYZ_Tristimulus};
 use crate::{Float, Vec3};
 use core::iter::Sum;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
@@ -243,7 +243,8 @@ impl From<sRGB_Linear> for Color {
 
 impl From<XYZ_Tristimulus> for Color {
     fn from(value: XYZ_Tristimulus) -> Self {
-        let value: XYZ_Normalized = value.into();
+        // FIXME:
+        // let value: XYZ_Normalized = value.into();
         let value: sRGB_Linear = value.into();
         let value: Color = value.into();
         value

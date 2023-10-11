@@ -2,7 +2,7 @@
 
 use crate::{color::Color, Float};
 
-use super::XYZ_Normalized;
+use super::XYZ_Tristimulus;
 
 /// Linear `sRGB` color based on three [Floats](crate::Float) values.
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -18,9 +18,9 @@ pub struct sRGB_Linear {
 }
 
 /// Conversion from XYZ (D65) to linear `sRGB` values <https://color.org/chardata/rgb/sRGB.pdf>
-impl From<XYZ_Normalized> for sRGB_Linear {
-    fn from(value: XYZ_Normalized) -> Self {
-        let XYZ_Normalized { x, y, z } = value;
+impl From<XYZ_Tristimulus> for sRGB_Linear {
+    fn from(value: XYZ_Tristimulus) -> Self {
+        let XYZ_Tristimulus { x, y, z } = value;
         let r = 3.240_625_5 * x - 1.537_208 * y - 0.498_628_6 * z;
         let g = -0.968_930_7 * x + 1.875_756_1 * y + 0.041_517_5 * z;
         let b = 0.055_710_1 * x - 0.204_021_1 * y + 1.056_995_9 * z;
@@ -32,6 +32,21 @@ impl From<XYZ_Normalized> for sRGB_Linear {
         sRGB_Linear { r, g, b }
     }
 }
+// FIXME: this should be required, but gets worse results visually?
+// impl From<XYZ_Normalized> for sRGB_Linear {
+//     fn from(value: XYZ_Normalized) -> Self {
+//         let XYZ_Normalized { x, y, z } = value;
+//         let r = 3.240_625_5 * x - 1.537_208 * y - 0.498_628_6 * z;
+//         let g = -0.968_930_7 * x + 1.875_756_1 * y + 0.041_517_5 * z;
+//         let b = 0.055_710_1 * x - 0.204_021_1 * y + 1.056_995_9 * z;
+
+//         let r = r.clamp(0.0, 1.0);
+//         let g = g.clamp(0.0, 1.0);
+//         let b = b.clamp(0.0, 1.0);
+
+//         sRGB_Linear { r, g, b }
+//     }
+// }
 
 /// Color component transfer function.
 /// Note: Produces `sRGB` digital values with a range 0 to 1, which must then be multiplied by 2^(bit depth) – 1 and quantized.
@@ -96,7 +111,7 @@ impl From<Color> for sRGB_Linear {
 
 #[cfg(test)]
 mod tests {
-    use crate::colors::{sRGB, XYZ_Normalized, XYZ_Tristimulus};
+    use crate::colors::{sRGB, XYZ_Tristimulus};
 
     use super::sRGB_Linear;
 
@@ -107,8 +122,8 @@ mod tests {
             y: 0.0,
             z: 0.0,
         };
-        let converted: XYZ_Normalized = original.into();
-        let converted: sRGB_Linear = converted.into();
+        // FIXME: let converted: XYZ_Normalized = original.into();
+        let converted: sRGB_Linear = original.into();
         let expected = sRGB_Linear {
             r: 0.0,
             g: 0.0,
@@ -125,8 +140,8 @@ mod tests {
             y: 1.0000,
             z: 1.0888,
         };
-        let converted: XYZ_Normalized = original.into();
-        let converted: sRGB_Linear = converted.into();
+        // FIXME: let converted: XYZ_Normalized = original.into();
+        let converted: sRGB_Linear = original.into();
         let converted: sRGB = converted.into();
         // NOTE: if using floats in the expected, precision errors ensue. Womp womp.
         // let expected = sRGB {
