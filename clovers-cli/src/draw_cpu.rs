@@ -86,6 +86,8 @@ fn sample(
     let ray: Ray = scene.camera.get_ray(u, v, rng);
     let new_color = colorize(&ray, scene, 0, max_depth, rng);
     if new_color.is_finite() {
+        // helper when experimentally switching between XYZ and RGB in colorize.rs
+        #[allow(clippy::useless_conversion)]
         return Some(new_color.into());
     }
     None
