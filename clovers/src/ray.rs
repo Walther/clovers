@@ -1,4 +1,4 @@
-//! The very core of the ray tracing rendering itself: the [Ray](crate::ray::Ray)
+//! The very core of the ray tracing rendering itself: the [Ray]
 
 use crate::{colors::Wavelength, Float, Vec3};
 

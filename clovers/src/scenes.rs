@@ -16,13 +16,13 @@ use tracing::info;
 #[derive(Debug)]
 /// A representation of the scene that is being rendered.
 pub struct Scene<'scene> {
-    /// Bounding-volume hierarchy of [Hitable] objects in the scene. This could, as currently written, be any [Hitable] - in practice, we place the root of the [BVHNode](crate::bvhnode::BVHNode) tree here.
+    /// Bounding-volume hierarchy of [Hitable] objects in the scene. This could, as currently written, be any [Hitable] - in practice, we place the root of the [BVHNode] tree here.
     pub objects: BVHNode<'scene>,
     /// The camera object used for rendering the scene.
     pub camera: Camera,
     /// The background color to use when the rays do not hit anything in the scene.
     pub background_color: Color, // TODO: make into Texture or something?
-    /// A [BVHNode](crate::bvhnode::BVHNode) tree of prioritized objects - e.g. glass items or lights - that affect the biased sampling of the scene. Wrapped into a [Hitable] for convenience reasons (see various PDF functions).
+    /// A [BVHNode] tree of prioritized objects - e.g. glass items or lights - that affect the biased sampling of the scene. Wrapped into a [Hitable] for convenience reasons (see various PDF functions).
     pub priority_objects: Hitable<'scene>,
 }
 
