@@ -21,6 +21,8 @@ pub fn spectrum_xyz_to_p(lambda: Wavelength, xyz: XYZ_Tristimulus) -> Float {
     let lambda: f64 = lambda as f64;
     let xyz: [f64; 3] = [f64::from(xyz.x), f64::from(xyz.y), f64::from(xyz.z)];
     let p = spectrum_grid::spectrum_xyz_to_p(lambda, xyz) / equal_energy_reflectance;
+    // Scale due to 5nm intervals
+    let p = p / 5.0;
 
     #[allow(clippy::cast_possible_truncation)]
     let p = p as Float;

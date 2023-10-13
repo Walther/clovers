@@ -4,6 +4,8 @@ use core::{array::from_fn, ops::Range};
 use rand::rngs::SmallRng;
 use rand_distr::uniform::SampleRange;
 
+use crate::Float;
+
 /// A fundamental light particle.
 #[derive(Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -25,6 +27,9 @@ pub const MAX_WAVELENGTH: Wavelength = 780;
 pub const SPECTRUM: Range<Wavelength> = MIN_WAVELENGTH..MAX_WAVELENGTH;
 /// The length of the wavelength spectrum used
 pub const SPECTRUM_SIZE: usize = MAX_WAVELENGTH - MIN_WAVELENGTH;
+/// The probability of picking a specific wavelength
+#[allow(clippy::cast_precision_loss)]
+pub const WAVELENGTH_PROBABILITY: Float = 1.0 / (SPECTRUM_SIZE as Float);
 /// The count of wavelenghts used per ray in Hero Wavelength Sampling
 pub const WAVE_SAMPLE_COUNT: usize = 4;
 
