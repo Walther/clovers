@@ -1,7 +1,6 @@
 use crate::{colorize::colorize, normals::normal_map, ray::Ray, scenes, Float};
 use clovers::RenderOpts;
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
-use palette::convert::IntoColorUnclamped;
 use palette::{IntoColor, LinSrgb, Srgb};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
@@ -10,7 +9,7 @@ use scenes::Scene;
 use std::time::Duration;
 
 /// The main drawing function, returns a `Vec<Srgb>` as a pixelbuffer.
-pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb> {
+pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
     // Progress bar
     let pixels = (opts.width * opts.height) as u64;
     let bar = ProgressBar::new(pixels);
@@ -24,7 +23,7 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb> {
         bar.enable_steady_tick(Duration::from_millis(100));
     }
 
-    let black = Srgb::new(0.0, 0.0, 0.0);
+    let black: Srgb<u8> = Srgb::new(0, 0, 0);
     let mut pixelbuffer = vec![black; pixels as usize];
 
     pixelbuffer
@@ -50,7 +49,8 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb> {
                 let v = y / height;
                 let ray: Ray = scene.camera.get_ray(u, v, &mut rng);
                 color = normal_map(&ray, scene, &mut rng);
-                *pixel = color.into_color_unclamped();
+                let color: Srgb = color.into_color();
+                *pixel = color.into_format();
                 return;
             }
             // Otherwise, do a regular render
@@ -62,7 +62,9 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb> {
                 }
             }
             color /= opts.samples as Float;
-            *pixel = color.into_color();
+            // Gamma / component transfer function
+            let color: Srgb = color.into_color();
+            *pixel = color.into_format();
 
             bar.inc(1);
         });
