@@ -2,7 +2,7 @@
 
 use crate::{
     color::Color,
-    colors::XYZ_Tristimulus,
+    colors::wavelength_into_xyz,
     hitable::HitableTrait,
     materials::MaterialType,
     pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
@@ -10,6 +10,10 @@ use crate::{
     scenes::Scene,
     spectrum::spectrum_xyz_to_p,
     Float, EPSILON_SHADOW_ACNE,
+};
+use palette::{
+    convert::{FromColorUnclamped, IntoColorUnclamped},
+    Clamp, LinSrgb, Xyz,
 };
 use rand::rngs::SmallRng;
 
@@ -38,9 +42,15 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
         hit_record.v,
         hit_record.position,
     );
-    let tint: XYZ_Tristimulus = ray.wavelength.into();
-    let tint: Color = tint.into();
+    let tint = wavelength_into_xyz(ray.wavelength);
+    let emitted: Xyz = Xyz::from_color_unclamped(LinSrgb::new(emitted.r, emitted.g, emitted.b));
     let emitted = tint * emitted;
+    let emitted: LinSrgb = emitted.into_color_unclamped();
+    let emitted: Color = Color {
+        r: emitted.red,
+        g: emitted.green,
+        b: emitted.blue,
+    };
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
@@ -48,10 +58,17 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
         return emitted;
     };
     // We have scattered, and received an attenuation from the material.
-    let attenuation: XYZ_Tristimulus = scatter_record.attenuation.into();
-    let attenuation = attenuation * spectrum_xyz_to_p(ray.wavelength, attenuation);
-    let attenuation = attenuation.non_negative();
-    let attenuation: Color = attenuation.into();
+    let attenuation = scatter_record.attenuation;
+    let attenuation: Xyz =
+        Xyz::from_color_unclamped(LinSrgb::new(attenuation.r, attenuation.g, attenuation.b));
+    let attenuation = tint * attenuation * spectrum_xyz_to_p(ray.wavelength, attenuation);
+    let attenuation: LinSrgb = attenuation.into_color_unclamped();
+    let attenuation = attenuation.clamp();
+    let attenuation: Color = Color {
+        r: attenuation.red,
+        g: attenuation.green,
+        b: attenuation.blue,
+    };
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {

@@ -2,7 +2,6 @@
 
 // TODO: more flexible colors?
 
-use crate::colors::{sRGB, sRGB_Linear, XYZ_Tristimulus};
 use crate::{Float, Vec3};
 use core::iter::Sum;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
@@ -220,34 +219,6 @@ impl Div<Float> for Color {
     type Output = Color;
     fn div(self, rhs: Float) -> Color {
         Color::new(self.r / rhs, self.g / rhs, self.b / rhs)
-    }
-}
-
-// TODO: one of these is not correct
-impl From<sRGB> for Color {
-    fn from(value: sRGB) -> Self {
-        // TODO: verify correctness / possibly remove the simplistic `Color` type
-        let sRGB { r, g, b } = value;
-        Color { r, g, b }
-    }
-}
-
-// TODO: one of these is not correct
-impl From<sRGB_Linear> for Color {
-    fn from(value: sRGB_Linear) -> Self {
-        // TODO: verify correctness / possibly remove the simplistic `Color` type
-        let sRGB_Linear { r, g, b } = value;
-        Color { r, g, b }
-    }
-}
-
-impl From<XYZ_Tristimulus> for Color {
-    fn from(value: XYZ_Tristimulus) -> Self {
-        // FIXME:
-        // let value: XYZ_Normalized = value.into();
-        let value: sRGB_Linear = value.into();
-        let value: Color = value.into();
-        value
     }
 }
 

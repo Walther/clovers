@@ -1,6 +1,7 @@
 //! The fundamental building blocks of spectral rendering.
 
 use core::{array::from_fn, ops::Range};
+use palette::Xyz;
 use rand::rngs::SmallRng;
 use rand_distr::uniform::SampleRange;
 
@@ -45,6 +46,28 @@ pub fn rotate_wavelength(hero: Wavelength) -> [Wavelength; WAVE_SAMPLE_COUNT] {
         (hero - MIN_WAVELENGTH + (j * SPECTRUM_SIZE / WAVE_SAMPLE_COUNT)) % SPECTRUM_SIZE
             + MIN_WAVELENGTH
     })
+}
+
+/// Helper function adapted from <https://en.wikipedia.org/wiki/CIE_1931_color_space#Analytical_approximation>
+fn gaussian(x: Float, alpha: Float, mu: Float, sigma1: Float, sigma2: Float) -> Float {
+    let t = (x - mu) / (if x < mu { sigma1 } else { sigma2 });
+    alpha * (-(t * t) / 2.0).exp()
+}
+
+/// Helper function adapted from <https://en.wikipedia.org/wiki/CIE_1931_color_space#Analytical_approximation>
+#[allow(clippy::cast_precision_loss)]
+#[must_use]
+pub fn wavelength_into_xyz(lambda: Wavelength) -> Xyz {
+    // With the wavelength λ measured in nanometers, we then approximate the 1931 color matching functions:
+    let l: Float = lambda as Float;
+    let x = 0.0 // for readability of next lines
+        + gaussian(l, 1.056, 599.8, 37.9, 31.0)
+        + gaussian(l, 0.362, 442.0, 16.0, 26.7)
+        + gaussian(l, -0.065, 501.1, 20.4, 26.2);
+    let y = gaussian(l, 0.821, 568.8, 46.9, 40.5) + gaussian(l, 0.286, 530.9, 16.3, 31.1);
+    let z = gaussian(l, 1.217, 437.0, 11.8, 36.0) + gaussian(l, 0.681, 459.0, 26.0, 13.8);
+
+    Xyz::new(x, y, z)
 }
 
 #[cfg(test)]
