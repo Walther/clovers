@@ -13,25 +13,36 @@ use crate::{
 };
 use palette::{
     convert::{FromColorUnclamped, IntoColorUnclamped},
-    Clamp, LinSrgb, Xyz,
+    Clamp, LinSrgb, Srgb, Xyz,
 };
 use rand::rngs::SmallRng;
 
 /// The main coloring function. Sends a [Ray] to the [Scene], sees if it hits anything, and eventually returns a [Color]. Taking into account the [Material](crate::materials::Material) that is hit, the method recurses with various adjustments, with a new [Ray] started from the location that was hit.
 #[must_use]
-pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut SmallRng) -> Color {
+pub fn colorize(
+    ray: &Ray,
+    scene: &Scene,
+    depth: u32,
+    max_depth: u32,
+    rng: &mut SmallRng,
+) -> LinSrgb {
+    let bg = LinSrgb::from_color_unclamped(Srgb::new(
+        scene.background_color.r,
+        scene.background_color.g,
+        scene.background_color.b,
+    ));
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
         // Ray bounce limit reached, early return background_color
         // TODO: this weighs the colorization of any pixel with the background color quite heavily!
-        return scene.background_color;
+        return bg;
     }
 
     // Send the ray to the scene, and see if it hits anything.
     // distance_min is set to an epsilon to avoid "shadow acne" that can happen when set to zero
     let Some(hit_record) = scene.objects.hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng) else {
         // If the ray hits nothing, early return the background color.
-        return scene.background_color;
+        return bg;
     };
 
     // Get the emitted color from the surface that we just hit
@@ -43,14 +54,9 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
         hit_record.position,
     );
     let tint = wavelength_into_xyz(ray.wavelength);
-    let emitted: Xyz = Xyz::from_color_unclamped(LinSrgb::new(emitted.r, emitted.g, emitted.b));
+    let emitted: Xyz = Xyz::from_color_unclamped(Srgb::new(emitted.r, emitted.g, emitted.b));
     let emitted = tint * emitted;
     let emitted: LinSrgb = emitted.into_color_unclamped();
-    let emitted: Color = Color {
-        r: emitted.red,
-        g: emitted.green,
-        b: emitted.blue,
-    };
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
@@ -60,15 +66,10 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
     // We have scattered, and received an attenuation from the material.
     let attenuation = scatter_record.attenuation;
     let attenuation: Xyz =
-        Xyz::from_color_unclamped(LinSrgb::new(attenuation.r, attenuation.g, attenuation.b));
+        Xyz::from_color_unclamped(Srgb::new(attenuation.r, attenuation.g, attenuation.b));
     let attenuation = tint * attenuation * spectrum_xyz_to_p(ray.wavelength, attenuation);
     let attenuation: LinSrgb = attenuation.into_color_unclamped();
     let attenuation = attenuation.clamp();
-    let attenuation: Color = Color {
-        r: attenuation.red,
-        g: attenuation.green,
-        b: attenuation.blue,
-    };
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {
@@ -120,7 +121,7 @@ pub fn colorize(ray: &Ray, scene: &Scene, depth: u32, max_depth: u32, rng: &mut 
             // Tint and weight it according to the PDF
             let scattered = attenuation * scattering_pdf * recurse / pdf_val;
             // Ensure positive color
-            let scattered = scattered.non_negative();
+            // let scattered = scattered.non_negative();
             // Blend it all together
             emitted + scattered
         }
