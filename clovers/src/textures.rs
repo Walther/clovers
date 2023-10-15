@@ -5,11 +5,12 @@ pub mod spatial_checker;
 pub mod surface_checker;
 
 use enum_dispatch::enum_dispatch;
+use palette::LinSrgb;
 pub use solid_color::*;
 pub use spatial_checker::*;
 pub use surface_checker::*;
 
-use crate::{color::Color, Float, Vec3};
+use crate::{Float, Vec3};
 
 #[enum_dispatch(TextureTrait)]
 #[derive(Clone, Debug)]
@@ -29,7 +30,7 @@ pub enum Texture {
 pub(crate) trait TextureTrait {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
     #[must_use]
-    fn color(&self, u: Float, v: Float, position: Vec3) -> Color;
+    fn color(&self, u: Float, v: Float, position: Vec3) -> LinSrgb;
 }
 
 impl Default for Texture {

@@ -2,12 +2,12 @@
 
 use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
-    color::Color,
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     ray::Ray,
     Float, Vec3,
 };
+use palette::{convert::IntoColorUnclamped, Srgb};
 use rand::rngs::SmallRng;
 use rand::Rng;
 
@@ -20,15 +20,15 @@ pub struct Dielectric {
     pub refractive_index: Float,
     /// Color of the material. Used for colorizing the rays. Default value: [`Color::new(1.0, 1.0, 1.0)`](crate::color::Color), producing a fully transparent, clear glass.
     #[cfg_attr(feature = "serde-derive", serde(default = "default_color"))]
-    pub color: Color,
+    pub color: Srgb,
 }
 
 fn default_index() -> Float {
     1.5
 }
 
-fn default_color() -> Color {
-    Color::new(1.0, 1.0, 1.0)
+fn default_color() -> Srgb {
+    Srgb::new(1.0, 1.0, 1.0)
 }
 
 impl MaterialTrait for Dielectric {
@@ -40,7 +40,6 @@ impl MaterialTrait for Dielectric {
         hit_record: &HitRecord,
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
-        let attenuation = self.color;
         let refraction_ratio: Float = if hit_record.front_face {
             1.0 / self.refractive_index
         } else {
@@ -71,7 +70,7 @@ impl MaterialTrait for Dielectric {
         Some(ScatterRecord {
             material_type: MaterialType::Specular,
             specular_ray: Some(specular_ray),
-            attenuation,
+            attenuation: self.color.into_color_unclamped(),
             pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()), //TODO: ugly hack due to nullptr in original tutorial
         })
     }
@@ -92,7 +91,7 @@ impl MaterialTrait for Dielectric {
 impl Dielectric {
     /// Creates a new [Dielectric] material with the given refractive index and color.
     #[must_use]
-    pub fn new(refractive_index: Float, color: Color) -> Self {
+    pub fn new(refractive_index: Float, color: Srgb) -> Self {
         Dielectric {
             refractive_index,
             color,

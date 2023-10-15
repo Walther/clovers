@@ -2,7 +2,6 @@
 
 use super::{MaterialTrait, ScatterRecord};
 use crate::{
-    color::Color,
     hitable::HitRecord,
     ray::Ray,
     textures::{SolidColor, Texture, TextureTrait},
@@ -22,7 +21,7 @@ impl Default for DiffuseLight {
     /// Creates a new [`DiffuseLight`] with white light at intensity `100.0`
     fn default() -> Self {
         DiffuseLight {
-            emit: Texture::SolidColor(SolidColor::new(Color::new(100.0, 100.0, 100.0))),
+            emit: Texture::SolidColor(SolidColor::new(Srgb::new(100.0, 100.0, 100.0))),
         }
     }
 }
@@ -63,8 +62,7 @@ impl MaterialTrait for DiffuseLight {
         position: Vec3,
     ) -> LinSrgb {
         if hit_record.front_face {
-            let emit: Color = self.emit.color(u, v, position);
-            let emit: Srgb = Srgb::new(emit.r, emit.g, emit.b);
+            let emit = self.emit.color(u, v, position);
             let emit: LinSrgb = emit.into_color_unclamped();
             emit
         } else {

@@ -2,7 +2,7 @@
 
 use core::fmt::Debug;
 
-use crate::{color::Color, hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
+use crate::{hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
 pub mod cone_light;
 pub mod dielectric;
 pub mod diffuse_light;
@@ -129,7 +129,7 @@ pub struct ScatterRecord<'ray> {
     /// Direction of a generated specular ray
     pub specular_ray: Option<Ray>,
     /// Current color to take into account when following the scattered ray for futher iterations
-    pub attenuation: Color,
+    pub attenuation: LinSrgb,
     /// Probability density function to use with the [ScatterRecord].
     // TODO: understand & explain
     pub pdf_ptr: PDF<'ray>,

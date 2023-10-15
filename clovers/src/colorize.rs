@@ -64,8 +64,7 @@ pub fn colorize(
     };
     // We have scattered, and received an attenuation from the material.
     let attenuation = scatter_record.attenuation;
-    let attenuation: Xyz =
-        Xyz::from_color_unclamped(Srgb::new(attenuation.r, attenuation.g, attenuation.b));
+    let attenuation: Xyz = attenuation.into_color_unclamped();
     let attenuation = tint * attenuation * spectrum_xyz_to_p(ray.wavelength, attenuation);
     let attenuation: LinSrgb = attenuation.into_color_unclamped();
     let attenuation = attenuation.clamp();

@@ -4,6 +4,7 @@
 
 #[cfg(feature = "gl_tf")]
 use gltf::{image::Data, Material};
+use palette::LinSrgb;
 use rand::rngs::SmallRng;
 
 use crate::{
@@ -92,6 +93,7 @@ impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
 
         // TODO: full color model
         let attenuation = emissive + base_color * occlusion;
+        let attenuation: LinSrgb = LinSrgb::new(attenuation.r, attenuation.g, attenuation.b);
 
         // TODO: better metalness model
         if metalness > 0.0 {

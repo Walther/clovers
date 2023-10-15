@@ -2,7 +2,6 @@
 
 use super::{MaterialTrait, ScatterRecord};
 use crate::{
-    color::Color,
     hitable::HitRecord,
     ray::Ray,
     textures::{SolidColor, Texture, TextureTrait},
@@ -24,7 +23,7 @@ impl Default for ConeLight {
     fn default() -> Self {
         ConeLight {
             spread: 10.0,
-            emit: Texture::SolidColor(SolidColor::new(Color::new(100.0, 100.0, 100.0))),
+            emit: Texture::SolidColor(SolidColor::new(Srgb::new(100.0, 100.0, 100.0))),
         }
     }
 }
@@ -75,8 +74,7 @@ impl MaterialTrait for ConeLight {
             / (ray.direction.magnitude() * hit_record.normal.magnitude()))
         .acos();
 
-        let emit: Color = self.emit.color(u, v, position);
-        let emit: Srgb = Srgb::new(emit.r, emit.g, emit.b);
+        let emit = self.emit.color(u, v, position);
         let emit: LinSrgb = emit.into_color_unclamped();
         if angle <= spread_radians {
             emit
