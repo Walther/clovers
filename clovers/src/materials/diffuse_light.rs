@@ -8,6 +8,7 @@ use crate::{
     textures::{SolidColor, Texture, TextureTrait},
     Float, Vec3,
 };
+use palette::{convert::IntoColorUnclamped, LinSrgb, Srgb};
 use rand::prelude::SmallRng;
 
 /// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
@@ -60,11 +61,14 @@ impl MaterialTrait for DiffuseLight {
         u: Float,
         v: Float,
         position: Vec3,
-    ) -> Color {
+    ) -> LinSrgb {
         if hit_record.front_face {
-            self.emit.color(u, v, position)
+            let emit: Color = self.emit.color(u, v, position);
+            let emit: Srgb = Srgb::new(emit.r, emit.g, emit.b);
+            let emit: LinSrgb = emit.into_color_unclamped();
+            emit
         } else {
-            Color::new(0.0, 0.0, 0.0)
+            LinSrgb::new(0.0, 0.0, 0.0)
         }
     }
 }

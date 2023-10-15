@@ -21,6 +21,7 @@ use enum_dispatch::enum_dispatch;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
+use palette::LinSrgb;
 use rand::prelude::SmallRng;
 
 /// Initialization structure for a `Material`. Either contains a `Material` by itself, or a String `name` to be found in a shared material list.
@@ -78,8 +79,8 @@ pub trait MaterialTrait: Debug {
         _u: Float,
         _v: Float,
         _position: Vec3,
-    ) -> Color {
-        Color::new(0.0, 0.0, 0.0)
+    ) -> LinSrgb {
+        LinSrgb::new(0.0, 0.0, 0.0)
     }
 }
 

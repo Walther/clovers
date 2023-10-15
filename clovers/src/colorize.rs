@@ -1,7 +1,6 @@
 //! An opinionated colorize method. Given a [Ray] and a [Scene], evaluates the ray's path and returns a color.
 
 use crate::{
-    color::Color,
     colors::wavelength_into_xyz,
     hitable::HitableTrait,
     materials::MaterialType,
@@ -46,7 +45,7 @@ pub fn colorize(
     };
 
     // Get the emitted color from the surface that we just hit
-    let emitted: Color = hit_record.material.emit(
+    let emitted = hit_record.material.emit(
         ray,
         &hit_record,
         hit_record.u,
@@ -54,7 +53,7 @@ pub fn colorize(
         hit_record.position,
     );
     let tint = wavelength_into_xyz(ray.wavelength);
-    let emitted: Xyz = Xyz::from_color_unclamped(Srgb::new(emitted.r, emitted.g, emitted.b));
+    let emitted: Xyz = Xyz::from_color_unclamped(emitted);
     let emitted = tint * emitted;
     let emitted: LinSrgb = emitted.into_color_unclamped();
 
