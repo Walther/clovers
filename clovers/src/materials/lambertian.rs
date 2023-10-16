@@ -38,7 +38,6 @@ impl MaterialTrait for Lambertian {
     }
 
     /// Returns the scattering probability density function for the [Lambertian] material. TODO: explain the math
-    #[allow(clippy::unused_self)] // TODO:
     #[must_use]
     fn scattering_pdf(
         &self,

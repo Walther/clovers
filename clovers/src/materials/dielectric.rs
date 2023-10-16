@@ -76,7 +76,6 @@ impl MaterialTrait for Dielectric {
     }
 
     /// Scattering probability density function for Dielectric material. NOTE: not implemented!
-    #[allow(clippy::unused_self)] // TODO
     #[must_use]
     fn scattering_pdf(
         &self,

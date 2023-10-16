@@ -30,7 +30,6 @@ impl Default for ConeLight {
 
 impl MaterialTrait for ConeLight {
     /// Scatter method for the [`ConeLight`] material. Always returns `None`, as diffuse light does not scatter.
-    #[allow(clippy::unused_self)]
     #[must_use]
     fn scatter(
         &self,
@@ -42,7 +41,6 @@ impl MaterialTrait for ConeLight {
     }
 
     /// Scattering probability density function for the [`ConeLight`] material. Always returns 0, as diffuse light does not scatter.
-    #[allow(clippy::unused_self)] // TODO:
     #[must_use]
     fn scattering_pdf(
         &self,

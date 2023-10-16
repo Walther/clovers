@@ -47,7 +47,6 @@ impl MaterialTrait for Metal {
     }
 
     /// Scattering probability density function for [Metal]. Always returns zero. TODO: why?
-    #[allow(clippy::unused_self)] // TODO:
     #[must_use]
     fn scattering_pdf(
         &self,

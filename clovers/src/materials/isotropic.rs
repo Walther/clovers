@@ -40,7 +40,6 @@ impl MaterialTrait for Isotropic {
     }
 
     /// Returns the scattering probability density function for the [Isotropic] material
-    #[allow(clippy::unused_self)]
     #[must_use]
     fn scattering_pdf(
         &self,
