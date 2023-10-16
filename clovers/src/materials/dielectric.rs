@@ -18,7 +18,7 @@ pub struct Dielectric {
     /// Refractive index of the material. Used for calculating the new direction of a ray when entering the material at an angle. Follows Snell's law of refraction. Default value: 1.5, based on typical window glass.
     #[cfg_attr(feature = "serde-derive", serde(default = "default_index"))]
     pub refractive_index: Float,
-    /// Color of the material. Used for colorizing the rays. Default value: [`Color::new(1.0, 1.0, 1.0)`](crate::color::Color), producing a fully transparent, clear glass.
+    /// Color of the material. Used for colorizing the rays. Default value: [`(1.0, 1.0, 1.0)`], producing a fully transparent, clear glass.
     #[cfg_attr(feature = "serde-derive", serde(default = "default_color"))]
     pub color: Srgb,
 }

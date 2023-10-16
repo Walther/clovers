@@ -16,7 +16,7 @@ use palette::{
 };
 use rand::rngs::SmallRng;
 
-/// The main coloring function. Sends a [Ray] to the [Scene], sees if it hits anything, and eventually returns a [Color]. Taking into account the [Material](crate::materials::Material) that is hit, the method recurses with various adjustments, with a new [Ray] started from the location that was hit.
+/// The main coloring function. Sends a [`Ray`] to the [`Scene`], sees if it hits anything, and eventually returns a [`LinSrgb`]. Taking into account the [Material](crate::materials::Material) that is hit, the method recurses with various adjustments, with a new [`Ray`] started from the location that was hit.
 #[must_use]
 pub fn colorize(
     ray: &Ray,
