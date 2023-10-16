@@ -1,7 +1,7 @@
 //! The fundamental building blocks of spectral rendering.
 
 use core::{array::from_fn, ops::Range};
-use palette::Xyz;
+use palette::{chromatic_adaptation::AdaptInto, white_point::E, Xyz};
 use rand::rngs::SmallRng;
 use rand_distr::uniform::SampleRange;
 
@@ -67,7 +67,10 @@ pub fn wavelength_into_xyz(lambda: Wavelength) -> Xyz {
     let y = gaussian(l, 0.821, 568.8, 46.9, 40.5) + gaussian(l, 0.286, 530.9, 16.3, 31.1);
     let z = gaussian(l, 1.217, 437.0, 11.8, 36.0) + gaussian(l, 0.681, 459.0, 26.0, 13.8);
 
-    Xyz::new(x, y, z)
+    // The functions above have been designed for the whitepoint E
+    // We need to convert into whitepoint D65 which is assumed in the other parts of the renderer
+    let xyz = Xyz::<E>::new(x, y, z);
+    xyz.adapt_into()
 }
 
 #[cfg(test)]
