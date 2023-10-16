@@ -1,7 +1,7 @@
 //! The fundamental building blocks of spectral rendering.
 
 use core::{array::from_fn, ops::Range};
-use palette::{chromatic_adaptation::AdaptInto, white_point::E, Xyz};
+use palette::{white_point::E, Xyz};
 use rand::rngs::SmallRng;
 use rand_distr::uniform::SampleRange;
 
@@ -57,7 +57,7 @@ fn gaussian(x: Float, alpha: Float, mu: Float, sigma1: Float, sigma2: Float) -> 
 /// Helper function adapted from <https://en.wikipedia.org/wiki/CIE_1931_color_space#Analytical_approximation>
 #[allow(clippy::cast_precision_loss)]
 #[must_use]
-pub fn wavelength_into_xyz(lambda: Wavelength) -> Xyz {
+pub fn wavelength_into_xyz(lambda: Wavelength) -> Xyz<E> {
     // With the wavelength λ measured in nanometers, we then approximate the 1931 color matching functions:
     let l: Float = lambda as Float;
     let x = 0.0 // for readability of next lines
@@ -68,9 +68,7 @@ pub fn wavelength_into_xyz(lambda: Wavelength) -> Xyz {
     let z = gaussian(l, 1.217, 437.0, 11.8, 36.0) + gaussian(l, 0.681, 459.0, 26.0, 13.8);
 
     // The functions above have been designed for the whitepoint E
-    // We need to convert into whitepoint D65 which is assumed in the other parts of the renderer
-    let xyz = Xyz::<E>::new(x, y, z);
-    xyz.adapt_into()
+    Xyz::<E>::new(x, y, z)
 }
 
 #[cfg(test)]

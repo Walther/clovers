@@ -135,7 +135,7 @@
       "spread": 2.0,
       "emit": {
         "kind": "SolidColor",
-        "color": [500, 500, 500]
+        "color": [25, 25, 25]
       }
     },
     {

@@ -10,7 +10,9 @@ use crate::{
     spectrum::spectrum_xyz_to_p,
     Float, EPSILON_SHADOW_ACNE,
 };
-use palette::{convert::IntoColorUnclamped, Clamp, LinSrgb, Xyz};
+use palette::{
+    chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, Clamp, Xyz,
+};
 use rand::rngs::SmallRng;
 
 /// The main coloring function. Sends a [`Ray`] to the [`Scene`], sees if it hits anything, and eventually returns a [`LinSrgb`]. Taking into account the [Material](crate::materials::Material) that is hit, the method recurses with various adjustments, with a new [`Ray`] started from the location that was hit.
@@ -21,8 +23,9 @@ pub fn colorize(
     depth: u32,
     max_depth: u32,
     rng: &mut SmallRng,
-) -> LinSrgb {
-    let bg: LinSrgb = scene.background_color.into_color_unclamped();
+) -> Xyz<E> {
+    let bg: Xyz = scene.background_color.into_color_unclamped();
+    let bg: Xyz<E> = bg.adapt_into();
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
         // Ray bounce limit reached, early return background_color
@@ -38,6 +41,7 @@ pub fn colorize(
     };
 
     // Get the emitted color from the surface that we just hit
+    // TODO: spectral light sources!
     let emitted = hit_record.material.emit(
         ray,
         &hit_record,
@@ -45,10 +49,10 @@ pub fn colorize(
         hit_record.v,
         hit_record.position,
     );
-    let tint: Xyz = wavelength_into_xyz(ray.wavelength);
+    let tint: Xyz<E> = wavelength_into_xyz(ray.wavelength);
     let emitted: Xyz = emitted.into_color_unclamped();
+    let emitted: Xyz<E> = emitted.adapt_into();
     let emitted = tint * emitted;
-    let emitted: LinSrgb = emitted.into_color_unclamped();
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
@@ -58,8 +62,9 @@ pub fn colorize(
     // We have scattered, and received an attenuation from the material.
     let attenuation = scatter_record.attenuation;
     let attenuation: Xyz = attenuation.into_color_unclamped();
-    let attenuation = tint * attenuation * spectrum_xyz_to_p(ray.wavelength, attenuation);
-    let attenuation: LinSrgb = attenuation.into_color_unclamped();
+    let attenuation: Xyz<E> = attenuation.adapt_into();
+    let attenuation_factor = spectrum_xyz_to_p(ray.wavelength, attenuation);
+    let attenuation = attenuation * attenuation_factor;
     let attenuation = attenuation.clamp();
 
     // Check the material type and recurse accordingly:

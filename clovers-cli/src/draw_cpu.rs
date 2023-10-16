@@ -1,7 +1,10 @@
 use crate::{colorize::colorize, normals::normal_map, ray::Ray, scenes, Float};
 use clovers::RenderOpts;
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
-use palette::{IntoColor, LinSrgb, Srgb};
+use palette::chromatic_adaptation::AdaptInto;
+use palette::convert::IntoColorUnclamped;
+use palette::white_point::E;
+use palette::{IntoColor, LinSrgb, Srgb, Xyz};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
@@ -85,7 +88,9 @@ fn sample(
     let u = (x + rng.gen::<Float>()) / width;
     let v = (y + rng.gen::<Float>()) / height;
     let ray: Ray = scene.camera.get_ray(u, v, rng);
-    let new_color = colorize(&ray, scene, 0, max_depth, rng);
+    let new_color: Xyz<E> = colorize(&ray, scene, 0, max_depth, rng);
+    let new_color: Xyz = new_color.adapt_into();
+    let new_color: LinSrgb = new_color.into_color_unclamped();
     if new_color.red.is_finite() && new_color.green.is_finite() && new_color.blue.is_finite() {
         return Some(new_color);
     }

@@ -2,7 +2,7 @@
 
 #![allow(clippy::cast_precision_loss)]
 
-use palette::Xyz;
+use palette::{white_point::E, Xyz};
 
 use crate::{colors::Wavelength, Float};
 
@@ -13,10 +13,9 @@ pub mod spectrum_grid;
 
 /// Evaluate the spectrum at the given wavelength for the given XYZ color
 #[must_use]
-pub fn spectrum_xyz_to_p(lambda: Wavelength, xyz: Xyz) -> Float {
-    // Currently, the data is only built for 5nm intervals. Find a nearby value
+pub fn spectrum_xyz_to_p(lambda: Wavelength, xyz: Xyz<E>) -> Float {
+    // Currently, the data is only built for 5nm intervals
     // TODO: generate a file with 1nm intervals?
-    let lambda = (lambda / 5) * 5;
     let lambda: f64 = lambda as f64;
     let xyz: [f64; 3] = [f64::from(xyz.x), f64::from(xyz.y), f64::from(xyz.z)];
     let p = spectrum_grid::spectrum_xyz_to_p(lambda, xyz) / equal_energy_reflectance;
