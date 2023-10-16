@@ -9,7 +9,7 @@
     "aperture": 0,
     "focus_distance": 10.0
   },
-  "background_color": [0.1, 0.1, 0.1],
+  "background_color": [0.3, 0.3, 0.3],
   "objects": [
     {
       "kind": "GLTF",

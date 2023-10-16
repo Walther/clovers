@@ -4,11 +4,10 @@
 
 #[cfg(feature = "gl_tf")]
 use gltf::{image::Data, Material};
-use palette::LinSrgb;
+use palette::{convert::IntoColorUnclamped, LinSrgb, Srgb, Srgba};
 use rand::rngs::SmallRng;
 
 use crate::{
-    color::Color,
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     random::random_in_unit_sphere,
@@ -85,15 +84,14 @@ impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
         hit_record: &HitRecord,
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
-        let base_color = self.sample_base_color(hit_record);
-        let emissive = self.sample_emissive(hit_record);
+        let base_color: LinSrgb = self.sample_base_color(hit_record);
+        let emissive: LinSrgb = self.sample_emissive(hit_record).into_color_unclamped();
         let (metalness, roughness) = self.sample_metalness_roughness(hit_record);
-        let normal = self.sample_normal(hit_record);
-        let occlusion = self.sample_occlusion(hit_record);
+        let normal: Vec3 = self.sample_normal(hit_record);
+        let occlusion: Float = self.sample_occlusion(hit_record);
 
         // TODO: full color model
-        let attenuation = emissive + base_color * occlusion;
-        let attenuation: LinSrgb = LinSrgb::new(attenuation.r, attenuation.g, attenuation.b);
+        let attenuation: LinSrgb = emissive + base_color * occlusion;
 
         // TODO: better metalness model
         if metalness > 0.0 {
@@ -140,7 +138,7 @@ impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
 }
 
 impl<'scene> GLTFMaterial<'scene> {
-    fn sample_base_color(&self, hit_record: &HitRecord) -> Color {
+    fn sample_base_color(&self, hit_record: &HitRecord) -> LinSrgb {
         let base_color_texture = self
             .material
             .pbr_metallic_roughness()
@@ -150,20 +148,21 @@ impl<'scene> GLTFMaterial<'scene> {
         let base_color = match &base_color_texture {
             Some(texture) => {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
-                get_color_rgb(texture, x, y)
+                get_color_srgb(texture, x, y)
             }
-            None => Color::new(1.0, 1.0, 1.0),
+            None => Srgb::new(1.0, 1.0, 1.0),
         };
-        let base_color_factor: Color = self
+        let base_color_factor: Srgba = self
             .material
             .pbr_metallic_roughness()
             .base_color_factor()
             .into();
+        let base_color_factor: Srgb = base_color_factor.into_color_unclamped();
 
-        base_color * base_color_factor
+        (base_color * base_color_factor).into_color_unclamped()
     }
 
-    fn sample_emissive(&self, hit_record: &HitRecord) -> Color {
+    fn sample_emissive(&self, hit_record: &HitRecord) -> Srgb {
         let emissive_texture = self
             .material
             .emissive_texture()
@@ -172,13 +171,13 @@ impl<'scene> GLTFMaterial<'scene> {
         let emissive = match &emissive_texture {
             Some(texture) => {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
-                get_color_rgb(texture, x, y)
+                get_color_srgb(texture, x, y)
             }
-            None => Color::new(1.0, 1.0, 1.0),
+            None => Srgb::new(1.0, 1.0, 1.0),
         };
-        let emissive_factor: Color = self.material.emissive_factor().into();
+        let emissive_factor: Srgb = self.material.emissive_factor().into();
 
-        emissive * emissive_factor
+        (emissive * emissive_factor).into_color_unclamped()
     }
 
     fn sample_metalness_roughness(&self, hit_record: &HitRecord) -> (Float, Float) {
@@ -190,9 +189,9 @@ impl<'scene> GLTFMaterial<'scene> {
         let (metalness, roughness) = match &metallic_roughness_texture {
             Some(texture) => {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
-                let sampled_color = get_color_rgb(texture, x, y);
-                let roughness = sampled_color.g;
-                let metalness = sampled_color.b;
+                let sampled_color = get_color_linsrgb(texture, x, y);
+                let roughness = sampled_color.green;
+                let metalness = sampled_color.blue;
                 (metalness, roughness)
             }
             None => (1.0, 1.0),
@@ -211,9 +210,9 @@ impl<'scene> GLTFMaterial<'scene> {
         match &occlusion_texture {
             Some(texture) => {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
-                let sampled_color = get_color_rgb(texture, x, y);
+                let sampled_color = get_color_linsrgb(texture, x, y);
                 // Only the red channel is taken into account
-                sampled_color.r
+                sampled_color.red
             }
             None => 1.0,
         }
@@ -242,9 +241,10 @@ impl<'scene> GLTFMaterial<'scene> {
         let texture_normal = match &normal_texture {
             Some(texture) => {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
-                let sampled_color = get_color_rgb(texture, x, y);
+                let sampled_color = get_color_linsrgb(texture, x, y);
                 // Convert from Color to Vec 0..1, scale and move to -1..1
-                let normal: Vec3 = Vec3::from(sampled_color) * 2.0 - Vec3::new(1.0, 1.0, 1.0);
+                let (r, g, b) = sampled_color.into_components();
+                let normal: Vec3 = Vec3::new(r, g, b) * 2.0 - Vec3::new(1.0, 1.0, 1.0);
                 normal.normalize()
             }
             // If we don't have a normal texture, early return with the triangle normal
@@ -299,8 +299,8 @@ impl<'scene> GLTFMaterial<'scene> {
     }
 }
 
-/// Given a reference to a texture and pixel space coordinates, returns the color at that pixel
-fn get_color_rgb(texture: &&Data, x: usize, y: usize) -> Color {
+/// Given a reference to a texture and pixel space coordinates, returns the raw byte triple `(r,g,b)`
+fn sample_texture_raw(texture: &&Data, x: usize, y: usize) -> (u8, u8, u8) {
     let index = match texture.format {
         gltf::image::Format::R8G8B8 => 3 * (x + texture.width as usize * y),
         gltf::image::Format::R8G8B8A8 => 4 * (x + texture.width as usize * y),
@@ -309,5 +309,19 @@ fn get_color_rgb(texture: &&Data, x: usize, y: usize) -> Color {
     let r = texture.pixels[index];
     let g = texture.pixels[index + 1];
     let b = texture.pixels[index + 2];
-    Color::from([r, g, b])
+    (r, g, b)
+}
+
+/// Given a reference to a texture and pixel space coordinates, returns the color at that pixel, sRGB with gamma.
+fn get_color_srgb(texture: &&Data, x: usize, y: usize) -> Srgb {
+    let (r, g, b) = sample_texture_raw(texture, x, y);
+    let color: Srgb<u8> = Srgb::from_components((r, g, b));
+    color.into_format()
+}
+
+/// Given a reference to a texture and pixel space coordinates, returns the color at that pixel, linear sRGB
+fn get_color_linsrgb(texture: &&Data, x: usize, y: usize) -> LinSrgb {
+    let (r, g, b) = sample_texture_raw(texture, x, y);
+    let color: LinSrgb<u8> = LinSrgb::from_components((r, g, b));
+    color.into_format()
 }

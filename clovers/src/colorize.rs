@@ -12,7 +12,7 @@ use crate::{
 };
 use palette::{
     convert::{FromColorUnclamped, IntoColorUnclamped},
-    Clamp, LinSrgb, Srgb, Xyz,
+    Clamp, LinSrgb, Xyz,
 };
 use rand::rngs::SmallRng;
 
@@ -25,11 +25,7 @@ pub fn colorize(
     max_depth: u32,
     rng: &mut SmallRng,
 ) -> LinSrgb {
-    let bg = LinSrgb::from_color_unclamped(Srgb::new(
-        scene.background_color.r,
-        scene.background_color.g,
-        scene.background_color.b,
-    ));
+    let bg = LinSrgb::from_color_unclamped(scene.background_color);
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
         // Ray bounce limit reached, early return background_color

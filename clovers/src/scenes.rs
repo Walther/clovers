@@ -3,13 +3,13 @@
 use crate::{
     bvhnode::BVHNode,
     camera::{Camera, CameraInit},
-    color::Color,
     hitable::Hitable,
     materials::SharedMaterial,
     objects::{object_to_hitable, Object},
     Float, Vec,
 };
 
+use palette::Srgb;
 #[cfg(feature = "traces")]
 use tracing::info;
 
@@ -21,7 +21,7 @@ pub struct Scene<'scene> {
     /// The camera object used for rendering the scene.
     pub camera: Camera,
     /// The background color to use when the rays do not hit anything in the scene.
-    pub background_color: Color, // TODO: make into Texture or something?
+    pub background_color: Srgb, // TODO: make into Texture or something?
     /// A [BVHNode] tree of prioritized objects - e.g. glass items or lights - that affect the biased sampling of the scene. Wrapped into a [Hitable] for convenience reasons (see various PDF functions).
     pub priority_objects: Hitable<'scene>,
 }
@@ -35,7 +35,7 @@ impl<'scene> Scene<'scene> {
         camera: Camera,
         objects: Vec<Hitable<'scene>>,
         priority_objects: Vec<Hitable<'scene>>,
-        background_color: Color,
+        background_color: Srgb,
     ) -> Scene<'scene> {
         Scene {
             objects: BVHNode::from_list(objects, time_0, time_1),
@@ -57,7 +57,7 @@ impl<'scene> Scene<'scene> {
 pub struct SceneFile {
     time_0: Float,
     time_1: Float,
-    background_color: Color,
+    background_color: Srgb,
     camera: CameraInit,
     objects: Vec<Object>,
     #[cfg_attr(feature = "serde-derive", serde(default))]
