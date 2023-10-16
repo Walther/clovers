@@ -12,9 +12,7 @@ use crate::{
     bvhnode::BVHNode,
     colors::Wavelength,
     materials::MaterialTrait,
-    objects::{
-        Boxy, ConstantMedium, FlipFace, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle,
-    },
+    objects::{Boxy, ConstantMedium, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle},
     ray::Ray,
     Float, Vec3,
 };
@@ -60,7 +58,6 @@ pub enum Hitable<'scene> {
     Boxy(Boxy<'scene>),
     BVHNode(BVHNode<'scene>),
     ConstantMedium(ConstantMedium<'scene>),
-    FlipFace(FlipFace<'scene>),
     MovingSphere(MovingSphere<'scene>),
     Quad(Quad<'scene>),
     RotateY(RotateY<'scene>),
