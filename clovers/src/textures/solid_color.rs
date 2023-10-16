@@ -6,7 +6,7 @@ use crate::{Float, Vec3};
 
 use super::TextureTrait;
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A solid color texture. Simplest possible [Texture](crate::textures::Texture): returns a solid color at any surface coordinate or spatial position.
 pub struct SolidColor {
@@ -27,5 +27,14 @@ impl SolidColor {
     #[must_use]
     pub fn new(color: Srgb) -> Self {
         SolidColor { color }
+    }
+}
+
+impl Default for SolidColor {
+    fn default() -> Self {
+        // 18% grey
+        Self {
+            color: LinSrgb::new(0.18, 0.18, 0.18).into_color_unclamped(),
+        }
     }
 }

@@ -22,7 +22,6 @@ pub struct SurfaceChecker {
 #[cfg(feature = "serde-derive")]
 fn default_even() -> Srgb {
     // White minus middle gray 18%
-
     LinSrgb::new(0.82, 0.82, 0.82).into_color_unclamped()
 }
 
