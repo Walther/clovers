@@ -22,6 +22,7 @@ let scene = {
 };
 
 // Big light for smooth lighting of the entire scene
+let brightness = 2.5;
 let light = {
   kind: "Quad",
   q: [-100.0, 80.0, -100.0],
@@ -31,7 +32,7 @@ let light = {
     kind: "DiffuseLight",
     emit: {
       kind: "SolidColor",
-      color: [3.0, 3.0, 3.0],
+      color: [brightness, brightness, brightness],
     },
   },
 };
