@@ -1,7 +1,7 @@
 //! An opinionated colorize method. Given a [Ray] and a [Scene], evaluates the ray's path and returns a color.
 
 use crate::{
-    colors::wavelength_into_xyz,
+    colors::{wavelength_into_xyz, Wavelength},
     hitable::HitableTrait,
     materials::MaterialType,
     pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
@@ -11,7 +11,8 @@ use crate::{
     Float, EPSILON_SHADOW_ACNE,
 };
 use palette::{
-    chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, Clamp, Xyz,
+    chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, Clamp, LinSrgb,
+    Xyz,
 };
 use rand::rngs::SmallRng;
 
@@ -49,10 +50,7 @@ pub fn colorize(
         hit_record.v,
         hit_record.position,
     );
-    let tint: Xyz<E> = wavelength_into_xyz(ray.wavelength);
-    let emitted: Xyz = emitted.into_color_unclamped();
-    let emitted: Xyz<E> = emitted.adapt_into();
-    let emitted = tint * emitted;
+    let emitted = adjust_emitted(emitted, ray.wavelength);
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
@@ -60,12 +58,7 @@ pub fn colorize(
         return emitted;
     };
     // We have scattered, and received an attenuation from the material.
-    let attenuation = scatter_record.attenuation;
-    let attenuation: Xyz = attenuation.into_color_unclamped();
-    let attenuation: Xyz<E> = attenuation.adapt_into();
-    let attenuation_factor = spectrum_xyz_to_p(ray.wavelength, attenuation);
-    let attenuation = attenuation * attenuation_factor;
-    let attenuation = attenuation.clamp();
+    let attenuation = adjust_attenuation(scatter_record.attenuation, ray.wavelength);
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {
@@ -122,4 +115,19 @@ pub fn colorize(
             emitted + scattered
         }
     }
+}
+
+fn adjust_emitted(emitted: LinSrgb, wavelength: Wavelength) -> Xyz<E> {
+    let tint: Xyz<E> = wavelength_into_xyz(wavelength);
+    let emitted: Xyz = emitted.into_color_unclamped();
+    let emitted: Xyz<E> = emitted.adapt_into();
+    tint * emitted
+}
+
+fn adjust_attenuation(attenuation: LinSrgb, wavelength: Wavelength) -> Xyz<E> {
+    let attenuation: Xyz = attenuation.into_color_unclamped();
+    let attenuation: Xyz<E> = attenuation.adapt_into();
+    let attenuation_factor = spectrum_xyz_to_p(wavelength, attenuation);
+    let attenuation = attenuation * attenuation_factor;
+    attenuation.clamp()
 }
