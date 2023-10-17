@@ -6,7 +6,7 @@ use crate::{
     colors::Wavelength,
     hitable::{Hitable, HitableTrait},
     onb::ONB,
-    random::{random_cosine_direction, random_in_unit_sphere},
+    random::{random_cosine_direction, random_unit_vector},
     Box, Float, Vec3, PI,
 };
 use enum_dispatch::enum_dispatch;
@@ -171,7 +171,7 @@ impl PDFTrait for SpherePDF {
 
     #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Vec3 {
-        random_in_unit_sphere(rng)
+        random_unit_vector(rng)
     }
 }
 
@@ -200,7 +200,7 @@ impl PDFTrait for ZeroPDF {
 
     #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Vec3 {
-        random_in_unit_sphere(rng)
+        random_unit_vector(rng)
     }
 }
 

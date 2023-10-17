@@ -5,7 +5,7 @@ use crate::{
     colors::Wavelength,
     hitable::{HitRecord, HitableTrait},
     materials::{Material, MaterialInit},
-    random::random_in_unit_sphere,
+    random::random_unit_vector,
     ray::Ray,
     Float, Vec3, PI,
 };
@@ -174,6 +174,6 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
     }
 
     fn random(&self, _origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        random_in_unit_sphere(rng)
+        random_unit_vector(rng)
     }
 }

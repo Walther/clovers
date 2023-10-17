@@ -10,7 +10,7 @@ use rand::rngs::SmallRng;
 use crate::{
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
-    random::random_in_unit_sphere,
+    random::random_unit_vector,
     ray::Ray,
     Float, Vec2, Vec3, Vec4, PI,
 };
@@ -97,7 +97,7 @@ impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
         if metalness > 0.0 {
             // TODO: borrowed from metal, should this be different?
             let reflected: Vec3 = reflect(ray.direction.normalize(), normal);
-            let direction = reflected + roughness * random_in_unit_sphere(rng);
+            let direction = reflected + roughness * random_unit_vector(rng);
 
             Some(ScatterRecord {
                 specular_ray: Some(Ray {

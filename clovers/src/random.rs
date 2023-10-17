@@ -3,16 +3,9 @@
 use crate::{Float, Vec3, PI};
 use rand::rngs::SmallRng;
 use rand::Rng;
-use rand_distr::{Distribution, UnitBall, UnitDisc, UnitSphere};
+use rand_distr::{Distribution, UnitDisc, UnitSphere};
 
-/// Internal helper. Originally used for lambertian reflection with flaws
-#[must_use]
-#[inline]
-pub fn random_in_unit_sphere(rng: &mut SmallRng) -> Vec3 {
-    UnitBall.sample(rng).into()
-}
-
-/// Internal helper. Use this for the more correct "True Lambertian" reflection
+/// Internal helper.
 #[must_use]
 pub fn random_unit_vector(rng: &mut SmallRng) -> Vec3 {
     UnitSphere.sample(rng).into()
@@ -42,8 +35,8 @@ pub fn random_cosine_direction(rng: &mut SmallRng) -> Vec3 {
 
 /// Internal helper.
 #[must_use]
-pub fn random_in_hemisphere(normal: Vec3, rng: &mut SmallRng) -> Vec3 {
-    let in_unit_sphere: Vec3 = random_in_unit_sphere(rng);
+pub fn random_on_hemisphere(normal: Vec3, rng: &mut SmallRng) -> Vec3 {
+    let in_unit_sphere: Vec3 = random_unit_vector(rng);
     if in_unit_sphere.dot(&normal) > 0.0 {
         // In the same hemisphere as the normal
         in_unit_sphere

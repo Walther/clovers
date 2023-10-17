@@ -4,7 +4,7 @@ use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
-    random::random_in_unit_sphere,
+    random::random_unit_vector,
     ray::Ray,
     textures::{Texture, TextureTrait},
     Float, Vec3,
@@ -34,7 +34,7 @@ impl MaterialTrait for Metal {
         Some(ScatterRecord {
             specular_ray: Some(Ray {
                 origin: hit_record.position,
-                direction: reflected + self.fuzz * random_in_unit_sphere(rng),
+                direction: reflected + self.fuzz * random_unit_vector(rng),
                 time: ray.time,
                 wavelength: ray.wavelength,
             }),
