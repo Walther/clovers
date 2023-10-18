@@ -1,13 +1,13 @@
 //! An opinionated colorize method. Given a [Ray] and a [Scene], evaluates the ray's path and returns a color.
 
 use crate::{
-    colors::{wavelength_into_xyz, Wavelength},
     hitable::HitableTrait,
     materials::MaterialType,
     pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
     ray::Ray,
     scenes::Scene,
     spectrum::spectrum_xyz_to_p,
+    wavelength::{wavelength_into_xyz, Wavelength},
     Float, EPSILON_SHADOW_ACNE,
 };
 use palette::{

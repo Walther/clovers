@@ -91,6 +91,7 @@ pub mod ray;
 pub mod scenes;
 pub mod spectrum;
 pub mod textures;
+pub mod wavelength;
 
 /// Rendering options struct
 #[derive(Clone, Debug)]

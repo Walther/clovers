@@ -1,8 +1,7 @@
 //! CIE spectral luminous efficiency for photopic vision <https://doi.org/10.25039/CIE.DS.dktna2s3>
 
+use crate::wavelength::Wavelength;
 use crate::Float;
-
-use super::Wavelength;
 
 #[allow(clippy::unreadable_literal)]
 #[rustfmt::skip]

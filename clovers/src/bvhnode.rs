@@ -6,9 +6,9 @@ use rand::{rngs::SmallRng, Rng};
 
 use crate::{
     aabb::AABB,
-    colors::Wavelength,
     hitable::{Empty, HitRecord, Hitable, HitableTrait},
     ray::Ray,
+    wavelength::Wavelength,
     Box, Float, Vec, Vec3,
 };
 

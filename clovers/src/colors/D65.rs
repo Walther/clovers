@@ -1,8 +1,7 @@
 //! CIE standard illuminant D65, 1 nm wavelength steps. Starts from 300, ends at 830 inclusive. Data from <https://doi.org/10.25039/CIE.DS.hjfjmt59>
 
+use crate::wavelength::Wavelength;
 use crate::Float;
-
-use super::Wavelength;
 
 static CIE_STANDARD_ILLUMINANT_D65: [Float; 531] = [
     0.0341, 0.36014, 0.68618, 1.01222, 1.33826, 1.6643, 1.99034, 2.31638, 2.64242, 2.96846, 3.2945,

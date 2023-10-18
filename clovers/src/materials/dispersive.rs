@@ -17,10 +17,10 @@ use palette::LinSrgb;
 use rand::{rngs::SmallRng, Rng};
 
 use crate::{
-    colors::Wavelength,
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     ray::Ray,
+    wavelength::Wavelength,
     Float, Vec3,
 };
 

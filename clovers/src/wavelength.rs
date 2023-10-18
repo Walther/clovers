@@ -7,16 +7,6 @@ use rand_distr::uniform::SampleRange;
 
 use crate::Float;
 
-/// A fundamental light particle.
-#[derive(Copy, Clone, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct Photon {
-    /// Wavelength of the photon
-    pub wavelength: Wavelength,
-    // TODO: spin for polarization
-    // pub spin: bool,
-}
-
 /// Wavelength in nanometers
 pub type Wavelength = usize;
 

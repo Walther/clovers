@@ -9,11 +9,11 @@ use std::fs::OpenOptions;
 use crate::{
     aabb::AABB,
     bvhnode::BVHNode,
-    colors::Wavelength,
     hitable::{HitRecord, Hitable, HitableTrait},
     materials::{Material, MaterialInit, SharedMaterial},
     objects::Triangle,
     ray::Ray,
+    wavelength::Wavelength,
     Float, Vec3,
 };
 

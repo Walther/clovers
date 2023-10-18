@@ -4,7 +4,7 @@
 
 use palette::{white_point::E, Xyz};
 
-use crate::{colors::Wavelength, Float};
+use crate::{wavelength::Wavelength, Float};
 
 use self::spectra_xyz_5nm_380_780_097::equal_energy_reflectance;
 

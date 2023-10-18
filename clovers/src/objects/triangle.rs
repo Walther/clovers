@@ -1,10 +1,10 @@
 //! A triangle object. Almost exact copy of [Quad](crate::objects::Quad), with an adjusted `hit_ab` method.
 // TODO: better docs
 
-use crate::colors::Wavelength;
 use crate::hitable::HitableTrait;
 use crate::interval::Interval;
 use crate::materials::MaterialInit;
+use crate::wavelength::Wavelength;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3,
