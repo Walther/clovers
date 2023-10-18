@@ -78,7 +78,6 @@ pub mod aabb;
 pub mod bvhnode;
 pub mod camera;
 pub mod colorize;
-pub mod colors;
 pub mod hitable;
 pub mod interval;
 pub mod materials;
