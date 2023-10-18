@@ -2,7 +2,6 @@
 
 use super::{MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
-    color::Color,
     hitable::HitRecord,
     pdf::{SpherePDF, PDF},
     ray::Ray,
@@ -28,7 +27,7 @@ impl MaterialTrait for Isotropic {
         hit_record: &HitRecord,
         _rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
-        let albedo: Color = self
+        let albedo = self
             .albedo
             .color(hit_record.u, hit_record.v, hit_record.position);
 
@@ -41,7 +40,6 @@ impl MaterialTrait for Isotropic {
     }
 
     /// Returns the scattering probability density function for the [Isotropic] material
-    #[allow(clippy::unused_self)]
     #[must_use]
     fn scattering_pdf(
         &self,

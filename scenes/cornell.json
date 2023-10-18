@@ -80,7 +80,7 @@
       "kind": "Sphere",
       "center": [190, 90, 190],
       "radius": 90,
-      "material": "glass",
+      "material": "Dense flint glass SF10",
       "comment": "glass sphere"
     }
   ],
@@ -97,20 +97,16 @@
       "kind": "Sphere",
       "center": [190, 90, 190],
       "radius": 90,
-      "material": {
-        "kind": "Dielectric",
-        "refractive_index": 1.5,
-        "color": [1, 1, 1]
-      },
+      "material": "Dense flint glass SF10",
       "comment": "glass sphere"
     }
   ],
   "materials": [
     {
-      "name": "glass",
-      "kind": "Dielectric",
-      "refractive_index": 1.5,
-      "color": [1, 1, 1]
+      "name": "Dense flint glass SF10",
+      "kind": "Dispersive",
+      "cauchy_a": 1.728,
+      "cauchy_b": 0.01342
     },
     {
       "name": "lamp",

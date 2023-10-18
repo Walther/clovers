@@ -45,9 +45,6 @@ struct Opts {
     /// Maximum evaluated bounce depth for each ray
     #[clap(short = 'd', long, default_value = "100")]
     max_depth: u32,
-    /// Gamma correction value
-    #[clap(short, long, default_value = "2.0")]
-    gamma: Float,
     /// Suppress most of the text output
     #[clap(short, long)]
     quiet: bool,
@@ -96,7 +93,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         height: opts.height,
         samples: opts.samples,
         max_depth: opts.max_depth,
-        gamma: opts.gamma,
         quiet: opts.quiet,
         normalmap: opts.normalmap,
     };
@@ -127,7 +123,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut img: RgbImage = ImageBuffer::new(width, height);
     img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
         let index = y * width + x;
-        *pixel = Rgb(pixelbuffer[index as usize].to_rgb_u8());
+        *pixel = Rgb(pixelbuffer[index as usize].into());
     });
 
     // Graphics assume origin at bottom left corner of the screen

@@ -8,7 +8,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     let mut rng = SmallRng::from_entropy();
 
     c.bench_function("random in unit sphere", |b| {
-        b.iter(|| random_in_unit_sphere(black_box(&mut rng)))
+        b.iter(|| random_unit_vector(black_box(&mut rng)))
     });
 
     c.bench_function("random in unit disk", |b| {
@@ -25,7 +25,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
 
     let normal = Vec3::new(1.0, 0.0, 0.0);
     c.bench_function("random in hemisphere", |b| {
-        b.iter(|| random_in_hemisphere(normal, black_box(&mut rng)))
+        b.iter(|| random_on_hemisphere(normal, black_box(&mut rng)))
     });
 }
 

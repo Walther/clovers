@@ -77,7 +77,6 @@ use nalgebra::base::{Vector2, Vector3, Vector4};
 pub mod aabb;
 pub mod bvhnode;
 pub mod camera;
-pub mod color;
 pub mod colorize;
 pub mod hitable;
 pub mod interval;
@@ -89,7 +88,9 @@ pub mod pdf;
 pub mod random;
 pub mod ray;
 pub mod scenes;
+pub mod spectrum;
 pub mod textures;
+pub mod wavelength;
 
 /// Rendering options struct
 #[derive(Clone, Debug)]
@@ -103,8 +104,6 @@ pub struct RenderOpts {
     pub samples: u32,
     /// Maximum ray bounce depth. Higher number implies higher quality.
     pub max_depth: u32,
-    /// Gamma correction value
-    pub gamma: Float,
     /// Optionally, suppress CLI output
     pub quiet: bool,
     /// Experimental render mode: return a normal map only instead of doing a full path trace render.
@@ -117,11 +116,11 @@ pub struct RenderOpts {
 pub type Float = f32;
 /// Internal helper: re-exports the pi constant as our internal [Float] type. TODO: selectable at run time instead of build time?
 pub const PI: Float = core::f32::consts::PI;
-/// Internal type alias: a nalgebra [Vector2](nalgebra::Vector2) which is a vector with two dimensions, containing two of our internal [Float] types
+/// Internal type alias: a nalgebra [Vector2] which is a vector with two dimensions, containing two of our internal [Float] types
 pub type Vec2 = Vector2<Float>;
-/// Internal type alias: a nalgebra [Vector3](nalgebra::Vector3) which is a vector with three dimensions, containing three of our internal [Float] types
+/// Internal type alias: a nalgebra [Vector3] which is a vector with three dimensions, containing three of our internal [Float] types
 pub type Vec3 = Vector3<Float>;
-/// Internal type alias: a nalgebra [Vector4](nalgebra::Vector4) which is a vector with four dimensions, containing four of our internal [Float] types
+/// Internal type alias: a nalgebra [Vector4] which is a vector with four dimensions, containing four of our internal [Float] types
 pub type Vec4 = Vector4<Float>;
 /// Internal const: epsilon used for avoiding "shadow acne". This is mostly used for the initial minimum distance for ray hits after reflecting or scattering from a surface.
 pub const EPSILON_SHADOW_ACNE: Float = 0.001;

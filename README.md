@@ -31,3 +31,15 @@ This repository has some example model files for demonstrating triangle-based ob
 - Stanford Bunny model `bunny.stl` CC Attribution 3.0 Unported [Wikipedia](https://commons.wikimedia.org/wiki/File:Stanford_Bunny.stl)
 - Stanford Dragon model `dragon.stl` (stl converted version) CC Attribution [Thingiverse](https://www.thingiverse.com/thing:27666)
 - Rubber Duck model `duck.stl` CC0 1.0 Universal Public Domain [Thingiverse](https://www.thingiverse.com/thing:139894)
+- Triangular Prism model `prism.stl` Public Domain [Wikipedia](https://commons.wikimedia.org/wiki/File:Triangular_prism.stl)
+
+## Useful references
+
+Making this renderer would not have been possible without the availability of an abundance of great literature. Here are listed some of the sources that have been useful:
+
+- [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+- [Ray Tracing: The Next Week](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
+- [Ray Tracing: The Rest of Your Life](https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html)
+- [Physically Meaningful Rendering using Tristimulus Colours](https://doi.org/10.1111/cgf.12676)
+- [Hero Wavelength Spectral Sampling](https://doi.org/10.1111/cgf.12419)
+- [How to interpret the sRGB color space](https://color.org/chardata/rgb/sRGB.pdf)

@@ -1,14 +1,18 @@
-use crate::{color::Color, colorize::colorize, normals::normal_map, ray::Ray, scenes, Float};
+use crate::{colorize::colorize, normals::normal_map, ray::Ray, scenes, Float};
 use clovers::RenderOpts;
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
+use palette::chromatic_adaptation::AdaptInto;
+use palette::convert::IntoColorUnclamped;
+use palette::white_point::E;
+use palette::{IntoColor, LinSrgb, Srgb, Xyz};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 use scenes::Scene;
 use std::time::Duration;
 
-/// The main drawing function, returns a `Vec<Color>` as a pixelbuffer.
-pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Color> {
+/// The main drawing function, returns a `Vec<Srgb>` as a pixelbuffer.
+pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
     // Progress bar
     let pixels = (opts.width * opts.height) as u64;
     let bar = ProgressBar::new(pixels);
@@ -22,7 +26,7 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Color> {
         bar.enable_steady_tick(Duration::from_millis(100));
     }
 
-    let black = Color::new(0.0, 0.0, 0.0);
+    let black: Srgb<u8> = Srgb::new(0, 0, 0);
     let mut pixelbuffer = vec![black; pixels as usize];
 
     pixelbuffer
@@ -40,7 +44,7 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Color> {
             let mut rng = SmallRng::from_entropy();
 
             // Initialize a mutable base color for the pixel
-            let mut color: Color = Color::new(0.0, 0.0, 0.0);
+            let mut color: LinSrgb = LinSrgb::new(0.0, 0.0, 0.0);
 
             if opts.normalmap {
                 // If we are rendering just a normalmap, make it quick and early return
@@ -48,7 +52,8 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Color> {
                 let v = y / height;
                 let ray: Ray = scene.camera.get_ray(u, v, &mut rng);
                 color = normal_map(&ray, scene, &mut rng);
-                *pixel = color;
+                let color: Srgb = color.into_color();
+                *pixel = color.into_format();
                 return;
             }
             // Otherwise, do a regular render
@@ -60,10 +65,9 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Color> {
                 }
             }
             color /= opts.samples as Float;
-
-            // After multisampling, perform gamma correction and store final color into the pixel
-            color = color.gamma_correction(opts.gamma);
-            *pixel = color;
+            // Gamma / component transfer function
+            let color: Srgb = color.into_color();
+            *pixel = color.into_format();
 
             bar.inc(1);
         });
@@ -80,13 +84,14 @@ fn sample(
     height: Float,
     rng: &mut SmallRng,
     max_depth: u32,
-) -> Option<Color> {
+) -> Option<LinSrgb> {
     let u = (x + rng.gen::<Float>()) / width;
     let v = (y + rng.gen::<Float>()) / height;
     let ray: Ray = scene.camera.get_ray(u, v, rng);
-    let new_color = colorize(&ray, scene, 0, max_depth, rng);
-    // skip NaN and Infinity
-    if new_color.r.is_finite() && new_color.g.is_finite() && new_color.b.is_finite() {
+    let new_color: Xyz<E> = colorize(&ray, scene, 0, max_depth, rng);
+    let new_color: Xyz = new_color.adapt_into();
+    let new_color: LinSrgb = new_color.into_color_unclamped();
+    if new_color.red.is_finite() && new_color.green.is_finite() && new_color.blue.is_finite() {
         return Some(new_color);
     }
     None

@@ -2,21 +2,26 @@
 
 use core::fmt::Debug;
 
-use crate::{color::Color, hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
+use crate::{hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
+pub mod cone_light;
 pub mod dielectric;
 pub mod diffuse_light;
+pub mod dispersive;
 #[cfg(feature = "gl_tf")]
 pub mod gltf;
 pub mod isotropic;
 pub mod lambertian;
 pub mod metal;
 
+pub use cone_light::*;
 pub use dielectric::*;
 pub use diffuse_light::*;
+pub use dispersive::*;
 use enum_dispatch::enum_dispatch;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
+use palette::LinSrgb;
 use rand::prelude::SmallRng;
 
 /// Initialization structure for a `Material`. Either contains a `Material` by itself, or a String `name` to be found in a shared material list.
@@ -66,7 +71,7 @@ pub trait MaterialTrait: Debug {
         rng: &mut SmallRng,
     ) -> Option<Float>;
 
-    /// Returns the emissivity of the material at the given position.
+    /// Returns the emissivity of the material at the given position. Defaults to black as most materials don't emit - override when needed.
     fn emit(
         &self,
         _ray: &Ray,
@@ -74,9 +79,8 @@ pub trait MaterialTrait: Debug {
         _u: Float,
         _v: Float,
         _position: Vec3,
-    ) -> Color {
-        // Most materials don't emit, override when needed
-        Color::new(0.0, 0.0, 0.0)
+    ) -> LinSrgb {
+        LinSrgb::new(0.0, 0.0, 0.0)
     }
 }
 
@@ -88,8 +92,12 @@ pub trait MaterialTrait: Debug {
 pub enum Material {
     /// Dielectric material
     Dielectric(Dielectric),
+    /// Dispersive material
+    Dispersive(Dispersive),
     /// Lambertian material
     Lambertian(Lambertian),
+    /// ConeLight material
+    ConeLight(ConeLight),
     /// DiffuseLight material
     DiffuseLight(DiffuseLight),
     /// Metal material
@@ -121,7 +129,7 @@ pub struct ScatterRecord<'ray> {
     /// Direction of a generated specular ray
     pub specular_ray: Option<Ray>,
     /// Current color to take into account when following the scattered ray for futher iterations
-    pub attenuation: Color,
+    pub attenuation: LinSrgb,
     /// Probability density function to use with the [ScatterRecord].
     // TODO: understand & explain
     pub pdf_ptr: PDF<'ray>,
@@ -135,9 +143,10 @@ fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
 }
 
 #[must_use]
-fn refract(uv: Vec3, normal: Vec3, etai_over_etat: Float) -> Vec3 {
+fn refract(uv: Vec3, normal: Vec3, refraction_ratio: Float) -> Vec3 {
     let cos_theta: Float = -uv.dot(&normal);
-    let r_out_parallel: Vec3 = etai_over_etat * (uv + cos_theta * normal);
+    let cos_theta = cos_theta.min(1.0); // Clamp
+    let r_out_parallel: Vec3 = refraction_ratio * (uv + cos_theta * normal);
     let r_out_perp: Vec3 = -(1.0 - r_out_parallel.norm_squared()).sqrt() * normal;
     r_out_parallel + r_out_perp
 }

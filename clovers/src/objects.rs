@@ -9,7 +9,6 @@ use crate::{
 
 pub mod boxy; // avoid keyword
 pub mod constant_medium;
-pub mod flip_face;
 #[cfg(feature = "gl_tf")]
 pub mod gltf;
 pub mod moving_sphere;
@@ -26,7 +25,6 @@ pub use self::gltf::*;
 use alloc::vec::Vec;
 pub use boxy::*; // avoid keyword
 pub use constant_medium::*;
-pub use flip_face::*;
 pub use moving_sphere::*;
 pub use quad::*;
 pub use rotate::*;
@@ -57,8 +55,6 @@ pub enum Object {
     Boxy(BoxyInit),
     /// ConstantMedium object initializer
     ConstantMedium(ConstantMediumInit),
-    /// FlipFace object initializer
-    FlipFace(FlipFaceInit),
     /// MovingSphere object initializer
     MovingSphere(MovingSphereInit),
     /// ObjectList object initializer
@@ -95,11 +91,6 @@ pub fn object_to_hitable(obj: Object, materials: &[SharedMaterial]) -> Hitable<'
             let obj = *x.boundary;
             let obj: Hitable = object_to_hitable(obj, materials);
             Hitable::ConstantMedium(ConstantMedium::new(Box::new(obj), x.density, x.texture))
-        }
-        Object::FlipFace(x) => {
-            let obj = *x.object;
-            let obj: Hitable = object_to_hitable(obj, materials);
-            Hitable::FlipFace(FlipFace::new(obj))
         }
         Object::MovingSphere(x) => {
             let material = initialize_material(x.material, materials);

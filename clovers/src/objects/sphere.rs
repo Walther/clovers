@@ -6,6 +6,7 @@ use crate::{
     materials::{Material, MaterialInit},
     onb::ONB,
     ray::Ray,
+    wavelength::Wavelength,
     Float, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use rand::{rngs::SmallRng, Rng};
@@ -126,13 +127,21 @@ impl<'scene> HitableTrait for Sphere<'scene> {
 
     /// Returns the probability density function for the sphere? TODO: what does this do again and how
     #[must_use]
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        match self.hit(
-            &Ray::new(origin, vector, time),
-            EPSILON_SHADOW_ACNE,
-            Float::INFINITY,
-            rng,
-        ) {
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
+        let ray = Ray {
+            origin,
+            direction: vector,
+            time,
+            wavelength,
+        };
+        match self.hit(&ray, EPSILON_SHADOW_ACNE, Float::INFINITY, rng) {
             None => 0.0,
             Some(_hit_record) => {
                 let cos_theta_max = (1.0

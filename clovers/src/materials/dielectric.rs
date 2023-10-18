@@ -2,12 +2,12 @@
 
 use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
-    color::Color,
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     ray::Ray,
     Float, Vec3,
 };
+use palette::{convert::IntoColorUnclamped, Srgb};
 use rand::rngs::SmallRng;
 use rand::Rng;
 
@@ -18,17 +18,17 @@ pub struct Dielectric {
     /// Refractive index of the material. Used for calculating the new direction of a ray when entering the material at an angle. Follows Snell's law of refraction. Default value: 1.5, based on typical window glass.
     #[cfg_attr(feature = "serde-derive", serde(default = "default_index"))]
     pub refractive_index: Float,
-    /// Color of the material. Used for colorizing the rays. Default value: [`Color::new(1.0, 1.0, 1.0)`](crate::color::Color), producing a fully transparent, clear glass.
+    /// Color of the material. Used for colorizing the rays. Default value: [`(1.0, 1.0, 1.0)`], producing a fully transparent, clear glass.
     #[cfg_attr(feature = "serde-derive", serde(default = "default_color"))]
-    pub color: Color,
+    pub color: Srgb,
 }
 
 fn default_index() -> Float {
     1.5
 }
 
-fn default_color() -> Color {
-    Color::new(1.0, 1.0, 1.0)
+fn default_color() -> Srgb {
+    Srgb::new(1.0, 1.0, 1.0)
 }
 
 impl MaterialTrait for Dielectric {
@@ -40,10 +40,7 @@ impl MaterialTrait for Dielectric {
         hit_record: &HitRecord,
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
-        let albedo = self.color;
-        let specular_ray: Ray;
-
-        let etai_over_etat: Float = if hit_record.front_face {
+        let refraction_ratio: Float = if hit_record.front_face {
             1.0 / self.refractive_index
         } else {
             self.refractive_index
@@ -52,29 +49,33 @@ impl MaterialTrait for Dielectric {
         let unit_direction: Vec3 = ray.direction.normalize();
         let cos_theta: Float = (-unit_direction.dot(&hit_record.normal)).min(1.0);
         let sin_theta: Float = (1.0 - cos_theta * cos_theta).sqrt();
-        if etai_over_etat * sin_theta > 1.0 {
-            let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
-            specular_ray = Ray::new(hit_record.position, reflected, ray.time);
+        let specular_direction: Vec3 = if refraction_ratio * sin_theta > 1.0 {
+            reflect(unit_direction, hit_record.normal)
         } else {
-            let reflect_probability: Float = schlick(cos_theta, etai_over_etat);
+            let reflect_probability: Float = schlick(cos_theta, refraction_ratio);
             if rng.gen::<Float>() < reflect_probability {
-                let reflected: Vec3 = reflect(unit_direction, hit_record.normal);
-                specular_ray = Ray::new(hit_record.position, reflected, ray.time);
+                reflect(unit_direction, hit_record.normal)
             } else {
-                let refracted: Vec3 = refract(unit_direction, hit_record.normal, etai_over_etat);
-                specular_ray = Ray::new(hit_record.position, refracted, ray.time);
+                // Refracted
+                refract(unit_direction, hit_record.normal, refraction_ratio)
             }
-        }
+        };
+        let specular_ray = Ray {
+            origin: hit_record.position,
+            direction: specular_direction,
+            time: ray.time,
+            wavelength: ray.wavelength,
+        };
+
         Some(ScatterRecord {
             material_type: MaterialType::Specular,
             specular_ray: Some(specular_ray),
-            attenuation: albedo,
+            attenuation: self.color.into_color_unclamped(),
             pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()), //TODO: ugly hack due to nullptr in original tutorial
         })
     }
 
     /// Scattering probability density function for Dielectric material. NOTE: not implemented!
-    #[allow(clippy::unused_self)] // TODO
     #[must_use]
     fn scattering_pdf(
         &self,
@@ -89,7 +90,7 @@ impl MaterialTrait for Dielectric {
 impl Dielectric {
     /// Creates a new [Dielectric] material with the given refractive index and color.
     #[must_use]
-    pub fn new(refractive_index: Float, color: Color) -> Self {
+    pub fn new(refractive_index: Float, color: Srgb) -> Self {
         Dielectric {
             refractive_index,
             color,

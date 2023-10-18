@@ -4,8 +4,9 @@ use crate::{
     aabb::AABB,
     hitable::{HitRecord, HitableTrait},
     materials::{Material, MaterialInit},
-    random::random_in_unit_sphere,
+    random::random_unit_vector,
     ray::Ray,
+    wavelength::Wavelength,
     Float, Vec3, PI,
 };
 use rand::rngs::SmallRng;
@@ -160,12 +161,19 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
         Some(&self.aabb)
     }
 
-    fn pdf_value(&self, _origin: Vec3, _vector: Vec3, _time: Float, _rng: &mut SmallRng) -> Float {
+    fn pdf_value(
+        &self,
+        _origin: Vec3,
+        _vector: Vec3,
+        _wavelength: Wavelength,
+        _time: Float,
+        _rng: &mut SmallRng,
+    ) -> Float {
         // TODO: fix
         0.0
     }
 
     fn random(&self, _origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        random_in_unit_sphere(rng)
+        random_unit_vector(rng)
     }
 }

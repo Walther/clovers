@@ -2,12 +2,12 @@
 
 use super::{MaterialTrait, ScatterRecord};
 use crate::{
-    color::Color,
     hitable::HitRecord,
     ray::Ray,
     textures::{SolidColor, Texture, TextureTrait},
     Float, Vec3,
 };
+use palette::{convert::IntoColorUnclamped, LinSrgb, Srgb};
 use rand::prelude::SmallRng;
 
 /// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
@@ -21,14 +21,13 @@ impl Default for DiffuseLight {
     /// Creates a new [`DiffuseLight`] with white light at intensity `100.0`
     fn default() -> Self {
         DiffuseLight {
-            emit: Texture::SolidColor(SolidColor::new(Color::new(100.0, 100.0, 100.0))),
+            emit: Texture::SolidColor(SolidColor::new(Srgb::new(100.0, 100.0, 100.0))),
         }
     }
 }
 
 impl MaterialTrait for DiffuseLight {
     /// Scatter method for the [`DiffuseLight`] material. Always returns `None`, as diffuse light does not scatter.
-    #[allow(clippy::unused_self)]
     #[must_use]
     fn scatter(
         &self,
@@ -40,7 +39,6 @@ impl MaterialTrait for DiffuseLight {
     }
 
     /// Scattering probability density function for the [`DiffuseLight`] material. Always returns 0, as diffuse light does not scatter.
-    #[allow(clippy::unused_self)] // TODO:
     #[must_use]
     fn scattering_pdf(
         &self,
@@ -60,11 +58,13 @@ impl MaterialTrait for DiffuseLight {
         u: Float,
         v: Float,
         position: Vec3,
-    ) -> Color {
+    ) -> LinSrgb {
         if hit_record.front_face {
-            self.emit.color(u, v, position)
+            let emit = self.emit.color(u, v, position);
+            let emit: LinSrgb = emit.into_color_unclamped();
+            emit
         } else {
-            Color::new(0.0, 0.0, 0.0)
+            LinSrgb::new(0.0, 0.0, 0.0)
         }
     }
 }

@@ -1,0 +1,150 @@
+{
+  "time_0": 0,
+  "time_1": 1,
+  "camera": {
+    "look_from": [-600, 310, -400],
+    "look_at": [0, 310, 0],
+    "up": [0, 1, 0],
+    "vertical_fov": 35,
+    "aperture": 0,
+    "focus_distance": 10
+  },
+  "background_color": [0, 0, 0],
+  "objects": [
+    {
+      "kind": "Quad",
+      "q": [555, 0, 0],
+      "u": [0, 0, 555],
+      "v": [0, 555, 0],
+      "material": "grey wall",
+      "comment": "wall, left"
+    },
+    {
+      "kind": "Quad",
+      "q": [113, 750, 127],
+      "u": [330, 0, 0],
+      "v": [0, 0, 305],
+      "material": "big lamp",
+      "comment": "big ceiling light"
+    },
+    {
+      "kind": "Quad",
+      "q": [277, 554, 140],
+      "u": [10, 0, 0],
+      "v": [0, 0, 278],
+      "material": "narrow lamp",
+      "comment": "narrow ceiling light"
+    },
+    {
+      "kind": "STL",
+      "center": [300, 350, 278],
+      "scale": 20,
+      "rotation": [0, 0, -30],
+      "path": "stl/prism.stl",
+      "material": "Dense flint glass SF10",
+      "comment": "triangular prism"
+    }
+  ],
+  "priority_objects": [
+    {
+      "kind": "Quad",
+      "q": [113, 750, 127],
+      "u": [330, 0, 0],
+      "v": [0, 0, 305],
+      "material": "big lamp",
+      "comment": "big ceiling light"
+    },
+    {
+      "kind": "Quad",
+      "q": [277, 554, 140],
+      "u": [10, 0, 0],
+      "v": [0, 0, 278],
+      "material": "narrow lamp",
+      "comment": "narrow ceiling light"
+    },
+    {
+      "kind": "STL",
+      "center": [300, 350, 278],
+      "scale": 20,
+      "rotation": [0, 0, -30],
+      "path": "stl/prism.stl",
+      "material": "Dense flint glass SF10",
+      "comment": "triangular prism"
+    }
+  ],
+  "materials": [
+    {
+      "name": "dielectric glass",
+      "kind": "Dielectric",
+      "refractive_index": 1.5,
+      "color": [1, 1, 1]
+    },
+    {
+      "name": "Fused silica",
+      "kind": "Dispersive",
+      "cauchy_a": 1.458,
+      "cauchy_b": 0.00354
+    },
+    {
+      "name": "Borosilicate glass BK7",
+      "kind": "Dispersive",
+      "cauchy_a": 1.5046,
+      "cauchy_b": 0.0042
+    },
+    {
+      "name": "Hard crown glass K5",
+      "kind": "Dispersive",
+      "cauchy_a": 1.522,
+      "cauchy_b": 0.00459
+    },
+    {
+      "name": "Barium crown glass BaK4",
+      "kind": "Dispersive",
+      "cauchy_a": 1.569,
+      "cauchy_b": 0.00531
+    },
+    {
+      "name": "Barium flint glass BaF10",
+      "kind": "Dispersive",
+      "cauchy_a": 1.67,
+      "cauchy_b": 0.00743
+    },
+    {
+      "name": "Dense flint glass SF10",
+      "kind": "Dispersive",
+      "cauchy_a": 1.728,
+      "cauchy_b": 0.01342
+    },
+    {
+      "name": "Super dispersive glass",
+      "kind": "Dispersive",
+      "cauchy_a": 1.8,
+      "cauchy_b": 0.5
+    },
+    {
+      "name": "big lamp",
+      "kind": "DiffuseLight",
+      "emit": {
+        "kind": "SolidColor",
+        "color": [2, 2, 2]
+      }
+    },
+    {
+      "name": "narrow lamp",
+      "kind": "ConeLight",
+      "spread": 2.0,
+      "emit": {
+        "kind": "SolidColor",
+        "color": [25, 25, 25]
+      }
+    },
+    {
+      "name": "grey wall",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.73, 0.73, 0.73]
+      }
+    }
+  ]
+}

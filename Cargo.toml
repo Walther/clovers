@@ -1,7 +1,8 @@
 [workspace]
 resolver = "2"
 
-members = [
-  "clovers",
-  "clovers-cli",
-]
+members = ["clovers", "clovers-cli"]
+
+[profile.release]
+codegen-units = 1
+lto = "fat"

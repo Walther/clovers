@@ -16,6 +16,7 @@ use crate::{
     interval::Interval,
     materials::gltf::GLTFMaterial,
     ray::Ray,
+    wavelength::Wavelength,
     Float, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
 
@@ -94,8 +95,16 @@ impl<'scene> HitableTrait for GLTF<'scene> {
 
     /// Returns a probability density function value based on the object
     #[must_use]
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
-        self.bvhnode.pdf_value(origin, vector, time, rng)
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
+        self.bvhnode
+            .pdf_value(origin, vector, wavelength, time, rng)
     }
 
     /// Returns a random point on the ssurface of the object
@@ -324,14 +333,22 @@ impl<'scene> HitableTrait for GLTFTriangle<'scene> {
         Some(&self.aabb)
     }
 
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
+        let ray = Ray {
+            origin,
+            direction: vector,
+            time,
+            wavelength,
+        };
         // TODO: this is from quad and not updated!
-        match self.hit(
-            &Ray::new(origin, vector, time),
-            EPSILON_SHADOW_ACNE,
-            Float::INFINITY,
-            rng,
-        ) {
+        match self.hit(&ray, EPSILON_SHADOW_ACNE, Float::INFINITY, rng) {
             Some(hit_record) => {
                 let distance_squared =
                     hit_record.distance * hit_record.distance * vector.norm_squared();

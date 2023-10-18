@@ -9,7 +9,7 @@
     "aperture": 0,
     "focus_distance": 10.0
   },
-  "background_color": [0.1, 0.1, 0.1],
+  "background_color": [0.3, 0.3, 0.3],
   "objects": [
     {
       "kind": "GLTF",
@@ -23,7 +23,7 @@
         "kind": "DiffuseLight",
         "emit": {
           "kind": "SolidColor",
-          "color": [2.0, 2.0, 2.0]
+          "color": [5.0, 5.0, 5.0]
         }
       }
     }
@@ -37,7 +37,7 @@
         "kind": "DiffuseLight",
         "emit": {
           "kind": "SolidColor",
-          "color": [2.0, 2.0, 2.0]
+          "color": [5.0, 5.0, 5.0]
         }
       }
     }

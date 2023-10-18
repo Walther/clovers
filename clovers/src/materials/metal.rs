@@ -4,7 +4,7 @@ use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
-    random::random_in_unit_sphere,
+    random::random_unit_vector,
     ray::Ray,
     textures::{Texture, TextureTrait},
     Float, Vec3,
@@ -32,11 +32,12 @@ impl MaterialTrait for Metal {
     ) -> Option<ScatterRecord> {
         let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
         Some(ScatterRecord {
-            specular_ray: Some(Ray::new(
-                hit_record.position,
-                reflected + self.fuzz * random_in_unit_sphere(rng),
-                ray.time,
-            )),
+            specular_ray: Some(Ray {
+                origin: hit_record.position,
+                direction: reflected + self.fuzz * random_unit_vector(rng),
+                time: ray.time,
+                wavelength: ray.wavelength,
+            }),
             attenuation: self
                 .albedo
                 .color(hit_record.u, hit_record.v, hit_record.position),
@@ -46,7 +47,6 @@ impl MaterialTrait for Metal {
     }
 
     /// Scattering probability density function for [Metal]. Always returns zero. TODO: why?
-    #[allow(clippy::unused_self)] // TODO:
     #[must_use]
     fn scattering_pdf(
         &self,

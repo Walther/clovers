@@ -4,6 +4,7 @@ use crate::{
     aabb::AABB,
     hitable::{HitRecord, Hitable, HitableTrait},
     ray::Ray,
+    wavelength::Wavelength,
     Box, Float, Vec3,
 };
 use rand::rngs::SmallRng;
@@ -52,7 +53,12 @@ impl<'scene> HitableTrait for Translate<'scene> {
         distance_max: Float,
         rng: &mut SmallRng,
     ) -> Option<HitRecord> {
-        let moved_ray: Ray = Ray::new(ray.origin - self.offset, ray.direction, ray.time);
+        let moved_ray = Ray {
+            origin: ray.origin - self.offset,
+            direction: ray.direction,
+            time: ray.time,
+            wavelength: ray.wavelength,
+        };
 
         match self.object.hit(&moved_ray, distance_min, distance_max, rng) {
             // Didn't hit anything, return None
@@ -74,10 +80,17 @@ impl<'scene> HitableTrait for Translate<'scene> {
 
     /// Returns a probability density function value based on the inner object
     #[must_use]
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
         // TODO: is this correct?
         self.object
-            .pdf_value(origin + self.offset, vector, time, rng)
+            .pdf_value(origin + self.offset, vector, wavelength, time, rng)
     }
 
     /// Returns a random point on the surface of the moved object

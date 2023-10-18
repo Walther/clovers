@@ -4,10 +4,11 @@
 use crate::hitable::HitableTrait;
 use crate::interval::Interval;
 use crate::materials::MaterialInit;
+use crate::wavelength::Wavelength;
 use crate::EPSILON_SHADOW_ACNE;
 use crate::{
-    aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
-    Vec3, EPSILON_RECT_THICKNESS,
+    aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3,
+    EPSILON_RECT_THICKNESS,
 };
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -146,18 +147,18 @@ impl<'scene> HitableTrait for Triangle<'scene> {
         }
 
         // Ray hits the 2D shape; set the rest of the hit record and return
-
-        let (front_face, normal) = get_orientation(ray, self.normal);
-
-        Some(HitRecord {
+        let mut record = HitRecord {
             distance: t,
             position: intersection,
-            normal,
             u: alpha,
             v: beta,
             material: self.material,
-            front_face,
-        })
+            normal: self.normal,
+            front_face: false,
+        };
+        record.set_face_normal(ray, self.normal);
+
+        Some(record)
     }
 
     /// Returns the bounding box of the triangle
@@ -170,14 +171,22 @@ impl<'scene> HitableTrait for Triangle<'scene> {
 
     /// Returns a probability density function value? // TODO: understand & explain
     #[must_use]
-    fn pdf_value(&self, origin: Vec3, vector: Vec3, time: Float, rng: &mut SmallRng) -> Float {
+    fn pdf_value(
+        &self,
+        origin: Vec3,
+        vector: Vec3,
+        wavelength: Wavelength,
+        time: Float,
+        rng: &mut SmallRng,
+    ) -> Float {
+        let ray = Ray {
+            origin,
+            direction: vector,
+            time,
+            wavelength,
+        };
         // TODO: this is from quad and not updated!
-        match self.hit(
-            &Ray::new(origin, vector, time),
-            EPSILON_SHADOW_ACNE,
-            Float::INFINITY,
-            rng,
-        ) {
+        match self.hit(&ray, EPSILON_SHADOW_ACNE, Float::INFINITY, rng) {
             Some(hit_record) => {
                 let distance_squared =
                     hit_record.distance * hit_record.distance * vector.norm_squared();
@@ -222,30 +231,30 @@ mod tests {
 
     use super::*;
 
+    const TIME_0: Float = 0.0;
+    const TIME_1: Float = 1.0;
+    const RAY: Ray = Ray {
+        origin: Vec3::new(0.0, 0.0, -1.0),
+        direction: Vec3::new(0.0, 0.0, 1.0),
+        time: TIME_0,
+        wavelength: 600,
+    };
+
     #[test]
     fn xy_unit_triangle() {
-        let time_0 = 0.0;
-        let time_1 = 1.0;
+        let mut rng = SmallRng::from_entropy();
         let material = Box::default();
 
         // Unit triangle at origin
-        let xy_unit_triangle = Triangle::new(
+        let triangle = Triangle::new(
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(1.0, 0.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),
             &material,
         );
 
-        let ray = Ray::new(
-            Vec3::new(0.0, 0.0, -1.0).normalize(),
-            Vec3::new(0.0, 0.0, 1.0).normalize(),
-            time_0,
-        );
-
-        let mut rng = SmallRng::from_entropy();
-
-        let aabb = xy_unit_triangle
-            .bounding_box(time_0, time_1)
+        let aabb = triangle
+            .bounding_box(TIME_0, TIME_1)
             .expect("No AABB for the triangle");
 
         let expected_aabb = AABB::new(
@@ -256,42 +265,34 @@ mod tests {
 
         assert_eq!(aabb, &expected_aabb);
 
-        let boxhit = aabb.hit(&ray, time_0, time_1);
+        let boxhit = aabb.hit(&RAY, TIME_0, TIME_1);
         assert!(boxhit);
 
-        let hit_record = xy_unit_triangle
-            .hit(&ray, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
+        let hit_record = triangle
+            .hit(&RAY, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
             .expect("No hit record for triangle and ray");
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
         assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
         assert_eq!(hit_record.normal, Vec3::new(0.0, 0.0, -1.0));
+        assert!(!hit_record.front_face);
     }
 
     #[test]
     fn yx_unit_triangle() {
-        let time_0 = 0.0;
-        let time_1 = 1.0;
+        let mut rng = SmallRng::from_entropy();
         let material = Box::default();
 
         // Unit triangle at origin, u and v coords swapped
-        let xy_unit_triangle = Triangle::new(
+        let triangle = Triangle::new(
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),
             Vec3::new(1.0, 0.0, 0.0),
             &material,
         );
 
-        let ray = Ray::new(
-            Vec3::new(0.0, 0.0, -1.0).normalize(),
-            Vec3::new(0.0, 0.0, 1.0).normalize(),
-            time_0,
-        );
-
-        let mut rng = SmallRng::from_entropy();
-
-        let aabb = xy_unit_triangle
-            .bounding_box(time_0, time_1)
+        let aabb = triangle
+            .bounding_box(TIME_0, TIME_1)
             .expect("No AABB for the triangle");
 
         let expected_aabb = AABB::new(
@@ -302,42 +303,34 @@ mod tests {
 
         assert_eq!(aabb, &expected_aabb);
 
-        let boxhit = aabb.hit(&ray, time_0, time_1);
+        let boxhit = aabb.hit(&RAY, TIME_0, TIME_1);
         assert!(boxhit);
 
-        let hit_record = xy_unit_triangle
-            .hit(&ray, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
+        let hit_record = triangle
+            .hit(&RAY, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
             .expect("No hit record for triangle and ray");
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
         assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
         assert_eq!(hit_record.normal, Vec3::new(0.0, 0.0, -1.0));
+        assert!(hit_record.front_face);
     }
 
     #[test]
     fn neg_xy_unit_triangle() {
-        let time_0 = 0.0;
-        let time_1 = 1.0;
+        let mut rng = SmallRng::from_entropy();
         let material: Box<Material> = Box::default();
 
         // Unit triangle at origin, u and v coords swapped
-        let neg_xy_unit_triangle = Triangle::new(
+        let triangle = Triangle::new(
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(-1.0, 0.0, 0.0),
             Vec3::new(0.0, -1.0, 0.0),
             &material,
         );
 
-        let ray = Ray::new(
-            Vec3::new(0.0, 0.0, -1.0).normalize(),
-            Vec3::new(0.0, 0.0, 1.0).normalize(),
-            time_0,
-        );
-
-        let mut rng = SmallRng::from_entropy();
-
-        let aabb = neg_xy_unit_triangle
-            .bounding_box(time_0, time_1)
+        let aabb = triangle
+            .bounding_box(TIME_0, TIME_1)
             .expect("No AABB for the triangle");
 
         let expected_aabb = AABB::new(
@@ -348,15 +341,54 @@ mod tests {
 
         assert_eq!(aabb, &expected_aabb);
 
-        let boxhit = aabb.hit(&ray, time_0, time_1);
+        let boxhit = aabb.hit(&RAY, TIME_0, TIME_1);
         assert!(boxhit);
 
-        let hit_record = neg_xy_unit_triangle
-            .hit(&ray, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
+        let hit_record = triangle
+            .hit(&RAY, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
             .expect("No hit record for triangle and ray");
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
         assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
         assert_eq!(hit_record.normal, Vec3::new(0.0, 0.0, -1.0));
+        assert!(!hit_record.front_face);
+    }
+
+    #[test]
+    fn neg_yx_unit_triangle() {
+        let mut rng = SmallRng::from_entropy();
+        let material: Box<Material> = Box::default();
+
+        // Unit triangle at origin, u and v coords swapped
+        let triangle = Triangle::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, -1.0, 0.0),
+            Vec3::new(-1.0, 0.0, 0.0),
+            &material,
+        );
+
+        let aabb = triangle
+            .bounding_box(TIME_0, TIME_1)
+            .expect("No AABB for the triangle");
+
+        let expected_aabb = AABB::new(
+            Interval::new(-1.0, 0.0),
+            Interval::new(-1.0, 0.0),
+            Interval::new(0.0, 0.0).expand(EPSILON_RECT_THICKNESS),
+        );
+
+        assert_eq!(aabb, &expected_aabb);
+
+        let boxhit = aabb.hit(&RAY, TIME_0, TIME_1);
+        assert!(boxhit);
+
+        let hit_record = triangle
+            .hit(&RAY, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
+            .expect("No hit record for triangle and ray");
+
+        assert!(hit_record.distance - 1.0 <= Float::EPSILON);
+        assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
+        assert_eq!(hit_record.normal, Vec3::new(0.0, 0.0, -1.0));
+        assert!(hit_record.front_face);
     }
 }
