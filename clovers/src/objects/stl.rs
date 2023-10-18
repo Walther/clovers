@@ -1,5 +1,4 @@
 //! STL utilities
-// TODO: better docs
 
 use alloc::string::String;
 use nalgebra::Rotation3;

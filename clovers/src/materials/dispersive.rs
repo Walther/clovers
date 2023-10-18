@@ -49,7 +49,7 @@ fn default_b() -> Float {
 // TODO: less precision loss?
 #[allow(clippy::cast_precision_loss)]
 impl Dispersive {
-    /// Creates a new [Dispersive] material with the given refractive index and Abbe number.
+    /// Creates a new [Dispersive] material with the given Cauchy equation constants.
     #[must_use]
     pub fn new(cauchy_a: Float, cauchy_b: Float) -> Self {
         Dispersive { cauchy_a, cauchy_b }
