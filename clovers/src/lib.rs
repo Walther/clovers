@@ -104,8 +104,6 @@ pub struct RenderOpts {
     pub samples: u32,
     /// Maximum ray bounce depth. Higher number implies higher quality.
     pub max_depth: u32,
-    /// Gamma correction value
-    pub gamma: Float,
     /// Optionally, suppress CLI output
     pub quiet: bool,
     /// Experimental render mode: return a normal map only instead of doing a full path trace render.
