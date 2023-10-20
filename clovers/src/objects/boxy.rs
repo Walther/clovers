@@ -15,6 +15,9 @@ use rand::{rngs::SmallRng, Rng};
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct BoxyInit {
+    /// Used for multiple importance sampling
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub priority: bool,
     /// First corner for the box
     pub corner_0: Vec3,
     /// Second, opposing corner for the box

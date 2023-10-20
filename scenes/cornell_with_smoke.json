@@ -16,13 +16,7 @@
       "q": [555, 0, 0],
       "u": [0, 0, 555],
       "v": [0, 555, 0],
-      "material": {
-        "kind": "Lambertian",
-        "albedo": {
-          "kind": "SolidColor",
-          "color": [0.12, 0.45, 0.15]
-        }
-      },
+      "material": "green wall",
       "comment": "green wall, left"
     },
     {
@@ -30,13 +24,7 @@
       "q": [0, 0, 555],
       "u": [0, 0, -555],
       "v": [0, 555, 0],
-      "material": {
-        "kind": "Lambertian",
-        "albedo": {
-          "kind": "SolidColor",
-          "color": [0.65, 0.05, 0.05]
-        }
-      },
+      "material": "red wall",
       "comment": "red wall, right"
     },
     {
@@ -44,13 +32,7 @@
       "q": [0, 0, 0],
       "u": [555, 0, 0],
       "v": [0, 0, 555],
-      "material": {
-        "kind": "Lambertian",
-        "albedo": {
-          "kind": "SolidColor",
-          "color": [0.73, 0.73, 0.73]
-        }
-      },
+      "material": "grey wall",
       "comment": "floor"
     },
     {
@@ -58,13 +40,7 @@
       "q": [0, 555, 0],
       "u": [555, 0, 0],
       "v": [0, 0, 555],
-      "material": {
-        "kind": "Lambertian",
-        "albedo": {
-          "kind": "SolidColor",
-          "color": [0.73, 0.73, 0.73]
-        }
-      },
+      "material": "grey wall",
       "comment": "ceiling"
     },
     {
@@ -72,27 +48,16 @@
       "q": [0, 0, 555],
       "u": [555, 0, 0],
       "v": [0, 555, 0],
-      "material": {
-        "kind": "Lambertian",
-        "albedo": {
-          "kind": "SolidColor",
-          "color": [0.73, 0.73, 0.73]
-        }
-      },
+      "material": "grey wall",
       "comment": "back wall"
     },
     {
       "kind": "Quad",
+      "priority": true,
       "q": [113, 554, 127],
       "u": [330, 0, 0],
       "v": [0, 0, 305],
-      "material": {
-        "kind": "DiffuseLight",
-        "emit": {
-          "kind": "SolidColor",
-          "color": [7, 7, 7]
-        }
-      },
+      "material": "lamp",
       "comment": "big ceiling light"
     },
     {
@@ -138,20 +103,38 @@
       }
     }
   ],
-  "priority_objects": [
+  "materials": [
     {
-      "kind": "Quad",
-      "q": [113, 554, 127],
-      "u": [330, 0, 0],
-      "v": [0, 0, 305],
-      "material": {
-        "kind": "DiffuseLight",
-        "emit": {
-          "kind": "SolidColor",
-          "color": [7, 7, 7]
-        }
-      },
-      "comment": "big ceiling light"
+      "name": "lamp",
+      "kind": "DiffuseLight",
+      "emit": {
+        "kind": "SolidColor",
+        "color": [7, 7, 7]
+      }
+    },
+    {
+      "name": "green wall",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.12, 0.45, 0.15]
+      }
+    },
+    {
+      "name": "red wall",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.65, 0.05, 0.05]
+      }
+    },
+    {
+      "name": "grey wall",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.73, 0.73, 0.73]
+      }
     }
   ]
 }

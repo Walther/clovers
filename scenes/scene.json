@@ -18,13 +18,7 @@
       "rotation": [-90, 180, 0],
       "center": [270, 300, 600],
       "scale": 15,
-      "material": {
-        "kind": "Metal",
-        "albedo": {
-          "kind": "SolidColor",
-          "color": [0.9, 0.6, 0.3]
-        }
-      }
+      "material": "gold"
     },
     {
       "kind": "STL",
@@ -32,13 +26,7 @@
       "comment": "teapot",
       "rotation": [-90, 180, 0],
       "center": [650, 0, 100],
-      "material": {
-        "kind": "Lambertian",
-        "albedo": {
-          "kind": "SolidColor",
-          "color": [0.5, 0.9, 0.7]
-        }
-      },
+      "material": "teal",
       "scale": 20
     },
     {
@@ -48,13 +36,7 @@
       "scale": 3,
       "center": [-80, -15, 300],
       "rotation": [-90, 180, 0],
-      "material": {
-        "kind": "Lambertian",
-        "albedo": {
-          "kind": "SolidColor",
-          "color": [0.7, 0.3, 0.5]
-        }
-      }
+      "material": "pink"
     },
     {
       "kind": "Translate",
@@ -70,13 +52,7 @@
             "kind": "Boxy",
             "corner_0": [0, 0, 0],
             "corner_1": [200, 400, 200],
-            "material": {
-              "kind": "Isotropic",
-              "albedo": {
-                "kind": "SolidColor",
-                "color": [0.9, 0.9, 0.9]
-              }
-            }
+            "material": "fog"
           }
         },
         "texture": {
@@ -90,14 +66,7 @@
       "comment": "metal sphere",
       "radius": 90,
       "center": [400, 90, 300],
-      "material": {
-        "kind": "Metal",
-        "fuzz": 0.05,
-        "albedo": {
-          "kind": "SolidColor",
-          "color": [0.7, 0.7, 0.7]
-        }
-      }
+      "material": "metal sphere"
     },
     {
       "kind": "Quad",
@@ -105,68 +74,92 @@
       "u": [10000, 0, 0],
       "v": [0, 0, 10000],
       "comment": "floor",
-      "material": {
-        "kind": "Metal",
-        "albedo": {
-          "kind": "SurfaceChecker",
-          "even": [0.9, 0.9, 0.9],
-          "odd": [0.1, 0.1, 0.1],
-          "density": 100
-        },
-        "fuzz": 0.015
-      }
+      "material": "metal floor"
     },
     {
       "kind": "Quad",
+      "priority": true,
       "q": [0, 700, -100],
       "u": [600, 0, 0],
       "v": [0, 0, 300],
-      "material": {
-        "kind": "DiffuseLight",
-        "emit": {
-          "kind": "SolidColor",
-          "color": [7, 7, 7]
-        }
-      },
+      "material": "lamp",
       "comment": "big ceiling light"
     },
     {
       "kind": "Sphere",
+      "priority": true,
       "center": [190, 120, 190],
       "radius": 90,
-      "material": {
-        "kind": "Dielectric",
-        "refractive_index": 1.5,
-        "color": [1, 1, 1]
-      },
+      "material": "glass",
       "comment": "glass sphere"
     }
   ],
-  "priority_objects": [
+  "materials": [
     {
-      "kind": "Quad",
-      "q": [113, 554, 127],
-      "u": [330, 0, 0],
-      "v": [0, 0, 305],
-      "material": {
-        "kind": "DiffuseLight",
-        "emit": {
-          "kind": "SolidColor",
-          "color": [7, 7, 7]
-        }
-      },
-      "comment": "big ceiling light"
+      "name": "gold",
+      "kind": "Metal",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.9, 0.6, 0.3]
+      }
     },
     {
-      "kind": "Sphere",
-      "center": [190, 120, 190],
-      "radius": 90,
-      "material": {
-        "kind": "Dielectric",
-        "refractive_index": 1.5,
-        "color": [1, 1, 1]
+      "name": "teal",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.5, 0.9, 0.7]
+      }
+    },
+    {
+      "name": "pink",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.7, 0.3, 0.5]
+      }
+    },
+    {
+      "name": "fog",
+      "kind": "Isotropic",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.9, 0.9, 0.9]
+      }
+    },
+    {
+      "name": "metal sphere",
+      "kind": "Metal",
+      "fuzz": 0.05,
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.7, 0.7, 0.7]
+      }
+    },
+    {
+      "name": "metal floor",
+      "kind": "Metal",
+      "albedo": {
+        "kind": "SurfaceChecker",
+        "even": [0.9, 0.9, 0.9],
+        "odd": [0.1, 0.1, 0.1],
+        "density": 100
       },
-      "comment": "glass sphere"
+      "fuzz": 0.015
+    },
+    {
+      "name": "lamp",
+      "kind": "DiffuseLight",
+      "emit": {
+        "kind": "SolidColor",
+        "color": [7, 7, 7]
+      }
+    },
+    {
+      "name": "glass",
+      "kind": "Dielectric",
+      "refractive_index": 1.5,
+      "color": [1, 1, 1]
     }
   ]
 }

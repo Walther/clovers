@@ -28,7 +28,7 @@ pub struct BVHNode<'scene> {
 impl<'scene> BVHNode<'scene> {
     /// Create a new `BVHNode` tree from a given list of [Object](crate::objects::Object)s
     #[must_use]
-    pub fn from_list(mut objects: Vec<Hitable>, time_0: Float, time_1: Float) -> BVHNode {
+    pub fn from_list(mut hitables: Vec<Hitable>, time_0: Float, time_1: Float) -> BVHNode {
         // Initialize two child nodes
         let left: Box<Hitable>;
         let right: Box<Hitable>;
@@ -38,7 +38,7 @@ impl<'scene> BVHNode<'scene> {
         // What is the axis with the largest span?
         // TODO: horribly inefficient, improve!
         let bounding: AABB =
-            vec_bounding_box(&objects, time_0, time_1).expect("No bounding box for objects");
+            vec_bounding_box(&hitables, time_0, time_1).expect("No bounding box for objects");
         let spans = [
             bounding.axis(0).size(),
             bounding.axis(1).size(),
@@ -50,12 +50,12 @@ impl<'scene> BVHNode<'scene> {
         let comparator = comparators[axis];
 
         // How many objects do we have?
-        let object_span = objects.len();
+        let object_span = hitables.len();
 
         if object_span == 1 {
             // If we only have one object, add one and an empty object.
             // TODO: can this hack be removed?
-            left = Box::new(objects[0].clone());
+            left = Box::new(hitables[0].clone());
             right = Box::new(Hitable::Empty(Empty {}));
             let bounding_box = left.bounding_box(time_0, time_1).unwrap().clone(); // TODO: remove unwrap
             return BVHNode {
@@ -66,14 +66,14 @@ impl<'scene> BVHNode<'scene> {
         } else if object_span == 2 {
             // If we are comparing two objects, perform the comparison
             // Insert the child nodes in order
-            match comparator(&objects[0], &objects[1]) {
+            match comparator(&hitables[0], &hitables[1]) {
                 Ordering::Less => {
-                    left = Box::new(objects[0].clone());
-                    right = Box::new(objects[1].clone());
+                    left = Box::new(hitables[0].clone());
+                    right = Box::new(hitables[1].clone());
                 }
                 Ordering::Greater => {
-                    left = Box::new(objects[1].clone());
-                    right = Box::new(objects[0].clone());
+                    left = Box::new(hitables[1].clone());
+                    right = Box::new(hitables[0].clone());
                 }
                 Ordering::Equal => {
                     // TODO: what should happen here?
@@ -82,29 +82,29 @@ impl<'scene> BVHNode<'scene> {
             }
         } else if object_span == 3 {
             // Three objects: create one bare object and one BVHNode with two objects
-            objects.sort_by(comparator);
-            left = Box::new(objects[0].clone());
+            hitables.sort_by(comparator);
+            left = Box::new(hitables[0].clone());
             right = Box::new(Hitable::BVHNode(BVHNode {
-                left: Box::new(objects[1].clone()),
-                right: Box::new(objects[2].clone()),
+                left: Box::new(hitables[1].clone()),
+                right: Box::new(hitables[2].clone()),
                 bounding_box: AABB::surrounding_box(
                     // TODO: no unwrap?
-                    objects[1].bounding_box(time_0, time_1).unwrap(),
-                    objects[2].bounding_box(time_0, time_1).unwrap(),
+                    hitables[1].bounding_box(time_0, time_1).unwrap(),
+                    hitables[2].bounding_box(time_0, time_1).unwrap(),
                 ),
             }));
         } else {
             // Otherwise, recurse
-            objects.sort_by(comparator);
+            hitables.sort_by(comparator);
 
             // Split the vector; divide and conquer
             let mid = object_span / 2;
-            let objects_right = objects.split_off(mid);
+            let hitables_right = hitables.split_off(mid);
             left = Box::new(Hitable::BVHNode(BVHNode::from_list(
-                objects, time_0, time_1,
+                hitables, time_0, time_1,
             )));
             right = Box::new(Hitable::BVHNode(BVHNode::from_list(
-                objects_right,
+                hitables_right,
                 time_0,
                 time_1,
             )));

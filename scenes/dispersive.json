@@ -1,75 +1,59 @@
 {
   "time_0": 0,
   "time_1": 1,
+  "background_color": [0, 0, 0],
   "camera": {
-    "look_from": [-600, 310, -400],
-    "look_at": [0, 310, 0],
+    "look_from": [-600, 280, -400],
+    "look_at": [0, 280, 0],
     "up": [0, 1, 0],
     "vertical_fov": 35,
     "aperture": 0,
     "focus_distance": 10
   },
-  "background_color": [0, 0, 0],
   "objects": [
     {
       "kind": "Quad",
-      "q": [555, 0, 0],
-      "u": [0, 0, 555],
-      "v": [0, 555, 0],
-      "material": "grey wall",
-      "comment": "wall, left"
+      "comment": "floor",
+      "q": [-1000, 120, -1000],
+      "u": [10000, 0, 0],
+      "v": [0, 0, 10000],
+      "material": "floor material"
+    },
+    {
+      "kind": "Sphere",
+      "comment": "glass sphere",
+      "radius": 50,
+      "center": [0, 200, 250],
+      "priority": true,
+      "material": "Dense flint glass SF10"
     },
     {
       "kind": "Quad",
-      "q": [113, 750, 127],
+      "q": [0, 750, 127],
       "u": [330, 0, 0],
       "v": [0, 0, 305],
       "material": "big lamp",
-      "comment": "big ceiling light"
+      "comment": "big ceiling light",
+      "priority": true
     },
     {
       "kind": "Quad",
-      "q": [277, 554, 140],
+      "q": [410, 555, 0],
       "u": [10, 0, 0],
-      "v": [0, 0, 278],
+      "v": [0, 0, 300],
       "material": "narrow lamp",
-      "comment": "narrow ceiling light"
+      "comment": "narrow ceiling light",
+      "priority": true
     },
     {
       "kind": "STL",
-      "center": [300, 350, 278],
-      "scale": 20,
+      "center": [400, 350, 150],
+      "scale": 25,
       "rotation": [0, 0, -30],
       "path": "stl/prism.stl",
       "material": "Dense flint glass SF10",
-      "comment": "triangular prism"
-    }
-  ],
-  "priority_objects": [
-    {
-      "kind": "Quad",
-      "q": [113, 750, 127],
-      "u": [330, 0, 0],
-      "v": [0, 0, 305],
-      "material": "big lamp",
-      "comment": "big ceiling light"
-    },
-    {
-      "kind": "Quad",
-      "q": [277, 554, 140],
-      "u": [10, 0, 0],
-      "v": [0, 0, 278],
-      "material": "narrow lamp",
-      "comment": "narrow ceiling light"
-    },
-    {
-      "kind": "STL",
-      "center": [300, 350, 278],
-      "scale": 20,
-      "rotation": [0, 0, -30],
-      "path": "stl/prism.stl",
-      "material": "Dense flint glass SF10",
-      "comment": "triangular prism"
+      "comment": "triangular prism",
+      "priority": true
     }
   ],
   "materials": [
@@ -124,27 +108,18 @@
     {
       "name": "big lamp",
       "kind": "DiffuseLight",
-      "emit": {
-        "kind": "SolidColor",
-        "color": [2, 2, 2]
-      }
+      "emit": { "kind": "SolidColor", "color": [2, 2, 2] }
     },
     {
       "name": "narrow lamp",
       "kind": "ConeLight",
-      "spread": 2.0,
-      "emit": {
-        "kind": "SolidColor",
-        "color": [25, 25, 25]
-      }
+      "spread": 2,
+      "emit": { "kind": "SolidColor", "color": [25, 25, 25] }
     },
     {
-      "name": "grey wall",
+      "name": "floor material",
       "kind": "Lambertian",
-      "albedo": {
-        "kind": "SolidColor",
-        "color": [0.73, 0.73, 0.73]
-      }
+      "albedo": { "kind": "SolidColor", "color": [1, 1, 1] }
     }
   ]
 }

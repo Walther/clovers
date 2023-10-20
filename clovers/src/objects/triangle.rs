@@ -17,6 +17,9 @@ use rand::Rng;
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct TriangleInit {
+    /// Used for multiple importance sampling
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub priority: bool,
     /// Corner point
     pub q: Vec3,
     /// Vector describing the u side

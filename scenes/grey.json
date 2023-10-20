@@ -13,39 +13,31 @@
   "objects": [
     {
       "kind": "Quad",
+      "priority": true,
       "q": [-100, 80, -100],
       "u": [200, 0, 0],
       "v": [0, 0, 100],
-      "material": {
-        "kind": "DiffuseLight",
-        "emit": {
-          "kind": "SolidColor",
-          "color": [2.5, 2.5, 2.5]
-        }
-      }
+      "material": "lamp"
     },
     {
       "kind": "Sphere",
       "center": [0, 0, 0],
       "radius": 8,
-      "material": {
-        "kind": "Lambertian"
-      }
+      "material": "grey"
     }
   ],
-  "priority_objects": [
+  "materials": [
     {
-      "kind": "Quad",
-      "q": [-100, 80, -100],
-      "u": [200, 0, 0],
-      "v": [0, 0, 100],
-      "material": {
-        "kind": "DiffuseLight",
-        "emit": {
-          "kind": "SolidColor",
-          "color": [2.5, 2.5, 2.5]
-        }
+      "name": "lamp",
+      "kind": "DiffuseLight",
+      "emit": {
+        "kind": "SolidColor",
+        "color": [2.5, 2.5, 2.5]
       }
+    },
+    {
+      "name": "grey",
+      "kind": "Lambertian"
     }
   ]
 }

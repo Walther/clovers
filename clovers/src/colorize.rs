@@ -35,7 +35,10 @@ pub fn colorize(
 
     // Send the ray to the scene, and see if it hits anything.
     // distance_min is set to an epsilon to avoid "shadow acne" that can happen when set to zero
-    let Some(hit_record) = scene.objects.hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng) else {
+    let Some(hit_record) = scene
+        .hitables
+        .hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng)
+    else {
         // If the ray hits nothing, early return the background color.
         return bg;
     };
@@ -77,7 +80,7 @@ pub fn colorize(
             // Use a probability density function to figure out where to scatter a new ray
             // TODO: this weighed priority sampling should be adjusted or removed - doesn't feel ideal.
             let light_ptr = PDF::HitablePDF(HitablePDF::new(
-                &scene.priority_objects,
+                &scene.priority_hitables,
                 hit_record.position,
             ));
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);

@@ -42,6 +42,9 @@ pub use triangle::*;
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A list of objects. Allows multiple objects to be used e.g. in a Rotate or Translate object as the target.
 pub struct ObjectList {
+    /// Priority
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub priority: bool,
     /// The encased [Object] list
     pub objects: Vec<Object>,
 }

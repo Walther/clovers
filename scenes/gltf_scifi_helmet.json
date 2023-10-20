@@ -17,28 +17,19 @@
     },
     {
       "kind": "Sphere",
+      "priority": true,
       "center": [2.0, 14.0, 2.0],
       "radius": 12.0,
-      "material": {
-        "kind": "DiffuseLight",
-        "emit": {
-          "kind": "SolidColor",
-          "color": [5.0, 5.0, 5.0]
-        }
-      }
+      "material": "lamp"
     }
   ],
-  "priority_objects": [
+  "materials": [
     {
-      "kind": "Sphere",
-      "center": [2.0, 14.0, 2.0],
-      "radius": 12.0,
-      "material": {
-        "kind": "DiffuseLight",
-        "emit": {
-          "kind": "SolidColor",
-          "color": [5.0, 5.0, 5.0]
-        }
+      "name": "lamp",
+      "kind": "DiffuseLight",
+      "emit": {
+        "kind": "SolidColor",
+        "color": [5.0, 5.0, 5.0]
       }
     }
   ]

@@ -20,16 +20,18 @@ let scene = {
   },
   background_color: [0.0, 0.0, 0.0],
   objects: [],
-  priority_objects: [],
+  materials: [],
 };
 
 let ground = {
+  name: "ground material",
   kind: "Lambertian",
   albedo: {
     kind: "SolidColor",
     color: [0.48, 0.83, 0.53],
   },
 };
+scene.materials.push(ground);
 
 let boxes = [];
 let boxes_per_side = 20;
@@ -48,7 +50,7 @@ for (let i = 0; i < boxes_per_side; i++) {
       kind: "Boxy",
       corner_0: [x0, y0, z0],
       corner_1: [x1, y1, z1],
-      material: ground,
+      material: "ground material",
     };
 
     boxes.push(box);
@@ -56,22 +58,34 @@ for (let i = 0; i < boxes_per_side; i++) {
 }
 scene.objects.push(...boxes);
 
+let lamp_material = {
+  name: "big lamp",
+  kind: "DiffuseLight",
+  emit: {
+    kind: "SolidColor",
+    color: [7.0, 7.0, 7.0],
+  },
+};
+scene.materials.push(lamp_material);
 let light = {
   kind: "Quad",
+  priority: true,
   q: [123.0, 554.0, 147.0],
   u: [300.0, 0.0, 0.0],
   v: [0.0, 0.0, 265.0],
-  material: {
-    kind: "DiffuseLight",
-    emit: {
-      kind: "SolidColor",
-      color: [7.0, 7.0, 7.0],
-    },
-  },
+  material: "big lamp",
 };
 scene.objects.push(light);
-scene.priority_objects.push(light);
 
+let moving_sphere_material = {
+  name: "moving sphere material",
+  kind: "Lambertian",
+  albedo: {
+    kind: "SolidColor",
+    color: [0.7, 0.3, 0.1],
+  },
+};
+scene.materials.push(moving_sphere_material);
 let moving_sphere = {
   kind: "MovingSphere",
   center_0: [400.0, 400.0, 200.0],
@@ -79,39 +93,39 @@ let moving_sphere = {
   time_0,
   time_1,
   radius: 50.0,
-  material: {
-    kind: "Lambertian",
-    albedo: {
-      kind: "SolidColor",
-      color: [0.7, 0.3, 0.1],
-    },
-  },
+  material: "moving sphere material",
 };
 scene.objects.push(moving_sphere);
 
+let glass = {
+  name: "glass",
+  kind: "Dielectric",
+  refractive_index: 1.5,
+};
+scene.materials.push(glass);
 let glass_sphere = {
   kind: "Sphere",
   center: [260.0, 150.0, 45.0],
   radius: 50.0,
-  material: {
-    kind: "Dielectric",
-    refractive_index: 1.5,
-  },
+  material: "glass",
 };
 scene.objects.push(glass_sphere);
 
+let matte_metal = {
+  name: "matte metal",
+  kind: "Metal",
+  fuzz: 1.0,
+  albedo: {
+    kind: "SolidColor",
+    color: [0.8, 0.8, 0.9],
+  },
+};
+scene.materials.push(matte_metal);
 let half_matte_metal_sphere = {
   kind: "Sphere",
   center: [0.0, 150.0, 145.0],
   radius: 50.0,
-  material: {
-    kind: "Metal",
-    fuzz: 1.0,
-    albedo: {
-      kind: "SolidColor",
-      color: [0.8, 0.8, 0.9],
-    },
-  },
+  material: "matte metal",
 };
 scene.objects.push(half_matte_metal_sphere);
 
@@ -120,10 +134,7 @@ let blue_sphere_glass = {
   kind: "Sphere",
   center: [360.0, 150.0, 145.0],
   radius: 70.0,
-  material: {
-    kind: "Dielectric",
-    refractive_index: 1.5,
-  },
+  material: "glass",
 };
 scene.objects.push(blue_sphere_glass);
 
@@ -157,22 +168,6 @@ let mist = {
 };
 scene.objects.push(mist);
 
-let marble = {
-  kind: "Sphere",
-  center: [220.0, 280.0, 300.0],
-  radius: 80.0,
-  material: {
-    kind: "Lambertian",
-    // albedo: {
-    // Originally NoiseTexture. Removed support for it.
-    // NoiseTexture: {
-    //   scale: 0.1,
-    // },
-    // },
-  },
-};
-scene.objects.push(marble);
-
 // Sphere-rasterized pseudo box
 let spherebox = {
   kind: "ObjectList",
@@ -180,12 +175,14 @@ let spherebox = {
 };
 let num_spheres = 1000;
 let white = {
+  name: "white",
   kind: "Lambertian",
   albedo: {
     kind: "SolidColor",
     color: [0.73, 0.73, 0.73],
   },
 };
+scene.materials.push(white);
 for (let i = 0; i < num_spheres; i++) {
   let sphere = {
     kind: "Sphere",
@@ -195,7 +192,7 @@ for (let i = 0; i < num_spheres; i++) {
       random_float(0.0, 165.0),
     ],
     radius: 10.0,
-    material: white,
+    material: "white",
   };
   spherebox.objects.push(sphere);
 }

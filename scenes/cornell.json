@@ -53,6 +53,7 @@
     },
     {
       "kind": "Quad",
+      "priority": true,
       "q": [113, 554, 127],
       "u": [330, 0, 0],
       "v": [0, 0, 305],
@@ -78,23 +79,7 @@
     },
     {
       "kind": "Sphere",
-      "center": [190, 90, 190],
-      "radius": 90,
-      "material": "Dense flint glass SF10",
-      "comment": "glass sphere"
-    }
-  ],
-  "priority_objects": [
-    {
-      "kind": "Quad",
-      "q": [113, 554, 127],
-      "u": [330, 0, 0],
-      "v": [0, 0, 305],
-      "comment": "big ceiling light",
-      "material": "lamp"
-    },
-    {
-      "kind": "Sphere",
+      "priority": true,
       "center": [190, 90, 190],
       "radius": 90,
       "material": "Dense flint glass SF10",
