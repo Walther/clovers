@@ -103,6 +103,7 @@ pub fn initialize<'scene>(scene_file: SceneFile, width: u32, height: u32) -> Sce
             Object::RotateY(i) => i.priority,
             Object::Sphere(i) => i.priority,
             Object::STL(i) => i.priority,
+            #[cfg(feature = "gl_tf")]
             Object::GLTF(i) => i.priority,
             Object::Translate(i) => i.priority,
             Object::Triangle(i) => i.priority,
