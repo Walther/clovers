@@ -71,6 +71,9 @@ impl<'scene> HitableTrait for STL<'scene> {
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct STLInit {
+    /// Used for multiple importance sampling
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub priority: bool,
     /// Path of the .stl file
     pub path: String,
     /// Material to use for the .stl object

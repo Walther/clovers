@@ -15,6 +15,9 @@ use rand::rngs::SmallRng;
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `SphereInit` structure describes the necessary data for constructing a [`Sphere`](super::Sphere). Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 pub struct MovingSphereInit {
+    /// Used for multiple importance sampling
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub priority: bool,
     /// Center point of the sphere at time_0
     pub center_0: Vec3,
     /// Center point of the sphere at time_1

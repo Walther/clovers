@@ -15,6 +15,9 @@ use super::Object;
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `RotateInit` structure describes the necessary data for constructing a [`RotateY`]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 pub struct RotateInit {
+    /// Used for multiple importance sampling
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub priority: bool,
     /// The encased [Object] to rotate
     pub object: Box<Object>,
     /// Angle to rotate the object, in degrees

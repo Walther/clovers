@@ -18,27 +18,29 @@ let scene = {
   },
   background_color: [0.0, 0.0, 0.0],
   objects: [],
-  priority_objects: [],
+  materials: [],
 };
 
 // Big light for smooth lighting of the entire scene
 let brightness = 2.5;
+let lamp_material = {
+  name: "big lamp",
+  kind: "DiffuseLight",
+  emit: {
+    kind: "SolidColor",
+    color: [brightness, brightness, brightness],
+  },
+};
+scene.materials.push(lamp_material);
 let light = {
   kind: "Quad",
+  priority: true,
   q: [-100.0, 80.0, -100.0],
   u: [200.0, 0.0, 0.0],
   v: [0.0, 0.0, 200.0],
-  material: {
-    kind: "DiffuseLight",
-    emit: {
-      kind: "SolidColor",
-      color: [brightness, brightness, brightness],
-    },
-  },
+  material: "big lamp",
 };
-
 scene.objects.push(light);
-scene.priority_objects.push(light);
 
 const colors = [
   // Row 1: Natural colors
@@ -98,19 +100,22 @@ const ystart = -0.5 * 4 * multiplier + 0.5 * gap;
 const xstart = 0.5 * 4 * multiplier + 0.5 * gap;
 colors.forEach((row, y) => {
   row.forEach(([name, hex], x) => {
+    let material = {
+      name,
+      kind: "Lambertian",
+      albedo: {
+        kind: "SolidColor",
+        color: hexToRgb(hex),
+      },
+    };
+    scene.materials.push(material);
     let quad = {
       kind: "Quad",
       // TODO: fix the camera setup, these coordinates are in weird order :|
       q: [ystart + y * multiplier, width, xstart + x * -multiplier],
       u: [width, 0.0, 0.0],
       v: [0.0, 0.0, width],
-      material: {
-        kind: "Lambertian",
-        albedo: {
-          kind: "SolidColor",
-          color: hexToRgb(hex),
-        },
-      },
+      material: name,
     };
     scene.objects.push(quad);
   });

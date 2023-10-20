@@ -24,6 +24,9 @@ use crate::{
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct GLTFInit {
+    /// Used for multiple importance sampling
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub priority: bool,
     /// Path of the .gltf file
     pub path: String,
 }

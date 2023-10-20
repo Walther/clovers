@@ -15,6 +15,9 @@ use super::Object;
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `TranslateInit` structure describes the necessary data for constructing a [Translate] object. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 pub struct TranslateInit {
+    /// Used for multiple importance sampling
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub priority: bool,
     /// The encased [Object] to translate i.e. move
     pub object: Box<Object>,
     /// The vector describing the movement of the object

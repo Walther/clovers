@@ -19,6 +19,9 @@ use super::Object;
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// `ConstantMediumInit` structure describes the necessary data for constructing a [`ConstantMedium`]. Used with [serde] when importing [`SceneFiles`](crate::scenes::SceneFile).
 pub struct ConstantMediumInit {
+    /// Used for multiple importance sampling
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub priority: bool,
     /// The boundary object for the constant medium. This determines the size and shape of the fog object.
     pub boundary: Box<Object>,
     #[cfg_attr(feature = "serde-derive", serde(default = "default_density"))]
