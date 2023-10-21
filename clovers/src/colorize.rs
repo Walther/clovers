@@ -56,20 +56,19 @@ pub fn colorize(
     // Hero Wavelength Sampling optimization
     let waves = rotate_wavelength(ray.wavelength);
     let emits = waves.map(|wavelength| adjust_emitted(emitted, wavelength));
-    let emitted = (emits[0] + emits[1] + emits[2] + emits[3]) / 4.0;
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
         // No scatter, early return the emitted color only
-        return emitted;
+        return (emits[0] + emits[1] + emits[2] + emits[3]) / 4.0;
     };
 
     // We have scattered, and received an attenuation from the material.
     let attenuation = scatter_record.attenuation;
 
     // Hero Wavelength Sampling optimization
+    let waves = rotate_wavelength(ray.wavelength);
     let attenuations = waves.map(|wavelength| adjust_attenuation(attenuation, wavelength));
-    let scattered = (attenuations[0] + attenuations[1] + attenuations[2] + attenuations[3]) / 4.0;
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {
@@ -98,38 +97,45 @@ pub fn colorize(
                 hit_record.position,
             ));
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
+            let direction = mixture_pdf.generate(rng);
             let scatter_ray = Ray {
                 origin: hit_record.position,
-                direction: mixture_pdf.generate(rng),
+                direction,
                 time: ray.time,
                 wavelength: ray.wavelength,
             };
-            let pdf_val = mixture_pdf.value(scatter_ray.direction, ray.wavelength, ray.time, rng);
-            if pdf_val <= 0.0 {
-                // scattering impossible, prevent division by zero below
-                // for more ctx, see https://github.com/RayTracing/raytracing.github.io/issues/979#issuecomment-1034517236
-                return emitted;
-            }
-
+            // Recurse for the scattering ray
+            let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
             // Calculate the PDF weighting for the scatter // TODO: understand the literature for this, and explain
             let Some(scattering_pdf) =
                 hit_record
                     .material
                     .scattering_pdf(&hit_record, &scatter_ray, rng)
             else {
-                // No scatter, only emit
-                return emitted;
+                // No scatter, combined emit
+                return (emits[0] + emits[1] + emits[2] + emits[3]) / 4.0;
             };
 
-            // Recurse for the scattering ray
-            let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
             // Tint and weight it according to the PDF
-            let scattered = scattered * scattering_pdf * recurse / pdf_val;
+            // Note four wavelengths, four emits, four attenuations
+            let colors: Vec<Xyz<E>> = (0..4)
+                .map(|i| {
+                    let wave = waves[i];
+                    let emit = emits[i];
+                    let att = attenuations[i];
 
-            // Ensure positive color
-            // let scattered = scattered.non_negative();
-            // Blend it all together
-            emitted + scattered
+                    let pdf_val = mixture_pdf.value(direction, wave, ray.time, rng);
+                    if pdf_val <= 0.0 {
+                        // scattering impossible, prevent division by zero below
+                        // for more ctx, see https://github.com/RayTracing/raytracing.github.io/issues/979#issuecomment-1034517236
+                        return emit / 4.0;
+                    }
+
+                    emit + att * scattering_pdf * recurse / pdf_val / 4.0
+                })
+                .collect();
+
+            colors[0] + colors[1] + colors[2] + colors[3]
         }
     }
 }
