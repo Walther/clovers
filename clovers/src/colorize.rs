@@ -7,7 +7,7 @@ use crate::{
     ray::Ray,
     scenes::Scene,
     spectrum::spectrum_xyz_to_p,
-    wavelength::{wavelength_into_xyz, Wavelength},
+    wavelength::{rotate_wavelength, wavelength_into_xyz, Wavelength},
     Float, EPSILON_SHADOW_ACNE,
 };
 use palette::{
@@ -52,15 +52,24 @@ pub fn colorize(
         hit_record.v,
         hit_record.position,
     );
-    let emitted = adjust_emitted(emitted, ray.wavelength);
+
+    // Hero Wavelength Sampling optimization
+    let waves = rotate_wavelength(ray.wavelength);
+    let emits = waves.map(|wavelength| adjust_emitted(emitted, wavelength));
+    let emitted = (emits[0] + emits[1] + emits[2] + emits[3]) / 4.0;
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
         // No scatter, early return the emitted color only
         return emitted;
     };
+
     // We have scattered, and received an attenuation from the material.
-    let attenuation = adjust_attenuation(scatter_record.attenuation, ray.wavelength);
+    let attenuation = scatter_record.attenuation;
+
+    // Hero Wavelength Sampling optimization
+    let attenuations = waves.map(|wavelength| adjust_attenuation(attenuation, wavelength));
+    let scattered = (attenuations[0] + attenuations[1] + attenuations[2] + attenuations[3]) / 4.0;
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {
@@ -74,6 +83,11 @@ pub fn colorize(
                 max_depth,
                 rng,
             );
+
+            // Single-wavelength attenuation only; skip the Hero Wavelength Sampling
+            // when dealing with specular and dispersive materials
+            let attenuation = adjust_attenuation(attenuation, ray.wavelength);
+
             specular * attenuation
         }
         MaterialType::Diffuse => {
@@ -110,7 +124,8 @@ pub fn colorize(
             // Recurse for the scattering ray
             let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
             // Tint and weight it according to the PDF
-            let scattered = attenuation * scattering_pdf * recurse / pdf_val;
+            let scattered = scattered * scattering_pdf * recurse / pdf_val;
+
             // Ensure positive color
             // let scattered = scattered.non_negative();
             // Blend it all together
