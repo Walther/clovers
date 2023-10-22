@@ -43,6 +43,10 @@ pub fn colorize(
         return bg;
     };
 
+    // Hero Wavelength Spectral Sampling
+    let hero = ray.wavelength;
+    let waves = rotate_wavelength(hero);
+
     // Get the emitted color from the surface that we just hit
     // TODO: spectral light sources!
     let emitted = hit_record.material.emit(
@@ -52,42 +56,27 @@ pub fn colorize(
         hit_record.v,
         hit_record.position,
     );
-
-    // Hero Wavelength Sampling optimization
-    let waves = rotate_wavelength(ray.wavelength);
-    let emits = waves.map(|wavelength| adjust_emitted(emitted, wavelength));
+    let hero_emitted = adjust_emitted(emitted, hero);
+    let avg_emitted: Xyz<E> = waves.into_iter().fold(Xyz::new(0.0, 0.0, 0.0), |acc, w| {
+        acc + adjust_emitted(emitted, w) / 4.0
+    });
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
         // No scatter, early return the emitted color only
-        return (emits[0] + emits[1] + emits[2] + emits[3]) / 4.0;
+        // TODO: Should this be hero or avg?
+        return avg_emitted;
     };
-
     // We have scattered, and received an attenuation from the material.
-    let attenuation = scatter_record.attenuation;
-
-    // Hero Wavelength Sampling optimization
-    let waves = rotate_wavelength(ray.wavelength);
-    let attenuations = waves.map(|wavelength| adjust_attenuation(attenuation, wavelength));
+    let hero_attenuation = adjust_attenuation(scatter_record.attenuation, hero);
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {
         MaterialType::Specular => {
-            // If we hit a specular material, generate a specular ray, and multiply it with the attenuation
-            let specular = colorize(
-                // a scatter_record from a specular material should always have this ray
-                &scatter_record.specular_ray.unwrap(),
-                scene,
-                depth + 1,
-                max_depth,
-                rng,
-            );
-
-            // Single-wavelength attenuation only; skip the Hero Wavelength Sampling
-            // when dealing with specular and dispersive materials
-            let attenuation = adjust_attenuation(attenuation, ray.wavelength);
-
-            specular * attenuation
+            // If we hit a specular material, only use the hero wavelength attenuation to preserve the dispersion effects
+            let specular_ray = scatter_record.specular_ray.unwrap();
+            let recurse = colorize(&specular_ray, scene, depth + 1, max_depth, rng);
+            hero_attenuation * recurse
         }
         MaterialType::Diffuse => {
             // Use a probability density function to figure out where to scatter a new ray
@@ -97,45 +86,51 @@ pub fn colorize(
                 hit_record.position,
             ));
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
-            let direction = mixture_pdf.generate(rng);
-            let scatter_ray = Ray {
+
+            // scatter ray - the path used for the next sample
+            let path = Ray {
                 origin: hit_record.position,
-                direction,
+                direction: mixture_pdf.generate(rng),
                 time: ray.time,
-                wavelength: ray.wavelength,
-            };
-            // Recurse for the scattering ray
-            let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
-            // Calculate the PDF weighting for the scatter // TODO: understand the literature for this, and explain
-            let Some(scattering_pdf) =
-                hit_record
-                    .material
-                    .scattering_pdf(&hit_record, &scatter_ray, rng)
-            else {
-                // No scatter, combined emit
-                return (emits[0] + emits[1] + emits[2] + emits[3]) / 4.0;
+                wavelength: hero,
             };
 
-            // Tint and weight it according to the PDF
-            // Note four wavelengths, four emits, four attenuations
-            let colors: Vec<Xyz<E>> = (0..4)
-                .map(|i| {
-                    let wave = waves[i];
-                    let emit = emits[i];
-                    let att = attenuations[i];
-
-                    let pdf_val = mixture_pdf.value(direction, wave, ray.time, rng);
+            let denominator: Float = waves
+                .map(|wave| {
+                    let pdf_val = mixture_pdf.value(path.direction, wave, ray.time, rng);
                     if pdf_val <= 0.0 {
-                        // scattering impossible, prevent division by zero below
-                        // for more ctx, see https://github.com/RayTracing/raytracing.github.io/issues/979#issuecomment-1034517236
-                        return emit / 4.0;
+                        return 0.0;
                     }
 
-                    emit + att * scattering_pdf * recurse / pdf_val / 4.0
+                    pdf_val / 4.0
                 })
-                .collect();
+                .into_iter()
+                .sum();
 
-            colors[0] + colors[1] + colors[2] + colors[3]
+            if denominator <= 0.0 {
+                // scattering impossible, prevent division by zero below
+                // for more ctx, see https://github.com/RayTracing/raytracing.github.io/issues/979#issuecomment-1034517236
+
+                // TODO: Should this be hero or avg?
+                return hero_emitted;
+            }
+
+            let Some(scattering_pdf) = hit_record.material.scattering_pdf(&hit_record, &path, rng)
+            else {
+                // TODO: Should this be hero or avg?
+                return hero_emitted;
+            };
+
+            // Recurse for the scattering ray
+            let recurse = colorize(&path, scene, depth + 1, max_depth, rng);
+
+            // TODO: is this the correct way to combine?
+            let mut sample: Xyz<E> = Xyz::new(0.0, 0.0, 0.0);
+            for wave in waves {
+                let att = adjust_attenuation(scatter_record.attenuation, wave);
+                sample += (att * (recurse / 4.0) * scattering_pdf) / denominator;
+            }
+            avg_emitted + sample
         }
     }
 }
