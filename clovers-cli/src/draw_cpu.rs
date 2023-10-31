@@ -13,66 +13,75 @@ use std::time::Duration;
 
 /// The main drawing function, returns a `Vec<Srgb>` as a pixelbuffer.
 pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
-    // Progress bar
     let pixels = (opts.width * opts.height) as u64;
-    let bar = ProgressBar::new(pixels);
+    let bar = progress_bar(&opts, pixels);
 
-    if opts.quiet {
-        bar.set_draw_target(ProgressDrawTarget::hidden())
-    } else {
-        bar.set_style(ProgressStyle::default_bar().template(
-            "Elapsed: {elapsed_precise}\nPixels:  {bar} {pos}/{len}\nETA:     {eta_precise}",
-        ).unwrap());
-        bar.enable_steady_tick(Duration::from_millis(100));
-    }
-
+    // Initialize a pixelbuffer
     let black: Srgb<u8> = Srgb::new(0, 0, 0);
     let mut pixelbuffer = vec![black; pixels as usize];
 
+    // Rendering time!
     pixelbuffer
         .par_iter_mut()
         .enumerate()
         .for_each(|(index, pixel)| {
-            // Enumerate gives us an usize, opts.width and opts.height are u32
-            // Most internal functions expect a Float, perform conversions
-            let x = (index % (opts.width as usize)) as Float;
-            let y = (index / (opts.width as usize)) as Float;
-            let width = opts.width as Float;
-            let height = opts.height as Float;
-
-            // Initialize a thread-local random number generator
-            let mut rng = SmallRng::from_entropy();
-
-            // Initialize a mutable base color for the pixel
-            let mut color: LinSrgb = LinSrgb::new(0.0, 0.0, 0.0);
-
             if opts.normalmap {
-                // If we are rendering just a normalmap, make it quick and early return
-                let u = x / width;
-                let v = y / height;
-                let ray: Ray = scene.camera.get_ray(u, v, &mut rng);
-                color = normal_map(&ray, scene, &mut rng);
-                let color: Srgb = color.into_color();
-                *pixel = color.into_format();
-                return;
+                *pixel = render_pixel_normalmap(scene, &opts, index, &bar);
+            } else {
+                *pixel = render_pixel(scene, &opts, index, &bar);
             }
-            // Otherwise, do a regular render
-
-            // Multisampling for antialiasing
-            for _sample in 0..opts.samples {
-                if let Some(s) = sample(scene, x, y, width, height, &mut rng, opts.max_depth) {
-                    color += s
-                }
-            }
-            color /= opts.samples as Float;
-            // Gamma / component transfer function
-            let color: Srgb = color.into_color();
-            *pixel = color.into_format();
-
-            bar.inc(1);
         });
 
     pixelbuffer
+}
+
+// Render a single pixel, including possible multisampling
+fn render_pixel(scene: &Scene, opts: &RenderOpts, index: usize, bar: &ProgressBar) -> Srgb<u8> {
+    let (x, y, width, height) = index_to_params(opts, index);
+    let mut rng = SmallRng::from_entropy();
+    let mut color: LinSrgb = LinSrgb::new(0.0, 0.0, 0.0);
+    for _sample in 0..opts.samples {
+        if let Some(s) = sample(scene, x, y, width, height, &mut rng, opts.max_depth) {
+            color += s
+        }
+    }
+    color /= opts.samples as Float;
+    let color: Srgb = color.into_color();
+    let color: Srgb<u8> = color.into_format();
+    bar.inc(1);
+    color
+}
+
+// Render a single pixel in normalmap mode
+fn render_pixel_normalmap(
+    scene: &Scene,
+    opts: &RenderOpts,
+    index: usize,
+    bar: &ProgressBar,
+) -> Srgb<u8> {
+    let (x, y, width, height) = index_to_params(opts, index);
+    let mut rng = SmallRng::from_entropy();
+    let color: LinSrgb = sample_normalmap(scene, x, y, width, height, &mut rng);
+    let color: Srgb = color.into_color();
+    let color: Srgb<u8> = color.into_format();
+    bar.inc(1);
+    color
+}
+
+// Get a single sample for a single pixel in the scene, normalmap mode.
+fn sample_normalmap(
+    scene: &Scene,
+    x: Float,
+    y: Float,
+    width: Float,
+    height: Float,
+    rng: &mut SmallRng,
+) -> LinSrgb {
+    let u = x / width;
+    let v = y / height;
+    let ray: Ray = scene.camera.get_ray(u, v, rng);
+    let color = normal_map(&ray, scene, rng);
+    color.into_color()
 }
 
 /// Get a single sample for a single pixel in the scene. Has slight jitter for antialiasing when multisampling.
@@ -88,11 +97,32 @@ fn sample(
     let u = (x + rng.gen::<Float>()) / width;
     let v = (y + rng.gen::<Float>()) / height;
     let ray: Ray = scene.camera.get_ray(u, v, rng);
-    let new_color: Xyz<E> = colorize(&ray, scene, 0, max_depth, rng);
-    let new_color: Xyz = new_color.adapt_into();
-    let new_color: LinSrgb = new_color.into_color_unclamped();
-    if new_color.red.is_finite() && new_color.green.is_finite() && new_color.blue.is_finite() {
-        return Some(new_color);
+    let color: Xyz<E> = colorize(&ray, scene, 0, max_depth, rng);
+    let color: Xyz = color.adapt_into();
+    let color: LinSrgb = color.into_color_unclamped();
+    if color.red.is_finite() && color.green.is_finite() && color.blue.is_finite() {
+        return Some(color);
     }
     None
+}
+
+fn index_to_params(opts: &RenderOpts, index: usize) -> (Float, Float, Float, Float) {
+    let x = (index % (opts.width as usize)) as Float;
+    let y = (index / (opts.width as usize)) as Float;
+    let width = opts.width as Float;
+    let height = opts.height as Float;
+    (x, y, width, height)
+}
+
+fn progress_bar(opts: &RenderOpts, pixels: u64) -> ProgressBar {
+    let bar = ProgressBar::new(pixels);
+    if opts.quiet {
+        bar.set_draw_target(ProgressDrawTarget::hidden())
+    } else {
+        bar.set_style(ProgressStyle::default_bar().template(
+            "Elapsed:   {elapsed_precise}\nPixels:    {bar} {pos}/{len}\nRemaining: {eta_precise}",
+        ).unwrap());
+        bar.enable_steady_tick(Duration::from_millis(100));
+    }
+    bar
 }
