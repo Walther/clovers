@@ -16,3 +16,6 @@ Cargo.lock
 
 # some scene files are not checked into version control
 local_scenes
+
+# profiling
+profile.json
