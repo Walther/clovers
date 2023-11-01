@@ -9,30 +9,31 @@ use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 use scenes::Scene;
-use std::time::Duration;
 
 /// The main drawing function, returns a `Vec<Srgb>` as a pixelbuffer.
 pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
-    let pixels = (opts.width * opts.height) as u64;
-    let bar = progress_bar(&opts, pixels);
+    let width = opts.width as usize;
+    let height = opts.height as usize;
+    let bar = progress_bar(&opts);
 
-    // Initialize a pixelbuffer
-    let black: Srgb<u8> = Srgb::new(0, 0, 0);
-    let mut pixelbuffer = vec![black; pixels as usize];
-
-    // Rendering time!
-    pixelbuffer
-        .par_iter_mut()
-        .enumerate()
-        .for_each(|(index, pixel)| {
+    let pixelbuffer: Vec<Srgb<u8>> = (0..height)
+        .into_par_iter()
+        .map(|row_index| {
             let mut rng = SmallRng::from_entropy();
-            if opts.normalmap {
-                *pixel = render_pixel_normalmap(scene, &opts, index, &mut rng);
-            } else {
-                *pixel = render_pixel(scene, &opts, index, &mut rng);
+            let mut row = Vec::with_capacity(width);
+            for index in 0..width {
+                let index = index + row_index * width;
+                if opts.normalmap {
+                    row.push(render_pixel_normalmap(scene, &opts, index, &mut rng));
+                } else {
+                    row.push(render_pixel(scene, &opts, index, &mut rng));
+                }
             }
             bar.inc(1);
-        });
+            row
+        })
+        .flatten()
+        .collect();
 
     pixelbuffer
 }
@@ -112,15 +113,14 @@ fn index_to_params(opts: &RenderOpts, index: usize) -> (Float, Float, Float, Flo
     (x, y, width, height)
 }
 
-fn progress_bar(opts: &RenderOpts, pixels: u64) -> ProgressBar {
-    let bar = ProgressBar::new(pixels);
+fn progress_bar(opts: &RenderOpts) -> ProgressBar {
+    let bar = ProgressBar::new(opts.height as u64);
     if opts.quiet {
         bar.set_draw_target(ProgressDrawTarget::hidden())
     } else {
         bar.set_style(ProgressStyle::default_bar().template(
-            "Elapsed:   {elapsed_precise}\nPixels:    {bar} {pos}/{len}\nRemaining: {eta_precise}",
+            "Elapsed:   {elapsed_precise}\nRows:      {bar} {pos}/{len}\nRemaining: {eta_precise}",
         ).unwrap());
-        bar.enable_steady_tick(Duration::from_millis(100));
     }
     bar
 }
