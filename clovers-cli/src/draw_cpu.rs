@@ -26,17 +26,18 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
         .enumerate()
         .for_each(|(index, pixel)| {
             if opts.normalmap {
-                *pixel = render_pixel_normalmap(scene, &opts, index, &bar);
+                *pixel = render_pixel_normalmap(scene, &opts, index);
             } else {
-                *pixel = render_pixel(scene, &opts, index, &bar);
+                *pixel = render_pixel(scene, &opts, index);
             }
+            bar.inc(1);
         });
 
     pixelbuffer
 }
 
 // Render a single pixel, including possible multisampling
-fn render_pixel(scene: &Scene, opts: &RenderOpts, index: usize, bar: &ProgressBar) -> Srgb<u8> {
+fn render_pixel(scene: &Scene, opts: &RenderOpts, index: usize) -> Srgb<u8> {
     let (x, y, width, height) = index_to_params(opts, index);
     let mut rng = SmallRng::from_entropy();
     let mut color: LinSrgb = LinSrgb::new(0.0, 0.0, 0.0);
@@ -48,23 +49,16 @@ fn render_pixel(scene: &Scene, opts: &RenderOpts, index: usize, bar: &ProgressBa
     color /= opts.samples as Float;
     let color: Srgb = color.into_color();
     let color: Srgb<u8> = color.into_format();
-    bar.inc(1);
     color
 }
 
 // Render a single pixel in normalmap mode
-fn render_pixel_normalmap(
-    scene: &Scene,
-    opts: &RenderOpts,
-    index: usize,
-    bar: &ProgressBar,
-) -> Srgb<u8> {
+fn render_pixel_normalmap(scene: &Scene, opts: &RenderOpts, index: usize) -> Srgb<u8> {
     let (x, y, width, height) = index_to_params(opts, index);
     let mut rng = SmallRng::from_entropy();
     let color: LinSrgb = sample_normalmap(scene, x, y, width, height, &mut rng);
     let color: Srgb = color.into_color();
     let color: Srgb<u8> = color.into_format();
-    bar.inc(1);
     color
 }
 
