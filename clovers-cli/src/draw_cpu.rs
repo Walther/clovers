@@ -25,10 +25,11 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
         .par_iter_mut()
         .enumerate()
         .for_each(|(index, pixel)| {
+            let mut rng = SmallRng::from_entropy();
             if opts.normalmap {
-                *pixel = render_pixel_normalmap(scene, &opts, index);
+                *pixel = render_pixel_normalmap(scene, &opts, index, &mut rng);
             } else {
-                *pixel = render_pixel(scene, &opts, index);
+                *pixel = render_pixel(scene, &opts, index, &mut rng);
             }
             bar.inc(1);
         });
@@ -37,12 +38,11 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
 }
 
 // Render a single pixel, including possible multisampling
-fn render_pixel(scene: &Scene, opts: &RenderOpts, index: usize) -> Srgb<u8> {
+fn render_pixel(scene: &Scene, opts: &RenderOpts, index: usize, rng: &mut SmallRng) -> Srgb<u8> {
     let (x, y, width, height) = index_to_params(opts, index);
-    let mut rng = SmallRng::from_entropy();
     let mut color: LinSrgb = LinSrgb::new(0.0, 0.0, 0.0);
     for _sample in 0..opts.samples {
-        if let Some(s) = sample(scene, x, y, width, height, &mut rng, opts.max_depth) {
+        if let Some(s) = sample(scene, x, y, width, height, rng, opts.max_depth) {
             color += s
         }
     }
@@ -53,10 +53,14 @@ fn render_pixel(scene: &Scene, opts: &RenderOpts, index: usize) -> Srgb<u8> {
 }
 
 // Render a single pixel in normalmap mode
-fn render_pixel_normalmap(scene: &Scene, opts: &RenderOpts, index: usize) -> Srgb<u8> {
+fn render_pixel_normalmap(
+    scene: &Scene,
+    opts: &RenderOpts,
+    index: usize,
+    rng: &mut SmallRng,
+) -> Srgb<u8> {
     let (x, y, width, height) = index_to_params(opts, index);
-    let mut rng = SmallRng::from_entropy();
-    let color: LinSrgb = sample_normalmap(scene, x, y, width, height, &mut rng);
+    let color: LinSrgb = sample_normalmap(scene, x, y, width, height, rng);
     let color: Srgb = color.into_color();
     let color: Srgb<u8> = color.into_format();
     color
