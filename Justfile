@@ -21,3 +21,8 @@ all-scenes:
   for scene in $(ls scenes/ |grep json); \
   do just cli -s 1 --input scenes/$scene --output renders/$DATE/${scene%.json}.png; \
   done;
+
+# Profiling helper
+profile *ARGS:
+  cargo build --profile profiling; \
+  samply record -- ./target/profiling/clovers-cli {{ARGS}}
