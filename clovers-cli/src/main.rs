@@ -6,7 +6,6 @@
 
 // External imports
 use clap::Parser;
-use human_format::Formatter;
 use humantime::format_duration;
 use image::{ImageBuffer, ImageOutputFormat, Rgb, RgbImage};
 use img_parts::png::{Png, PngChunk};
@@ -60,9 +59,20 @@ struct Opts {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let opts: Opts = Opts::parse();
+    let Opts {
+        input,
+        output,
+        width,
+        height,
+        samples,
+        max_depth,
+        quiet,
+        gpu,
+        debug,
+        normalmap,
+    } = Opts::parse();
 
-    if opts.debug {
+    if debug {
         tracing_subscriber::fmt()
             .with_max_level(Level::DEBUG)
             .with_timer(UtcTime::rfc_3339())
@@ -76,33 +86,30 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     // Pretty printing output, unless in quiet mode
-    if !opts.quiet {
-        println!("clovers 🍀    ray tracing in rust 🦀");
-        println!("width:          {}", opts.width);
-        println!("height:         {}", opts.height);
-        println!("samples:        {}", opts.samples);
-        println!("max depth:      {}", opts.max_depth);
-        let rays: u64 =
-            opts.width as u64 * opts.height as u64 * opts.samples as u64 * opts.max_depth as u64;
-        println!("max total rays: {}", Formatter::new().format(rays as f64));
+    if !quiet {
+        println!("clovers 🍀 path tracing renderer");
+        println!();
+        println!("{width}x{height} resolution");
+        println!("{samples} samples per pixel");
+        println!("{max_depth} max bounce depth");
         println!(); // Empty line before progress bar
     }
 
     let renderopts: RenderOpts = RenderOpts {
-        width: opts.width,
-        height: opts.height,
-        samples: opts.samples,
-        max_depth: opts.max_depth,
-        quiet: opts.quiet,
-        normalmap: opts.normalmap,
+        width,
+        height,
+        samples,
+        max_depth,
+        quiet,
+        normalmap,
     };
     let threads = std::thread::available_parallelism()?;
 
     info!("Reading the scene file");
-    let path = Path::new(&opts.input);
+    let path = Path::new(&input);
     let scene = match path.extension() {
         Some(ext) => match &ext.to_str() {
-            Some("json") => json_scene::initialize(path, &opts),
+            Some("json") => json_scene::initialize(path, width, height),
             _ => panic!("Unknown file type"),
         },
         None => panic!("Unknown file type"),
@@ -110,7 +117,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     info!("Calling draw()");
     let start = Instant::now();
-    let pixelbuffer = match opts.gpu {
+    let pixelbuffer = match gpu {
         // Note: live progress bar printed within draw_cpu::draw
         false => draw_cpu::draw(renderopts, &scene),
         true => unimplemented!("GPU accelerated rendering is currently unimplemented"),
@@ -118,8 +125,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     info!("Drawing a pixelbuffer finished");
 
     info!("Converting pixelbuffer to an image");
-    let width = opts.width;
-    let height = opts.height;
     let mut img: RgbImage = ImageBuffer::new(width, height);
     img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
         let index = y * width + x;
@@ -135,8 +140,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let formatted_duration = format_duration(duration);
     info!("Finished render in {}", formatted_duration);
 
-    if !opts.quiet {
-        println!(); // Empty line after progress bar
+    if !quiet {
         println!("Finished render in {}", formatted_duration);
     }
 
@@ -146,10 +150,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     img.write_to(&mut Cursor::new(&mut bytes), ImageOutputFormat::Png)?;
     let mut png = Png::from_bytes(bytes.into())?;
 
-    let comment = if opts.normalmap {
-        format!("Comment\0{} rendered with the clovers raytracing engine at {}x{} in normalmap mode. finished render in {}, using {} threads", opts.input, opts.width, opts.height, formatted_duration, threads)
+    let comment = if normalmap {
+        format!("Comment\0{input} rendered with the clovers raytracing engine at {width}x{height} in normalmap mode. finished render in {formatted_duration}, using {threads} threads")
     } else {
-        format!("Comment\0{} rendered with the clovers raytracing engine at {}x{}, {} samples per pixel, {} max ray bounce depth. finished render in {}, using {} threads", opts.input, opts.width, opts.height, opts.samples, opts.max_depth, formatted_duration, threads)
+        format!("Comment\0{input} rendered with the clovers raytracing engine at {width}x{height}, {samples} samples per pixel, {max_depth} max ray bounce depth. finished render in {formatted_duration}, using {threads} threads")
     };
     let software = "Software\0https://github.com/walther/clovers".to_string();
 
@@ -159,7 +163,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         png.chunks_mut().push(chunk);
     }
 
-    let target = match opts.output {
+    let target = match output {
         Some(filename) => filename,
         None => {
             // Default to using a timestamp & `renders/` directory
