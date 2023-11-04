@@ -1,0 +1,8 @@
+{
+  "name": "Rust",
+  "image": "mcr.microsoft.com/devcontainers/rust:1-1-bookworm",
+  "features": {
+    "ghcr.io/lee-orr/rusty-dev-containers/cargo-binstall": {},
+    "ghcr.io/guiyomh/features/just": {}
+  }
+}
