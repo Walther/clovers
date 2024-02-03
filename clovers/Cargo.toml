@@ -36,3 +36,7 @@ divan = "0.1.11"
 [[bench]]
 name = "random"
 harness = false
+
+[[bench]]
+name = "interval"
+harness = false
