@@ -40,3 +40,7 @@ harness = false
 [[bench]]
 name = "interval"
 harness = false
+
+[[bench]]
+name = "aabb"
+harness = false
