@@ -32,6 +32,7 @@ tracing = { version = "0.1.40", optional = true }
 
 [dev-dependencies]
 divan = "0.1.11"
+proptest = "1"
 
 [[bench]]
 name = "random"
