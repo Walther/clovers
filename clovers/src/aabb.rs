@@ -39,39 +39,11 @@ impl AABB {
         }
     }
 
-    /// Given a [Ray], returns whether the ray hits the bounding box or not. Based on ["An Optimized AABB Hit Method"](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
+    /// Given a [Ray], returns whether the ray hits the bounding box or not. Current default method, based on ["An Optimized AABB Hit Method"](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
     #[must_use]
     pub fn hit(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
         // TODO: Create an improved hit method with more robust handling of zeroes. See https://github.com/RayTracing/raytracing.github.io/issues/927
         // Both methods below are susceptible for NaNs and infinities, and have subtly different edge cases.
-
-        // "New method"
-        // for axis in 0..3 {
-        //     let a = (self.axis(axis).min - ray.origin[axis]) / ray.direction[axis];
-        //     let b = (self.axis(axis).max - ray.origin[axis]) / ray.direction[axis];
-        //     let t0: Float = a.min(b);
-        //     let t1: Float = a.max(b);
-        //     tmin = t0.max(tmin);
-        //     tmax = t1.min(tmax);
-        //     if tmax <= tmin {
-        //         return false;
-        //     }
-        // }
-
-        // "Old method"
-        // for axis in 0..3 {
-        //     let invd = 1.0 / ray.direction[axis];
-        //     let mut t0: Float = (self.axis(axis).min - ray.origin[axis]) * invd;
-        //     let mut t1: Float = (self.axis(axis).max - ray.origin[axis]) * invd;
-        //     if invd < 0.0 {
-        //         core::mem::swap(&mut t0, &mut t1);
-        //     }
-        //     tmin = if t0 > tmin { t0 } else { tmin };
-        //     tmax = if t1 < tmax { t1 } else { tmax };
-        //     if tmax <= tmin {
-        //         return false;
-        //     }
-        // }
 
         // "My adjusted method" - possibly more zero-resistant?
         // TODO: validate
@@ -99,6 +71,46 @@ impl AABB {
         }
 
         // If we have not missed on any axis, return true for the hit
+        true
+    }
+
+    /// Given a [Ray], returns whether the ray hits the bounding box or not. Old method from a GitHub issue. Exists mostly for testing purposes.
+    #[must_use]
+    #[deprecated]
+    pub fn hit_old(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
+        // "Old method"
+        for axis in 0..3 {
+            let invd = 1.0 / ray.direction[axis];
+            let mut t0: Float = (self.axis(axis).min - ray.origin[axis]) * invd;
+            let mut t1: Float = (self.axis(axis).max - ray.origin[axis]) * invd;
+            if invd < 0.0 {
+                core::mem::swap(&mut t0, &mut t1);
+            }
+            tmin = if t0 > tmin { t0 } else { tmin };
+            tmax = if t1 < tmax { t1 } else { tmax };
+            if tmax <= tmin {
+                return false;
+            }
+        }
+        true
+    }
+
+    /// Given a [Ray], returns whether the ray hits the bounding box or not. Newer method from a GitHub issue. Exists mostly for testing purposes.
+    #[must_use]
+    #[deprecated]
+    pub fn hit_new(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
+        // "New method"
+        for axis in 0..3 {
+            let a = (self.axis(axis).min - ray.origin[axis]) / ray.direction[axis];
+            let b = (self.axis(axis).max - ray.origin[axis]) / ray.direction[axis];
+            let t0: Float = a.min(b);
+            let t1: Float = a.max(b);
+            tmin = t0.max(tmin);
+            tmax = t1.min(tmax);
+            if tmax <= tmin {
+                return false;
+            }
+        }
         true
     }
 

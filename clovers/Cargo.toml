@@ -31,8 +31,25 @@ stl_io = { version = "0.7.0", optional = true }
 tracing = { version = "0.1.40", optional = true }
 
 [dev-dependencies]
-criterion = "0.4.0"
+divan = "0.1.11"
+proptest = "1"
 
 [[bench]]
 name = "random"
+harness = false
+
+[[bench]]
+name = "interval"
+harness = false
+
+[[bench]]
+name = "aabb"
+harness = false
+
+[[bench]]
+name = "wavelength"
+harness = false
+
+[[bench]]
+name = "spectrum"
 harness = false

@@ -26,3 +26,11 @@ all-scenes:
 profile *ARGS:
   cargo build --profile profiling; \
   samply record -- ./target/profiling/clovers-cli {{ARGS}}
+
+# Run all tests
+test:
+  cargo nextest run --cargo-quiet
+
+# Run all benchmarks
+bench:
+  cargo bench --quiet

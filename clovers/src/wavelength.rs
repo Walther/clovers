@@ -60,16 +60,3 @@ pub fn wavelength_into_xyz(lambda: Wavelength) -> Xyz<E> {
     // The functions above have been designed for the whitepoint E
     Xyz::<E>::new(x, y, z)
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn rotate_wavelength_spread() {
-        let hero = 380;
-        let rotations = rotate_wavelength(hero);
-        let expected = [380, 480, 580, 680];
-        assert_eq!(rotations, expected);
-    }
-}
