@@ -25,3 +25,5 @@ proptest! {
       let _ = spectrum_xyz_to_p(lambda, xyz);
   }
 }
+
+// TODO: add more comprehensive tests for varying Xyz
