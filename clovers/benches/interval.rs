@@ -1,4 +1,4 @@
-use clovers::{interval::*, Float};
+use clovers::interval::*;
 use divan::black_box;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
@@ -8,34 +8,52 @@ fn main() {
 }
 
 #[divan::bench]
-fn new() -> Interval {
-    let mut rng = SmallRng::from_entropy();
-    let (a, b) = black_box((rng.gen(), rng.gen()));
-    black_box(Interval::new(a, b))
+fn new(bencher: divan::Bencher) {
+    bencher
+        .with_inputs(|| {
+            let mut rng = SmallRng::from_entropy();
+            (rng.gen(), rng.gen())
+        })
+        .bench_values(|(a, b)| black_box(Interval::new(a, b)))
 }
 
 #[divan::bench]
-fn new_from_intervals() -> Interval {
-    let mut rng = SmallRng::from_entropy();
-    let (a, b) = black_box((rng.gen(), rng.gen()));
-    let (c, d) = black_box((rng.gen(), rng.gen()));
-    let ab = black_box(Interval::new(a, b));
-    let cd = black_box(Interval::new(c, d));
-    black_box(Interval::new_from_intervals(ab, cd))
+fn new_from_intervals(bencher: divan::Bencher) {
+    bencher
+        .with_inputs(|| {
+            let mut rng = SmallRng::from_entropy();
+            let ab = random_interval(&mut rng);
+            let cd = random_interval(&mut rng);
+            (ab, cd)
+        })
+        .bench_values(|(ab, cd)| black_box(Interval::new_from_intervals(ab, cd)))
 }
 
 #[divan::bench]
-fn expand() -> Interval {
-    let mut rng = SmallRng::from_entropy();
-    let (a, b) = black_box((rng.gen(), rng.gen()));
-    let ab = black_box(Interval::new(a, b));
-    black_box(ab.expand(rng.gen()))
+fn expand(bencher: divan::Bencher) {
+    bencher
+        .with_inputs(|| {
+            let mut rng = SmallRng::from_entropy();
+            let ab = random_interval(&mut rng);
+            let delta = rng.gen();
+            (ab, delta)
+        })
+        .bench_values(|(ab, delta)| black_box(ab.expand(delta)))
 }
 
 #[divan::bench]
-fn size() -> Float {
-    let mut rng = SmallRng::from_entropy();
-    let (a, b) = black_box((rng.gen(), rng.gen()));
-    let ab = black_box(Interval::new(a, b));
-    black_box(ab.size())
+fn size(bencher: divan::Bencher) {
+    bencher
+        .with_inputs(|| {
+            let mut rng = SmallRng::from_entropy();
+            random_interval(&mut rng)
+        })
+        .bench_values(|ab| black_box(ab.size()))
+}
+
+// Helper functions
+
+fn random_interval(rng: &mut SmallRng) -> Interval {
+    let (a, b) = (rng.gen(), rng.gen());
+    Interval::new(a, b)
 }
