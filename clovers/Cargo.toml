@@ -19,12 +19,12 @@ traces = ["tracing"]
 
 [dependencies]
 enum_dispatch = "0.3.12"
-gltf = { version = "1.3.0", optional = true }
+gltf = { version = "1.4.0", optional = true }
 nalgebra = { version = "0.32.3" }
-palette = { version = "0.7.3", features = ["serializing"] }
+palette = { version = "0.7.4", features = ["serializing"] }
 rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
 rand_distr = "0.4.3"
-serde = { version = "1.0.190", features = [
+serde = { version = "1.0.196", features = [
   "derive",
 ], default-features = false, optional = true }
 stl_io = { version = "0.7.0", optional = true }
