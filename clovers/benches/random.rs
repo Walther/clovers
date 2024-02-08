@@ -1,7 +1,10 @@
 use clovers::{random::*, Vec3};
-use divan::black_box;
+use divan::{black_box, AllocProfiler};
 use rand::rngs::SmallRng;
 use rand::SeedableRng;
+
+#[global_allocator]
+static ALLOC: AllocProfiler = AllocProfiler::system();
 
 fn main() {
     divan::main();
@@ -11,6 +14,7 @@ fn main() {
 fn unit_vector(bencher: divan::Bencher) {
     bencher
         .with_inputs(SmallRng::from_entropy)
+        .counter(1u32)
         .bench_values(|mut rng| random_unit_vector(black_box(&mut rng)))
 }
 
@@ -18,6 +22,7 @@ fn unit_vector(bencher: divan::Bencher) {
 fn unit_disk(bencher: divan::Bencher) {
     bencher
         .with_inputs(SmallRng::from_entropy)
+        .counter(1u32)
         .bench_values(|mut rng| random_in_unit_disk(black_box(&mut rng)))
 }
 
@@ -25,6 +30,7 @@ fn unit_disk(bencher: divan::Bencher) {
 fn cosine_direction(bencher: divan::Bencher) {
     bencher
         .with_inputs(SmallRng::from_entropy)
+        .counter(1u32)
         .bench_values(|mut rng| random_cosine_direction(black_box(&mut rng)))
 }
 
@@ -32,6 +38,7 @@ fn cosine_direction(bencher: divan::Bencher) {
 fn hemisphere(bencher: divan::Bencher) {
     bencher
         .with_inputs(SmallRng::from_entropy)
+        .counter(1u32)
         .bench_values(|mut rng| {
             let normal = Vec3::new(1.0, 0.0, 0.0);
             random_on_hemisphere(normal, black_box(&mut rng))

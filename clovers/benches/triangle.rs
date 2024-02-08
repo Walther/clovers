@@ -7,8 +7,12 @@ use clovers::ray::Ray;
 use clovers::wavelength::random_wavelength;
 use clovers::Vec3;
 use divan::black_box;
+use divan::AllocProfiler;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
+
+#[global_allocator]
+static ALLOC: AllocProfiler = AllocProfiler::system();
 
 fn main() {
     divan::main();
@@ -18,6 +22,7 @@ fn main() {
 fn new(bencher: divan::Bencher) {
     bencher
         .with_inputs(random_triangle_ingredients)
+        .counter(1u32)
         .bench_values(|(a, b, c, material)| black_box(Triangle::new(a, b, c, material)))
 }
 
@@ -29,6 +34,7 @@ fn hit(bencher: divan::Bencher) {
             let (triangle, ray) = random_triangle_and_ray();
             (triangle, ray, rng)
         })
+        .counter(1u32)
         .bench_values(|(triangle, ray, mut rng)| {
             black_box(
                 triangle

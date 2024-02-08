@@ -53,6 +53,8 @@ pub(super) fn spectrum_xyz_to_p(lambda: f64, xyz: [f64; 3]) -> f64 {
     } = spectrum_grid[cell_idx];
     let num = num_points;
 
+    // TODO: can this alloc be removed?
+
     // get linearly interpolated spectral power for the corner vertices:
     let mut p = std::iter::repeat(0.0).take(num).collect::<Vec<_>>();
     // this clamping is only necessary if lambda is not sure to be >= spectrum_sample_min and <= spectrum_sample_max:
