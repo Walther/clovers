@@ -39,6 +39,7 @@ impl AABB {
         }
     }
 
+    #[allow(clippy::doc_link_with_quotes)]
     /// Given a [Ray], returns whether the ray hits the bounding box or not. Current default method, based on ["An Optimized AABB Hit Method"](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
     #[must_use]
     pub fn hit(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
