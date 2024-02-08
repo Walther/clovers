@@ -53,3 +53,7 @@ harness = false
 [[bench]]
 name = "spectrum"
 harness = false
+
+[[bench]]
+name = "triangle"
+harness = false

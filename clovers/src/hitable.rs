@@ -109,7 +109,7 @@ impl HitableTrait for Empty {
 }
 
 #[enum_dispatch]
-pub(crate) trait HitableTrait {
+pub trait HitableTrait {
     #[must_use]
     fn hit(
         &self,
