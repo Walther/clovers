@@ -8,6 +8,11 @@ publish = false
 name = "clovers-cli"
 path = "src/main.rs"
 
+[lib]
+# For testing purposes
+name = "clovers_draw_cpu"
+path = "src/draw_cpu.rs"
+
 [dependencies]
 # Internal
 clovers = { path = "../clovers", features = [
@@ -37,3 +42,11 @@ serde_json = { version = "1.0", features = ["alloc"], default-features = false }
 time = { version = "0.3.34", default-features = false }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["time"] }
+
+[dev-dependencies]
+divan = "0.1.11"
+proptest = "1"
+
+[[bench]]
+name = "draw_cpu"
+harness = false

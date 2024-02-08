@@ -1,5 +1,6 @@
-use crate::{colorize::colorize, normals::normal_map, ray::Ray, scenes, Float};
-use clovers::RenderOpts;
+use clovers::{
+    colorize::colorize, normals::normal_map, ray::Ray, scenes::Scene, Float, RenderOpts,
+};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use palette::chromatic_adaptation::AdaptInto;
 use palette::convert::IntoColorUnclamped;
@@ -8,7 +9,6 @@ use palette::{IntoColor, LinSrgb, Srgb, Xyz};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
-use scenes::Scene;
 
 /// The main drawing function, returns a `Vec<Srgb>` as a pixelbuffer.
 pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
