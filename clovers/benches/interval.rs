@@ -1,7 +1,10 @@
 use clovers::interval::*;
-use divan::black_box;
+use divan::{black_box, AllocProfiler};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
+
+#[global_allocator]
+static ALLOC: AllocProfiler = AllocProfiler::system();
 
 fn main() {
     divan::main();
@@ -14,6 +17,7 @@ fn new(bencher: divan::Bencher) {
             let mut rng = SmallRng::from_entropy();
             (rng.gen(), rng.gen())
         })
+        .counter(1u32)
         .bench_values(|(a, b)| black_box(Interval::new(a, b)))
 }
 
@@ -26,6 +30,7 @@ fn new_from_intervals(bencher: divan::Bencher) {
             let cd = random_interval(&mut rng);
             (ab, cd)
         })
+        .counter(1u32)
         .bench_values(|(ab, cd)| black_box(Interval::new_from_intervals(ab, cd)))
 }
 
@@ -38,6 +43,7 @@ fn expand(bencher: divan::Bencher) {
             let delta = rng.gen();
             (ab, delta)
         })
+        .counter(1u32)
         .bench_values(|(ab, delta)| black_box(ab.expand(delta)))
 }
 
@@ -48,6 +54,7 @@ fn size(bencher: divan::Bencher) {
             let mut rng = SmallRng::from_entropy();
             random_interval(&mut rng)
         })
+        .counter(1u32)
         .bench_values(|ab| black_box(ab.size()))
 }
 
