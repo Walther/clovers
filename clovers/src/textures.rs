@@ -4,6 +4,8 @@ pub mod solid_color;
 pub mod spatial_checker;
 pub mod surface_checker;
 
+use core::str::FromStr;
+
 use enum_dispatch::enum_dispatch;
 use palette::{
     chromatic_adaptation::AdaptInto,
@@ -22,6 +24,8 @@ use crate::{Float, Vec3};
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde-derive", serde(rename_all = "snake_case"))]
 pub enum TypedColorInit {
+    /// Hex "web color" Srgb
+    Hex(String),
     /// Linear Srgb
     LinSrgb(LinSrgb),
     /// Non-linear Srgb
@@ -57,6 +61,13 @@ impl From<ColorInit> for Xyz<E> {
                 c
             }
             ColorInit::TypedColor(s) => match s {
+                TypedColorInit::Hex(c) => {
+                    let c: Srgb<u8> = Srgb::from_str(&c).unwrap();
+                    let c: Srgb = c.into_format();
+                    let c: Xyz = c.into_color_unclamped();
+                    let c: Xyz<E> = c.adapt_into();
+                    c
+                }
                 TypedColorInit::LinSrgb(c) => {
                     let c = LinSrgb::new(c.red, c.green, c.blue);
                     let c: Xyz = c.into_color_unclamped();
