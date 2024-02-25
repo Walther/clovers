@@ -26,9 +26,6 @@ use crate::{
 
 use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecord};
 
-/// Type alias for consistency with other materials.
-pub type DispersiveInit = Dispersive;
-
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A dispersive glass material.

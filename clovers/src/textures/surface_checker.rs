@@ -22,8 +22,19 @@ pub struct SurfaceCheckerInit {
     pub density: Float,
 }
 
+impl From<SurfaceCheckerInit> for SurfaceChecker {
+    fn from(value: SurfaceCheckerInit) -> Self {
+        SurfaceChecker {
+            even: value.even.into(),
+            odd: value.odd.into(),
+            density: value.density,
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", serde(from = "SurfaceCheckerInit"))]
 /// A standard checkered texture based on 2D surface UV coordinates.
 pub struct SurfaceChecker {
     /// Uniform color for the even-numbered checkers of the texture.

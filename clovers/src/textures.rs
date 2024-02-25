@@ -66,46 +66,11 @@ impl From<ColorInit> for Xyz<E> {
     }
 }
 
-/// Initialization structure for a texture.
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
-pub enum TextureInit {
-    /// SolidColor texture
-    SolidColor(SolidColorInit),
-    /// SpatialChecker texture
-    SpatialChecker(SpatialCheckerInit),
-    /// SurfaceChecker texture
-    SurfaceChecker(SurfaceCheckerInit),
-}
-
-impl Default for TextureInit {
-    fn default() -> Self {
-        TextureInit::SolidColor(SolidColorInit {
-            color: ColorInit::TypedColor(TypedColorInit::XyzE(Xyz::new(0.5, 0.5, 0.5))),
-        })
-    }
-}
-
-impl From<TextureInit> for Texture {
-    fn from(value: TextureInit) -> Self {
-        match value {
-            TextureInit::SolidColor(s) => Texture::SolidColor(SolidColor::new(s.color)),
-            TextureInit::SpatialChecker(s) => {
-                Texture::SpatialChecker(SpatialChecker::new(s.even, s.odd, s.density))
-            }
-            TextureInit::SurfaceChecker(s) => {
-                Texture::SurfaceChecker(SurfaceChecker::new(s.even, s.odd, s.density))
-            }
-        }
-    }
-}
-
 #[enum_dispatch(TextureTrait)]
 #[derive(Clone, Debug)]
 /// A texture enum.
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde-derive", serde(from = "TextureInit"))]
+#[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
 pub enum Texture {
     /// SolidColor texture
     SolidColor(SolidColor),

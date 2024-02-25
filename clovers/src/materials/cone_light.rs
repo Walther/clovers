@@ -4,21 +4,11 @@ use super::{MaterialTrait, ScatterRecord};
 use crate::{
     hitable::HitRecord,
     ray::Ray,
-    textures::{SolidColor, Texture, TextureInit, TextureTrait},
+    textures::{SolidColor, Texture, TextureTrait},
     Float, Vec3,
 };
 use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
-
-/// Initialization structure for the cone light material.
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct ConeLightInit {
-    /// Spread of the light relative to the surface normal, degrees
-    pub spread: Float,
-    /// Emission texture of the light
-    pub emit: TextureInit,
-}
 
 /// A cone light material. The material emits light if the incoming ray is within a certain amount of degrees from the surface normal.
 #[derive(Clone, Debug)]

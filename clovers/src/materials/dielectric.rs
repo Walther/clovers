@@ -5,24 +5,11 @@ use crate::{
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     ray::Ray,
-    textures::{ColorInit, TypedColorInit},
     Float, Vec3,
 };
 use palette::{white_point::E, Xyz};
 use rand::rngs::SmallRng;
 use rand::Rng;
-
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// An initialization structure for the dielectric material.
-pub struct DielectricInit {
-    /// Refractive index of the material. Used for calculating the new direction of a ray when entering the material at an angle. Follows Snell's law of refraction. Default value: 1.5, based on typical window glass.
-    #[cfg_attr(feature = "serde-derive", serde(default = "default_index"))]
-    pub refractive_index: Float,
-    /// Color of the material. Used for colorizing the rays. Default value: [`(1.0, 1.0, 1.0)`], producing a fully transparent, clear glass.
-    #[cfg_attr(feature = "serde-derive", serde(default = "default_color_init"))]
-    pub color: ColorInit,
-}
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -38,10 +25,6 @@ pub struct Dielectric {
 
 fn default_index() -> Float {
     1.5
-}
-
-fn default_color_init() -> ColorInit {
-    ColorInit::TypedColor(TypedColorInit::XyzE(Xyz::new(100.0, 100.0, 100.0)))
 }
 
 fn default_color() -> Xyz<E> {

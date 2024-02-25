@@ -32,7 +32,7 @@ pub enum MaterialInit {
     /// Name of the shared material
     Shared(String),
     /// Owned material structure
-    Owned(MaterialInitInner),
+    Owned(Material),
 }
 
 impl Default for MaterialInit {
@@ -50,27 +50,6 @@ pub struct SharedMaterial {
     /// The shared material itself
     #[serde(flatten)]
     pub material: Material,
-}
-
-#[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// Initialization structure for the [Material] enum.
-#[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
-pub enum MaterialInitInner {
-    /// Dielectric material
-    Dielectric(DielectricInit),
-    /// Dispersive material
-    Dispersive(DispersiveInit),
-    /// Lambertian material
-    Lambertian(LambertianInit),
-    /// ConeLight material
-    ConeLight(ConeLightInit),
-    /// DiffuseLight material
-    DiffuseLight(DiffuseLightInit),
-    /// Metal material
-    Metal(MetalInit),
-    /// Isotropic material
-    Isotropic(IsotropicInit),
 }
 
 #[enum_dispatch]
@@ -105,31 +84,11 @@ pub trait MaterialTrait: Debug {
     }
 }
 
-impl From<MaterialInitInner> for Material {
-    fn from(mat: MaterialInitInner) -> Self {
-        match mat {
-            MaterialInitInner::Dielectric(m) => {
-                Material::Dielectric(Dielectric::new(m.refractive_index, m.color))
-            }
-            MaterialInitInner::Dispersive(m) => {
-                Material::Dispersive(Dispersive::new(m.cauchy_a, m.cauchy_b))
-            }
-            MaterialInitInner::Lambertian(m) => Material::Lambertian(Lambertian::new(m.albedo)),
-            MaterialInitInner::ConeLight(m) => {
-                Material::ConeLight(ConeLight::new(m.spread, m.emit))
-            }
-            MaterialInitInner::DiffuseLight(m) => Material::DiffuseLight(DiffuseLight::new(m.emit)),
-            MaterialInitInner::Metal(m) => Material::Metal(Metal::new(m.albedo, m.fuzz)),
-            MaterialInitInner::Isotropic(m) => Material::Isotropic(Isotropic::new(m.albedo)),
-        }
-    }
-}
-
 #[enum_dispatch(MaterialTrait)]
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
 /// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
-#[cfg_attr(feature = "serde-derive", serde(from = "MaterialInitInner"))]
 pub enum Material {
     /// Dielectric material
     Dielectric(Dielectric),

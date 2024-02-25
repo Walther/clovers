@@ -5,19 +5,10 @@ use crate::{
     hitable::HitRecord,
     pdf::{SpherePDF, PDF},
     ray::Ray,
-    textures::{Texture, TextureInit, TextureTrait},
+    textures::{Texture, TextureTrait},
     Float, PI,
 };
 use rand::prelude::SmallRng;
-
-#[derive(Debug, Clone, Default)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// Initialization structure for the [Isotropic] material.
-pub struct IsotropicInit {
-    #[cfg_attr(feature = "serde-derive", serde(default))]
-    /// Texture initializer for the material.
-    pub albedo: TextureInit,
-}
 
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]

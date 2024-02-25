@@ -5,29 +5,13 @@ use crate::{
     hitable::HitRecord,
     pdf::{CosinePDF, PDF},
     ray::Ray,
-    textures::{Texture, TextureInit, TextureTrait},
+    textures::{Texture, TextureTrait},
     Float, PI,
 };
 use rand::prelude::SmallRng;
 
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// Initialization structure for the [Lambertian] material.
-pub struct LambertianInit {
-    #[cfg_attr(feature = "serde-derive", serde(default))]
-    /// Texture initializer for the material.
-    pub albedo: TextureInit,
-}
-
-impl From<LambertianInit> for Lambertian {
-    fn from(value: LambertianInit) -> Self {
-        Lambertian::new(value.albedo)
-    }
-}
-
-#[derive(Clone, Debug, Default)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde-derive", serde(from = "LambertianInit"))]
 /// Lambertian material. This is the default material with a smooth, matte surface.
 pub struct Lambertian {
     #[cfg_attr(feature = "serde-derive", serde(default))]

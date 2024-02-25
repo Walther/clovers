@@ -4,19 +4,11 @@ use super::{MaterialTrait, ScatterRecord};
 use crate::{
     hitable::HitRecord,
     ray::Ray,
-    textures::{SolidColor, Texture, TextureInit, TextureTrait},
+    textures::{SolidColor, Texture, TextureTrait},
     Float, Vec3,
 };
 use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
-
-/// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct DiffuseLightInit {
-    /// Texture initializer for the emission of the light. Usually a [SolidColor].
-    pub emit: TextureInit,
-}
 
 /// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
 #[derive(Clone, Debug)]

@@ -14,9 +14,18 @@ pub struct SolidColorInit {
     pub color: ColorInit,
 }
 
+impl From<SolidColorInit> for SolidColor {
+    fn from(value: SolidColorInit) -> Self {
+        SolidColor {
+            color: value.color.into(),
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 /// A solid color texture. Simplest possible [Texture](crate::textures::Texture): returns a solid color at any surface coordinate or spatial position.
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", serde(from = "SolidColorInit"))]
 pub struct SolidColor {
     /// The color of the [Texture](crate::textures::Texture).
     pub color: Xyz<E>,

@@ -6,22 +6,10 @@ use crate::{
     pdf::{ZeroPDF, PDF},
     random::random_unit_vector,
     ray::Ray,
-    textures::{Texture, TextureInit, TextureTrait},
+    textures::{Texture, TextureTrait},
     Float, Vec3,
 };
 use rand::prelude::SmallRng;
-
-#[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// Initialization structure for the [Metal] material.
-pub struct MetalInit {
-    #[cfg_attr(feature = "serde-derive", serde(default))]
-    /// Texture initializer for the material.
-    pub albedo: TextureInit,
-    #[cfg_attr(feature = "serde-derive", serde(default))]
-    /// Fuzziness factor of the metal, adjusting between a shiny and a brushed look.
-    pub fuzz: Float,
-}
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
