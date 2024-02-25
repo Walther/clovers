@@ -7,7 +7,7 @@ use crate::{
     textures::{SolidColor, Texture, TextureTrait},
     Float, Vec3,
 };
-use palette::{convert::IntoColorUnclamped, LinSrgb, Srgb};
+use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
 
 /// A cone light material. The material emits light if the incoming ray is within a certain amount of degrees from the surface normal.
@@ -23,7 +23,7 @@ impl Default for ConeLight {
     fn default() -> Self {
         ConeLight {
             spread: 10.0,
-            emit: Texture::SolidColor(SolidColor::new(Srgb::new(100.0, 100.0, 100.0))),
+            emit: Texture::SolidColor(SolidColor::new(Xyz::new(100.0, 100.0, 100.0))),
         }
     }
 }
@@ -60,10 +60,10 @@ impl MaterialTrait for ConeLight {
         u: Float,
         v: Float,
         position: Vec3,
-    ) -> LinSrgb {
+    ) -> Xyz<E> {
         // If we don't hit the front face, return black
         if !hit_record.front_face {
-            return LinSrgb::new(0.0, 0.0, 0.0);
+            return Xyz::new(0.0, 0.0, 0.0);
         }
 
         // We have hit the front. Calculate the angle of incidence
@@ -73,7 +73,6 @@ impl MaterialTrait for ConeLight {
         .acos();
 
         let emit = self.emit.color(u, v, position);
-        let emit: LinSrgb = emit.into_color_unclamped();
         if angle <= spread_radians {
             emit
         } else {
@@ -92,7 +91,10 @@ impl MaterialTrait for ConeLight {
 impl ConeLight {
     /// Creates a new [`ConeLight`] material with the given [Texture].
     #[must_use]
-    pub fn new(spread: Float, emit: Texture) -> Self {
-        ConeLight { spread, emit }
+    pub fn new(spread: Float, emit: impl Into<Texture>) -> Self {
+        ConeLight {
+            spread,
+            emit: emit.into(),
+        }
     }
 }

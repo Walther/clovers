@@ -5,7 +5,7 @@ pub mod spatial_checker;
 pub mod surface_checker;
 
 use enum_dispatch::enum_dispatch;
-use palette::LinSrgb;
+use palette::{white_point::E, Xyz};
 pub use solid_color::*;
 pub use spatial_checker::*;
 pub use surface_checker::*;
@@ -14,8 +14,8 @@ use crate::{Float, Vec3};
 
 #[enum_dispatch(TextureTrait)]
 #[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A texture enum.
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
 pub enum Texture {
     /// SolidColor texture
@@ -30,7 +30,7 @@ pub enum Texture {
 pub(crate) trait TextureTrait {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
     #[must_use]
-    fn color(&self, u: Float, v: Float, position: Vec3) -> LinSrgb;
+    fn color(&self, u: Float, v: Float, position: Vec3) -> Xyz<E>;
 }
 
 impl Default for Texture {

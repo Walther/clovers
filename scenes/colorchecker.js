@@ -81,18 +81,6 @@ const colors = [
   ],
 ];
 
-const hexToRgb = (hex) => {
-  let r = "0x" + hex[1] + hex[2];
-  let g = "0x" + hex[3] + hex[4];
-  let b = "0x" + hex[5] + hex[6];
-
-  r = r / 255.0;
-  g = g / 255.0;
-  b = b / 255.0;
-
-  return [r, g, b];
-};
-
 const width = 2.5;
 const gap = 0.5;
 const multiplier = width + gap;
@@ -105,7 +93,9 @@ colors.forEach((row, y) => {
       kind: "Lambertian",
       albedo: {
         kind: "SolidColor",
-        color: hexToRgb(hex),
+        color: {
+          hex,
+        },
       },
     };
     scene.materials.push(material);

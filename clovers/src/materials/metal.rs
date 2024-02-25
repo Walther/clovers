@@ -61,9 +61,9 @@ impl MaterialTrait for Metal {
 impl Metal {
     /// Creates a new [Metal] material with the albedo of the given [Texture] and a smoothness-roughness factor specified by `fuzz` parameter.
     #[must_use]
-    pub fn new(albedo: Texture, fuzz: Float) -> Self {
+    pub fn new(albedo: impl Into<Texture>, fuzz: Float) -> Self {
         Metal {
-            albedo,
+            albedo: albedo.into(),
             fuzz: fuzz.min(1.0),
         }
     }

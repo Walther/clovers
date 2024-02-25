@@ -54,7 +54,9 @@ impl MaterialTrait for Isotropic {
 impl Isotropic {
     /// Creates a new [Isotropic] material with an albedo of the given [Texture].
     #[must_use]
-    pub fn new(emission: Texture) -> Self {
-        Isotropic { albedo: emission }
+    pub fn new(emission: impl Into<Texture>) -> Self {
+        Isotropic {
+            albedo: emission.into(),
+        }
     }
 }

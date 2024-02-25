@@ -21,7 +21,7 @@ use enum_dispatch::enum_dispatch;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
-use palette::LinSrgb;
+use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
 
 /// Initialization structure for a `Material`. Either contains a `Material` by itself, or a String `name` to be found in a shared material list.
@@ -79,16 +79,16 @@ pub trait MaterialTrait: Debug {
         _u: Float,
         _v: Float,
         _position: Vec3,
-    ) -> LinSrgb {
-        LinSrgb::new(0.0, 0.0, 0.0)
+    ) -> Xyz<E> {
+        Xyz::new(0.0, 0.0, 0.0)
     }
 }
 
 #[enum_dispatch(MaterialTrait)]
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
+/// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
 pub enum Material {
     /// Dielectric material
     Dielectric(Dielectric),
@@ -129,7 +129,7 @@ pub struct ScatterRecord<'ray> {
     /// Direction of a generated specular ray
     pub specular_ray: Option<Ray>,
     /// Current color to take into account when following the scattered ray for futher iterations
-    pub attenuation: LinSrgb,
+    pub attenuation: Xyz<E>,
     /// Probability density function to use with the [ScatterRecord].
     // TODO: understand & explain
     pub pdf_ptr: PDF<'ray>,

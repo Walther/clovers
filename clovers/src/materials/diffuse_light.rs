@@ -7,7 +7,7 @@ use crate::{
     textures::{SolidColor, Texture, TextureTrait},
     Float, Vec3,
 };
-use palette::{convert::IntoColorUnclamped, LinSrgb, Srgb};
+use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
 
 /// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
@@ -21,7 +21,7 @@ impl Default for DiffuseLight {
     /// Creates a new [`DiffuseLight`] with white light at intensity `100.0`
     fn default() -> Self {
         DiffuseLight {
-            emit: Texture::SolidColor(SolidColor::new(Srgb::new(100.0, 100.0, 100.0))),
+            emit: Texture::SolidColor(SolidColor::new(Xyz::new(100.0, 100.0, 100.0))),
         }
     }
 }
@@ -58,13 +58,11 @@ impl MaterialTrait for DiffuseLight {
         u: Float,
         v: Float,
         position: Vec3,
-    ) -> LinSrgb {
+    ) -> Xyz<E> {
         if hit_record.front_face {
-            let emit = self.emit.color(u, v, position);
-            let emit: LinSrgb = emit.into_color_unclamped();
-            emit
+            self.emit.color(u, v, position)
         } else {
-            LinSrgb::new(0.0, 0.0, 0.0)
+            Xyz::new(0.0, 0.0, 0.0)
         }
     }
 }
@@ -72,7 +70,9 @@ impl MaterialTrait for DiffuseLight {
 impl DiffuseLight {
     /// Creates a new [`DiffuseLight`] material with the given [Texture].
     #[must_use]
-    pub fn new(emission: Texture) -> Self {
-        DiffuseLight { emit: emission }
+    pub fn new(emission: impl Into<Texture>) -> Self {
+        DiffuseLight {
+            emit: emission.into(),
+        }
     }
 }

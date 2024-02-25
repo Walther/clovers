@@ -7,7 +7,7 @@ use crate::{
     ray::Ray,
     Float, Vec3,
 };
-use palette::{convert::IntoColorUnclamped, Srgb};
+use palette::{white_point::E, Xyz};
 use rand::rngs::SmallRng;
 use rand::Rng;
 
@@ -20,15 +20,15 @@ pub struct Dielectric {
     pub refractive_index: Float,
     /// Color of the material. Used for colorizing the rays. Default value: [`(1.0, 1.0, 1.0)`], producing a fully transparent, clear glass.
     #[cfg_attr(feature = "serde-derive", serde(default = "default_color"))]
-    pub color: Srgb,
+    pub color: Xyz<E>,
 }
 
 fn default_index() -> Float {
     1.5
 }
 
-fn default_color() -> Srgb {
-    Srgb::new(1.0, 1.0, 1.0)
+fn default_color() -> Xyz<E> {
+    Xyz::new(100.0, 100.0, 100.0)
 }
 
 impl MaterialTrait for Dielectric {
@@ -70,7 +70,7 @@ impl MaterialTrait for Dielectric {
         Some(ScatterRecord {
             material_type: MaterialType::Specular,
             specular_ray: Some(specular_ray),
-            attenuation: self.color.into_color_unclamped(),
+            attenuation: self.color,
             pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()), //TODO: ugly hack due to nullptr in original tutorial
         })
     }
@@ -90,10 +90,10 @@ impl MaterialTrait for Dielectric {
 impl Dielectric {
     /// Creates a new [Dielectric] material with the given refractive index and color.
     #[must_use]
-    pub fn new(refractive_index: Float, color: Srgb) -> Self {
+    pub fn new(refractive_index: Float, color: impl Into<Xyz<E>>) -> Self {
         Dielectric {
             refractive_index,
-            color,
+            color: color.into(),
         }
     }
 }

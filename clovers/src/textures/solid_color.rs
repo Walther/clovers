@@ -1,23 +1,40 @@
 //! A solid color texture.
 
-use palette::{convert::IntoColorUnclamped, LinSrgb, Srgb};
-
-use crate::{Float, Vec3};
+use palette::{convert::IntoColorUnclamped, white_point::E, Xyz};
 
 use super::TextureTrait;
+use crate::colorinit::ColorInit;
+use crate::{Float, Vec3};
 
+/// Initialization structure for a solid color texture.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+pub struct SolidColorInit {
+    /// Initialization struct for the color.
+    pub color: ColorInit,
+}
+
+impl From<SolidColorInit> for SolidColor {
+    fn from(value: SolidColorInit) -> Self {
+        SolidColor {
+            color: value.color.into(),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 /// A solid color texture. Simplest possible [Texture](crate::textures::Texture): returns a solid color at any surface coordinate or spatial position.
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde-derive", serde(from = "SolidColorInit"))]
 pub struct SolidColor {
     /// The color of the [Texture](crate::textures::Texture).
-    pub color: Srgb,
+    pub color: Xyz<E>,
 }
 
 impl TextureTrait for SolidColor {
     /// Evaluates the color ignoring the given surface coordinates and spatial position - always returns the solid color.
     #[must_use]
-    fn color(&self, _u: Float, _v: Float, _position: Vec3) -> LinSrgb {
+    fn color(&self, _u: Float, _v: Float, _position: Vec3) -> Xyz<E> {
         self.color.into_color_unclamped()
     }
 }
@@ -25,16 +42,18 @@ impl TextureTrait for SolidColor {
 impl SolidColor {
     /// Creates a new solid color texture with the specified color.
     #[must_use]
-    pub fn new(color: Srgb) -> Self {
-        SolidColor { color }
+    pub fn new(color: impl Into<Xyz<E>>) -> Self {
+        SolidColor {
+            color: color.into(),
+        }
     }
 }
 
 impl Default for SolidColor {
     fn default() -> Self {
-        // 18% grey
+        // middle grey
         Self {
-            color: LinSrgb::new(0.18, 0.18, 0.18).into_color_unclamped(),
+            color: Xyz::new(0.5, 0.5, 0.5),
         }
     }
 }

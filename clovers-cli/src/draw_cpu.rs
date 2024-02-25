@@ -5,7 +5,7 @@ use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use palette::chromatic_adaptation::AdaptInto;
 use palette::convert::IntoColorUnclamped;
 use palette::white_point::E;
-use palette::{IntoColor, LinSrgb, Srgb, Xyz};
+use palette::{LinSrgb, Srgb, Xyz};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
@@ -41,14 +41,14 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
 // Render a single pixel, including possible multisampling
 fn render_pixel(scene: &Scene, opts: &RenderOpts, index: usize, rng: &mut SmallRng) -> Srgb<u8> {
     let (x, y, width, height) = index_to_params(opts, index);
-    let mut color: LinSrgb = LinSrgb::new(0.0, 0.0, 0.0);
+    let mut color: Xyz<E> = Xyz::new(0.0, 0.0, 0.0);
     for _sample in 0..opts.samples {
         if let Some(s) = sample(scene, x, y, width, height, rng, opts.max_depth) {
             color += s
         }
     }
     color /= opts.samples as Float;
-    let color: Srgb = color.into_color();
+    let color: Srgb = color.adapt_into();
     let color: Srgb<u8> = color.into_format();
     color
 }
@@ -62,7 +62,7 @@ fn render_pixel_normalmap(
 ) -> Srgb<u8> {
     let (x, y, width, height) = index_to_params(opts, index);
     let color: LinSrgb = sample_normalmap(scene, x, y, width, height, rng);
-    let color: Srgb = color.into_color();
+    let color: Srgb = color.into_color_unclamped();
     let color: Srgb<u8> = color.into_format();
     color
 }
@@ -79,8 +79,7 @@ fn sample_normalmap(
     let u = x / width;
     let v = y / height;
     let ray: Ray = scene.camera.get_ray(u, v, rng);
-    let color = normal_map(&ray, scene, rng);
-    color.into_color()
+    normal_map(&ray, scene, rng)
 }
 
 /// Get a single sample for a single pixel in the scene. Has slight jitter for antialiasing when multisampling.
@@ -92,14 +91,12 @@ fn sample(
     height: Float,
     rng: &mut SmallRng,
     max_depth: u32,
-) -> Option<LinSrgb> {
+) -> Option<Xyz<E>> {
     let u = (x + rng.gen::<Float>()) / width;
     let v = (y + rng.gen::<Float>()) / height;
     let ray: Ray = scene.camera.get_ray(u, v, rng);
     let color: Xyz<E> = colorize(&ray, scene, 0, max_depth, rng);
-    let color: Xyz = color.adapt_into();
-    let color: LinSrgb = color.into_color_unclamped();
-    if color.red.is_finite() && color.green.is_finite() && color.blue.is_finite() {
+    if color.x.is_finite() && color.y.is_finite() && color.z.is_finite() {
         return Some(color);
     }
     None
