@@ -9,7 +9,6 @@ use core::str::FromStr;
 use enum_dispatch::enum_dispatch;
 use palette::{
     chromatic_adaptation::AdaptInto,
-    convert::IntoColorUnclamped,
     white_point::{D65, E},
     LinSrgb, Oklch, Srgb, Xyz,
 };
@@ -54,40 +53,14 @@ impl From<ColorInit> for Xyz<E> {
     fn from(val: ColorInit) -> Self {
         // TODO: ensure correctness
         match val {
-            ColorInit::Color(c) => {
-                let c = Srgb::new(c[0], c[1], c[2]);
-                let c: Xyz = c.into_color_unclamped();
-                let c: Xyz<E> = c.adapt_into();
-                c
-            }
+            ColorInit::Color(c) => Srgb::new(c[0], c[1], c[2]).adapt_into(),
             ColorInit::TypedColor(s) => match s {
-                TypedColorInit::Hex(c) => {
-                    let c: Srgb<u8> = Srgb::from_str(&c).unwrap();
-                    let c: Srgb = c.into_format();
-                    let c: Xyz = c.into_color_unclamped();
-                    let c: Xyz<E> = c.adapt_into();
-                    c
-                }
-                TypedColorInit::LinSrgb(c) => {
-                    let c = LinSrgb::new(c.red, c.green, c.blue);
-                    let c: Xyz = c.into_color_unclamped();
-                    let c: Xyz<E> = c.adapt_into();
-                    c
-                }
-                TypedColorInit::Srgb(c) => {
-                    let c = Srgb::new(c.red, c.green, c.blue);
-                    let c: Xyz = c.into_color_unclamped();
-                    let c: Xyz<E> = c.adapt_into();
-                    c
-                }
+                TypedColorInit::Hex(c) => Srgb::from_str(&c).unwrap().into_format().adapt_into(),
+                TypedColorInit::LinSrgb(c) => LinSrgb::new(c.red, c.green, c.blue).adapt_into(),
+                TypedColorInit::Srgb(c) => Srgb::new(c.red, c.green, c.blue).adapt_into(),
                 TypedColorInit::XyzE(c) => c,
                 TypedColorInit::XyzD65(c) => c.adapt_into(),
-                TypedColorInit::Oklch(c) => {
-                    let c = Oklch::new(c.l, c.chroma, c.hue);
-                    let c: Xyz = c.into_color_unclamped();
-                    let c: Xyz<E> = c.adapt_into();
-                    c
-                }
+                TypedColorInit::Oklch(c) => Oklch::new(c.l, c.chroma, c.hue).adapt_into(),
             },
         }
     }
