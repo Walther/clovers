@@ -4,7 +4,8 @@ use palette::convert::IntoColorUnclamped;
 use palette::white_point::E;
 use palette::Xyz;
 
-use super::{ColorInit, TextureTrait, TypedColorInit};
+use super::TextureTrait;
+use crate::colorinit::{ColorInit, TypedColorInit};
 use crate::{Float, Vec3, PI};
 
 #[derive(Clone, Debug)]

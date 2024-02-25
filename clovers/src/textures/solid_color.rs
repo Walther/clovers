@@ -2,9 +2,9 @@
 
 use palette::{convert::IntoColorUnclamped, white_point::E, Xyz};
 
+use super::TextureTrait;
+use crate::colorinit::ColorInit;
 use crate::{Float, Vec3};
-
-use super::{ColorInit, TextureTrait};
 
 /// Initialization structure for a solid color texture.
 #[derive(Clone, Debug)]

@@ -77,6 +77,7 @@ use nalgebra::base::{Vector2, Vector3, Vector4};
 pub mod aabb;
 pub mod bvhnode;
 pub mod camera;
+pub mod colorinit;
 pub mod colorize;
 pub mod hitable;
 pub mod interval;
