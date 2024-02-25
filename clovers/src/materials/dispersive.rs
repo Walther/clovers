@@ -13,7 +13,7 @@ Dense flint glass SF10 	    1.7280 	    0.01342
 
 // TODO: consider other options, e.g. Sellmeier https://en.wikipedia.org/wiki/Sellmeier_equation
 
-use palette::LinSrgb;
+use palette::Xyz;
 use rand::{rngs::SmallRng, Rng};
 
 use crate::{
@@ -25,6 +25,9 @@ use crate::{
 };
 
 use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecord};
+
+/// Type alias for consistency with other materials.
+pub type DispersiveInit = Dispersive;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -78,7 +81,7 @@ impl MaterialTrait for Dispersive {
     ) -> Option<ScatterRecord> {
         // Calculate refractive index based on the wavelength of the incoming material
         // TODO: colored dispersive glass?
-        let attenuation = LinSrgb::new(1.0, 1.0, 1.0);
+        let attenuation = Xyz::new(1.0, 1.0, 1.0);
         let refractive_index = self.refractive_index(ray.wavelength);
         let refraction_ratio: Float = if hit_record.front_face {
             1.0 / refractive_index

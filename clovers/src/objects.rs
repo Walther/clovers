@@ -4,6 +4,7 @@ use crate::{
     bvhnode::BVHNode,
     hitable::Hitable,
     materials::{Material, MaterialInit, SharedMaterial},
+    textures::{SolidColor, SpatialChecker, SurfaceChecker, Texture, TextureInit},
     Box,
 };
 
@@ -93,7 +94,8 @@ pub fn object_to_hitable(obj: Object, materials: &[SharedMaterial]) -> Hitable<'
         Object::ConstantMedium(x) => {
             let obj = *x.boundary;
             let obj: Hitable = object_to_hitable(obj, materials);
-            Hitable::ConstantMedium(ConstantMedium::new(Box::new(obj), x.density, x.texture))
+            let texture = initialize_texture(x.texture);
+            Hitable::ConstantMedium(ConstantMedium::new(Box::new(obj), x.density, texture))
         }
         Object::MovingSphere(x) => {
             let material = initialize_material(x.material, materials);
@@ -150,7 +152,7 @@ fn initialize_material<'scene>(
     let material: &Material = match material_init {
         MaterialInit::Owned(m) => {
             // TODO: do not leak memory
-            let material: &'scene Material = Box::leak(Box::new(m));
+            let material: &'scene Material = Box::leak(Box::new(m.into()));
             material
         }
         MaterialInit::Shared(name) => {
@@ -172,4 +174,16 @@ fn initialize_material<'scene>(
         }
     };
     material
+}
+
+fn initialize_texture(texture: TextureInit) -> Texture {
+    match texture {
+        TextureInit::SolidColor(s) => Texture::SolidColor(SolidColor::new(s.color)),
+        TextureInit::SpatialChecker(s) => {
+            Texture::SpatialChecker(SpatialChecker::new(s.even, s.odd, s.density))
+        }
+        TextureInit::SurfaceChecker(s) => {
+            Texture::SurfaceChecker(SurfaceChecker::new(s.even, s.odd, s.density))
+        }
+    }
 }

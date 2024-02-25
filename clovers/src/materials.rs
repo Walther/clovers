@@ -21,7 +21,7 @@ use enum_dispatch::enum_dispatch;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
-use palette::LinSrgb;
+use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
 
 /// Initialization structure for a `Material`. Either contains a `Material` by itself, or a String `name` to be found in a shared material list.
@@ -32,7 +32,7 @@ pub enum MaterialInit {
     /// Name of the shared material
     Shared(String),
     /// Owned material structure
-    Owned(Material),
+    Owned(MaterialInitInner),
 }
 
 impl Default for MaterialInit {
@@ -50,6 +50,27 @@ pub struct SharedMaterial {
     /// The shared material itself
     #[serde(flatten)]
     pub material: Material,
+}
+
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+/// Initialization structure for the [Material] enum.
+#[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
+pub enum MaterialInitInner {
+    /// Dielectric material
+    Dielectric(DielectricInit),
+    /// Dispersive material
+    Dispersive(DispersiveInit),
+    /// Lambertian material
+    Lambertian(LambertianInit),
+    /// ConeLight material
+    ConeLight(ConeLightInit),
+    /// DiffuseLight material
+    DiffuseLight(DiffuseLightInit),
+    /// Metal material
+    Metal(MetalInit),
+    /// Isotropic material
+    Isotropic(IsotropicInit),
 }
 
 #[enum_dispatch]
@@ -79,8 +100,28 @@ pub trait MaterialTrait: Debug {
         _u: Float,
         _v: Float,
         _position: Vec3,
-    ) -> LinSrgb {
-        LinSrgb::new(0.0, 0.0, 0.0)
+    ) -> Xyz<E> {
+        Xyz::new(0.0, 0.0, 0.0)
+    }
+}
+
+impl From<MaterialInitInner> for Material {
+    fn from(mat: MaterialInitInner) -> Self {
+        match mat {
+            MaterialInitInner::Dielectric(m) => {
+                Material::Dielectric(Dielectric::new(m.refractive_index, m.color.into()))
+            }
+            MaterialInitInner::Dispersive(m) => {
+                Material::Dispersive(Dispersive::new(m.cauchy_a, m.cauchy_b))
+            }
+            MaterialInitInner::Lambertian(m) => Material::Lambertian(Lambertian::new(m.albedo)),
+            MaterialInitInner::ConeLight(m) => {
+                Material::ConeLight(ConeLight::new(m.spread, m.emit))
+            }
+            MaterialInitInner::DiffuseLight(m) => Material::DiffuseLight(DiffuseLight::new(m.emit)),
+            MaterialInitInner::Metal(m) => Material::Metal(Metal::new(m.albedo, m.fuzz)),
+            MaterialInitInner::Isotropic(m) => Material::Isotropic(Isotropic::new(m.albedo)),
+        }
     }
 }
 
@@ -88,7 +129,7 @@ pub trait MaterialTrait: Debug {
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
-#[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
+#[cfg_attr(feature = "serde-derive", serde(from = "MaterialInitInner"))]
 pub enum Material {
     /// Dielectric material
     Dielectric(Dielectric),
@@ -129,7 +170,7 @@ pub struct ScatterRecord<'ray> {
     /// Direction of a generated specular ray
     pub specular_ray: Option<Ray>,
     /// Current color to take into account when following the scattered ray for futher iterations
-    pub attenuation: LinSrgb,
+    pub attenuation: Xyz<E>,
     /// Probability density function to use with the [ScatterRecord].
     // TODO: understand & explain
     pub pdf_ptr: PDF<'ray>,

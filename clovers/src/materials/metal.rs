@@ -6,10 +6,22 @@ use crate::{
     pdf::{ZeroPDF, PDF},
     random::random_unit_vector,
     ray::Ray,
-    textures::{Texture, TextureTrait},
+    textures::{Texture, TextureInit, TextureTrait},
     Float, Vec3,
 };
 use rand::prelude::SmallRng;
+
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+/// Initialization structure for the [Metal] material.
+pub struct MetalInit {
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    /// Texture initializer for the material.
+    pub albedo: TextureInit,
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    /// Fuzziness factor of the metal, adjusting between a shiny and a brushed look.
+    pub fuzz: Float,
+}
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -61,9 +73,9 @@ impl MaterialTrait for Metal {
 impl Metal {
     /// Creates a new [Metal] material with the albedo of the given [Texture] and a smoothness-roughness factor specified by `fuzz` parameter.
     #[must_use]
-    pub fn new(albedo: Texture, fuzz: Float) -> Self {
+    pub fn new(albedo: impl Into<Texture>, fuzz: Float) -> Self {
         Metal {
-            albedo,
+            albedo: albedo.into(),
             fuzz: fuzz.min(1.0),
         }
     }

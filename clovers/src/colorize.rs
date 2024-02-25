@@ -11,8 +11,7 @@ use crate::{
     Float, EPSILON_SHADOW_ACNE,
 };
 use palette::{
-    chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, Clamp, LinSrgb,
-    Xyz,
+    chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, Clamp, Xyz,
 };
 use rand::rngs::SmallRng;
 
@@ -119,16 +118,12 @@ pub fn colorize(
     }
 }
 
-fn adjust_emitted(emitted: LinSrgb, wavelength: Wavelength) -> Xyz<E> {
+fn adjust_emitted(emitted: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
     let tint: Xyz<E> = wavelength_into_xyz(wavelength);
-    let emitted: Xyz = emitted.into_color_unclamped();
-    let emitted: Xyz<E> = emitted.adapt_into();
     tint * emitted
 }
 
-fn adjust_attenuation(attenuation: LinSrgb, wavelength: Wavelength) -> Xyz<E> {
-    let attenuation: Xyz = attenuation.into_color_unclamped();
-    let attenuation: Xyz<E> = attenuation.adapt_into();
+fn adjust_attenuation(attenuation: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
     let attenuation_factor = spectrum_xyz_to_p(wavelength, attenuation);
     let attenuation = attenuation * attenuation_factor;
     attenuation.clamp()

@@ -6,7 +6,7 @@ use crate::{
     materials::{isotropic::Isotropic, Material},
     random::random_unit_vector,
     ray::Ray,
-    textures::Texture,
+    textures::{Texture, TextureInit},
     wavelength::Wavelength,
     Box, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
 };
@@ -29,7 +29,7 @@ pub struct ConstantMediumInit {
     pub density: Float,
     #[cfg_attr(feature = "serde-derive", serde(default))]
     /// [Texture] used for the colorization of the fog.
-    pub texture: Texture,
+    pub texture: TextureInit,
 }
 
 #[cfg(feature = "serde-derive")]

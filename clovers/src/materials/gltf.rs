@@ -4,7 +4,10 @@
 
 #[cfg(feature = "gl_tf")]
 use gltf::{image::Data, Material};
-use palette::{convert::IntoColorUnclamped, LinSrgb, Srgb, Srgba};
+use palette::{
+    chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, LinSrgb, Srgb,
+    Srgba, Xyz,
+};
 use rand::rngs::SmallRng;
 
 use crate::{
@@ -92,6 +95,7 @@ impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
 
         // TODO: full color model
         let attenuation: LinSrgb = emissive + base_color * occlusion;
+        let attenuation: Xyz<E> = attenuation.adapt_into();
 
         // TODO: better metalness model
         if metalness > 0.0 {
