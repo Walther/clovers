@@ -109,7 +109,7 @@ impl From<MaterialInitInner> for Material {
     fn from(mat: MaterialInitInner) -> Self {
         match mat {
             MaterialInitInner::Dielectric(m) => {
-                Material::Dielectric(Dielectric::new(m.refractive_index, m.color.into()))
+                Material::Dielectric(Dielectric::new(m.refractive_index, m.color))
             }
             MaterialInitInner::Dispersive(m) => {
                 Material::Dispersive(Dispersive::new(m.cauchy_a, m.cauchy_b))
