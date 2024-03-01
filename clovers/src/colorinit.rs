@@ -1,5 +1,6 @@
 //! Initialization structures for colors. This exists for deserialization purposes.
 
+use alloc::string::String;
 use core::str::FromStr;
 
 use palette::{

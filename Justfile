@@ -34,3 +34,7 @@ test:
 # Run all benchmarks
 bench:
   cargo bench --quiet
+
+# Verify no_std compatibility
+nostd:
+  cargo clippy -q --release --package clovers --lib --no-default-features
