@@ -32,10 +32,7 @@ indicatif = { version = "0.17.7", features = [
   "rayon",
 ], default-features = false }
 palette = { version = "0.7.4", features = ["serializing"] }
-rand = { version = "0.8.5", features = [
-  "small_rng",
-  "getrandom",
-], default-features = false }
+rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
 rayon = "1.8.1"
 serde = { version = "1.0.196", features = ["derive"], default-features = false }
 serde_json = { version = "1.0", features = ["alloc"], default-features = false }
