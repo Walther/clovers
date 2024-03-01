@@ -105,7 +105,7 @@ pub fn initialize_stl<'scene>(
         MaterialInit::Shared(name) => &materials.iter().find(|m| m.name == name).unwrap().material,
         MaterialInit::Owned(m) => {
             // TODO: do not leak memory
-            let material: &'scene Material = Box::leak(Box::new(m.into()));
+            let material: &'scene Material = Box::leak(Box::new(m));
             material
         }
     };
