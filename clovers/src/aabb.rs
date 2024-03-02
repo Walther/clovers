@@ -2,7 +2,7 @@
 
 use core::ops::Add;
 
-use crate::{interval::Interval, ray::Ray, Float, Vec3, EPSILON_RECT_THICKNESS};
+use crate::{interval::Interval, ray::Ray, Float, Position, Vec3, EPSILON_RECT_THICKNESS};
 
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
@@ -31,7 +31,7 @@ impl AABB {
 
     /// Creates a new axis-aligned bounding box from two coordinates. Treats the two points a and b as extrema for the bounding box, so we don't require a particular minimum/maximum coordinate order.
     #[must_use]
-    pub fn new_from_coords(a: Vec3, b: Vec3) -> AABB {
+    pub fn new_from_coords(a: Position, b: Position) -> AABB {
         AABB {
             x: Interval::new(a[0].min(b[0]), a[0].max(b[0])),
             y: Interval::new(a[1].min(b[1]), a[1].max(b[1])),

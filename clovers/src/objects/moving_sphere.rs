@@ -7,8 +7,9 @@ use crate::{
     random::random_unit_vector,
     ray::Ray,
     wavelength::Wavelength,
-    Float, Vec3, PI,
+    Direction, Float, Position, PI,
 };
+use nalgebra::Unit;
 use rand::rngs::SmallRng;
 
 #[derive(Clone, Debug)]
@@ -19,9 +20,9 @@ pub struct MovingSphereInit {
     #[cfg_attr(feature = "serde-derive", serde(default))]
     pub priority: bool,
     /// Center point of the sphere at time_0
-    pub center_0: Vec3,
+    pub center_0: Position,
     /// Center point of the sphere at time_1
-    pub center_1: Vec3,
+    pub center_1: Position,
     /// Radius of the sphere.
     pub radius: Float,
     #[cfg_attr(feature = "serde-derive", serde(default))]
@@ -33,9 +34,9 @@ pub struct MovingSphereInit {
 /// A moving sphere object. This is represented by one `radius`, two center points `center_0` `center_1`, two times `time_0` `time_1`, and a [Material]. Any [Rays](Ray) hitting the object will also have an internal `time` value, which will be used for determining the interpolated position of the sphere at that time. With lots of rays hitting every pixel but at randomized times, we get temporal multiplexing and an approximation of perceived motion blur.
 pub struct MovingSphere<'scene> {
     /// Center point of the sphere at time_0
-    pub center_0: Vec3,
+    pub center_0: Position,
     /// Center point of the sphere at time_1
-    pub center_1: Vec3,
+    pub center_1: Position,
     /// Time 0
     pub time_0: Float,
     /// Time 1
@@ -52,20 +53,20 @@ impl<'scene> MovingSphere<'scene> {
     /// Creates a new `MovingSphere` object. See the struct documentation for more information: [`MovingSphere`].
     #[must_use]
     pub fn new(
-        center_0: Vec3,
-        center_1: Vec3,
+        center_0: Position,
+        center_1: Position,
         time_0: Float,
         time_1: Float,
         radius: Float,
         material: &'scene Material,
     ) -> Self {
         let box0: AABB = AABB::new_from_coords(
-            center_0 - Vec3::new(radius, radius, radius),
-            center_0 + Vec3::new(radius, radius, radius),
+            center_0 - Position::new(radius, radius, radius),
+            center_0 + Position::new(radius, radius, radius),
         );
         let box1: AABB = AABB::new_from_coords(
-            center_1 - Vec3::new(radius, radius, radius),
-            center_1 + Vec3::new(radius, radius, radius),
+            center_1 - Position::new(radius, radius, radius),
+            center_1 + Position::new(radius, radius, radius),
         );
 
         let aabb = AABB::surrounding_box(&box0, &box1);
@@ -83,7 +84,7 @@ impl<'scene> MovingSphere<'scene> {
 
     /// Returns the interpolated center of the moving sphere at the given time.
     #[must_use]
-    pub fn center(&self, time: Float) -> Vec3 {
+    pub fn center(&self, time: Float) -> Position {
         self.center_0
             + ((time - self.time_0) / (self.time_1 - self.time_0)) * (self.center_1 - self.center_0)
     }
@@ -91,8 +92,8 @@ impl<'scene> MovingSphere<'scene> {
     /// Returns the U,V surface coordinates of a hitpoint
     // TODO: verify this is up to date with the sphere get_uv methods and matches a surface coordinate instead of volumetric space cordinate
     #[must_use]
-    pub fn get_uv(&self, hit_position: Vec3, time: Float) -> (Float, Float) {
-        let translated: Vec3 = (hit_position - self.center(time)) / self.radius;
+    pub fn get_uv(&self, hit_position: Position, time: Float) -> (Float, Float) {
+        let translated: Position = (hit_position - self.center(time)) / self.radius;
         let phi: Float = translated.z.atan2(translated.x);
         let theta: Float = translated.y.asin();
         let u: Float = 1.0 - (phi + PI) / (2.0 * PI);
@@ -121,8 +122,9 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
             let distance: Float = (-half_b - root) / a;
             // First possible root
             if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.evaluate(distance);
+                let position: Position = ray.evaluate(distance);
                 let outward_normal = (position - self.center(ray.time)) / self.radius;
+                let outward_normal = Unit::new_normalize(outward_normal);
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {
                     distance,
@@ -139,8 +141,9 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
             // Second possible root
             let distance: Float = (-half_b + root) / a;
             if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.evaluate(distance);
+                let position: Position = ray.evaluate(distance);
                 let outward_normal = (position - self.center(ray.time)) / self.radius;
+                let outward_normal = Unit::new_normalize(outward_normal);
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {
                     distance,
@@ -166,8 +169,8 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
 
     fn pdf_value(
         &self,
-        _origin: Vec3,
-        _vector: Vec3,
+        _origin: Position,
+        _direction: Direction,
         _wavelength: Wavelength,
         _time: Float,
         _rng: &mut SmallRng,
@@ -176,7 +179,8 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
         0.0
     }
 
-    fn random(&self, _origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        random_unit_vector(rng)
+    fn random(&self, _origin: Position, rng: &mut SmallRng) -> Position {
+        // FIXME: this is incorrect! does not take into account sphere size, moving sphere position
+        *random_unit_vector(rng)
     }
 }

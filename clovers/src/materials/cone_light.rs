@@ -5,7 +5,7 @@ use crate::{
     hitable::HitRecord,
     ray::Ray,
     textures::{SolidColor, Texture, TextureTrait},
-    Float, Vec3,
+    Float, Position,
 };
 use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
@@ -59,7 +59,7 @@ impl MaterialTrait for ConeLight {
         hit_record: &HitRecord,
         u: Float,
         v: Float,
-        position: Vec3,
+        position: Position,
     ) -> Xyz<E> {
         // If we don't hit the front face, return black
         if !hit_record.front_face {

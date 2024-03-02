@@ -1,6 +1,7 @@
 use std::f32::{INFINITY, NEG_INFINITY};
 
 use clovers::interval::Interval;
+use clovers::random::random_unit_vector;
 use clovers::ray::Ray;
 use clovers::wavelength::random_wavelength;
 use clovers::{aabb::*, Vec3};
@@ -81,7 +82,7 @@ fn random_aabb(rng: &mut SmallRng) -> AABB {
 fn random_ray(rng: &mut SmallRng) -> Ray {
     black_box(Ray {
         origin: Vec3::new(0.0, 0.0, 0.0),
-        direction: Vec3::new(rng.gen(), rng.gen(), rng.gen()),
+        direction: random_unit_vector(rng),
         time: rng.gen(),
         wavelength: random_wavelength(rng),
     })

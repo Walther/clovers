@@ -5,7 +5,7 @@ use crate::{
     hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     ray::Ray,
-    Float, Vec3,
+    Direction, Float,
 };
 use palette::{white_point::E, Xyz};
 use rand::rngs::SmallRng;
@@ -46,18 +46,18 @@ impl MaterialTrait for Dielectric {
             self.refractive_index
         };
 
-        let unit_direction: Vec3 = ray.direction.normalize();
-        let cos_theta: Float = (-unit_direction.dot(&hit_record.normal)).min(1.0);
+        let direction: Direction = ray.direction;
+        let cos_theta: Float = (-direction.dot(&hit_record.normal)).min(1.0);
         let sin_theta: Float = (1.0 - cos_theta * cos_theta).sqrt();
-        let specular_direction: Vec3 = if refraction_ratio * sin_theta > 1.0 {
-            reflect(unit_direction, hit_record.normal)
+        let specular_direction: Direction = if refraction_ratio * sin_theta > 1.0 {
+            reflect(direction, hit_record.normal)
         } else {
             let reflect_probability: Float = schlick(cos_theta, refraction_ratio);
             if rng.gen::<Float>() < reflect_probability {
-                reflect(unit_direction, hit_record.normal)
+                reflect(direction, hit_record.normal)
             } else {
                 // Refracted
-                refract(unit_direction, hit_record.normal, refraction_ratio)
+                refract(direction, hit_record.normal, refraction_ratio)
             }
         };
         let specular_ray = Ray {

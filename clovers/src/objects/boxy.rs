@@ -7,7 +7,7 @@ use crate::{
     materials::{Material, MaterialInit},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Float, Vec3,
+    Box, Direction, Float, Position, Vec3,
 };
 use rand::{rngs::SmallRng, Rng};
 
@@ -19,9 +19,9 @@ pub struct BoxyInit {
     #[cfg_attr(feature = "serde-derive", serde(default))]
     pub priority: bool,
     /// First corner for the box
-    pub corner_0: Vec3,
+    pub corner_0: Position,
     /// Second, opposing corner for the box
-    pub corner_1: Vec3,
+    pub corner_1: Position,
     #[cfg_attr(feature = "serde-derive", serde(default))]
     /// Material used for the box
     pub material: MaterialInit,
@@ -40,14 +40,14 @@ pub struct Boxy<'scene> {
 impl<'scene> Boxy<'scene> {
     /// Initializes a new instance of a box, given two opposing [Vec3] corners `corner_0` and `corner_1`, and a [Material] `material`.
     #[must_use]
-    pub fn new(corner_0: Vec3, corner_1: Vec3, material: &'scene Material) -> Self {
+    pub fn new(corner_0: Position, corner_1: Position, material: &'scene Material) -> Self {
         // Construct the two opposite vertices with the minimum and maximum coordinates.
-        let min: Vec3 = Vec3::new(
+        let min: Position = Position::new(
             corner_0.x.min(corner_1.x),
             corner_0.y.min(corner_1.y),
             corner_0.z.min(corner_1.z),
         );
-        let max: Vec3 = Vec3::new(
+        let max: Position = Position::new(
             corner_0.x.max(corner_1.x),
             corner_0.y.max(corner_1.y),
             corner_0.z.max(corner_1.z),
@@ -114,8 +114,8 @@ impl<'scene> HitableTrait for Boxy<'scene> {
     #[must_use]
     fn pdf_value(
         &self,
-        origin: Vec3,
-        vector: Vec3,
+        origin: Position,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
@@ -123,7 +123,7 @@ impl<'scene> HitableTrait for Boxy<'scene> {
         let mut sum = 0.0;
 
         self.sides.iter().for_each(|object| {
-            sum += object.pdf_value(origin, vector, wavelength, time, rng) / 6.0;
+            sum += object.pdf_value(origin, direction, wavelength, time, rng) / 6.0;
         });
 
         sum
@@ -131,7 +131,7 @@ impl<'scene> HitableTrait for Boxy<'scene> {
 
     /// Returns a random point on the box
     #[must_use]
-    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Vec3 {
         let index: usize = rng.gen_range(0..6);
         self.sides[index].random(origin, rng)
     }

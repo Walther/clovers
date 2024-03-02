@@ -4,6 +4,7 @@
 
 #[cfg(feature = "gl_tf")]
 use gltf::{image::Data, Material};
+use nalgebra::Unit;
 use palette::{
     chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, LinSrgb, Srgb,
     Srgba, Xyz,
@@ -15,7 +16,7 @@ use crate::{
     pdf::{ZeroPDF, PDF},
     random::random_unit_vector,
     ray::Ray,
-    Float, Vec2, Vec3, Vec4, PI,
+    Direction, Float, Vec2, Vec3, Vec4, PI,
 };
 
 use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
@@ -90,7 +91,7 @@ impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
         let base_color: LinSrgb = self.sample_base_color(hit_record);
         let emissive: LinSrgb = self.sample_emissive(hit_record).into_color_unclamped();
         let (metalness, roughness) = self.sample_metalness_roughness(hit_record);
-        let normal: Vec3 = self.sample_normal(hit_record);
+        let normal: Direction = self.sample_normal(hit_record);
         let occlusion: Float = self.sample_occlusion(hit_record);
 
         // TODO: full color model
@@ -100,8 +101,9 @@ impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
         // TODO: better metalness model
         if metalness > 0.0 {
             // TODO: borrowed from metal, should this be different?
-            let reflected: Vec3 = reflect(ray.direction.normalize(), normal);
-            let direction = reflected + roughness * random_unit_vector(rng);
+            let reflected: Direction = reflect(ray.direction, normal);
+            let direction = *reflected + roughness * *random_unit_vector(rng);
+            let direction = Unit::new_normalize(direction);
 
             Some(ScatterRecord {
                 specular_ray: Some(Ray {
@@ -222,7 +224,7 @@ impl<'scene> GLTFMaterial<'scene> {
         }
     }
 
-    fn sample_normal(&self, hit_record: &HitRecord) -> Vec3 {
+    fn sample_normal(&self, hit_record: &HitRecord) -> Direction {
         let Some(normals) = self.normals else {
             // If we don't have normals, early return with the triangle normal
             return hit_record.normal;
@@ -273,7 +275,7 @@ impl<'scene> GLTFMaterial<'scene> {
             nalgebra::Matrix3::from_columns(&[tangent, bitangent, normal]);
 
         // Transform the texture normal from tangent space to world space
-        (matrix * texture_normal).normalize()
+        Unit::new_normalize(matrix * texture_normal)
     }
 
     /// Find the correct texture coordinates in pixel space

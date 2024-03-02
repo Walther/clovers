@@ -2,8 +2,9 @@
 
 use alloc::string::String;
 use core::fmt::Debug;
+use nalgebra::Unit;
 
-use crate::{hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
+use crate::{hitable::HitRecord, pdf::PDF, ray::Ray, Direction, Float, Position, Vec3};
 pub mod cone_light;
 pub mod dielectric;
 pub mod diffuse_light;
@@ -79,7 +80,7 @@ pub trait MaterialTrait: Debug {
         _hit_record: &HitRecord,
         _u: Float,
         _v: Float,
-        _position: Vec3,
+        _position: Position,
     ) -> Xyz<E> {
         Xyz::new(0.0, 0.0, 0.0)
     }
@@ -139,17 +140,18 @@ pub struct ScatterRecord<'ray> {
 // TODO: are these up to date / correct?
 
 #[must_use]
-fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
-    vector - 2.0 * vector.dot(&normal) * normal
+fn reflect(vector: Direction, normal: Direction) -> Direction {
+    let v: Vec3 = *vector - 2.0 * vector.dot(&normal) * *normal;
+    Unit::new_normalize(v)
 }
 
 #[must_use]
-fn refract(uv: Vec3, normal: Vec3, refraction_ratio: Float) -> Vec3 {
-    let cos_theta: Float = -uv.dot(&normal);
+fn refract(vector: Direction, normal: Direction, refraction_ratio: Float) -> Direction {
+    let cos_theta: Float = -vector.dot(&normal);
     let cos_theta = cos_theta.min(1.0); // Clamp
-    let r_out_parallel: Vec3 = refraction_ratio * (uv + cos_theta * normal);
-    let r_out_perp: Vec3 = -(1.0 - r_out_parallel.norm_squared()).sqrt() * normal;
-    r_out_parallel + r_out_perp
+    let r_out_parallel: Vec3 = refraction_ratio * (*vector + cos_theta * *normal);
+    let r_out_perp: Vec3 = -(1.0 - r_out_parallel.norm_squared()).sqrt() * *normal;
+    Unit::new_normalize(r_out_parallel + r_out_perp)
 }
 
 #[must_use]

@@ -4,11 +4,12 @@
 use crate::hitable::HitableTrait;
 use crate::materials::MaterialInit;
 use crate::wavelength::Wavelength;
-use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
     Vec3, EPSILON_RECT_THICKNESS,
 };
+use crate::{Direction, Position, EPSILON_SHADOW_ACNE};
+use nalgebra::Unit;
 use rand::rngs::SmallRng;
 use rand::Rng;
 
@@ -20,7 +21,7 @@ pub struct QuadInit {
     #[cfg_attr(feature = "serde-derive", serde(default))]
     pub priority: bool,
     /// Corner point
-    pub q: Vec3,
+    pub q: Position,
     /// Vector describing the u side
     pub u: Vec3,
     /// Vector describing the v side
@@ -34,7 +35,7 @@ pub struct QuadInit {
 #[derive(Clone, Debug)]
 pub struct Quad<'scene> {
     /// Corner point
-    pub q: Vec3,
+    pub q: Position,
     /// Vector describing the u side
     pub u: Vec3,
     /// Vector describing the v side
@@ -44,7 +45,7 @@ pub struct Quad<'scene> {
     /// Area of the surface
     pub area: Float,
     /// Normal vector of the surface
-    pub normal: Vec3,
+    pub normal: Direction,
     /// What is this? // TODO: understand, explain
     pub d: Float,
     /// What is this? // TODO: understand, explain
@@ -56,9 +57,9 @@ pub struct Quad<'scene> {
 impl<'scene> Quad<'scene> {
     /// Creates a new quad
     #[must_use]
-    pub fn new(q: Vec3, u: Vec3, v: Vec3, material: &'scene Material) -> Quad<'scene> {
+    pub fn new(q: Position, u: Vec3, v: Vec3, material: &'scene Material) -> Quad<'scene> {
         let n: Vec3 = u.cross(&v);
-        let normal: Vec3 = n.normalize();
+        let normal = Unit::new_normalize(n);
         // TODO: what is this?
         let d = -(normal.dot(&q));
         // TODO: what is this?
@@ -105,8 +106,8 @@ impl<'scene> HitableTrait for Quad<'scene> {
         }
 
         // Determine the hit point lies within the planar shape using its plane coordinates.
-        let intersection: Vec3 = ray.evaluate(t);
-        let planar_hitpt_vector: Vec3 = intersection - self.q;
+        let intersection: Position = ray.evaluate(t);
+        let planar_hitpt_vector: Position = intersection - self.q;
         let alpha: Float = self.w.dot(&planar_hitpt_vector.cross(&self.v));
         let beta: Float = self.w.dot(&self.u.cross(&planar_hitpt_vector));
 
@@ -140,23 +141,23 @@ impl<'scene> HitableTrait for Quad<'scene> {
     #[must_use]
     fn pdf_value(
         &self,
-        origin: Vec3,
-        vector: Vec3,
+        origin: Position,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
     ) -> Float {
         let ray = Ray {
             origin,
-            direction: vector,
+            direction,
             time,
             wavelength,
         };
         match self.hit(&ray, EPSILON_SHADOW_ACNE, Float::INFINITY, rng) {
             Some(hit_record) => {
                 let distance_squared =
-                    hit_record.distance * hit_record.distance * vector.norm_squared();
-                let cosine = vector.dot(&hit_record.normal).abs() / vector.magnitude();
+                    hit_record.distance * hit_record.distance * direction.norm_squared();
+                let cosine = direction.dot(&hit_record.normal).abs() / direction.magnitude();
 
                 distance_squared / (cosine * self.area)
             }
@@ -166,8 +167,10 @@ impl<'scene> HitableTrait for Quad<'scene> {
 
     /// Returns a random point on the quadrilateral surface
     #[must_use]
-    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        let point: Vec3 = self.q + (rng.gen::<Float>() * self.u) + (rng.gen::<Float>() * self.v);
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
+        let point: Position =
+            self.q + (rng.gen::<Float>() * self.u) + (rng.gen::<Float>() * self.v);
+        // TODO: why point minus origin?
         point - origin
     }
 }

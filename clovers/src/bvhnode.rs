@@ -9,7 +9,7 @@ use crate::{
     hitable::{Empty, HitRecord, Hitable, HitableTrait},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Float, Vec, Vec3,
+    Box, Direction, Float, Position, Vec,
 };
 
 /// Bounding Volume Hierarchy Node.
@@ -187,18 +187,26 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
     #[must_use]
     fn pdf_value(
         &self,
-        origin: Vec3,
-        vector: Vec3,
+        origin: Position,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
     ) -> Float {
         match (&*self.left, &*self.right) {
-            (_, Hitable::Empty(_)) => self.left.pdf_value(origin, vector, wavelength, time, rng),
-            (Hitable::Empty(_), _) => self.right.pdf_value(origin, vector, wavelength, time, rng),
+            (_, Hitable::Empty(_)) => self
+                .left
+                .pdf_value(origin, direction, wavelength, time, rng),
+            (Hitable::Empty(_), _) => self
+                .right
+                .pdf_value(origin, direction, wavelength, time, rng),
             (_, _) => {
-                (self.left.pdf_value(origin, vector, wavelength, time, rng)
-                    + self.right.pdf_value(origin, vector, wavelength, time, rng))
+                (self
+                    .left
+                    .pdf_value(origin, direction, wavelength, time, rng)
+                    + self
+                        .right
+                        .pdf_value(origin, direction, wavelength, time, rng))
                     / 2.0
             }
         }
@@ -206,7 +214,7 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
 
     /// Returns a random point on the surface of one of the children
     #[must_use]
-    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
         match (&*self.left, &*self.right) {
             (_, Hitable::Empty(_)) => self.left.random(origin, rng),
             (Hitable::Empty(_), _) => self.right.random(origin, rng),

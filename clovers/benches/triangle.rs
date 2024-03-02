@@ -3,6 +3,7 @@ use std::f32::{INFINITY, NEG_INFINITY};
 use clovers::hitable::HitableTrait;
 use clovers::materials::Material;
 use clovers::objects::Triangle;
+use clovers::random::random_unit_vector;
 use clovers::ray::Ray;
 use clovers::wavelength::random_wavelength;
 use clovers::Vec3;
@@ -71,7 +72,7 @@ fn random_ray() -> Ray {
     let mut rng = SmallRng::from_entropy();
     black_box(Ray {
         origin: Vec3::new(0.0, 0.0, 0.0),
-        direction: Vec3::new(rng.gen(), rng.gen(), rng.gen()),
+        direction: random_unit_vector(&mut rng),
         time: rng.gen(),
         wavelength: random_wavelength(&mut rng),
     })
