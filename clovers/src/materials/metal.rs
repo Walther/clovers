@@ -7,8 +7,9 @@ use crate::{
     random::random_unit_vector,
     ray::Ray,
     textures::{Texture, TextureTrait},
-    Float, Vec3,
+    Direction, Float,
 };
+use nalgebra::Unit;
 use rand::prelude::SmallRng;
 
 #[derive(Debug, Clone)]
@@ -30,11 +31,13 @@ impl MaterialTrait for Metal {
         hit_record: &HitRecord,
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
-        let reflected: Vec3 = reflect(ray.direction.normalize(), hit_record.normal);
+        let reflected: Direction = reflect(ray.direction, hit_record.normal);
+        let direction = *reflected + self.fuzz * *random_unit_vector(rng);
+        let direction = Unit::new_normalize(direction);
         Some(ScatterRecord {
             specular_ray: Some(Ray {
                 origin: hit_record.position,
-                direction: reflected + self.fuzz * random_unit_vector(rng),
+                direction,
                 time: ray.time,
                 wavelength: ray.wavelength,
             }),

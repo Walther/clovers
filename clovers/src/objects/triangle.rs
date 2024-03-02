@@ -5,11 +5,12 @@ use crate::hitable::HitableTrait;
 use crate::interval::Interval;
 use crate::materials::MaterialInit;
 use crate::wavelength::Wavelength;
-use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3,
     EPSILON_RECT_THICKNESS,
 };
+use crate::{Direction, EPSILON_SHADOW_ACNE};
+use nalgebra::Unit;
 use rand::rngs::SmallRng;
 use rand::Rng;
 
@@ -45,7 +46,7 @@ pub struct Triangle<'scene> {
     /// Area of the surface
     pub area: Float,
     /// Normal vector of the surface
-    pub normal: Vec3,
+    pub normal: Direction,
     /// What is this? // TODO: understand, explain
     pub d: Float,
     /// What is this? // TODO: understand, explain
@@ -59,7 +60,7 @@ impl<'scene> Triangle<'scene> {
     #[must_use]
     pub fn new(q: Vec3, u: Vec3, v: Vec3, material: &'scene Material) -> Triangle<'scene> {
         let n: Vec3 = u.cross(&v);
-        let normal: Vec3 = n.normalize();
+        let normal = Unit::new_normalize(n);
         // TODO: what is this?
         let d = -(normal.dot(&q));
         // TODO: what is this?
@@ -177,14 +178,14 @@ impl<'scene> HitableTrait for Triangle<'scene> {
     fn pdf_value(
         &self,
         origin: Vec3,
-        vector: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
     ) -> Float {
         let ray = Ray {
             origin,
-            direction: vector,
+            direction,
             time,
             wavelength,
         };
@@ -192,8 +193,8 @@ impl<'scene> HitableTrait for Triangle<'scene> {
         match self.hit(&ray, EPSILON_SHADOW_ACNE, Float::INFINITY, rng) {
             Some(hit_record) => {
                 let distance_squared =
-                    hit_record.distance * hit_record.distance * vector.norm_squared();
-                let cosine = vector.dot(&hit_record.normal).abs() / vector.magnitude();
+                    hit_record.distance * hit_record.distance * direction.norm_squared();
+                let cosine = direction.dot(&hit_record.normal).abs() / direction.magnitude();
 
                 distance_squared / (cosine * self.area)
             }
@@ -238,7 +239,7 @@ mod tests {
     const TIME_1: Float = 1.0;
     const RAY: Ray = Ray {
         origin: Vec3::new(0.0, 0.0, -1.0),
-        direction: Vec3::new(0.0, 0.0, 1.0),
+        direction: Unit::new_unchecked(Vec3::new(0.0, 0.0, 1.0)),
         time: TIME_0,
         wavelength: 600,
     };
@@ -277,7 +278,10 @@ mod tests {
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
         assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
-        assert_eq!(hit_record.normal, Vec3::new(0.0, 0.0, -1.0));
+        assert_eq!(
+            hit_record.normal,
+            Unit::new_normalize(Vec3::new(0.0, 0.0, -1.0))
+        );
         assert!(!hit_record.front_face);
     }
 
@@ -315,7 +319,10 @@ mod tests {
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
         assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
-        assert_eq!(hit_record.normal, Vec3::new(0.0, 0.0, -1.0));
+        assert_eq!(
+            hit_record.normal,
+            Unit::new_normalize(Vec3::new(0.0, 0.0, -1.0))
+        );
         assert!(hit_record.front_face);
     }
 
@@ -353,7 +360,10 @@ mod tests {
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
         assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
-        assert_eq!(hit_record.normal, Vec3::new(0.0, 0.0, -1.0));
+        assert_eq!(
+            hit_record.normal,
+            Unit::new_normalize(Vec3::new(0.0, 0.0, -1.0))
+        );
         assert!(!hit_record.front_face);
     }
 
@@ -391,7 +401,10 @@ mod tests {
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
         assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
-        assert_eq!(hit_record.normal, Vec3::new(0.0, 0.0, -1.0));
+        assert_eq!(
+            hit_record.normal,
+            Unit::new_normalize(Vec3::new(0.0, 0.0, -1.0))
+        );
         assert!(hit_record.front_face);
     }
 }

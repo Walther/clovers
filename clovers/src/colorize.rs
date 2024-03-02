@@ -10,6 +10,7 @@ use crate::{
     wavelength::{wavelength_into_xyz, Wavelength},
     Float, EPSILON_SHADOW_ACNE,
 };
+use nalgebra::Unit;
 use palette::{
     chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, Clamp, Xyz,
 };
@@ -83,9 +84,11 @@ pub fn colorize(
                 hit_record.position,
             ));
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
+            let direction = mixture_pdf.generate(rng);
+            let direction = Unit::new_normalize(direction);
             let scatter_ray = Ray {
                 origin: hit_record.position,
-                direction: mixture_pdf.generate(rng),
+                direction,
                 time: ray.time,
                 wavelength: ray.wavelength,
             };

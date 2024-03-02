@@ -9,7 +9,7 @@ use crate::{
     hitable::{Empty, HitRecord, Hitable, HitableTrait},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Float, Vec, Vec3,
+    Box, Direction, Float, Vec, Vec3,
 };
 
 /// Bounding Volume Hierarchy Node.
@@ -188,17 +188,25 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
     fn pdf_value(
         &self,
         origin: Vec3,
-        vector: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
     ) -> Float {
         match (&*self.left, &*self.right) {
-            (_, Hitable::Empty(_)) => self.left.pdf_value(origin, vector, wavelength, time, rng),
-            (Hitable::Empty(_), _) => self.right.pdf_value(origin, vector, wavelength, time, rng),
+            (_, Hitable::Empty(_)) => self
+                .left
+                .pdf_value(origin, direction, wavelength, time, rng),
+            (Hitable::Empty(_), _) => self
+                .right
+                .pdf_value(origin, direction, wavelength, time, rng),
             (_, _) => {
-                (self.left.pdf_value(origin, vector, wavelength, time, rng)
-                    + self.right.pdf_value(origin, vector, wavelength, time, rng))
+                (self
+                    .left
+                    .pdf_value(origin, direction, wavelength, time, rng)
+                    + self
+                        .right
+                        .pdf_value(origin, direction, wavelength, time, rng))
                     / 2.0
             }
         }

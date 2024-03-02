@@ -4,6 +4,7 @@
 
 use crate::wavelength::random_wavelength;
 use crate::{random::random_in_unit_disk, ray::Ray, Float, Vec3, PI};
+use nalgebra::Unit;
 use rand::rngs::SmallRng;
 use rand::Rng;
 
@@ -109,11 +110,12 @@ impl Camera {
         let time: Float = rng.gen_range(self.time_0..self.time_1);
         // Random wavelength for spectral rendering
         let wavelength = random_wavelength(rng);
+        let direction =
+            self.lower_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset;
+        let direction = Unit::new_normalize(direction);
         Ray {
             origin: self.origin + offset,
-            direction: self.lower_left_corner + s * self.horizontal + t * self.vertical
-                - self.origin
-                - offset,
+            direction,
             time,
             wavelength,
         }

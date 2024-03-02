@@ -4,6 +4,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 #[cfg(feature = "gl_tf")]
 use gltf::{image::Data, Mesh, Node};
+use nalgebra::Unit;
 use rand::rngs::SmallRng;
 use rand::Rng;
 #[cfg(feature = "traces")]
@@ -17,7 +18,7 @@ use crate::{
     materials::gltf::GLTFMaterial,
     ray::Ray,
     wavelength::Wavelength,
-    Float, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
+    Direction, Float, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
 
 /// GLTF initialization structure
@@ -101,13 +102,13 @@ impl<'scene> HitableTrait for GLTF<'scene> {
     fn pdf_value(
         &self,
         origin: Vec3,
-        vector: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
     ) -> Float {
         self.bvhnode
-            .pdf_value(origin, vector, wavelength, time, rng)
+            .pdf_value(origin, direction, wavelength, time, rng)
     }
 
     /// Returns a random point on the ssurface of the object
@@ -239,7 +240,7 @@ pub struct GLTFTriangle<'scene> {
     d: Float,
     w: Vec3,
     area: Float,
-    normal: Vec3,
+    normal: Direction,
 }
 
 impl<'scene> GLTFTriangle<'scene> {
@@ -261,7 +262,7 @@ impl<'scene> GLTFTriangle<'scene> {
         let v = c - q;
 
         let n: Vec3 = u.cross(&v);
-        let normal: Vec3 = n.normalize();
+        let normal = Unit::new_normalize(n);
         // TODO: what is this?
         let d = -(normal.dot(&q));
         // TODO: what is this?
@@ -339,14 +340,14 @@ impl<'scene> HitableTrait for GLTFTriangle<'scene> {
     fn pdf_value(
         &self,
         origin: Vec3,
-        vector: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
     ) -> Float {
         let ray = Ray {
             origin,
-            direction: vector,
+            direction,
             time,
             wavelength,
         };
@@ -354,8 +355,8 @@ impl<'scene> HitableTrait for GLTFTriangle<'scene> {
         match self.hit(&ray, EPSILON_SHADOW_ACNE, Float::INFINITY, rng) {
             Some(hit_record) => {
                 let distance_squared =
-                    hit_record.distance * hit_record.distance * vector.norm_squared();
-                let cosine = vector.dot(&hit_record.normal).abs() / vector.magnitude();
+                    hit_record.distance * hit_record.distance * direction.norm_squared();
+                let cosine = direction.dot(&hit_record.normal).abs() / direction.magnitude();
 
                 distance_squared / (cosine * self.area)
             }

@@ -7,7 +7,7 @@ use crate::{
     onb::ONB,
     random::{random_cosine_direction, random_unit_vector},
     wavelength::Wavelength,
-    Box, Float, Vec3, PI,
+    Box, Direction, Float, Vec3, PI,
 };
 use enum_dispatch::enum_dispatch;
 use rand::rngs::SmallRng;
@@ -28,7 +28,7 @@ pub(crate) trait PDFTrait {
     #[must_use]
     fn value(
         &self,
-        direction: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
@@ -45,7 +45,7 @@ pub struct CosinePDF {
 
 impl CosinePDF {
     #[must_use]
-    pub fn new(w: Vec3) -> Self {
+    pub fn new(w: Direction) -> Self {
         CosinePDF {
             uvw: ONB::build_from_w(w),
         }
@@ -56,7 +56,7 @@ impl PDFTrait for CosinePDF {
     #[must_use]
     fn value(
         &self,
-        direction: Vec3,
+        direction: Direction,
         _wavelength: Wavelength,
         _time: Float,
         _rng: &mut SmallRng,
@@ -71,7 +71,7 @@ impl PDFTrait for CosinePDF {
 
     #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Vec3 {
-        self.uvw.local(random_cosine_direction(rng))
+        *self.uvw.local(random_cosine_direction(rng))
     }
 }
 
@@ -92,7 +92,7 @@ impl<'scene> PDFTrait for HitablePDF<'scene> {
     #[must_use]
     fn value(
         &self,
-        direction: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
@@ -128,7 +128,7 @@ impl<'scene> PDFTrait for MixturePDF<'scene> {
     #[must_use]
     fn value(
         &self,
-        direction: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
@@ -161,7 +161,7 @@ impl PDFTrait for SpherePDF {
     #[must_use]
     fn value(
         &self,
-        _direction: Vec3,
+        _direction: Direction,
         _wavelength: Wavelength,
         _time: Float,
         _rng: &mut SmallRng,
@@ -171,7 +171,7 @@ impl PDFTrait for SpherePDF {
 
     #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Vec3 {
-        random_unit_vector(rng)
+        *random_unit_vector(rng)
     }
 }
 
@@ -190,7 +190,7 @@ impl PDFTrait for ZeroPDF {
     #[must_use]
     fn value(
         &self,
-        _direction: Vec3,
+        _direction: Direction,
         _wavelength: Wavelength,
         _time: Float,
         _rng: &mut SmallRng,
@@ -200,7 +200,7 @@ impl PDFTrait for ZeroPDF {
 
     #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Vec3 {
-        random_unit_vector(rng)
+        *random_unit_vector(rng)
     }
 }
 

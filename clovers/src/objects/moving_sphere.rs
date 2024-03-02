@@ -7,8 +7,9 @@ use crate::{
     random::random_unit_vector,
     ray::Ray,
     wavelength::Wavelength,
-    Float, Vec3, PI,
+    Direction, Float, Vec3, PI,
 };
+use nalgebra::Unit;
 use rand::rngs::SmallRng;
 
 #[derive(Clone, Debug)]
@@ -123,6 +124,7 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
             if distance < distance_max && distance > distance_min {
                 let position: Vec3 = ray.evaluate(distance);
                 let outward_normal = (position - self.center(ray.time)) / self.radius;
+                let outward_normal = Unit::new_normalize(outward_normal);
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {
                     distance,
@@ -141,6 +143,7 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
             if distance < distance_max && distance > distance_min {
                 let position: Vec3 = ray.evaluate(distance);
                 let outward_normal = (position - self.center(ray.time)) / self.radius;
+                let outward_normal = Unit::new_normalize(outward_normal);
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {
                     distance,
@@ -167,7 +170,7 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
     fn pdf_value(
         &self,
         _origin: Vec3,
-        _vector: Vec3,
+        _direction: Direction,
         _wavelength: Wavelength,
         _time: Float,
         _rng: &mut SmallRng,
@@ -177,6 +180,7 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
     }
 
     fn random(&self, _origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        random_unit_vector(rng)
+        // FIXME: this is incorrect! does not take into account sphere size, moving sphere position
+        *random_unit_vector(rng)
     }
 }

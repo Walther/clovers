@@ -4,11 +4,12 @@
 use crate::hitable::HitableTrait;
 use crate::materials::MaterialInit;
 use crate::wavelength::Wavelength;
-use crate::EPSILON_SHADOW_ACNE;
 use crate::{
     aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
     Vec3, EPSILON_RECT_THICKNESS,
 };
+use crate::{Direction, EPSILON_SHADOW_ACNE};
+use nalgebra::Unit;
 use rand::rngs::SmallRng;
 use rand::Rng;
 
@@ -44,7 +45,7 @@ pub struct Quad<'scene> {
     /// Area of the surface
     pub area: Float,
     /// Normal vector of the surface
-    pub normal: Vec3,
+    pub normal: Direction,
     /// What is this? // TODO: understand, explain
     pub d: Float,
     /// What is this? // TODO: understand, explain
@@ -58,7 +59,7 @@ impl<'scene> Quad<'scene> {
     #[must_use]
     pub fn new(q: Vec3, u: Vec3, v: Vec3, material: &'scene Material) -> Quad<'scene> {
         let n: Vec3 = u.cross(&v);
-        let normal: Vec3 = n.normalize();
+        let normal = Unit::new_normalize(n);
         // TODO: what is this?
         let d = -(normal.dot(&q));
         // TODO: what is this?
@@ -141,22 +142,22 @@ impl<'scene> HitableTrait for Quad<'scene> {
     fn pdf_value(
         &self,
         origin: Vec3,
-        vector: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
     ) -> Float {
         let ray = Ray {
             origin,
-            direction: vector,
+            direction,
             time,
             wavelength,
         };
         match self.hit(&ray, EPSILON_SHADOW_ACNE, Float::INFINITY, rng) {
             Some(hit_record) => {
                 let distance_squared =
-                    hit_record.distance * hit_record.distance * vector.norm_squared();
-                let cosine = vector.dot(&hit_record.normal).abs() / vector.magnitude();
+                    hit_record.distance * hit_record.distance * direction.norm_squared();
+                let cosine = direction.dot(&hit_record.normal).abs() / direction.magnitude();
 
                 distance_squared / (cosine * self.area)
             }

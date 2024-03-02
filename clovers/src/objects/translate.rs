@@ -5,7 +5,7 @@ use crate::{
     hitable::{HitRecord, Hitable, HitableTrait},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Float, Vec3,
+    Box, Direction, Float, Vec3,
 };
 use rand::rngs::SmallRng;
 
@@ -86,14 +86,14 @@ impl<'scene> HitableTrait for Translate<'scene> {
     fn pdf_value(
         &self,
         origin: Vec3,
-        vector: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
     ) -> Float {
         // TODO: is this correct?
         self.object
-            .pdf_value(origin + self.offset, vector, wavelength, time, rng)
+            .pdf_value(origin + self.offset, direction, wavelength, time, rng)
     }
 
     /// Returns a random point on the surface of the moved object

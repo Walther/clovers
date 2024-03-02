@@ -14,7 +14,7 @@ use crate::{
     objects::{Boxy, ConstantMedium, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle},
     ray::Ray,
     wavelength::Wavelength,
-    Float, Vec3,
+    Direction, Float, Vec3,
 };
 
 use enum_dispatch::enum_dispatch;
@@ -28,7 +28,7 @@ pub struct HitRecord<'a> {
     /// 3D coordinate of the hitpoint
     pub position: Vec3,
     /// Surface normal from the hitpoint
-    pub normal: Vec3,
+    pub normal: Direction,
     /// U surface coordinate of the hitpoint
     pub u: Float,
     /// V surface coordinate of the hitpoint
@@ -41,7 +41,7 @@ pub struct HitRecord<'a> {
 
 impl<'a> HitRecord<'a> {
     /// Helper function for getting normals pointing at the correct direction. TODO: consider removal?
-    pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
+    pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Direction) {
         self.front_face = ray.direction.dot(&outward_normal) < 0.0;
         if self.front_face {
             self.normal = outward_normal;
@@ -95,7 +95,7 @@ impl HitableTrait for Empty {
     fn pdf_value(
         &self,
         _origin: Vec3,
-        _vector: Vec3,
+        _direction: Direction,
         _wavelength: Wavelength,
         _time: Float,
         _rng: &mut SmallRng,
@@ -126,7 +126,7 @@ pub trait HitableTrait {
     fn pdf_value(
         &self,
         origin: Vec3,
-        vector: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
@@ -138,7 +138,7 @@ pub trait HitableTrait {
 
 /// Returns a tuple of `(front_face, normal)`. Used in lieu of `set_face_normal` in the Ray Tracing for the Rest Of Your Life book.
 #[must_use]
-pub fn get_orientation(ray: &Ray, outward_normal: Vec3) -> (bool, Vec3) {
+pub fn get_orientation(ray: &Ray, outward_normal: Direction) -> (bool, Direction) {
     let front_face = ray.direction.dot(&outward_normal) < 0.0;
     let normal = if front_face {
         outward_normal

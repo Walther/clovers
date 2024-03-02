@@ -8,7 +8,7 @@ use crate::{
     ray::Ray,
     textures::Texture,
     wavelength::Wavelength,
-    Box, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
+    Box, Direction, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
 };
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -114,7 +114,7 @@ impl<'scene> HitableTrait for ConstantMedium<'scene> {
         let distance = rec1.distance + hit_distance / ray_length;
         let position = ray.evaluate(distance);
 
-        let normal: Vec3 = random_unit_vector(rng); // tutorial says: arbitrary
+        let normal: Direction = random_unit_vector(rng); // tutorial says: arbitrary
         let front_face: bool = true; // tutorial says: also arbitrary
 
         let u = rec1.u;
@@ -142,13 +142,13 @@ impl<'scene> HitableTrait for ConstantMedium<'scene> {
     fn pdf_value(
         &self,
         origin: Vec3,
-        vector: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
     ) -> Float {
         self.boundary
-            .pdf_value(origin, vector, wavelength, time, rng)
+            .pdf_value(origin, direction, wavelength, time, rng)
     }
 
     /// Returns a random point on the surface of the boundary of the fog

@@ -7,8 +7,9 @@ use crate::{
     onb::ONB,
     ray::Ray,
     wavelength::Wavelength,
-    Float, Vec3, EPSILON_SHADOW_ACNE, PI,
+    Direction, Float, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
+use nalgebra::Unit;
 use rand::{rngs::SmallRng, Rng};
 
 #[derive(Clone, Debug)]
@@ -87,6 +88,7 @@ impl<'scene> HitableTrait for Sphere<'scene> {
             if distance < distance_max && distance > distance_min {
                 let position: Vec3 = ray.evaluate(distance);
                 let outward_normal = (position - self.center) / self.radius;
+                let outward_normal = Unit::new_normalize(outward_normal);
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {
                     distance,
@@ -105,6 +107,7 @@ impl<'scene> HitableTrait for Sphere<'scene> {
             if distance < distance_max && distance > distance_min {
                 let position: Vec3 = ray.evaluate(distance);
                 let outward_normal = (position - self.center) / self.radius;
+                let outward_normal = Unit::new_normalize(outward_normal);
                 let (u, v) = self.get_uv(position, ray.time);
                 let mut record = HitRecord {
                     distance,
@@ -133,14 +136,14 @@ impl<'scene> HitableTrait for Sphere<'scene> {
     fn pdf_value(
         &self,
         origin: Vec3,
-        vector: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
     ) -> Float {
         let ray = Ray {
             origin,
-            direction: vector,
+            direction,
             time,
             wavelength,
         };
@@ -161,10 +164,12 @@ impl<'scene> HitableTrait for Sphere<'scene> {
     /// Utility function from Ray Tracing: The Rest of Your Life. TODO: understand, document
     #[must_use]
     fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        let direction: Vec3 = self.center - origin;
-        let distance_squared: Float = direction.norm_squared();
-        let uvw = ONB::build_from_w(direction);
-        uvw.local(random_to_sphere(self.radius, distance_squared, rng))
+        let offset: Vec3 = self.center - origin;
+        let distance_squared: Float = offset.norm_squared();
+        let uvw = ONB::build_from_w(Unit::new_normalize(offset));
+        let vec = random_to_sphere(self.radius, distance_squared, rng);
+        let vec = Unit::new_normalize(vec);
+        *uvw.local(vec)
     }
 }
 

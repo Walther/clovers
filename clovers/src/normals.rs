@@ -1,6 +1,8 @@
 //! Alternative render method to [colorize](crate::colorize::colorize).
 
-use crate::{hitable::HitableTrait, ray::Ray, scenes::Scene, Float, Vec3, EPSILON_SHADOW_ACNE};
+use crate::{
+    hitable::HitableTrait, ray::Ray, scenes::Scene, Direction, Float, Vec3, EPSILON_SHADOW_ACNE,
+};
 use palette::LinSrgb;
 use rand::rngs::SmallRng;
 
@@ -15,15 +17,13 @@ pub fn normal_map(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinSrgb {
         return LinSrgb::new(0.0, 0.0, 0.0);
     };
 
-    let normal: Vec3 = hit_record.normal;
+    let normal: Direction = hit_record.normal;
     normal_to_color(normal)
 }
 
 /// Given a surface normal, return a color based on normal mapping colorization.
 #[must_use]
-pub fn normal_to_color(normal: Vec3) -> LinSrgb {
-    // normalize just in case
-    let normal: Vec3 = normal.normalize();
+pub fn normal_to_color(normal: Direction) -> LinSrgb {
     // flip the Z and X axes because the wikipedia example uses left-handed coordinate system and my renderer uses a right-handed one for some reason.
     // TODO: figure out a good coordinate system to use... See also https://twitter.com/FreyaHolmer/status/1325556229410861056
     let normal: Vec3 = Vec3::new(-normal.x, normal.y, -normal.z);

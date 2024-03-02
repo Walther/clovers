@@ -7,7 +7,7 @@ use crate::{
     materials::{Material, MaterialInit},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Float, Vec3,
+    Box, Direction, Float, Vec3,
 };
 use rand::{rngs::SmallRng, Rng};
 
@@ -115,7 +115,7 @@ impl<'scene> HitableTrait for Boxy<'scene> {
     fn pdf_value(
         &self,
         origin: Vec3,
-        vector: Vec3,
+        direction: Direction,
         wavelength: Wavelength,
         time: Float,
         rng: &mut SmallRng,
@@ -123,7 +123,7 @@ impl<'scene> HitableTrait for Boxy<'scene> {
         let mut sum = 0.0;
 
         self.sides.iter().for_each(|object| {
-            sum += object.pdf_value(origin, vector, wavelength, time, rng) / 6.0;
+            sum += object.pdf_value(origin, direction, wavelength, time, rng) / 6.0;
         });
 
         sum

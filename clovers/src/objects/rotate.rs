@@ -5,8 +5,9 @@ use crate::{
     hitable::{HitRecord, Hitable, HitableTrait},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Float, Vec3,
+    Box, Direction, Float, Vec3,
 };
+use nalgebra::Unit;
 use rand::rngs::SmallRng;
 
 use super::Object;
@@ -109,13 +110,15 @@ impl<'scene> HitableTrait for RotateY<'scene> {
         rng: &mut SmallRng,
     ) -> Option<HitRecord> {
         let mut origin: Vec3 = ray.origin;
-        let mut direction: Vec3 = ray.direction;
+        let mut direction: Vec3 = *ray.direction;
 
         origin[0] = self.cos_theta * ray.origin[0] - self.sin_theta * ray.origin[2];
         origin[2] = self.sin_theta * ray.origin[0] + self.cos_theta * ray.origin[2];
 
         direction[0] = self.cos_theta * ray.direction[0] - self.sin_theta * ray.direction[2];
         direction[2] = self.sin_theta * ray.direction[0] + self.cos_theta * ray.direction[2];
+
+        let direction = Unit::new_normalize(direction);
 
         let rotated_r: Ray = Ray {
             origin,
@@ -132,7 +135,7 @@ impl<'scene> HitableTrait for RotateY<'scene> {
         // Determine where the intersection is
         // TODO: understand and explain
         let mut position: Vec3 = hit_record.position;
-        let mut normal: Vec3 = hit_record.normal;
+        let mut normal: Vec3 = *hit_record.normal;
         let distance: Float = hit_record.distance;
 
         position[0] =
@@ -142,6 +145,8 @@ impl<'scene> HitableTrait for RotateY<'scene> {
 
         normal[0] = self.cos_theta * hit_record.normal[0] + self.sin_theta * hit_record.normal[2];
         normal[2] = -self.sin_theta * hit_record.normal[0] + self.cos_theta * hit_record.normal[2];
+
+        let normal = Unit::new_normalize(normal);
 
         let mut record = HitRecord {
             distance,
@@ -165,7 +170,7 @@ impl<'scene> HitableTrait for RotateY<'scene> {
     fn pdf_value(
         &self,
         _origin: Vec3,
-        _vector: Vec3,
+        _direction: Direction,
         _wavelength: Wavelength,
         _time: Float,
         _rng: &mut SmallRng,
