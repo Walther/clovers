@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["main"],"mod":["draw_cpu","json_scene"],"struct":["Opts"]};

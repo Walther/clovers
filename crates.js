@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["clovers","clovers_cli","clovers_draw_cpu"];
