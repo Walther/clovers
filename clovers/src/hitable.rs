@@ -14,7 +14,7 @@ use crate::{
     objects::{Boxy, ConstantMedium, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle},
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, Vec3,
+    Direction, Float, Position,
 };
 
 use enum_dispatch::enum_dispatch;
@@ -26,7 +26,7 @@ pub struct HitRecord<'a> {
     /// Distance from the ray origin to the hitpoint
     pub distance: Float,
     /// 3D coordinate of the hitpoint
-    pub position: Vec3,
+    pub position: Position,
     /// Surface normal from the hitpoint
     pub normal: Direction,
     /// U surface coordinate of the hitpoint
@@ -94,7 +94,7 @@ impl HitableTrait for Empty {
 
     fn pdf_value(
         &self,
-        _origin: Vec3,
+        _origin: Position,
         _direction: Direction,
         _wavelength: Wavelength,
         _time: Float,
@@ -103,7 +103,7 @@ impl HitableTrait for Empty {
         0.0
     }
 
-    fn random(&self, _origin: Vec3, _rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, _origin: Position, _rng: &mut SmallRng) -> Position {
         panic!("Hitable::Empty::random called!")
     }
 }
@@ -125,7 +125,7 @@ pub trait HitableTrait {
     #[must_use]
     fn pdf_value(
         &self,
-        origin: Vec3,
+        origin: Position,
         direction: Direction,
         wavelength: Wavelength,
         time: Float,
@@ -133,7 +133,7 @@ pub trait HitableTrait {
     ) -> Float;
 
     #[must_use]
-    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3;
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position;
 }
 
 /// Returns a tuple of `(front_face, normal)`. Used in lieu of `set_face_normal` in the Ray Tracing for the Rest Of Your Life book.

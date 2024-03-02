@@ -8,7 +8,7 @@ use crate::{
     ray::Ray,
     textures::Texture,
     wavelength::Wavelength,
-    Box, Direction, Float, Vec3, EPSILON_CONSTANT_MEDIUM,
+    Box, Direction, Float, Position, EPSILON_CONSTANT_MEDIUM,
 };
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -141,7 +141,7 @@ impl<'scene> HitableTrait for ConstantMedium<'scene> {
     #[must_use]
     fn pdf_value(
         &self,
-        origin: Vec3,
+        origin: Position,
         direction: Direction,
         wavelength: Wavelength,
         time: Float,
@@ -154,7 +154,7 @@ impl<'scene> HitableTrait for ConstantMedium<'scene> {
     /// Returns a random point on the surface of the boundary of the fog
     // TODO: should this return a random point inside the volume instead?
     #[must_use]
-    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
         self.boundary.random(origin, rng)
     }
 }

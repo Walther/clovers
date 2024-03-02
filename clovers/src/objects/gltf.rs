@@ -18,7 +18,7 @@ use crate::{
     materials::gltf::GLTFMaterial,
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
+    Direction, Float, Position, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
 
 /// GLTF initialization structure
@@ -101,7 +101,7 @@ impl<'scene> HitableTrait for GLTF<'scene> {
     #[must_use]
     fn pdf_value(
         &self,
-        origin: Vec3,
+        origin: Position,
         direction: Direction,
         wavelength: Wavelength,
         time: Float,
@@ -111,9 +111,9 @@ impl<'scene> HitableTrait for GLTF<'scene> {
             .pdf_value(origin, direction, wavelength, time, rng)
     }
 
-    /// Returns a random point on the ssurface of the object
+    /// Returns a random point on the surface of the object
     #[must_use]
-    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
         self.bvhnode.random(origin, rng)
     }
 }
@@ -339,7 +339,7 @@ impl<'scene> HitableTrait for GLTFTriangle<'scene> {
 
     fn pdf_value(
         &self,
-        origin: Vec3,
+        origin: Position,
         direction: Direction,
         wavelength: Wavelength,
         time: Float,
@@ -364,7 +364,7 @@ impl<'scene> HitableTrait for GLTFTriangle<'scene> {
         }
     }
 
-    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Vec3 {
         let mut a = rng.gen::<Float>();
         let mut b = rng.gen::<Float>();
         if a + b > 1.0 {

@@ -7,7 +7,7 @@ use crate::{
     onb::ONB,
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, Vec3, EPSILON_SHADOW_ACNE, PI,
+    Direction, Float, Position, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use nalgebra::Unit;
 use rand::{rngs::SmallRng, Rng};
@@ -20,7 +20,7 @@ pub struct SphereInit {
     #[cfg_attr(feature = "serde-derive", serde(default))]
     pub priority: bool,
     /// Center of the sphere.
-    pub center: Vec3,
+    pub center: Position,
     /// Radius of the sphere.
     pub radius: Float,
     #[cfg_attr(feature = "serde-derive", serde(default))]
@@ -31,7 +31,7 @@ pub struct SphereInit {
 #[derive(Debug, Clone)]
 /// A sphere object.
 pub struct Sphere<'scene> {
-    center: Vec3,
+    center: Position,
     radius: Float,
     material: &'scene Material,
     aabb: AABB,
@@ -40,10 +40,10 @@ pub struct Sphere<'scene> {
 impl<'scene> Sphere<'scene> {
     /// Creates a new `Sphere` object with the given center, radius and material.
     #[must_use]
-    pub fn new(center: Vec3, radius: Float, material: &'scene Material) -> Self {
+    pub fn new(center: Position, radius: Float, material: &'scene Material) -> Self {
         let aabb = AABB::new_from_coords(
-            center - Vec3::new(radius, radius, radius),
-            center + Vec3::new(radius, radius, radius),
+            center - Position::new(radius, radius, radius),
+            center + Position::new(radius, radius, radius),
         );
         Sphere {
             center,
@@ -55,8 +55,8 @@ impl<'scene> Sphere<'scene> {
 
     /// Returns the U,V surface coordinates of a hitpoint
     #[must_use]
-    pub fn get_uv(&self, hit_position: Vec3, _time: Float) -> (Float, Float) {
-        let translated: Vec3 = (hit_position - self.center) / self.radius;
+    pub fn get_uv(&self, hit_position: Position, _time: Float) -> (Float, Float) {
+        let translated: Position = (hit_position - self.center) / self.radius;
         let phi: Float = translated.z.atan2(translated.x);
         let theta: Float = translated.y.asin();
         let u: Float = 1.0 - (phi + PI) / (2.0 * PI);
@@ -75,7 +75,7 @@ impl<'scene> HitableTrait for Sphere<'scene> {
         distance_max: Float,
         _rng: &mut SmallRng,
     ) -> Option<HitRecord> {
-        let oc: Vec3 = ray.origin - self.center;
+        let oc: Position = ray.origin - self.center;
         let a: Float = ray.direction.norm_squared();
         let half_b: Float = oc.dot(&ray.direction);
         let c: Float = oc.norm_squared() - self.radius * self.radius;
@@ -86,7 +86,7 @@ impl<'scene> HitableTrait for Sphere<'scene> {
             // First possible root
             let distance: Float = (-half_b - root) / a;
             if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.evaluate(distance);
+                let position: Position = ray.evaluate(distance);
                 let outward_normal = (position - self.center) / self.radius;
                 let outward_normal = Unit::new_normalize(outward_normal);
                 let (u, v) = self.get_uv(position, ray.time);
@@ -105,7 +105,7 @@ impl<'scene> HitableTrait for Sphere<'scene> {
             // Second possible root
             let distance: Float = (-half_b + root) / a;
             if distance < distance_max && distance > distance_min {
-                let position: Vec3 = ray.evaluate(distance);
+                let position = ray.evaluate(distance);
                 let outward_normal = (position - self.center) / self.radius;
                 let outward_normal = Unit::new_normalize(outward_normal);
                 let (u, v) = self.get_uv(position, ray.time);
@@ -135,7 +135,7 @@ impl<'scene> HitableTrait for Sphere<'scene> {
     #[must_use]
     fn pdf_value(
         &self,
-        origin: Vec3,
+        origin: Position,
         direction: Direction,
         wavelength: Wavelength,
         time: Float,
@@ -163,8 +163,8 @@ impl<'scene> HitableTrait for Sphere<'scene> {
     // TODO: understand, document
     /// Utility function from Ray Tracing: The Rest of Your Life. TODO: understand, document
     #[must_use]
-    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
-        let offset: Vec3 = self.center - origin;
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
+        let offset: Position = self.center - origin;
         let distance_squared: Float = offset.norm_squared();
         let uvw = ONB::build_from_w(Unit::new_normalize(offset));
         let vec = random_to_sphere(self.radius, distance_squared, rng);

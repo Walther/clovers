@@ -10,7 +10,7 @@ pub use solid_color::*;
 pub use spatial_checker::*;
 pub use surface_checker::*;
 
-use crate::{Float, Vec3};
+use crate::{Float, Position};
 
 #[enum_dispatch(TextureTrait)]
 #[derive(Clone, Debug)]
@@ -30,7 +30,7 @@ pub enum Texture {
 pub(crate) trait TextureTrait {
     /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
     #[must_use]
-    fn color(&self, u: Float, v: Float, position: Vec3) -> Xyz<E>;
+    fn color(&self, u: Float, v: Float, position: Position) -> Xyz<E>;
 }
 
 impl Default for Texture {

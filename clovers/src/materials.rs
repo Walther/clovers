@@ -4,7 +4,7 @@ use alloc::string::String;
 use core::fmt::Debug;
 use nalgebra::Unit;
 
-use crate::{hitable::HitRecord, pdf::PDF, ray::Ray, Direction, Float, Vec3};
+use crate::{hitable::HitRecord, pdf::PDF, ray::Ray, Direction, Float, Position, Vec3};
 pub mod cone_light;
 pub mod dielectric;
 pub mod diffuse_light;
@@ -80,7 +80,7 @@ pub trait MaterialTrait: Debug {
         _hit_record: &HitRecord,
         _u: Float,
         _v: Float,
-        _position: Vec3,
+        _position: Position,
     ) -> Xyz<E> {
         Xyz::new(0.0, 0.0, 0.0)
     }

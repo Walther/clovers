@@ -8,7 +8,7 @@ use super::TextureTrait;
 use crate::colorinit::ColorInit;
 #[cfg(feature = "serde-derive")]
 use crate::colorinit::TypedColorInit;
-use crate::{Float, Vec3, PI};
+use crate::{Float, Position, PI};
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -80,7 +80,7 @@ impl SurfaceChecker {
 impl TextureTrait for SurfaceChecker {
     /// Evaluates the color at the given surface position coordinates. Note that `SurfaceChecker` is surface-based, and thus ignores the spatial position coordinate.
     #[must_use]
-    fn color(&self, u: Float, v: Float, _position: Vec3) -> Xyz<E> {
+    fn color(&self, u: Float, v: Float, _position: Position) -> Xyz<E> {
         // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;
         let sines = 1.0 // cosmetic 1 for readability of following lines :)

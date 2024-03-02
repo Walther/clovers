@@ -128,6 +128,8 @@ pub type Vec3 = Vector3<Float>;
 pub type Vec4 = Vector4<Float>;
 /// Internal type alias: a nalgebra [Unit] of a [Vector3]
 pub type Direction = Unit<Vec3>;
+/// Internal type alias: a nalgebra [Vector3]
+pub type Position = Vec3;
 /// Internal const: epsilon used for avoiding "shadow acne". This is mostly used for the initial minimum distance for ray hits after reflecting or scattering from a surface.
 pub const EPSILON_SHADOW_ACNE: Float = 0.001;
 /// Internal const: epsilon used for having a finitely-sized thickness for the bounding box of an infinitely-thin rectangle. Shouldn't be too small.

@@ -9,7 +9,7 @@ use crate::{
     aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3,
     EPSILON_RECT_THICKNESS,
 };
-use crate::{Direction, EPSILON_SHADOW_ACNE};
+use crate::{Direction, Position, EPSILON_SHADOW_ACNE};
 use nalgebra::Unit;
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -22,7 +22,7 @@ pub struct TriangleInit {
     #[cfg_attr(feature = "serde-derive", serde(default))]
     pub priority: bool,
     /// Corner point
-    pub q: Vec3,
+    pub q: Position,
     /// Vector describing the u side
     pub u: Vec3,
     /// Vector describing the v side
@@ -36,7 +36,7 @@ pub struct TriangleInit {
 #[derive(Clone, Debug)]
 pub struct Triangle<'scene> {
     /// Corner point
-    pub q: Vec3,
+    pub q: Position,
     /// Vector describing the u side
     pub u: Vec3,
     /// Vector describing the v side
@@ -58,9 +58,9 @@ pub struct Triangle<'scene> {
 impl<'scene> Triangle<'scene> {
     /// Creates a new triangle from a coordinate point and two side vectors relative to the point
     #[must_use]
-    pub fn new(q: Vec3, u: Vec3, v: Vec3, material: &'scene Material) -> Triangle<'scene> {
+    pub fn new(q: Position, u: Vec3, v: Vec3, material: &'scene Material) -> Triangle<'scene> {
         let n: Vec3 = u.cross(&v);
-        let normal = Unit::new_normalize(n);
+        let normal: Direction = Unit::new_normalize(n);
         // TODO: what is this?
         let d = -(normal.dot(&q));
         // TODO: what is this?
@@ -109,7 +109,7 @@ impl<'scene> Triangle<'scene> {
         material: &'scene Material,
     ) -> Triangle<'scene> {
         // Coordinate transform: from absolute coordinates to relative coordinates
-        let q: Vec3 = a;
+        let q: Position = a;
         let u: Vec3 = b - q;
         let v: Vec3 = c - q;
         Triangle::new(q, u, v, material)
@@ -140,8 +140,8 @@ impl<'scene> HitableTrait for Triangle<'scene> {
         }
 
         // Determine the hit point lies within the planar shape using its plane coordinates.
-        let intersection: Vec3 = ray.evaluate(t);
-        let planar_hitpt_vector: Vec3 = intersection - self.q;
+        let intersection: Position = ray.evaluate(t);
+        let planar_hitpt_vector: Position = intersection - self.q;
         let alpha: Float = self.w.dot(&planar_hitpt_vector.cross(&self.v));
         let beta: Float = self.w.dot(&self.u.cross(&planar_hitpt_vector));
 
@@ -177,7 +177,7 @@ impl<'scene> HitableTrait for Triangle<'scene> {
     #[must_use]
     fn pdf_value(
         &self,
-        origin: Vec3,
+        origin: Position,
         direction: Direction,
         wavelength: Wavelength,
         time: Float,
@@ -204,7 +204,7 @@ impl<'scene> HitableTrait for Triangle<'scene> {
 
     /// Returns a random point on the triangle surface
     #[must_use]
-    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
         let mut a = rng.gen::<Float>();
         let mut b = rng.gen::<Float>();
         if a + b > 1.0 {
@@ -212,7 +212,7 @@ impl<'scene> HitableTrait for Triangle<'scene> {
             b = 1.0 - b;
         }
 
-        let point: Vec3 = self.q + (a * self.u) + (b * self.v);
+        let point: Position = self.q + (a * self.u) + (b * self.v);
 
         point - origin
     }
@@ -238,7 +238,7 @@ mod tests {
     const TIME_0: Float = 0.0;
     const TIME_1: Float = 1.0;
     const RAY: Ray = Ray {
-        origin: Vec3::new(0.0, 0.0, -1.0),
+        origin: Position::new(0.0, 0.0, -1.0),
         direction: Unit::new_unchecked(Vec3::new(0.0, 0.0, 1.0)),
         time: TIME_0,
         wavelength: 600,
@@ -318,7 +318,7 @@ mod tests {
             .expect("No hit record for triangle and ray");
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
-        assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
+        assert_eq!(hit_record.position, Position::new(0.0, 0.0, 0.0));
         assert_eq!(
             hit_record.normal,
             Unit::new_normalize(Vec3::new(0.0, 0.0, -1.0))
@@ -359,7 +359,7 @@ mod tests {
             .expect("No hit record for triangle and ray");
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
-        assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
+        assert_eq!(hit_record.position, Position::new(0.0, 0.0, 0.0));
         assert_eq!(
             hit_record.normal,
             Unit::new_normalize(Vec3::new(0.0, 0.0, -1.0))
@@ -400,7 +400,7 @@ mod tests {
             .expect("No hit record for triangle and ray");
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
-        assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
+        assert_eq!(hit_record.position, Position::new(0.0, 0.0, 0.0));
         assert_eq!(
             hit_record.normal,
             Unit::new_normalize(Vec3::new(0.0, 0.0, -1.0))

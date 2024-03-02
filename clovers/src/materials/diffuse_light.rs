@@ -5,7 +5,7 @@ use crate::{
     hitable::HitRecord,
     ray::Ray,
     textures::{SolidColor, Texture, TextureTrait},
-    Float, Vec3,
+    Float, Position,
 };
 use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
@@ -57,7 +57,7 @@ impl MaterialTrait for DiffuseLight {
         hit_record: &HitRecord,
         u: Float,
         v: Float,
-        position: Vec3,
+        position: Position,
     ) -> Xyz<E> {
         if hit_record.front_face {
             self.emit.color(u, v, position)

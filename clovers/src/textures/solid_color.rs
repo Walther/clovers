@@ -4,7 +4,7 @@ use palette::{convert::IntoColorUnclamped, white_point::E, Xyz};
 
 use super::TextureTrait;
 use crate::colorinit::ColorInit;
-use crate::{Float, Vec3};
+use crate::{Float, Position};
 
 /// Initialization structure for a solid color texture.
 #[derive(Clone, Debug)]
@@ -34,7 +34,7 @@ pub struct SolidColor {
 impl TextureTrait for SolidColor {
     /// Evaluates the color ignoring the given surface coordinates and spatial position - always returns the solid color.
     #[must_use]
-    fn color(&self, _u: Float, _v: Float, _position: Vec3) -> Xyz<E> {
+    fn color(&self, _u: Float, _v: Float, _position: Position) -> Xyz<E> {
         self.color.into_color_unclamped()
     }
 }

@@ -5,7 +5,7 @@ use crate::{
     hitable::{HitRecord, Hitable, HitableTrait},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Direction, Float, Vec3,
+    Box, Direction, Float, Position, Vec3,
 };
 use nalgebra::Unit;
 use rand::rngs::SmallRng;
@@ -109,7 +109,7 @@ impl<'scene> HitableTrait for RotateY<'scene> {
         distance_max: Float,
         rng: &mut SmallRng,
     ) -> Option<HitRecord> {
-        let mut origin: Vec3 = ray.origin;
+        let mut origin: Position = ray.origin;
         let mut direction: Vec3 = *ray.direction;
 
         origin[0] = self.cos_theta * ray.origin[0] - self.sin_theta * ray.origin[2];
@@ -134,7 +134,7 @@ impl<'scene> HitableTrait for RotateY<'scene> {
 
         // Determine where the intersection is
         // TODO: understand and explain
-        let mut position: Vec3 = hit_record.position;
+        let mut position: Position = hit_record.position;
         let mut normal: Vec3 = *hit_record.normal;
         let distance: Float = hit_record.distance;
 
@@ -169,7 +169,7 @@ impl<'scene> HitableTrait for RotateY<'scene> {
 
     fn pdf_value(
         &self,
-        _origin: Vec3,
+        _origin: Position,
         _direction: Direction,
         _wavelength: Wavelength,
         _time: Float,
@@ -179,7 +179,7 @@ impl<'scene> HitableTrait for RotateY<'scene> {
         0.0
     }
 
-    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Vec3 {
         // TODO: fix, take rotation into account
         self.object.random(origin, rng)
     }

@@ -13,7 +13,7 @@ use crate::{
     objects::Triangle,
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, Vec3,
+    Direction, Float, Position, Vec3,
 };
 
 /// Internal STL object representation after initialization. Contains the material for all triangles in it to avoid having n copies.
@@ -50,7 +50,7 @@ impl<'scene> HitableTrait for STL<'scene> {
     #[must_use]
     fn pdf_value(
         &self,
-        origin: Vec3,
+        origin: Position,
         direction: Direction,
         wavelength: Wavelength,
         time: Float,
@@ -62,7 +62,7 @@ impl<'scene> HitableTrait for STL<'scene> {
 
     /// Returns a random point on the ssurface of the object
     #[must_use]
-    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Vec3 {
         self.bvhnode.random(origin, rng)
     }
 }
@@ -82,7 +82,7 @@ pub struct STLInit {
     /// Scaling factor for the object
     pub scale: Float,
     /// Location of the object in the rendered scene
-    pub center: Vec3,
+    pub center: Position,
     /// Rotation of the object. Described as three angles, `roll`, `pitch`, `yaw`, applied in that order.
     pub rotation: Vec3,
 }
