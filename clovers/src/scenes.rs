@@ -1,5 +1,7 @@
 //! A collection of objects, camera, and other things necessary to describe the environment you wish to render.
 
+use alloc::boxed::Box;
+
 use crate::{
     bvhnode::BVHNode,
     camera::{Camera, CameraInit},
@@ -102,6 +104,7 @@ pub fn initialize<'scene>(scene_file: SceneFile, width: u32, height: u32) -> Sce
             Object::Quad(i) => i.priority,
             Object::RotateY(i) => i.priority,
             Object::Sphere(i) => i.priority,
+            #[cfg(feature = "stl")]
             Object::STL(i) => i.priority,
             #[cfg(feature = "gl_tf")]
             Object::GLTF(i) => i.priority,

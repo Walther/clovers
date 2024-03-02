@@ -23,28 +23,25 @@ clovers = { path = "../clovers", features = [
 ], default-features = false }
 
 # External
-clap = { version = "4.4.18", features = ["std", "derive"] }
-human_format = "1.0.3"
+clap = { version = "4.5.1", features = ["std", "derive"] }
+human_format = "1.1.0"
 humantime = "2.1.0"
-image = { version = "0.24.8", features = ["png"], default-features = false }
+image = { version = "0.24.9", features = ["png"], default-features = false }
 img-parts = "0.3.0"
-indicatif = { version = "0.17.7", features = [
+indicatif = { version = "0.17.8", features = [
   "rayon",
 ], default-features = false }
-palette = { version = "0.7.4", features = ["serializing"] }
-rand = { version = "0.8.5", features = [
-  "small_rng",
-  "getrandom",
-], default-features = false }
-rayon = "1.8.1"
-serde = { version = "1.0.196", features = ["derive"], default-features = false }
+palette = { version = "0.7.5", features = ["serializing"] }
+rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
+rayon = "1.9.0"
+serde = { version = "1.0.197", features = ["derive"], default-features = false }
 serde_json = { version = "1.0", features = ["alloc"], default-features = false }
 time = { version = "0.3.34", default-features = false }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["time"] }
 
 [dev-dependencies]
-divan = "0.1.11"
+divan = "0.1.14"
 proptest = "1"
 
 [[bench]]

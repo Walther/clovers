@@ -1,5 +1,6 @@
 //! Materials enable different behaviors of light on objects.
 
+use alloc::string::String;
 use core::fmt::Debug;
 
 use crate::{hitable::HitRecord, pdf::PDF, ray::Ray, Float, Vec3};
@@ -48,7 +49,7 @@ pub struct SharedMaterial {
     /// Name of the shared material
     pub name: String,
     /// The shared material itself
-    #[serde(flatten)]
+    #[cfg_attr(feature = "serde-derive", serde(flatten))]
     pub material: Material,
 }
 

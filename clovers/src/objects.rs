@@ -150,7 +150,7 @@ fn initialize_material<'scene>(
     let material: &Material = match material_init {
         MaterialInit::Owned(m) => {
             // TODO: do not leak memory
-            let material: &'scene Material = Box::leak(Box::new(m.into()));
+            let material: &'scene Material = Box::leak(Box::new(m));
             material
         }
         MaterialInit::Shared(name) => {

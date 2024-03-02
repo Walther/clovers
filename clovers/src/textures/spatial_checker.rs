@@ -7,7 +7,9 @@ use palette::white_point::E;
 use palette::Xyz;
 
 use super::TextureTrait;
-use crate::colorinit::{ColorInit, TypedColorInit};
+use crate::colorinit::ColorInit;
+#[cfg(feature = "serde-derive")]
+use crate::colorinit::TypedColorInit;
 use crate::{Float, Vec3, PI};
 
 /// A standard checkered texture based on spatial 3D texturing.

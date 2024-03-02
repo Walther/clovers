@@ -34,3 +34,11 @@ test:
 # Run all benchmarks
 bench:
   cargo bench --quiet
+
+# Verify no_std compatibility
+nostd:
+  cargo clippy -q --release --package clovers --lib --no-default-features
+
+# Check the assembly of a given function
+asm name:
+  cargo asm --release --package clovers --lib --no-default-features {{name}}
