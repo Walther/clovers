@@ -29,6 +29,19 @@ pub fn random_wavelength(rng: &mut SmallRng) -> Wavelength {
     SPECTRUM.sample_single(rng)
 }
 
+// TODO: clippy fixes possible?
+/// Given a sample seed from a sampler, return the approximate wavelenght.
+#[must_use]
+#[allow(clippy::cast_possible_truncation)]
+#[allow(clippy::cast_sign_loss)]
+#[allow(clippy::cast_precision_loss)]
+pub fn sample_wavelength(sample: Float) -> Wavelength {
+    let pick = (sample * SPECTRUM_SIZE as Float).floor() as usize + MIN_WAVELENGTH;
+    assert!(pick <= MAX_WAVELENGTH);
+    assert!(pick >= MIN_WAVELENGTH);
+    pick
+}
+
 /// Given a hero wavelength, create additional equidistant wavelengths in the visible spectrum. Returns an array of wavelengths, with the original hero wavelength as the first one.
 #[must_use]
 pub fn rotate_wavelength(hero: Wavelength) -> [Wavelength; WAVE_SAMPLE_COUNT] {

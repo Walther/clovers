@@ -21,6 +21,8 @@ use tracing_subscriber::fmt::time::UtcTime;
 use clovers::*;
 mod draw_cpu;
 mod json_scene;
+mod sampler;
+use sampler::Sampler;
 
 // Configure CLI parameters
 #[derive(Parser)]
@@ -56,6 +58,9 @@ struct Opts {
     /// Render a normal map only. Experimental feature.
     #[clap(long)]
     normalmap: bool,
+    /// Sampler to use for rendering. Experimental feature.
+    #[clap(long, default_value = "random")]
+    sampler: Sampler,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -70,6 +75,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         gpu,
         debug,
         normalmap,
+        sampler,
     } = Opts::parse();
 
     if debug {
@@ -91,8 +97,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!();
         println!("{width}x{height} resolution");
         println!("{samples} samples per pixel");
+        println!("using the {sampler} sampler");
         println!("{max_depth} max bounce depth");
         println!(); // Empty line before progress bar
+    }
+
+    if sampler == Sampler::Blue && !([1, 2, 4, 8, 16, 32, 128, 256].contains(&samples)) {
+        panic!("the blue sampler only supports the following sample-per-pixel counts: [1, 2, 4, 8, 16, 32, 128, 256]");
     }
 
     let renderopts: RenderOpts = RenderOpts {
@@ -119,7 +130,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let start = Instant::now();
     let pixelbuffer = match gpu {
         // Note: live progress bar printed within draw_cpu::draw
-        false => draw_cpu::draw(renderopts, &scene),
+        false => draw_cpu::draw(renderopts, &scene, sampler),
         true => unimplemented!("GPU accelerated rendering is currently unimplemented"),
     };
     info!("Drawing a pixelbuffer finished");
