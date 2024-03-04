@@ -43,3 +43,14 @@ impl Display for Sampler {
         write!(f, "{s}")
     }
 }
+
+/// Various sampling dimensions used by the samplers
+#[derive(Clone, Copy)]
+pub enum SamplerDimension {
+    PixelOffsetX,
+    PixelOffsetY,
+    LensOffsetX,
+    LensOffsetY,
+    Time,
+    Wavelength,
+}

@@ -24,7 +24,7 @@ pub enum PDF<'scene> {
 }
 
 #[enum_dispatch]
-pub(crate) trait PDFTrait {
+pub trait PDFTrait {
     #[must_use]
     fn value(
         &self,

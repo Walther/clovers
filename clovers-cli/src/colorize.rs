@@ -1,6 +1,6 @@
 //! An opinionated colorize method. Given a [Ray] and a [Scene], evaluates the ray's path and returns a color.
 
-use crate::{
+use clovers::{
     hitable::HitableTrait,
     materials::MaterialType,
     pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
@@ -16,14 +16,18 @@ use palette::{
 };
 use rand::rngs::SmallRng;
 
-/// The main coloring function. Sends a [`Ray`] to the [`Scene`], sees if it hits anything, and eventually returns a color. Taking into account the [Material](crate::materials::Material) that is hit, the method recurses with various adjustments, with a new [`Ray`] started from the location that was hit.
+use crate::sampler::SamplerTrait;
+
+/// The main coloring function. Sends a [`Ray`] to the [`Scene`], sees if it hits anything, and eventually returns a color. Taking into account the [Material](clovers::materials::Material) that is hit, the method recurses with various adjustments, with a new [`Ray`] started from the location that was hit.
 #[must_use]
+#[allow(clippy::only_used_in_recursion)] // TODO: use sampler in more places!
 pub fn colorize(
     ray: &Ray,
     scene: &Scene,
     depth: u32,
     max_depth: u32,
     rng: &mut SmallRng,
+    sampler: &dyn SamplerTrait,
 ) -> Xyz<E> {
     let bg: Xyz = scene.background_color.into_color_unclamped();
     let bg: Xyz<E> = bg.adapt_into();
@@ -73,6 +77,7 @@ pub fn colorize(
                 depth + 1,
                 max_depth,
                 rng,
+                sampler,
             );
             specular * attenuation
         }
@@ -110,7 +115,7 @@ pub fn colorize(
             };
 
             // Recurse for the scattering ray
-            let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
+            let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng, sampler);
             // Tint and weight it according to the PDF
             let scattered = attenuation * scattering_pdf * recurse / pdf_val;
             // Ensure positive color

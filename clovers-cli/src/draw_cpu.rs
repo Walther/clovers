@@ -1,8 +1,8 @@
+//! An opinionated method for drawing a scene using the CPU for rendering.
+
 use clovers::wavelength::random_wavelength;
 use clovers::Vec2;
-use clovers::{
-    colorize::colorize, normals::normal_map, ray::Ray, scenes::Scene, Float, RenderOpts,
-};
+use clovers::{ray::Ray, scenes::Scene, Float, RenderOpts};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use palette::chromatic_adaptation::AdaptInto;
 use palette::convert::IntoColorUnclamped;
@@ -12,6 +12,8 @@ use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
+use crate::colorize::colorize;
+use crate::normals::normal_map;
 use crate::sampler::blue::BlueSampler;
 use crate::sampler::random::RandomSampler;
 use crate::sampler::{Sample, Sampler, SamplerTrait};
@@ -79,7 +81,7 @@ fn render_pixel(
         let ray: Ray = scene
             .camera
             .get_ray(pixel_uv, lens_offset, time, wavelength);
-        let sample_color: Xyz<E> = colorize(&ray, scene, 0, max_depth, rng);
+        let sample_color: Xyz<E> = colorize(&ray, scene, 0, max_depth, rng, sampler);
         if sample_color.x.is_finite() && sample_color.y.is_finite() && sample_color.z.is_finite() {
             pixel_color += sample_color;
         }

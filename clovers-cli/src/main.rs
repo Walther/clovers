@@ -18,9 +18,13 @@ use tracing_subscriber::fmt::time::UtcTime;
 // Internal imports
 use clovers::*;
 #[doc(hidden)]
+mod colorize;
+#[doc(hidden)]
 mod draw_cpu;
 #[doc(hidden)]
 mod json_scene;
+#[doc(hidden)]
+pub mod normals;
 #[doc(hidden)]
 mod sampler;
 use sampler::Sampler;

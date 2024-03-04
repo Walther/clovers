@@ -1,13 +1,13 @@
 //! A sampler based on blue noise. Works especially well at low samples-per-pixel counts.
 //!
-//! Utilizes library code from <https://github.com/Jasper-Bekkers/blue-noise-sampler>
+//! Utilizes library code from <https://github.com/Jasper-Bekkers/blue-noise-sampler>.
 
 use clovers::{wavelength::sample_wavelength, Float, RenderOpts, Vec2};
 
-use super::{Sample, SamplerTrait};
+use super::*;
 
 pub struct BlueSampler {
-    get: fn(i32, i32, i32, i32) -> Float,
+    get: fn(i32, i32, i32, SamplerDimension) -> Float,
 }
 
 impl<'scene> BlueSampler {
@@ -32,11 +32,17 @@ impl<'scene> BlueSampler {
 
 impl<'scene> SamplerTrait<'scene> for BlueSampler {
     fn sample(&mut self, i: i32, j: i32, index: i32) -> Sample {
-        let pixel_offset = Vec2::new((self.get)(i, j, index, 0), (self.get)(i, j, index, 1));
-        let lens_offset = Vec2::new((self.get)(i, j, index, 2), (self.get)(i, j, index, 3));
-        let time = (self.get)(i, j, index, 4);
+        let pixel_offset = Vec2::new(
+            (self.get)(i, j, index, SamplerDimension::PixelOffsetX),
+            (self.get)(i, j, index, SamplerDimension::PixelOffsetY),
+        );
+        let lens_offset = Vec2::new(
+            (self.get)(i, j, index, SamplerDimension::LensOffsetX),
+            (self.get)(i, j, index, SamplerDimension::LensOffsetY),
+        );
+        let time = (self.get)(i, j, index, SamplerDimension::Time);
         // TODO: verify uniformity & correctness for math?
-        let wavelength = sample_wavelength((self.get)(i, j, index, 5));
+        let wavelength = sample_wavelength((self.get)(i, j, index, SamplerDimension::Wavelength));
 
         Sample {
             pixel_offset,
@@ -54,7 +60,9 @@ macro_rules! define_blue_sampler {
                 mut pixel_i: i32,
                 mut pixel_j: i32,
                 mut sample_index: i32,
-                mut sample_dimension: i32) -> Float {
+                sample_dimension: SamplerDimension) -> Float {
+                    let mut sample_dimension = sample_dimension as i32;
+
                     use blue_noise_sampler::$spp::*;
 
                     // Adapted from <https://dl.acm.org/doi/10.1145/3306307.3328191> and <https://github.com/Jasper-Bekkers/blue-noise-sampler>

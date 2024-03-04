@@ -1,6 +1,6 @@
-//! Alternative render method to [colorize](crate::colorize::colorize).
+//! Alternative rendering method. Only returns a normalmap of the image, colorized using standard conventions.
 
-use crate::{
+use clovers::{
     hitable::HitableTrait, ray::Ray, scenes::Scene, Direction, Float, Vec3, EPSILON_SHADOW_ACNE,
 };
 use palette::LinSrgb;

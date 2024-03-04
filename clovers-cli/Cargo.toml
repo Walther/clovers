@@ -31,6 +31,7 @@ img-parts = "0.3.0"
 indicatif = { version = "0.17.8", features = [
   "rayon",
 ], default-features = false }
+nalgebra = { version = "0.32.4" }
 palette = { version = "0.7.5", features = ["serializing"] }
 paste = { version = "1.0.14" }
 rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
