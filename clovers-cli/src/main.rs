@@ -108,8 +108,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!(); // Empty line before progress bar
     }
 
-    if sampler == Sampler::Blue && !([1, 2, 4, 8, 16, 32, 128, 256].contains(&samples)) {
-        panic!("the blue sampler only supports the following sample-per-pixel counts: [1, 2, 4, 8, 16, 32, 128, 256]");
+    if sampler == Sampler::Blue && !([1, 2, 4, 8, 16, 32, 64, 128, 256].contains(&samples)) {
+        panic!("the blue sampler only supports the following sample-per-pixel counts: [1, 2, 4, 8, 16, 32, 64, 128, 256]");
     }
 
     let renderopts: RenderOpts = RenderOpts {
