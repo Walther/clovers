@@ -1,3 +1,7 @@
+//! A sampler based on blue noise. Works especially well at low samples-per-pixel counts.
+//!
+//! Utilizes library code from <https://github.com/Jasper-Bekkers/blue-noise-sampler>
+
 use clovers::{wavelength::sample_wavelength, Float, RenderOpts, Vec2};
 
 use super::{Sample, SamplerTrait};

@@ -1,6 +1,4 @@
-//! Command Line Interface for the raytracing renderer.
-//!
-//! CPU-based rendering is fully functional. GPU-based rendering is at early experimentation stage only.
+//! Command Line Interface for the `clovers` raytracing renderer.
 
 #![deny(clippy::all)]
 
@@ -19,32 +17,35 @@ use tracing_subscriber::fmt::time::UtcTime;
 
 // Internal imports
 use clovers::*;
+#[doc(hidden)]
 mod draw_cpu;
+#[doc(hidden)]
 mod json_scene;
+#[doc(hidden)]
 mod sampler;
 use sampler::Sampler;
 
-// Configure CLI parameters
+/// Command line parameters for the `clovers` raytracing renderer.
 #[derive(Parser)]
 #[clap(version = "0.1.0", author = "Walther", name = "clovers")]
-struct Opts {
+pub struct Opts {
     /// Input filename / location
     #[clap(short, long)]
     input: String,
-    /// Output filename / location. [default: renders/timestamp.png]
+    /// Output filename / location. Default: renders/unix_timestamp.png
     #[clap(short, long)]
     output: Option<String>,
-    /// Width of the image in pixels
+    /// Width of the image in pixels. Default: 1024
     #[clap(short, long, default_value = "1024")]
     width: u32,
-    /// Height of the image in pixels
+    /// Height of the image in pixels. Default: 1024
     #[clap(short, long, default_value = "1024")]
     height: u32,
-    /// Number of samples to generate per each pixel
-    #[clap(short, long, default_value = "100")]
+    /// Number of samples to generate per each pixel. Default: 64
+    #[clap(short, long, default_value = "64")]
     samples: u32,
-    /// Maximum evaluated bounce depth for each ray
-    #[clap(short = 'd', long, default_value = "100")]
+    /// Maximum evaluated bounce depth for each ray. Default: 64
+    #[clap(short = 'd', long, default_value = "64")]
     max_depth: u32,
     /// Suppress most of the text output
     #[clap(short, long)]
@@ -63,6 +64,7 @@ struct Opts {
     sampler: Sampler,
 }
 
+#[doc(hidden)]
 fn main() -> Result<(), Box<dyn Error>> {
     let Opts {
         input,

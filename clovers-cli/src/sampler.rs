@@ -1,3 +1,5 @@
+//! Sampler architecture for the renderer, based on the sampling infrastructure described in the book Physically Based Rendering, chapter [8.3 Sampling Interface](https://pbr-book.org/4ed/Sampling_and_Reconstruction/Sampling_Interface#Sampler)
+
 use std::fmt::Display;
 
 use clap::ValueEnum;
@@ -23,9 +25,12 @@ pub struct Sample {
     pub wavelength: Wavelength,
 }
 
+/// Enum of the supported samplers.
 #[derive(Clone, Debug, PartialEq, ValueEnum)]
 pub enum Sampler {
+    /// Blue noise based sampler, see [BlueSampler](blue::BlueSampler)
     Blue,
+    /// Random number generator based sampler, see [RandomSampler](random::RandomSampler)
     Random,
 }
 

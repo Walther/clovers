@@ -1,3 +1,5 @@
+//! A sampler based on a random number generator. This is the default sampler used in this renderer. It works especially well at high samples-per-pixel counts.
+
 use clovers::{random::random_in_unit_disk, wavelength::random_wavelength, Vec2};
 use rand::{rngs::SmallRng, Rng};
 
