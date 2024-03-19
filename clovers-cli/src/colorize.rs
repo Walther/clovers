@@ -7,7 +7,7 @@ use clovers::{
     ray::Ray,
     scenes::Scene,
     spectrum::spectrum_xyz_to_p,
-    wavelength::{wavelength_into_xyz, Wavelength},
+    wavelength::wavelength_into_xyz,
     Float, EPSILON_SHADOW_ACNE,
 };
 use nalgebra::Unit;
@@ -56,7 +56,8 @@ pub fn colorize(
         hit_record.v,
         hit_record.position,
     );
-    let emitted = adjust_emitted(emitted, ray.wavelength);
+    let tint: Xyz<E> = wavelength_into_xyz(ray.wavelength);
+    let emitted = emitted * tint;
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
@@ -64,7 +65,9 @@ pub fn colorize(
         return emitted;
     };
     // We have scattered, and received an attenuation from the material.
-    let attenuation = adjust_attenuation(scatter_record.attenuation, ray.wavelength);
+    let wavelength = ray.wavelength;
+    let attenuation_factor = spectrum_xyz_to_p(wavelength, scatter_record.attenuation);
+    let attenuation = (scatter_record.attenuation * attenuation_factor).clamp();
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {
@@ -124,15 +127,4 @@ pub fn colorize(
             emitted + scattered
         }
     }
-}
-
-fn adjust_emitted(emitted: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
-    let tint: Xyz<E> = wavelength_into_xyz(wavelength);
-    tint * emitted
-}
-
-fn adjust_attenuation(attenuation: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
-    let attenuation_factor = spectrum_xyz_to_p(wavelength, attenuation);
-    let attenuation = attenuation * attenuation_factor;
-    attenuation.clamp()
 }
