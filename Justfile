@@ -32,8 +32,8 @@ test:
   cargo nextest run --cargo-quiet
 
 # Run all benchmarks
-bench:
-  cargo bench --quiet
+bench *ARGS:
+  cargo bench --quiet {{ARGS}}
 
 # Verify no_std compatibility
 nostd:
