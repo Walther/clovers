@@ -30,4 +30,14 @@ impl<'scene> SamplerTrait<'scene> for RandomSampler<'scene> {
             wavelength,
         }
     }
+
+    fn sample_dimension(
+        &mut self,
+        _i: i32,
+        _j: i32,
+        _index: i32,
+        _dimension: super::SamplerDimension,
+    ) -> clovers::Float {
+        self.rng.gen()
+    }
 }

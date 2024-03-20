@@ -11,6 +11,15 @@ pub mod random;
 pub trait SamplerTrait<'scene> {
     // TODO: better types
     fn sample(&mut self, i: i32, j: i32, index: i32) -> Sample;
+
+    /// Manually request a sample from the specific dimension
+    fn sample_dimension(
+        &mut self,
+        i: i32,
+        j: i32,
+        index: i32,
+        dimension: SamplerDimension,
+    ) -> Float;
 }
 
 /// A collection of random values to be used for each sample. Returned as a struct to ensure the correct sampling order for the underlying source of randomness.

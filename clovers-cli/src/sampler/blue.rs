@@ -51,6 +51,16 @@ impl<'scene> SamplerTrait<'scene> for BlueSampler {
             wavelength,
         }
     }
+
+    fn sample_dimension(
+        &mut self,
+        i: i32,
+        j: i32,
+        index: i32,
+        dimension: SamplerDimension,
+    ) -> Float {
+        (self.get)(i, j, index, dimension)
+    }
 }
 
 macro_rules! define_blue_sampler {
