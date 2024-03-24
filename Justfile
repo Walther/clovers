@@ -15,11 +15,11 @@ scene:
   cargo run --bin clovers-cli --release -- --input scenes/scene.json -w 1920 -h 1080
 
 # Render all the test scenes available in the repository
-all-scenes spp="1":
+all-scenes *ARGS:
   DATE=$(date -u +%s); \
   mkdir -p renders/$DATE; \
   for scene in $(ls scenes/ |grep json); \
-  do just cli -s {{spp}} --input scenes/$scene --output renders/$DATE/${scene%.json}.png; \
+  do just cli --input scenes/$scene --output renders/$DATE/${scene%.json}.png {{ARGS}}; \
   done;
 
 # Profiling helper
