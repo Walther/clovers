@@ -1,13 +1,13 @@
 //! An opinionated colorize method. Given a [Ray] and a [Scene], evaluates the ray's path and returns a color.
 
-use crate::{
+use clovers::{
     hitable::HitableTrait,
     materials::MaterialType,
     pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
     ray::Ray,
     scenes::Scene,
     spectrum::spectrum_xyz_to_p,
-    wavelength::{wavelength_into_xyz, Wavelength},
+    wavelength::wavelength_into_xyz,
     Float, EPSILON_SHADOW_ACNE,
 };
 use nalgebra::Unit;
@@ -16,14 +16,18 @@ use palette::{
 };
 use rand::rngs::SmallRng;
 
-/// The main coloring function. Sends a [`Ray`] to the [`Scene`], sees if it hits anything, and eventually returns a color. Taking into account the [Material](crate::materials::Material) that is hit, the method recurses with various adjustments, with a new [`Ray`] started from the location that was hit.
+use crate::sampler::SamplerTrait;
+
+/// The main coloring function. Sends a [`Ray`] to the [`Scene`], sees if it hits anything, and eventually returns a color. Taking into account the [Material](clovers::materials::Material) that is hit, the method recurses with various adjustments, with a new [`Ray`] started from the location that was hit.
 #[must_use]
+#[allow(clippy::only_used_in_recursion)] // TODO: use sampler in more places!
 pub fn colorize(
     ray: &Ray,
     scene: &Scene,
     depth: u32,
     max_depth: u32,
     rng: &mut SmallRng,
+    sampler: &dyn SamplerTrait,
 ) -> Xyz<E> {
     let bg: Xyz = scene.background_color.into_color_unclamped();
     let bg: Xyz<E> = bg.adapt_into();
@@ -52,7 +56,8 @@ pub fn colorize(
         hit_record.v,
         hit_record.position,
     );
-    let emitted = adjust_emitted(emitted, ray.wavelength);
+    let tint: Xyz<E> = wavelength_into_xyz(ray.wavelength);
+    let emitted = emitted * tint;
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
@@ -60,7 +65,9 @@ pub fn colorize(
         return emitted;
     };
     // We have scattered, and received an attenuation from the material.
-    let attenuation = adjust_attenuation(scatter_record.attenuation, ray.wavelength);
+    let wavelength = ray.wavelength;
+    let attenuation_factor = spectrum_xyz_to_p(wavelength, scatter_record.attenuation);
+    let attenuation = (scatter_record.attenuation * attenuation_factor).clamp();
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {
@@ -73,6 +80,7 @@ pub fn colorize(
                 depth + 1,
                 max_depth,
                 rng,
+                sampler,
             );
             specular * attenuation
         }
@@ -110,7 +118,7 @@ pub fn colorize(
             };
 
             // Recurse for the scattering ray
-            let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng);
+            let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng, sampler);
             // Tint and weight it according to the PDF
             let scattered = attenuation * scattering_pdf * recurse / pdf_val;
             // Ensure positive color
@@ -119,15 +127,4 @@ pub fn colorize(
             emitted + scattered
         }
     }
-}
-
-fn adjust_emitted(emitted: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
-    let tint: Xyz<E> = wavelength_into_xyz(wavelength);
-    tint * emitted
-}
-
-fn adjust_attenuation(attenuation: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
-    let attenuation_factor = spectrum_xyz_to_p(wavelength, attenuation);
-    let attenuation = attenuation * attenuation_factor;
-    attenuation.clamp()
 }

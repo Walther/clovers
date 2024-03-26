@@ -1,6 +1,7 @@
 use clovers::scenes::{initialize, Scene, SceneFile};
 use clovers::RenderOpts;
-use clovers_draw_cpu::draw;
+use clovers_runtime::draw_cpu::draw;
+use clovers_runtime::sampler::Sampler;
 use divan::{black_box, AllocProfiler};
 
 #[global_allocator]
@@ -26,7 +27,7 @@ fn draw_cornell(bencher: divan::Bencher) {
     bencher
         .with_inputs(get_cornell)
         .counter(1u32)
-        .bench_values(|scene| black_box(draw(OPTS, &scene)))
+        .bench_values(|scene| black_box(draw(OPTS, &scene, Sampler::Random)))
 }
 
 fn get_cornell<'scene>() -> Scene<'scene> {

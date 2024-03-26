@@ -15,11 +15,11 @@ scene:
   cargo run --bin clovers-cli --release -- --input scenes/scene.json -w 1920 -h 1080
 
 # Render all the test scenes available in the repository
-all-scenes:
+all-scenes *ARGS:
   DATE=$(date -u +%s); \
   mkdir -p renders/$DATE; \
   for scene in $(ls scenes/ |grep json); \
-  do just cli -s 1 --input scenes/$scene --output renders/$DATE/${scene%.json}.png; \
+  do just cli --input scenes/$scene --output renders/$DATE/${scene%.json}.png {{ARGS}}; \
   done;
 
 # Profiling helper
@@ -32,8 +32,8 @@ test:
   cargo nextest run --cargo-quiet
 
 # Run all benchmarks
-bench:
-  cargo bench --quiet
+bench *ARGS:
+  cargo bench --quiet {{ARGS}}
 
 # Verify no_std compatibility
 nostd:

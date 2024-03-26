@@ -6,8 +6,8 @@
 
 Currently, this project is highly experimental. Things change all the time.
 
-- `clovers/` contains the library
-- `clovers-cli/` contains the CLI application
+- `clovers/` contains the core library and types
+- `clovers-cli/` contains the CLI application & runtime
 
 The automatically built documentation is hosted at <https://walther.github.io/clovers/clovers/>.
 
@@ -43,3 +43,4 @@ Making this renderer would not have been possible without the availability of an
 - [Physically Meaningful Rendering using Tristimulus Colours](https://doi.org/10.1111/cgf.12676)
 - [Hero Wavelength Spectral Sampling](https://doi.org/10.1111/cgf.12419)
 - [How to interpret the sRGB color space](https://color.org/chardata/rgb/sRGB.pdf)
+- [Physically Based Rendering: From Theory To Implementation. 4ed](https://pbr-book.org/)

@@ -37,7 +37,6 @@
 //!
 //! You most likely want to repeat this process multiple times for each of your pixels: generating multiple samples per pixel results in a higher quality image.
 //!
-//! The library provides an opinionated [`colorize()`](colorize::colorize) function that does the steps mentioned above. Using it is optional - feel free to implement your own methods that utilize the lower-level building blocks for more creative power!
 //!
 //! ## Post processing
 //!
@@ -81,11 +80,9 @@ pub mod aabb;
 pub mod bvhnode;
 pub mod camera;
 pub mod colorinit;
-pub mod colorize;
 pub mod hitable;
 pub mod interval;
 pub mod materials;
-pub mod normals;
 pub mod objects;
 pub mod onb;
 pub mod pdf;

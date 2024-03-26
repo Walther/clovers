@@ -2,12 +2,10 @@
 
 #![allow(clippy::too_many_arguments)] // TODO: Camera::new() has a lot of arguments.
 
-use crate::wavelength::random_wavelength;
-use crate::{random::random_in_unit_disk, ray::Ray, Float, Vec3, PI};
-use crate::{Direction, Position};
+use crate::wavelength::Wavelength;
+use crate::{ray::Ray, Float, Vec3, PI};
+use crate::{Direction, Position, Vec2};
 use nalgebra::Unit;
-use rand::rngs::SmallRng;
-use rand::Rng;
 
 #[derive(Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -100,19 +98,24 @@ impl Camera {
         }
     }
 
-    // TODO: fix the mysterious (u,v) vs (s,t) change that came from the tutorial
-    /// Generates a new [Ray] from the camera, at a random location of the aperture, at a random time interval between `time_0`, `time_1` of the camera.
+    /// Generates a new [Ray] from the camera
     #[must_use]
-    pub fn get_ray(self, s: Float, t: Float, rng: &mut SmallRng) -> Ray {
+    pub fn get_ray(
+        self,
+        pixel_uv: Vec2, // pixel location in image uv coordinates, range 0..1
+        mut lens_offset: Vec2,
+        time: Float,
+        wavelength: Wavelength,
+    ) -> Ray {
+        let (x_offset, y_offset) = (pixel_uv.x, pixel_uv.y);
         // TODO: add a better defocus blur / depth of field implementation
-        let rd: Vec3 = self.lens_radius * random_in_unit_disk(rng);
-        let offset: Vec3 = *self.u * rd.x + *self.v * rd.y;
-        // Randomized time used for motion blur
-        let time: Float = rng.gen_range(self.time_0..self.time_1);
-        // Random wavelength for spectral rendering
-        let wavelength = random_wavelength(rng);
+        lens_offset.x *= &self.lens_radius;
+        lens_offset.y *= &self.lens_radius;
+        let offset: Vec3 = *self.u * lens_offset.x + *self.v * lens_offset.y;
         let direction =
-            self.lower_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset;
+            self.lower_left_corner + x_offset * self.horizontal + y_offset * self.vertical
+                - self.origin
+                - offset;
         let direction = Unit::new_normalize(direction);
         Ray {
             origin: self.origin + offset,
