@@ -23,7 +23,7 @@ clovers = { path = "../clovers", features = [
 
 # External
 blue-noise-sampler = "0.1.0"
-clap = { version = "4.5.1", features = ["std", "derive"] }
+clap = { version = "4.5.4", features = ["std", "derive"] }
 human_format = "1.1.0"
 humantime = "2.1.0"
 image = { version = "0.24.9", features = ["png"], default-features = false }
@@ -35,7 +35,7 @@ nalgebra = { version = "0.32.4" }
 palette = { version = "0.7.5", features = ["serializing"] }
 paste = { version = "1.0.14" }
 rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
-rayon = "1.9.0"
+rayon = "1.10.0"
 serde = { version = "1.0.197", features = ["derive"], default-features = false }
 serde_json = { version = "1.0", features = ["alloc"], default-features = false }
 time = { version = "0.3.34", default-features = false }
