@@ -177,8 +177,7 @@ fn parse_mesh<'scene>(
                         .unwrap()
                         .into_f32()
                         .collect();
-                    let all_normals: Option<Vec<_>> =
-                        reader.read_normals().map(Iterator::collect);
+                    let all_normals: Option<Vec<_>> = reader.read_normals().map(Iterator::collect);
                     let all_tangents: Option<Vec<_>> =
                         reader.read_tangents().map(Iterator::collect);
 
