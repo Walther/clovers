@@ -1,6 +1,6 @@
 //! Various internal helper functions for getting specific kinds of random values.
 
-use crate::{Direction, Float, Vec3, PI};
+use crate::{Direction, Float, Vec2, Vec3, PI};
 use nalgebra::Unit;
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -15,9 +15,9 @@ pub fn random_unit_vector(rng: &mut SmallRng) -> Direction {
 
 /// Internal helper.
 #[must_use]
-pub fn random_in_unit_disk(rng: &mut SmallRng) -> Vec3 {
+pub fn random_in_unit_disk(rng: &mut SmallRng) -> Vec2 {
     let v: [Float; 2] = UnitDisc.sample(rng);
-    Vec3::new(v[0], v[1], 0.0)
+    Vec2::new(v[0], v[1])
 }
 
 /// Internal helper.
