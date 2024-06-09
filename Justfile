@@ -7,7 +7,7 @@ cli *ARGS:
   cargo run --bin clovers-cli --release -- {{ARGS}}
 
 # Build and open the documentation
-docs:
+doc:
   cargo doc --no-deps --open
 
 # Render a basic test scene with default settings with the CLI
