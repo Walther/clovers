@@ -10,9 +10,10 @@ pub mod random;
 
 pub trait SamplerTrait<'scene> {
     // TODO: better types
-    fn sample(&mut self, i: i32, j: i32, index: i32) -> Sample;
+    fn sample(&mut self, i: i32, j: i32, index: i32) -> Randomness;
 
     /// Manually request a sample from the specific dimension
+    #[allow(dead_code)] // TODO: remove
     fn sample_dimension(
         &mut self,
         i: i32,
@@ -23,7 +24,7 @@ pub trait SamplerTrait<'scene> {
 }
 
 /// A collection of random values to be used for each sample. Returned as a struct to ensure the correct sampling order for the underlying source of randomness.
-pub struct Sample {
+pub struct Randomness {
     /// Intra-pixel x,y offset. Used for antialiasing.
     pub pixel_offset: Vec2,
     /// The x,y offset used in the lens equations for aperture / depth-of-field simulation

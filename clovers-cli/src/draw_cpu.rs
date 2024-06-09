@@ -16,7 +16,7 @@ use crate::colorize::colorize;
 use crate::normals::normal_map;
 use crate::sampler::blue::BlueSampler;
 use crate::sampler::random::RandomSampler;
-use crate::sampler::{Sample, Sampler, SamplerTrait};
+use crate::sampler::{Randomness, Sampler, SamplerTrait};
 
 /// The main drawing function, returns a `Vec<Srgb>` as a pixelbuffer.
 pub fn draw(opts: RenderOpts, scene: &Scene, sampler: Sampler) -> Vec<Srgb<u8>> {
@@ -67,7 +67,7 @@ fn render_pixel(
     let max_depth = opts.max_depth;
     let mut pixel_color: Xyz<E> = Xyz::new(0.0, 0.0, 0.0);
     for sample in 0..opts.samples {
-        let Sample {
+        let Randomness {
             pixel_offset,
             lens_offset,
             time,

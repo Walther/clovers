@@ -31,7 +31,7 @@ impl<'scene> BlueSampler {
 }
 
 impl<'scene> SamplerTrait<'scene> for BlueSampler {
-    fn sample(&mut self, i: i32, j: i32, index: i32) -> Sample {
+    fn sample(&mut self, i: i32, j: i32, index: i32) -> Randomness {
         let pixel_offset = Vec2::new(
             (self.get)(i, j, index, SamplerDimension::PixelOffsetX),
             (self.get)(i, j, index, SamplerDimension::PixelOffsetY),
@@ -44,7 +44,7 @@ impl<'scene> SamplerTrait<'scene> for BlueSampler {
         // TODO: verify uniformity & correctness for math?
         let wavelength = sample_wavelength((self.get)(i, j, index, SamplerDimension::Wavelength));
 
-        Sample {
+        Randomness {
             pixel_offset,
             lens_offset,
             time,
