@@ -19,9 +19,9 @@ pub struct MovingSphereInit {
     /// Used for multiple importance sampling
     #[cfg_attr(feature = "serde-derive", serde(default))]
     pub priority: bool,
-    /// Center point of the sphere at time_0
+    /// Center point of the sphere at `time_0`
     pub center_0: Position,
-    /// Center point of the sphere at time_1
+    /// Center point of the sphere at `time_1`
     pub center_1: Position,
     /// Radius of the sphere.
     pub radius: Float,
@@ -33,9 +33,9 @@ pub struct MovingSphereInit {
 #[derive(Debug, Clone)]
 /// A moving sphere object. This is represented by one `radius`, two center points `center_0` `center_1`, two times `time_0` `time_1`, and a [Material]. Any [Rays](Ray) hitting the object will also have an internal `time` value, which will be used for determining the interpolated position of the sphere at that time. With lots of rays hitting every pixel but at randomized times, we get temporal multiplexing and an approximation of perceived motion blur.
 pub struct MovingSphere<'scene> {
-    /// Center point of the sphere at time_0
+    /// Center point of the sphere at `time_0`
     pub center_0: Position,
-    /// Center point of the sphere at time_1
+    /// Center point of the sphere at `time_1`
     pub center_1: Position,
     /// Time 0
     pub time_0: Float,

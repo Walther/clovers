@@ -17,9 +17,9 @@ use crate::{
 /// A node in a tree structure defining a hierarchy of objects in a scene: a node knows its bounding box, and has two children which are also `BVHNode`s. This is used for accelerating the ray-object intersection calculation in the ray tracer. See [Bounding Volume hierarchies](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 #[derive(Debug, Clone)]
 pub struct BVHNode<'scene> {
-    /// Left child of the BVHNode
+    /// Left child of the `BVHNode`
     pub left: Box<Hitable<'scene>>,
-    /// Right child of the BVHNode
+    /// Right child of the `BVHNode`
     pub right: Box<Hitable<'scene>>,
     /// Bounding box containing both of the child nodes
     pub bounding_box: AABB,

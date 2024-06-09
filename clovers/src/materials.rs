@@ -132,7 +132,7 @@ pub struct ScatterRecord<'ray> {
     pub specular_ray: Option<Ray>,
     /// Current color to take into account when following the scattered ray for futher iterations
     pub attenuation: Xyz<E>,
-    /// Probability density function to use with the [ScatterRecord].
+    /// Probability density function to use with the [`ScatterRecord`].
     // TODO: understand & explain
     pub pdf_ptr: PDF<'ray>,
 }

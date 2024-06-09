@@ -177,10 +177,9 @@ fn parse_mesh<'scene>(
                         .unwrap()
                         .into_f32()
                         .collect();
-                    let all_normals: Option<Vec<_>> =
-                        reader.read_normals().map(core::iter::Iterator::collect);
+                    let all_normals: Option<Vec<_>> = reader.read_normals().map(Iterator::collect);
                     let all_tangents: Option<Vec<_>> =
-                        reader.read_tangents().map(core::iter::Iterator::collect);
+                        reader.read_tangents().map(Iterator::collect);
 
                     while i < len {
                         let triangle = [

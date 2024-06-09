@@ -1,6 +1,8 @@
-use clovers::{
-    colorize::colorize, normals::normal_map, ray::Ray, scenes::Scene, Float, RenderOpts,
-};
+//! An opinionated method for drawing a scene using the CPU for rendering.
+
+use clovers::wavelength::random_wavelength;
+use clovers::Vec2;
+use clovers::{ray::Ray, scenes::Scene, Float, RenderOpts};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use palette::chromatic_adaptation::AdaptInto;
 use palette::convert::IntoColorUnclamped;
@@ -10,8 +12,14 @@ use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
+use crate::colorize::colorize;
+use crate::normals::normal_map;
+use crate::sampler::blue::BlueSampler;
+use crate::sampler::random::RandomSampler;
+use crate::sampler::{Randomness, Sampler, SamplerTrait};
+
 /// The main drawing function, returns a `Vec<Srgb>` as a pixelbuffer.
-pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
+pub fn draw(opts: RenderOpts, scene: &Scene, sampler: Sampler) -> Vec<Srgb<u8>> {
     let width = opts.width as usize;
     let height = opts.height as usize;
     let bar = progress_bar(&opts);
@@ -19,14 +27,21 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
     let pixelbuffer: Vec<Srgb<u8>> = (0..height)
         .into_par_iter()
         .map(|row_index| {
+            let mut sampler_rng = SmallRng::from_entropy();
+            let mut sampler: Box<dyn SamplerTrait> = match sampler {
+                Sampler::Blue => Box::new(BlueSampler::new(&opts)),
+                Sampler::Random => Box::new(RandomSampler::new(&mut sampler_rng)),
+            };
+
             let mut rng = SmallRng::from_entropy();
             let mut row = Vec::with_capacity(width);
+
             for index in 0..width {
                 let index = index + row_index * width;
                 if opts.normalmap {
                     row.push(render_pixel_normalmap(scene, &opts, index, &mut rng));
                 } else {
-                    row.push(render_pixel(scene, &opts, index, &mut rng));
+                    row.push(render_pixel(scene, &opts, index, &mut rng, &mut *sampler));
                 }
             }
             bar.inc(1);
@@ -39,16 +54,40 @@ pub fn draw(opts: RenderOpts, scene: &Scene) -> Vec<Srgb<u8>> {
 }
 
 // Render a single pixel, including possible multisampling
-fn render_pixel(scene: &Scene, opts: &RenderOpts, index: usize, rng: &mut SmallRng) -> Srgb<u8> {
+fn render_pixel(
+    scene: &Scene,
+    opts: &RenderOpts,
+    index: usize,
+    rng: &mut SmallRng,
+    sampler: &mut dyn SamplerTrait,
+) -> Srgb<u8> {
     let (x, y, width, height) = index_to_params(opts, index);
-    let mut color: Xyz<E> = Xyz::new(0.0, 0.0, 0.0);
-    for _sample in 0..opts.samples {
-        if let Some(s) = sample(scene, x, y, width, height, rng, opts.max_depth) {
-            color += s
+    let pixel_location = Vec2::new(x, y);
+    let canvas_size = Vec2::new(width, height);
+    let max_depth = opts.max_depth;
+    let mut pixel_color: Xyz<E> = Xyz::new(0.0, 0.0, 0.0);
+    for sample in 0..opts.samples {
+        let Randomness {
+            pixel_offset,
+            lens_offset,
+            time,
+            wavelength,
+        } = sampler.sample(x as i32, y as i32, sample as i32);
+        let pixel_uv: Vec2 = Vec2::new(
+            (pixel_location.x + pixel_offset.x) / canvas_size.x,
+            (pixel_location.y + pixel_offset.y) / canvas_size.y,
+        );
+        // note get_ray wants uv 0..1 location
+        let ray: Ray = scene
+            .camera
+            .get_ray(pixel_uv, lens_offset, time, wavelength);
+        let sample_color: Xyz<E> = colorize(&ray, scene, 0, max_depth, rng, sampler);
+        if sample_color.x.is_finite() && sample_color.y.is_finite() && sample_color.z.is_finite() {
+            pixel_color += sample_color;
         }
     }
-    color /= opts.samples as Float;
-    let color: Srgb = color.adapt_into();
+    pixel_color /= opts.samples as Float;
+    let color: Srgb = pixel_color.adapt_into();
     let color: Srgb<u8> = color.into_format();
     color
 }
@@ -61,45 +100,19 @@ fn render_pixel_normalmap(
     rng: &mut SmallRng,
 ) -> Srgb<u8> {
     let (x, y, width, height) = index_to_params(opts, index);
-    let color: LinSrgb = sample_normalmap(scene, x, y, width, height, rng);
+    let color: LinSrgb = {
+        let pixel_location = Vec2::new(x / width, y / height);
+        let lens_offset = Vec2::new(0.0, 0.0);
+        let wavelength = random_wavelength(rng);
+        let time = rng.gen();
+        let ray: Ray = scene
+            .camera
+            .get_ray(pixel_location, lens_offset, time, wavelength);
+        normal_map(&ray, scene, rng)
+    };
     let color: Srgb = color.into_color_unclamped();
     let color: Srgb<u8> = color.into_format();
     color
-}
-
-// Get a single sample for a single pixel in the scene, normalmap mode.
-fn sample_normalmap(
-    scene: &Scene,
-    x: Float,
-    y: Float,
-    width: Float,
-    height: Float,
-    rng: &mut SmallRng,
-) -> LinSrgb {
-    let u = x / width;
-    let v = y / height;
-    let ray: Ray = scene.camera.get_ray(u, v, rng);
-    normal_map(&ray, scene, rng)
-}
-
-/// Get a single sample for a single pixel in the scene. Has slight jitter for antialiasing when multisampling.
-fn sample(
-    scene: &Scene,
-    x: Float,
-    y: Float,
-    width: Float,
-    height: Float,
-    rng: &mut SmallRng,
-    max_depth: u32,
-) -> Option<Xyz<E>> {
-    let u = (x + rng.gen::<Float>()) / width;
-    let v = (y + rng.gen::<Float>()) / height;
-    let ray: Ray = scene.camera.get_ray(u, v, rng);
-    let color: Xyz<E> = colorize(&ray, scene, 0, max_depth, rng);
-    if color.x.is_finite() && color.y.is_finite() && color.z.is_finite() {
-        return Some(color);
-    }
-    None
 }
 
 fn index_to_params(opts: &RenderOpts, index: usize) -> (Float, Float, Float, Float) {

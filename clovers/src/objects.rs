@@ -56,15 +56,15 @@ pub struct ObjectList {
 pub enum Object {
     /// Boxy object initializer
     Boxy(BoxyInit),
-    /// ConstantMedium object initializer
+    /// `ConstantMedium` object initializer
     ConstantMedium(ConstantMediumInit),
-    /// MovingSphere object initializer
+    /// `MovingSphere` object initializer
     MovingSphere(MovingSphereInit),
-    /// ObjectList object initializer
+    /// `ObjectList` object initializer
     ObjectList(ObjectList),
     /// Quad object initializer
     Quad(QuadInit),
-    /// RotateY object initializer
+    /// `RotateY` object initializer
     RotateY(RotateInit),
     /// Sphere object initializer
     Sphere(SphereInit),
