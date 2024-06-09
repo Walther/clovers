@@ -5,7 +5,7 @@
 // External imports
 use clap::Parser;
 use humantime::format_duration;
-use image::{ImageBuffer, ImageOutputFormat, Rgb, RgbImage};
+use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
 use img_parts::png::{Png, PngChunk};
 use std::fs::File;
 use std::io::Cursor;
@@ -164,7 +164,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     info!("Writing an image file");
 
     let mut bytes: Vec<u8> = Vec::new();
-    img.write_to(&mut Cursor::new(&mut bytes), ImageOutputFormat::Png)?;
+    img.write_to(&mut Cursor::new(&mut bytes), ImageFormat::Png)?;
     let mut png = Png::from_bytes(bytes.into())?;
 
     let comment = if normalmap {
