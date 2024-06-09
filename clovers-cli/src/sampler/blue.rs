@@ -2,7 +2,7 @@
 //!
 //! Utilizes library code from <https://github.com/Jasper-Bekkers/blue-noise-sampler>.
 
-use clovers::{wavelength::sample_wavelength, Float, RenderOpts, Vec2};
+use clovers::{wavelength::sample_wavelength, Float, RenderOpts, Vec2, PI};
 
 use super::*;
 
@@ -36,7 +36,7 @@ impl<'scene> SamplerTrait<'scene> for BlueSampler {
             (self.get)(i, j, index, SamplerDimension::PixelOffsetX),
             (self.get)(i, j, index, SamplerDimension::PixelOffsetY),
         );
-        let lens_offset = Vec2::new(
+        let lens_offset = in_unit_disk(
             (self.get)(i, j, index, SamplerDimension::LensOffsetX),
             (self.get)(i, j, index, SamplerDimension::LensOffsetY),
         );
@@ -116,3 +116,15 @@ define_blue_sampler!(spp32);
 define_blue_sampler!(spp64);
 define_blue_sampler!(spp128);
 define_blue_sampler!(spp256);
+
+/// Given two samples in range `[0..1]`, return a sample within `[-0.5 .. 0.5]` unit disk.
+/// Based on <https://stackoverflow.com/a/50746409>
+fn in_unit_disk(x: Float, y: Float) -> Vec2 {
+    // Polar coordinates + correcting for the distribution using sqrt
+    let r = x.sqrt();
+    let theta = y * 2.0 * PI;
+    // Conversion to Cartesian coordinates
+    let x = r * theta.cos();
+    let y = r * theta.sin();
+    Vec2::new(x, y)
+}

@@ -25,11 +25,11 @@ pub trait SamplerTrait<'scene> {
 
 /// A collection of random values to be used for each sample. Returned as a struct to ensure the correct sampling order for the underlying source of randomness.
 pub struct Randomness {
-    /// Intra-pixel x,y offset. Used for antialiasing.
+    /// Intra-pixel `(x,y)` offset, both in range `[0..1]`. Used for antialiasing.
     pub pixel_offset: Vec2,
-    /// The x,y offset used in the lens equations for aperture / depth-of-field simulation
+    /// The `(x,y)` offset used in the lens equations for aperture / depth-of-field simulation. The coordinates are within the range `[-0.5..0.5]` and within a unit disk.
     pub lens_offset: Vec2,
-    /// The time of the ray, in range 0..1
+    /// The time of the ray, in range `[0..1]`
     pub time: Float,
     /// Wavelength of the ray
     pub wavelength: Wavelength,
