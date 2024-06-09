@@ -7,19 +7,15 @@ cli *ARGS:
   cargo run --bin clovers-cli --release -- {{ARGS}}
 
 # Build and open the documentation
-docs:
+doc:
   cargo doc --no-deps --open
-
-# Render a basic test scene with default settings with the CLI
-scene:
-  cargo run --bin clovers-cli --release -- --input scenes/scene.json -w 1920 -h 1080
 
 # Render all the test scenes available in the repository
 all-scenes *ARGS:
   DATE=$(date -u +%s); \
   mkdir -p renders/$DATE; \
   for scene in $(ls scenes/ |grep json); \
-  do just cli --input scenes/$scene --output renders/$DATE/${scene%.json}.png {{ARGS}}; \
+  do just cli render --output renders/$DATE/${scene%.json}.png {{ARGS}} scenes/$scene; \
   done;
 
 # Profiling helper
