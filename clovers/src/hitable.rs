@@ -1,7 +1,5 @@
 //! An abstraction for things that can be hit by [Rays](crate::ray::Ray).
 
-#![allow(missing_docs)] // TODO: Lots of undocumented things for now
-
 #[cfg(feature = "stl")]
 use crate::objects::STL;
 #[cfg(feature = "gl_tf")]
@@ -51,9 +49,10 @@ impl<'a> HitRecord<'a> {
     }
 }
 
-/// An abstraction for things that can be hit by [Rays](crate::ray::Ray).
+/// Enumeration of all runtime entities that can be intersected aka "hit" by a [Ray].
 #[enum_dispatch(HitableTrait)]
 #[derive(Debug, Clone)]
+#[allow(missing_docs)]
 pub enum Hitable<'scene> {
     Boxy(Boxy<'scene>),
     BVHNode(BVHNode<'scene>),
@@ -75,6 +74,7 @@ pub enum Hitable<'scene> {
 
 // TODO: remove horrible hack
 #[derive(Debug, Clone)]
+/// Empty hitable. Cannot be hit. Exists only as an internal workaround.
 pub struct Empty {}
 
 impl HitableTrait for Empty {
@@ -109,8 +109,10 @@ impl HitableTrait for Empty {
 }
 
 #[enum_dispatch]
+/// The main trait for entities that can be intersect aka "hit" by a [Ray].
 pub trait HitableTrait {
     #[must_use]
+    /// The main intersection method.
     fn hit(
         &self,
         ray: &Ray,
@@ -120,9 +122,11 @@ pub trait HitableTrait {
     ) -> Option<HitRecord>;
 
     #[must_use]
+    /// Returns the bounding box of the entity.
     fn bounding_box(&self, t0: Float, t1: Float) -> Option<&AABB>;
 
     #[must_use]
+    /// Probability density function value method, used for multiple importance sampling.
     fn pdf_value(
         &self,
         origin: Position,
@@ -133,6 +137,7 @@ pub trait HitableTrait {
     ) -> Float;
 
     #[must_use]
+    /// Random point on the entity, used for multiple importance sampling.
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Position;
 }
 
