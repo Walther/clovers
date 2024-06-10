@@ -161,7 +161,8 @@ impl<'scene> HitableTrait for Sphere<'scene> {
     }
 
     // TODO: understand, document
-    /// Utility function from Ray Tracing: The Rest of Your Life. TODO: understand, document
+    // TODO: improve correctness & optimization!
+    /// Utility function from Ray Tracing: The Rest of Your Life.
     #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
         let offset: Position = self.center - origin;

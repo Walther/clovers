@@ -9,7 +9,7 @@ use crate::{
     wavelength::Wavelength,
     Box, Direction, Float, Position, Vec3,
 };
-use rand::{rngs::SmallRng, Rng};
+use rand::rngs::SmallRng;
 
 /// `BoxyInit` structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
 #[derive(Debug, Clone)]
@@ -127,12 +127,5 @@ impl<'scene> HitableTrait for Boxy<'scene> {
         });
 
         sum
-    }
-
-    /// Returns a random point on the box
-    #[must_use]
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Vec3 {
-        let index: usize = rng.gen_range(0..6);
-        self.sides[index].random(origin, rng)
     }
 }

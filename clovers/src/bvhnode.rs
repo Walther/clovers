@@ -212,6 +212,7 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
         }
     }
 
+    // TODO: improve correctness & optimization!
     /// Returns a random point on the surface of one of the children
     #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {

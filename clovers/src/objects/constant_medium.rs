@@ -145,11 +145,4 @@ impl<'scene> HitableTrait for ConstantMedium<'scene> {
         self.boundary
             .pdf_value(origin, direction, wavelength, time, rng)
     }
-
-    /// Returns a random point on the surface of the boundary of the fog
-    // TODO: should this return a random point inside the volume instead?
-    #[must_use]
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
-        self.boundary.random(origin, rng)
-    }
 }

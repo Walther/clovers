@@ -60,7 +60,8 @@ impl<'scene> HitableTrait for STL<'scene> {
             .pdf_value(origin, direction, wavelength, time, rng)
     }
 
-    /// Returns a random point on the ssurface of the object
+    // TODO: improve correctness & optimization!
+    /// Returns a random point on the surface of the object
     #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Vec3 {
         self.bvhnode.random(origin, rng)

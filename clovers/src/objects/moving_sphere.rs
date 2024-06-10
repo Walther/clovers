@@ -4,7 +4,6 @@ use crate::{
     aabb::AABB,
     hitable::{HitRecord, HitableTrait},
     materials::{Material, MaterialInit},
-    random::random_unit_vector,
     ray::Ray,
     wavelength::Wavelength,
     Direction, Float, Position, PI,
@@ -177,10 +176,5 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
     ) -> Float {
         // TODO: fix
         0.0
-    }
-
-    fn random(&self, _origin: Position, rng: &mut SmallRng) -> Position {
-        // FIXME: this is incorrect! does not take into account sphere size, moving sphere position
-        *random_unit_vector(rng)
     }
 }

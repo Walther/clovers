@@ -202,6 +202,7 @@ impl<'scene> HitableTrait for Triangle<'scene> {
         }
     }
 
+    // TODO: improve correctness & optimization!
     /// Returns a random point on the triangle surface
     #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {

@@ -102,10 +102,6 @@ impl HitableTrait for Empty {
     ) -> Float {
         0.0
     }
-
-    fn random(&self, _origin: Position, _rng: &mut SmallRng) -> Position {
-        panic!("Hitable::Empty::random called!")
-    }
 }
 
 #[enum_dispatch]
@@ -138,7 +134,11 @@ pub trait HitableTrait {
 
     #[must_use]
     /// Random point on the entity, used for multiple importance sampling.
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position;
+    fn random(&self, _origin: Position, _rng: &mut SmallRng) -> Position {
+        unimplemented!(
+            "HitableTrait::random called for a Hitable that has no implementation for it!"
+        );
+    }
 }
 
 /// Returns a tuple of `(front_face, normal)`. Used in lieu of `set_face_normal` in the Ray Tracing for the Rest Of Your Life book.
