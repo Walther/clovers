@@ -13,7 +13,7 @@ use crate::{
     objects::Triangle,
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, Position, Vec3,
+    Direction, Displacement, Float, Position, Vec3,
 };
 
 /// Internal STL object representation after initialization. Contains the material for all triangles in it to avoid having n copies.
@@ -63,7 +63,7 @@ impl<'scene> HitableTrait for STL<'scene> {
     // TODO: improve correctness & optimization!
     /// Returns a random point on the surface of the object
     #[must_use]
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Vec3 {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         self.bvhnode.random(origin, rng)
     }
 }

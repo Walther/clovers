@@ -9,7 +9,7 @@ use crate::{
     aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3,
     EPSILON_RECT_THICKNESS,
 };
-use crate::{Direction, Position, EPSILON_SHADOW_ACNE};
+use crate::{Direction, Displacement, Position, EPSILON_SHADOW_ACNE};
 use nalgebra::Unit;
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -205,7 +205,7 @@ impl<'scene> HitableTrait for Triangle<'scene> {
     // TODO: improve correctness & optimization!
     /// Returns a random point on the triangle surface
     #[must_use]
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         let mut a = rng.gen::<Float>();
         let mut b = rng.gen::<Float>();
         if a + b > 1.0 {

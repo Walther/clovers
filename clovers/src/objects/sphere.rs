@@ -7,7 +7,7 @@ use crate::{
     onb::ONB,
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, Position, Vec3, EPSILON_SHADOW_ACNE, PI,
+    Direction, Displacement, Float, Position, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use nalgebra::Unit;
 use rand::{rngs::SmallRng, Rng};
@@ -164,7 +164,7 @@ impl<'scene> HitableTrait for Sphere<'scene> {
     // TODO: improve correctness & optimization!
     /// Utility function from Ray Tracing: The Rest of Your Life.
     #[must_use]
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         let offset: Position = self.center - origin;
         let distance_squared: Float = offset.norm_squared();
         let uvw = ONB::build_from_w(Unit::new_normalize(offset));

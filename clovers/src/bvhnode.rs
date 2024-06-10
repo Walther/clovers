@@ -9,7 +9,7 @@ use crate::{
     hitable::{Empty, HitRecord, Hitable, HitableTrait},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Direction, Float, Position, Vec,
+    Box, Direction, Displacement, Float, Position, Vec,
 };
 
 /// Bounding Volume Hierarchy Node.
@@ -215,7 +215,7 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
     // TODO: improve correctness & optimization!
     /// Returns a random point on the surface of one of the children
     #[must_use]
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         match (&*self.left, &*self.right) {
             (_, Hitable::Empty(_)) => self.left.random(origin, rng),
             (Hitable::Empty(_), _) => self.right.random(origin, rng),

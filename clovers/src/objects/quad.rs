@@ -8,7 +8,7 @@ use crate::{
     aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
     Vec3, EPSILON_RECT_THICKNESS,
 };
-use crate::{Direction, Position, EPSILON_SHADOW_ACNE};
+use crate::{Direction, Displacement, Position, EPSILON_SHADOW_ACNE};
 use nalgebra::Unit;
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -168,7 +168,7 @@ impl<'scene> HitableTrait for Quad<'scene> {
     // TODO: improve correctness & optimization!
     /// Returns a random point on the quadrilateral surface
     #[must_use]
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         let point: Position =
             self.q + (rng.gen::<Float>() * self.u) + (rng.gen::<Float>() * self.v);
         // TODO: why point minus origin?
