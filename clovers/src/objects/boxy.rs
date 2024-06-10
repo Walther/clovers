@@ -110,7 +110,8 @@ impl<'scene> HitableTrait for Boxy<'scene> {
         Some(&self.aabb)
     }
 
-    /// Returns a probability density function value? // TODO: understand & explain
+    // TODO: improve correctness & optimization!
+    /// Returns a probability density function value?
     #[must_use]
     fn pdf_value(
         &self,
