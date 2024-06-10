@@ -169,9 +169,9 @@ impl<'scene> HitableTrait for Quad<'scene> {
     /// Returns a random point on the quadrilateral surface
     #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
-        let point: Position =
-            self.q + (rng.gen::<Float>() * self.u) + (rng.gen::<Float>() * self.v);
-        // TODO: why point minus origin?
+        let point: Position = self.q // world-coordinate corner + random distances along edge vectors
+                + (rng.gen::<Float>() * self.u)
+                + (rng.gen::<Float>() * self.v);
         point - origin
     }
 }

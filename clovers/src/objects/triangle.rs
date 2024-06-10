@@ -202,18 +202,22 @@ impl<'scene> HitableTrait for Triangle<'scene> {
         }
     }
 
-    // TODO: improve correctness & optimization!
     /// Returns a random point on the triangle surface
     #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
+        // Random square coordinate
         let mut a = rng.gen::<Float>();
         let mut b = rng.gen::<Float>();
+
+        // If we're beyond the diagonal, rotate around a point by flipping on both axes
         if a + b > 1.0 {
             a = 1.0 - a;
             b = 1.0 - b;
         }
 
-        let point: Position = self.q + (a * self.u) + (b * self.v);
+        let point: Position = self.q // world-coordinate corner + random distances along edge vectors
+            + (a * self.u)
+            + (b * self.v);
 
         point - origin
     }
