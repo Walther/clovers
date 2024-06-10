@@ -34,6 +34,7 @@ pub trait PDFTrait {
         rng: &mut SmallRng,
     ) -> Float;
 
+    // TODO: verify correctness & explain for all impls
     #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Position;
 }
