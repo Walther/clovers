@@ -118,10 +118,9 @@ pub fn colorize(
 
             // Calculate the PDF weighting for the scatter
             // TODO: improve correctness & optimization!
-            let Some(scattering_pdf) =
-                hit_record
-                    .material
-                    .scattering_pdf(&hit_record, &scatter_ray, rng)
+            let Some(scattering_pdf) = hit_record
+                .material
+                .scattering_pdf(&hit_record, &scatter_ray)
             else {
                 // No scatter, only emit
                 return emitted;

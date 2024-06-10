@@ -66,12 +66,9 @@ pub trait MaterialTrait: Debug {
     ) -> Option<ScatterRecord>;
 
     /// TODO: explain
-    fn scattering_pdf(
-        &self,
-        hit_record: &HitRecord,
-        scattered: &Ray,
-        rng: &mut SmallRng,
-    ) -> Option<Float>;
+    fn scattering_pdf(&self, _hit_record: &HitRecord, _scattered: &Ray) -> Option<Float> {
+        None
+    }
 
     /// Returns the emissivity of the material at the given position. Defaults to black as most materials don't emit - override when needed.
     fn emit(

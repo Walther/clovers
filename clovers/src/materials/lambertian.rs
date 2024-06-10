@@ -37,15 +37,10 @@ impl MaterialTrait for Lambertian {
         })
     }
 
-    /// Returns the scattering probability density function for the [Lambertian] material. TODO: explain the math
-    #[must_use]
-    fn scattering_pdf(
-        &self,
-        hit_record: &HitRecord,
-        scattered: &Ray,
-        _rng: &mut SmallRng,
-    ) -> Option<Float> {
-        // TODO: explain the math
+    /// Returns the scattering probability density function for the [Lambertian] material.
+    ///
+    /// Given the `HitRecord` normal and a scattered `Ray`, computes the dot product and normalizes by `1/pi`. If the dot product is negative, returns `None`.
+    fn scattering_pdf(&self, hit_record: &HitRecord, scattered: &Ray) -> Option<Float> {
         let cosine = hit_record.normal.dot(&scattered.direction.normalize());
         if cosine < 0.0 {
             None

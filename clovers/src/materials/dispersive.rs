@@ -117,12 +117,5 @@ impl MaterialTrait for Dispersive {
         // End copied
     }
 
-    fn scattering_pdf(
-        &self,
-        _hit_record: &HitRecord,
-        _scattered: &Ray,
-        _rng: &mut SmallRng,
-    ) -> Option<Float> {
-        None // TODO: should a dispersive material scatter? how much?
-    }
+    // TODO: should this material provide a `scattering_pdf` function?
 }
