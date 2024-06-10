@@ -160,7 +160,6 @@ impl<'scene> HitableTrait for Sphere<'scene> {
         }
     }
 
-    // TODO: understand, document
     // TODO: improve correctness & optimization!
     /// Utility function from Ray Tracing: The Rest of Your Life.
     #[must_use]

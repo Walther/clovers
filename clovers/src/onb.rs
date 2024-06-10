@@ -15,7 +15,7 @@ pub struct ONB {
     pub w: Direction,
 }
 
-// TODO: understand, explain
+// TODO: improve correctness & optimization!
 
 impl ONB {
     /// Builds a new [ONB] structure given a normal vector.
