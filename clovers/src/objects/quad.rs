@@ -165,7 +165,6 @@ impl<'scene> HitableTrait for Quad<'scene> {
         }
     }
 
-    // TODO: improve correctness & optimization!
     /// Returns a random point on the quadrilateral surface
     #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
