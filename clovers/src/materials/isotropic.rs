@@ -41,12 +41,7 @@ impl MaterialTrait for Isotropic {
 
     /// Returns the scattering probability density function for the [Isotropic] material
     #[must_use]
-    fn scattering_pdf(
-        &self,
-        _hit_record: &HitRecord,
-        _scattered: &Ray,
-        _rng: &mut SmallRng,
-    ) -> Option<Float> {
+    fn scattering_pdf(&self, _hit_record: &HitRecord, _scattered: &Ray) -> Option<Float> {
         Some(1.0 / (4.0 * PI))
     }
 }

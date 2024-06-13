@@ -95,10 +95,4 @@ impl<'scene> HitableTrait for Translate<'scene> {
         self.object
             .pdf_value(origin + self.offset, direction, wavelength, time, rng)
     }
-
-    /// Returns a random point on the surface of the moved object
-    #[must_use]
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Vec3 {
-        self.object.random(origin, rng) + self.offset
-    }
 }

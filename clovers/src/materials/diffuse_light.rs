@@ -38,17 +38,6 @@ impl MaterialTrait for DiffuseLight {
         None
     }
 
-    /// Scattering probability density function for the [`DiffuseLight`] material. Always returns 0, as diffuse light does not scatter.
-    #[must_use]
-    fn scattering_pdf(
-        &self,
-        _hit_record: &HitRecord,
-        _scattered: &Ray,
-        _rng: &mut SmallRng,
-    ) -> Option<Float> {
-        None
-    }
-
     /// Emission function for [`DiffuseLight`]. If the given [`HitRecord`] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.
     #[must_use]
     fn emit(

@@ -6,7 +6,6 @@ use alloc::vec::Vec;
 use gltf::{image::Data, Mesh, Node};
 use nalgebra::Unit;
 use rand::rngs::SmallRng;
-use rand::Rng;
 #[cfg(feature = "traces")]
 use tracing::debug;
 
@@ -109,12 +108,6 @@ impl<'scene> HitableTrait for GLTF<'scene> {
     ) -> Float {
         self.bvhnode
             .pdf_value(origin, direction, wavelength, time, rng)
-    }
-
-    /// Returns a random point on the surface of the object
-    #[must_use]
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Position {
-        self.bvhnode.random(origin, rng)
     }
 }
 
@@ -361,19 +354,6 @@ impl<'scene> HitableTrait for GLTFTriangle<'scene> {
             }
             None => 0.0,
         }
-    }
-
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Vec3 {
-        let mut a = rng.gen::<Float>();
-        let mut b = rng.gen::<Float>();
-        if a + b > 1.0 {
-            a = 1.0 - a;
-            b = 1.0 - b;
-        }
-
-        let point: Vec3 = self.q + (a * self.u) + (b * self.v);
-
-        point - origin
     }
 }
 

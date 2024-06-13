@@ -30,7 +30,7 @@ pub struct Camera {
     pub u: Direction,
     /// V
     pub v: Direction,
-    /// W
+    /// The forward direction of the camera; the difference between `look_from` and `look_at` normalized to a unit vector.
     pub w: Direction,
 }
 

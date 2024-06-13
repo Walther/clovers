@@ -178,9 +178,4 @@ impl<'scene> HitableTrait for RotateY<'scene> {
         // TODO: fix
         0.0
     }
-
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Vec3 {
-        // TODO: fix, take rotation into account
-        self.object.random(origin, rng)
-    }
 }

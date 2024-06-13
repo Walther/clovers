@@ -126,12 +126,7 @@ impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
         }
     }
 
-    fn scattering_pdf(
-        &self,
-        hit_record: &HitRecord,
-        scattered: &Ray,
-        _rng: &mut SmallRng,
-    ) -> Option<Float> {
+    fn scattering_pdf(&self, hit_record: &HitRecord, scattered: &Ray) -> Option<Float> {
         // TODO: what should this be for GLTF materials?
         // Borrowed from Lambertian
         let cosine = hit_record.normal.dot(&scattered.direction.normalize());

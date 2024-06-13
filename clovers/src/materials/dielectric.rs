@@ -75,16 +75,7 @@ impl MaterialTrait for Dielectric {
         })
     }
 
-    /// Scattering probability density function for Dielectric material. NOTE: not implemented!
-    #[must_use]
-    fn scattering_pdf(
-        &self,
-        _hit_record: &HitRecord,
-        _scattered: &Ray,
-        _rng: &mut SmallRng,
-    ) -> Option<Float> {
-        None // TODO: should a dielectric material scatter? how much?
-    }
+    // TODO: should this material provide a `scattering_pdf` function?
 }
 
 impl Dielectric {

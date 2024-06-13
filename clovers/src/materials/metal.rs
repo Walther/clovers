@@ -49,16 +49,7 @@ impl MaterialTrait for Metal {
         })
     }
 
-    /// Scattering probability density function for [Metal]. Always returns zero. TODO: why?
-    #[must_use]
-    fn scattering_pdf(
-        &self,
-        _hit_record: &HitRecord,
-        _scattered: &Ray,
-        _rng: &mut SmallRng,
-    ) -> Option<Float> {
-        None // TODO: why does metal never scatter? should it scatter if fuzzy?
-    }
+    // TODO: should this material provide a `scattering_pdf` function?
 }
 
 impl Metal {

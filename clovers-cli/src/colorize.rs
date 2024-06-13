@@ -85,21 +85,30 @@ pub fn colorize(
             specular * attenuation
         }
         MaterialType::Diffuse => {
-            // Use a probability density function to figure out where to scatter a new ray
-            // TODO: this weighed priority sampling should be adjusted or removed - doesn't feel ideal.
+            // Multiple Importance Sampling:
+
+            // Create a new PDF object from the priority hitables of the scene, given the current hit_record position
             let light_ptr = PDF::HitablePDF(HitablePDF::new(
                 &scene.priority_hitables,
                 hit_record.position,
             ));
+
+            // Create a mixture PDF from the above + the PDF from the scatter_record
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);
-            let direction = mixture_pdf.generate(rng);
-            let direction = Unit::new_normalize(direction);
+
+            // Generate a direction for the scattering ray to go towards, weighed by the mixture PDF
+            let direction = Unit::new_normalize(mixture_pdf.generate(rng));
+
+            // Create the ray
             let scatter_ray = Ray {
                 origin: hit_record.position,
                 direction,
                 time: ray.time,
                 wavelength: ray.wavelength,
             };
+
+            // Get the distribution value for the PDF
+            // TODO: improve correctness & optimization!
             let pdf_val = mixture_pdf.value(scatter_ray.direction, ray.wavelength, ray.time, rng);
             if pdf_val <= 0.0 {
                 // scattering impossible, prevent division by zero below
@@ -107,11 +116,11 @@ pub fn colorize(
                 return emitted;
             }
 
-            // Calculate the PDF weighting for the scatter // TODO: understand the literature for this, and explain
-            let Some(scattering_pdf) =
-                hit_record
-                    .material
-                    .scattering_pdf(&hit_record, &scatter_ray, rng)
+            // Calculate the PDF weighting for the scatter
+            // TODO: improve correctness & optimization!
+            let Some(scattering_pdf) = hit_record
+                .material
+                .scattering_pdf(&hit_record, &scatter_ray)
             else {
                 // No scatter, only emit
                 return emitted;
