@@ -1,11 +1,10 @@
-use std::f32::{INFINITY, NEG_INFINITY};
-
 use clovers::hitable::HitableTrait;
 use clovers::materials::Material;
 use clovers::objects::Triangle;
 use clovers::random::random_unit_vector;
 use clovers::ray::Ray;
 use clovers::wavelength::random_wavelength;
+use clovers::Float;
 use clovers::Vec3;
 use divan::black_box;
 use divan::AllocProfiler;
@@ -39,7 +38,7 @@ fn hit(bencher: divan::Bencher) {
         .bench_values(|(triangle, ray, mut rng)| {
             black_box(
                 triangle
-                    .hit(&ray, NEG_INFINITY, INFINITY, &mut rng)
+                    .hit(&ray, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
                     .is_some(),
             )
         })
