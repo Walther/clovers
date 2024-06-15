@@ -165,7 +165,7 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
         // Did we hit neither of the child nodes, one of them, or both?
         // Return the closest thing we hit
         match (&hit_left, &hit_right) {
-            (None, None) => None, // In theory, this case should not be reachable
+            (None, None) => None,
             (None, Some(_)) => hit_right,
             (Some(_), None) => hit_left,
             (Some(left), Some(right)) => {
