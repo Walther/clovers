@@ -2,7 +2,7 @@
 
 use clovers::wavelength::random_wavelength;
 use clovers::Vec2;
-use clovers::{ray::Ray, scenes::Scene, Float, RenderOpts};
+use clovers::{ray::Ray, scenes::Scene, Float};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use palette::chromatic_adaptation::AdaptInto;
 use palette::convert::IntoColorUnclamped;
@@ -14,22 +14,41 @@ use rayon::prelude::*;
 
 use crate::colorize::colorize;
 use crate::normals::normal_map;
+use crate::render::{RenderMode, RenderOptions};
 use crate::sampler::blue::BlueSampler;
 use crate::sampler::random::RandomSampler;
 use crate::sampler::{Randomness, Sampler, SamplerTrait};
+use crate::GlobalOptions;
 
 /// The main drawing function, returns a `Vec<Srgb>` as a pixelbuffer.
-pub fn draw(opts: RenderOpts, scene: &Scene, sampler: Sampler) -> Vec<Srgb<u8>> {
-    let width = opts.width as usize;
-    let height = opts.height as usize;
-    let bar = progress_bar(&opts);
+pub fn draw(
+    global_options: &GlobalOptions,
+    render_options: &RenderOptions,
+    scene: &Scene,
+    _sampler: Sampler,
+) -> Vec<Srgb<u8>> {
+    let GlobalOptions { debug: _, quiet } = *global_options;
+    let RenderOptions {
+        input: _,
+        output: _,
+        width,
+        height,
+        samples,
+        max_depth: _,
+        mode,
+        sampler,
+    } = *render_options;
+    let bar = progress_bar(height, quiet);
+
+    let height = height as usize;
+    let width = width as usize;
 
     let pixelbuffer: Vec<Srgb<u8>> = (0..height)
         .into_par_iter()
         .map(|row_index| {
             let mut sampler_rng = SmallRng::from_entropy();
             let mut sampler: Box<dyn SamplerTrait> = match sampler {
-                Sampler::Blue => Box::new(BlueSampler::new(&opts)),
+                Sampler::Blue => Box::new(BlueSampler::new(samples)),
                 Sampler::Random => Box::new(RandomSampler::new(&mut sampler_rng)),
             };
 
@@ -38,11 +57,25 @@ pub fn draw(opts: RenderOpts, scene: &Scene, sampler: Sampler) -> Vec<Srgb<u8>> 
 
             for index in 0..width {
                 let index = index + row_index * width;
-                if opts.normalmap {
-                    row.push(render_pixel_normalmap(scene, &opts, index, &mut rng));
-                } else {
-                    row.push(render_pixel(scene, &opts, index, &mut rng, &mut *sampler));
-                }
+                match mode {
+                    RenderMode::Default => {
+                        row.push(render_pixel(
+                            scene,
+                            render_options,
+                            index,
+                            &mut rng,
+                            &mut *sampler,
+                        ));
+                    }
+                    RenderMode::NormalMap => {
+                        row.push(render_pixel_normalmap(
+                            scene,
+                            render_options,
+                            index,
+                            &mut rng,
+                        ));
+                    }
+                };
             }
             bar.inc(1);
             row
@@ -56,7 +89,7 @@ pub fn draw(opts: RenderOpts, scene: &Scene, sampler: Sampler) -> Vec<Srgb<u8>> 
 // Render a single pixel, including possible multisampling
 fn render_pixel(
     scene: &Scene,
-    opts: &RenderOpts,
+    opts: &RenderOptions,
     index: usize,
     rng: &mut SmallRng,
     sampler: &mut dyn SamplerTrait,
@@ -95,7 +128,7 @@ fn render_pixel(
 // Render a single pixel in normalmap mode
 fn render_pixel_normalmap(
     scene: &Scene,
-    opts: &RenderOpts,
+    opts: &RenderOptions,
     index: usize,
     rng: &mut SmallRng,
 ) -> Srgb<u8> {
@@ -115,7 +148,7 @@ fn render_pixel_normalmap(
     color
 }
 
-fn index_to_params(opts: &RenderOpts, index: usize) -> (Float, Float, Float, Float) {
+fn index_to_params(opts: &RenderOptions, index: usize) -> (Float, Float, Float, Float) {
     let x = (index % (opts.width as usize)) as Float;
     let y = (index / (opts.width as usize)) as Float;
     let width = opts.width as Float;
@@ -123,9 +156,9 @@ fn index_to_params(opts: &RenderOpts, index: usize) -> (Float, Float, Float, Flo
     (x, y, width, height)
 }
 
-fn progress_bar(opts: &RenderOpts) -> ProgressBar {
-    let bar = ProgressBar::new(opts.height as u64);
-    if opts.quiet {
+fn progress_bar(height: u32, quiet: bool) -> ProgressBar {
+    let bar = ProgressBar::new(height as u64);
+    if quiet {
         bar.set_draw_target(ProgressDrawTarget::hidden())
     } else {
         bar.set_style(ProgressStyle::default_bar().template(

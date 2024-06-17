@@ -1,5 +1,4 @@
-use clap::Args;
-use clovers::RenderOpts;
+use clap::{Args, ValueEnum};
 use humantime::format_duration;
 use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
 use img_parts::png::{Png, PngChunk};
@@ -11,49 +10,62 @@ use time::OffsetDateTime;
 use tracing::{debug, info, Level};
 use tracing_subscriber::fmt::time::UtcTime;
 
+use crate::draw_cpu;
+use crate::json_scene::initialize;
 use crate::sampler::Sampler;
-use crate::{draw_cpu, json_scene, GlobalOptions};
+use crate::GlobalOptions;
 
 #[derive(Args, Debug)]
-pub struct RenderParams {
+pub struct RenderOptions {
     /// Input filename / location
     #[arg()]
-    input: String,
+    pub input: String,
     /// Output filename / location. [default: ./renders/unix_timestamp.png]
     #[arg(short, long)]
-    output: Option<String>,
+    pub output: Option<String>,
     /// Width of the image in pixels.
     #[arg(short, long, default_value = "1024")]
-    width: u32,
+    pub width: u32,
     /// Height of the image in pixels.
     #[arg(short, long, default_value = "1024")]
-    height: u32,
+    pub height: u32,
     /// Number of samples to generate per each pixel.
     #[arg(short, long, default_value = "64")]
-    samples: u32,
+    pub samples: u32,
     /// Maximum evaluated bounce depth for each ray.
     #[arg(short = 'd', long, default_value = "64")]
-    max_depth: u32,
-    /// Render a normal map only.
-    #[arg(long)]
-    normalmap: bool,
+    pub max_depth: u32,
+    /// Rendering mode.
+    #[arg(short = 'm', long, default_value = "default")]
+    pub mode: RenderMode,
     /// Sampler to use for rendering.
     #[arg(long, default_value = "random")]
-    sampler: Sampler,
+    pub sampler: Sampler,
 }
 
-pub(crate) fn render(opts: GlobalOptions, params: RenderParams) -> Result<(), Box<dyn Error>> {
-    let GlobalOptions { quiet, debug } = opts;
-    let RenderParams {
-        input,
-        output,
+#[derive(Copy, Clone, Debug, PartialEq, ValueEnum)]
+pub enum RenderMode {
+    Default,
+    NormalMap,
+}
+
+// CLI usage somehow not detected
+#[allow(dead_code)]
+pub(crate) fn render(
+    global_options: GlobalOptions,
+    render_options: RenderOptions,
+) -> Result<(), Box<dyn Error>> {
+    let GlobalOptions { quiet, debug } = global_options;
+    let RenderOptions {
+        ref input,
+        ref output,
         width,
         height,
         samples,
         max_depth,
-        normalmap,
+        mode,
         sampler,
-    } = params;
+    } = render_options;
 
     if debug {
         tracing_subscriber::fmt()
@@ -73,7 +85,7 @@ pub(crate) fn render(opts: GlobalOptions, params: RenderParams) -> Result<(), Bo
         println!("clovers 🍀 path tracing renderer");
         println!();
         println!("{width}x{height} resolution");
-        if normalmap {
+        if mode == RenderMode::NormalMap {
             println!("rendering a normalmap");
         } else {
             println!("{samples} samples per pixel");
@@ -87,21 +99,13 @@ pub(crate) fn render(opts: GlobalOptions, params: RenderParams) -> Result<(), Bo
         panic!("the blue sampler only supports the following sample-per-pixel counts: [1, 2, 4, 8, 16, 32, 64, 128, 256]");
     }
 
-    let renderopts: RenderOpts = RenderOpts {
-        width,
-        height,
-        samples,
-        max_depth,
-        quiet,
-        normalmap,
-    };
     let threads = std::thread::available_parallelism()?;
 
     info!("Reading the scene file");
     let path = Path::new(&input);
     let scene = match path.extension() {
         Some(ext) => match &ext.to_str() {
-            Some("json") => json_scene::initialize(path, width, height),
+            Some("json") => initialize(path, width, height),
             _ => panic!("Unknown file type"),
         },
         None => panic!("Unknown file type"),
@@ -109,7 +113,7 @@ pub(crate) fn render(opts: GlobalOptions, params: RenderParams) -> Result<(), Bo
 
     info!("Calling draw()");
     let start = Instant::now();
-    let pixelbuffer = draw_cpu::draw(renderopts, &scene, sampler);
+    let pixelbuffer = draw_cpu::draw(&global_options, &render_options, &scene, sampler);
     info!("Drawing a pixelbuffer finished");
 
     info!("Converting pixelbuffer to an image");
@@ -138,10 +142,9 @@ pub(crate) fn render(opts: GlobalOptions, params: RenderParams) -> Result<(), Bo
     img.write_to(&mut Cursor::new(&mut bytes), ImageFormat::Png)?;
     let mut png = Png::from_bytes(bytes.into())?;
 
-    let comment = if normalmap {
-        format!("Comment\0{input} rendered with the clovers raytracing engine at {width}x{height} in normalmap mode. finished render in {formatted_duration}, using {threads} threads")
-    } else {
-        format!("Comment\0{input} rendered with the clovers raytracing engine at {width}x{height}, {samples} samples per pixel, {max_depth} max ray bounce depth. finished render in {formatted_duration}, using {threads} threads")
+    let comment = match mode {
+        RenderMode::Default => format!("Comment\0{input} rendered with the clovers raytracing engine at {width}x{height}, {samples} samples per pixel, {max_depth} max ray bounce depth. finished render in {formatted_duration}, using {threads} threads"),
+        RenderMode::NormalMap => format!("Comment\0{input} rendered with the clovers raytracing engine at {width}x{height} in normalmap mode. finished render in {formatted_duration}, using {threads} threads"),
     };
     let software = "Software\0https://github.com/walther/clovers".to_string();
 
@@ -152,7 +155,7 @@ pub(crate) fn render(opts: GlobalOptions, params: RenderParams) -> Result<(), Bo
     }
 
     let target = match output {
-        Some(filename) => filename,
+        Some(filename) => filename.to_owned(),
         None => {
             // Default to using a timestamp & `renders/` directory
             let timestamp = OffsetDateTime::now_utc().unix_timestamp();

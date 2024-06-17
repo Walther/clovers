@@ -18,8 +18,6 @@ const OPTS: RenderOpts = RenderOpts {
     height: HEIGHT,
     samples: 1,
     max_depth: 100,
-    quiet: true,
-    normalmap: false,
 };
 
 #[divan::bench]

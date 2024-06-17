@@ -93,24 +93,6 @@ pub mod spectrum;
 pub mod textures;
 pub mod wavelength;
 
-/// Rendering options struct
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct RenderOpts {
-    /// Width of the render in pixels
-    pub width: u32,
-    /// Height of the render in pixels
-    pub height: u32,
-    /// Samples per pixel to render for multisampling. Higher number implies higher quality.
-    pub samples: u32,
-    /// Maximum ray bounce depth. Higher number implies higher quality.
-    pub max_depth: u32,
-    /// Optionally, suppress CLI output
-    pub quiet: bool,
-    /// Experimental render mode: return a normal map only instead of doing a full path trace render.
-    pub normalmap: bool,
-}
-
 // Handy aliases for internal use
 
 /// Internal type alias: this allows the crate to easily switch between float precision without modifying a lot of files.

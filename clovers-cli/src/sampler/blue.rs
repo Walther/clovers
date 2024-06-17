@@ -2,7 +2,7 @@
 //!
 //! Utilizes library code from <https://github.com/Jasper-Bekkers/blue-noise-sampler>.
 
-use clovers::{wavelength::sample_wavelength, Float, RenderOpts, Vec2, PI};
+use clovers::{wavelength::sample_wavelength, Float, Vec2, PI};
 
 use super::*;
 
@@ -10,9 +10,9 @@ pub struct BlueSampler {
     get: fn(i32, i32, i32, SamplerDimension) -> Float,
 }
 
-impl<'scene> BlueSampler {
-    pub fn new(opts: &'scene RenderOpts) -> Self {
-        let get = match opts.samples {
+impl BlueSampler {
+    pub fn new(samples: u32) -> Self {
+        let get = match samples {
             1 => blue_sample_spp1,
             2 => blue_sample_spp2,
             4 => blue_sample_spp4,

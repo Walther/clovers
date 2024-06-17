@@ -6,7 +6,7 @@ use std::path::Path;
 
 use tracing::info;
 
-pub(crate) fn initialize<'scene>(
+pub fn initialize<'scene>(
     path: &Path,
     width: u32,
     height: u32,
