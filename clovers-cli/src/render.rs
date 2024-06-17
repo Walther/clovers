@@ -47,6 +47,7 @@ pub struct RenderOptions {
 pub enum RenderMode {
     Default,
     NormalMap,
+    BvhDepth,
 }
 
 // CLI usage somehow not detected
@@ -142,10 +143,18 @@ pub(crate) fn render(
     img.write_to(&mut Cursor::new(&mut bytes), ImageFormat::Png)?;
     let mut png = Png::from_bytes(bytes.into())?;
 
-    let comment = match mode {
-        RenderMode::Default => format!("Comment\0{input} rendered with the clovers raytracing engine at {width}x{height}, {samples} samples per pixel, {max_depth} max ray bounce depth. finished render in {formatted_duration}, using {threads} threads"),
-        RenderMode::NormalMap => format!("Comment\0{input} rendered with the clovers raytracing engine at {width}x{height} in normalmap mode. finished render in {formatted_duration}, using {threads} threads"),
+    let common = format!(
+        "Comment\0Rendered with the clovers path tracing engine. Scene file {input} rendered using the {mode:?} rendering mode at {width}x{height} resolution"
+    );
+    let details = match mode {
+        RenderMode::Default => {
+            format!(", {samples} samples per pixel, {max_depth} max ray bounce depth.")
+        }
+        _ => ".".to_owned(),
     };
+    let stats = format!("Rendering finished in {formatted_duration}, using {threads} threads.");
+    let comment = format!("{common}{details} {stats}");
+
     let software = "Software\0https://github.com/walther/clovers".to_string();
 
     for metadata in [comment, software] {

@@ -12,6 +12,7 @@ use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
+use crate::bvhdepth::bvh_depth;
 use crate::colorize::colorize;
 use crate::normals::normal_map;
 use crate::render::{RenderMode, RenderOptions};
@@ -57,25 +58,18 @@ pub fn draw(
 
             for index in 0..width {
                 let index = index + row_index * width;
-                match mode {
+                let pixel = match mode {
                     RenderMode::Default => {
-                        row.push(render_pixel(
-                            scene,
-                            render_options,
-                            index,
-                            &mut rng,
-                            &mut *sampler,
-                        ));
+                        render_pixel(scene, render_options, index, &mut rng, &mut *sampler)
                     }
                     RenderMode::NormalMap => {
-                        row.push(render_pixel_normalmap(
-                            scene,
-                            render_options,
-                            index,
-                            &mut rng,
-                        ));
+                        render_pixel_normalmap(scene, render_options, index, &mut rng)
+                    }
+                    RenderMode::BvhDepth => {
+                        render_pixel_bvhdepth(scene, render_options, index, &mut rng, &mut *sampler)
                     }
                 };
+                row.push(pixel);
             }
             bar.inc(1);
             row
@@ -143,6 +137,29 @@ fn render_pixel_normalmap(
             .get_ray(pixel_location, lens_offset, time, wavelength);
         normal_map(&ray, scene, rng)
     };
+    let color: Srgb = color.into_color_unclamped();
+    let color: Srgb<u8> = color.into_format();
+    color
+}
+
+// Render a single pixel in bvh depth visualization mode
+fn render_pixel_bvhdepth(
+    scene: &Scene,
+    render_options: &RenderOptions,
+    index: usize,
+    rng: &mut SmallRng,
+    _sampler: &mut dyn SamplerTrait,
+) -> Srgb<u8> {
+    let (x, y, width, height) = index_to_params(render_options, index);
+    let pixel_location = Vec2::new(x / width, y / height);
+    let lens_offset = Vec2::new(0.0, 0.0);
+    let wavelength = random_wavelength(rng);
+    let time = rng.gen();
+    let ray: Ray = scene
+        .camera
+        .get_ray(pixel_location, lens_offset, time, wavelength);
+
+    let color: LinSrgb = { bvh_depth(&ray, scene, rng) };
     let color: Srgb = color.into_color_unclamped();
     let color: Srgb<u8> = color.into_format();
     color

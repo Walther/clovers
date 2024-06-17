@@ -143,6 +143,70 @@ impl<'scene> BVHNode<'scene> {
     }
 }
 
+impl<'scene> BVHNode<'scene> {
+    /// Alternate hit method that maintains a depth count for the BVH traversals.
+    pub fn hit_depthcount(
+        &self,
+        depth: &mut usize,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        rng: &mut SmallRng,
+    ) -> (Option<HitRecord>, usize) {
+        *depth += 1;
+
+        // If we do not hit the bounding box of current node, early return None
+        if !self.bounding_box.hit(ray, distance_min, distance_max) {
+            return (None, *depth);
+        }
+
+        // Otherwise we have hit the bounding box of this node, recurse to child nodes
+        let hit_left = match &*self.left {
+            Hitable::BVHNode(bvh) => {
+                bvh.hit_depthcount(depth, ray, distance_min, distance_max, rng)
+            }
+            Hitable::STL(s) => {
+                s.bvhnode
+                    .hit_depthcount(depth, ray, distance_min, distance_max, rng)
+            }
+            Hitable::GLTF(g) => {
+                g.bvhnode
+                    .hit_depthcount(depth, ray, distance_min, distance_max, rng)
+            }
+            _ => (self.left.hit(ray, distance_min, distance_max, rng), *depth),
+        };
+
+        let hit_right = match &*self.right {
+            Hitable::BVHNode(bvh) => {
+                bvh.hit_depthcount(depth, ray, distance_min, distance_max, rng)
+            }
+            Hitable::STL(s) => {
+                s.bvhnode
+                    .hit_depthcount(depth, ray, distance_min, distance_max, rng)
+            }
+            Hitable::GLTF(g) => {
+                g.bvhnode
+                    .hit_depthcount(depth, ray, distance_min, distance_max, rng)
+            }
+            _ => (self.right.hit(ray, distance_min, distance_max, rng), *depth),
+        };
+
+        // Did we hit neither of the child nodes, one of them, or both?
+        // Return the closest thing we hit
+        match (&hit_left.0, &hit_right.0) {
+            (None, None) => (None, *depth),
+            (None, Some(_)) => hit_right,
+            (Some(_), None) => hit_left,
+            (Some(left), Some(right)) => {
+                if left.distance < right.distance {
+                    return hit_left;
+                }
+                hit_right
+            }
+        }
+    }
+}
+
 impl<'scene> HitableTrait for BVHNode<'scene> {
     /// The main `hit` function for a [`BVHNode`]. Given a [Ray], and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the encased objects during that interval.
     #[must_use]
