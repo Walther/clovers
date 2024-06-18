@@ -145,7 +145,7 @@ impl<'scene> BVHNode<'scene> {
 
 impl<'scene> BVHNode<'scene> {
     /// Alternate hit method that maintains a depth count for the BVH traversals.
-    pub fn hit_depthcount(
+    pub fn bvh_testcount(
         &self,
         depth: &mut usize,
         ray: &Ray,
@@ -162,31 +162,25 @@ impl<'scene> BVHNode<'scene> {
 
         // Otherwise we have hit the bounding box of this node, recurse to child nodes
         let hit_left = match &*self.left {
-            Hitable::BVHNode(bvh) => {
-                bvh.hit_depthcount(depth, ray, distance_min, distance_max, rng)
-            }
-            Hitable::STL(s) => {
-                s.bvhnode
-                    .hit_depthcount(depth, ray, distance_min, distance_max, rng)
-            }
+            Hitable::BVHNode(bvh) => bvh.bvh_testcount(depth, ray, distance_min, distance_max, rng),
+            Hitable::STL(s) => s
+                .bvhnode
+                .bvh_testcount(depth, ray, distance_min, distance_max, rng),
             Hitable::GLTF(g) => {
                 g.bvhnode
-                    .hit_depthcount(depth, ray, distance_min, distance_max, rng)
+                    .bvh_testcount(depth, ray, distance_min, distance_max, rng)
             }
             _ => (self.left.hit(ray, distance_min, distance_max, rng), *depth),
         };
 
         let hit_right = match &*self.right {
-            Hitable::BVHNode(bvh) => {
-                bvh.hit_depthcount(depth, ray, distance_min, distance_max, rng)
-            }
-            Hitable::STL(s) => {
-                s.bvhnode
-                    .hit_depthcount(depth, ray, distance_min, distance_max, rng)
-            }
+            Hitable::BVHNode(bvh) => bvh.bvh_testcount(depth, ray, distance_min, distance_max, rng),
+            Hitable::STL(s) => s
+                .bvhnode
+                .bvh_testcount(depth, ray, distance_min, distance_max, rng),
             Hitable::GLTF(g) => {
                 g.bvhnode
-                    .hit_depthcount(depth, ray, distance_min, distance_max, rng)
+                    .bvh_testcount(depth, ray, distance_min, distance_max, rng)
             }
             _ => (self.right.hit(ray, distance_min, distance_max, rng), *depth),
         };

@@ -1,26 +1,27 @@
-//! Alternative rendering method. Visualizes the BVH traversal's depth
+//! Alternative rendering methods for debug visualization purposes.
 
 use clovers::{ray::Ray, scenes::Scene, Float, EPSILON_SHADOW_ACNE};
 use palette::LinSrgb;
 use rand::rngs::SmallRng;
 
+/// Visualizes the BVH traversal count - how many BVH nodes needed to be tested for intersection?
 #[must_use]
-pub fn bvh_depth(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinSrgb {
+pub fn bvh_testcount(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinSrgb {
     let mut depth = 0;
     let depth =
         match scene
             .hitables
-            .hit_depthcount(&mut depth, ray, EPSILON_SHADOW_ACNE, Float::MAX, rng)
+            .bvh_testcount(&mut depth, ray, EPSILON_SHADOW_ACNE, Float::MAX, rng)
         {
             (Some(_), depth) => depth,
             (None, depth) => depth,
         };
 
-    bvh_depth_to_color(depth)
+    bvh_testcount_to_color(depth)
 }
 
 #[must_use]
-pub fn bvh_depth_to_color(depth: usize) -> LinSrgb {
+pub fn bvh_testcount_to_color(depth: usize) -> LinSrgb {
     match depth {
         // under 256, grayscale
         0..=255 => {

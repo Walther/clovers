@@ -47,7 +47,7 @@ pub struct RenderOptions {
 pub enum RenderMode {
     Default,
     NormalMap,
-    BvhDepth,
+    BvhTestCount,
 }
 
 // CLI usage somehow not detected

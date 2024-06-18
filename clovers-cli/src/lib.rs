@@ -2,8 +2,8 @@
 
 use clap::Args;
 
-pub mod bvhdepth;
 pub mod colorize;
+pub mod debug_visualizations;
 pub mod draw_cpu;
 pub mod json_scene;
 pub mod normals;

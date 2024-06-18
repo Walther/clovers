@@ -12,8 +12,8 @@ use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
-use crate::bvhdepth::bvh_depth;
 use crate::colorize::colorize;
+use crate::debug_visualizations::bvh_testcount;
 use crate::normals::normal_map;
 use crate::render::{RenderMode, RenderOptions};
 use crate::sampler::blue::BlueSampler;
@@ -65,9 +65,13 @@ pub fn draw(
                     RenderMode::NormalMap => {
                         render_pixel_normalmap(scene, render_options, index, &mut rng)
                     }
-                    RenderMode::BvhDepth => {
-                        render_pixel_bvhdepth(scene, render_options, index, &mut rng, &mut *sampler)
-                    }
+                    RenderMode::BvhTestCount => render_pixel_bvhtestcount(
+                        scene,
+                        render_options,
+                        index,
+                        &mut rng,
+                        &mut *sampler,
+                    ),
                 };
                 row.push(pixel);
             }
@@ -143,7 +147,7 @@ fn render_pixel_normalmap(
 }
 
 // Render a single pixel in bvh depth visualization mode
-fn render_pixel_bvhdepth(
+fn render_pixel_bvhtestcount(
     scene: &Scene,
     render_options: &RenderOptions,
     index: usize,
@@ -159,7 +163,7 @@ fn render_pixel_bvhdepth(
         .camera
         .get_ray(pixel_location, lens_offset, time, wavelength);
 
-    let color: LinSrgb = { bvh_depth(&ray, scene, rng) };
+    let color: LinSrgb = { bvh_testcount(&ray, scene, rng) };
     let color: Srgb = color.into_color_unclamped();
     let color: Srgb<u8> = color.into_format();
     color

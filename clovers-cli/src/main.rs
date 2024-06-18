@@ -11,9 +11,9 @@ use std::error::Error;
 // Internal imports
 use clovers::*;
 #[doc(hidden)]
-pub mod bvhdepth;
-#[doc(hidden)]
 mod colorize;
+#[doc(hidden)]
+pub mod debug_visualizations;
 #[doc(hidden)]
 mod draw_cpu;
 #[doc(hidden)]
