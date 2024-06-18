@@ -45,7 +45,3 @@ tracing-subscriber = { version = "0.3.18", features = ["time"] }
 [dev-dependencies]
 divan = "0.1.14"
 proptest = "1"
-
-[[bench]]
-name = "draw_cpu"
-harness = false
