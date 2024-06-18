@@ -170,7 +170,7 @@ fn render_pixel_bvhtestcount(
         .camera
         .get_ray(pixel_location, lens_offset, time, wavelength);
 
-    let color: LinSrgb = { bvh_testcount(&ray, scene, rng) };
+    let color: LinSrgb = { bvh_testcount(&ray, scene) };
     let color: Srgb = color.into_color_unclamped();
     let color: Srgb<u8> = color.into_format();
     color
