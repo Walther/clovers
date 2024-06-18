@@ -48,6 +48,7 @@ pub enum RenderMode {
     Default,
     NormalMap,
     BvhTestCount,
+    PrimitiveTestCount,
 }
 
 // CLI usage somehow not detected

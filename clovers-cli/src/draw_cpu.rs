@@ -13,7 +13,7 @@ use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
 use crate::colorize::colorize;
-use crate::debug_visualizations::bvh_testcount;
+use crate::debug_visualizations::{bvh_testcount, primitive_testcount};
 use crate::normals::normal_map;
 use crate::render::{RenderMode, RenderOptions};
 use crate::sampler::blue::BlueSampler;
@@ -66,6 +66,13 @@ pub fn draw(
                         render_pixel_normalmap(scene, render_options, index, &mut rng)
                     }
                     RenderMode::BvhTestCount => render_pixel_bvhtestcount(
+                        scene,
+                        render_options,
+                        index,
+                        &mut rng,
+                        &mut *sampler,
+                    ),
+                    RenderMode::PrimitiveTestCount => render_pixel_primitivetestcount(
                         scene,
                         render_options,
                         index,
@@ -146,7 +153,7 @@ fn render_pixel_normalmap(
     color
 }
 
-// Render a single pixel in bvh depth visualization mode
+// Render a single pixel in bvh test count visualization mode
 fn render_pixel_bvhtestcount(
     scene: &Scene,
     render_options: &RenderOptions,
@@ -164,6 +171,29 @@ fn render_pixel_bvhtestcount(
         .get_ray(pixel_location, lens_offset, time, wavelength);
 
     let color: LinSrgb = { bvh_testcount(&ray, scene, rng) };
+    let color: Srgb = color.into_color_unclamped();
+    let color: Srgb<u8> = color.into_format();
+    color
+}
+
+// Render a single pixel in primitive test count visualization mode
+fn render_pixel_primitivetestcount(
+    scene: &Scene,
+    render_options: &RenderOptions,
+    index: usize,
+    rng: &mut SmallRng,
+    _sampler: &mut dyn SamplerTrait,
+) -> Srgb<u8> {
+    let (x, y, width, height) = index_to_params(render_options, index);
+    let pixel_location = Vec2::new(x / width, y / height);
+    let lens_offset = Vec2::new(0.0, 0.0);
+    let wavelength = random_wavelength(rng);
+    let time = rng.gen();
+    let ray: Ray = scene
+        .camera
+        .get_ray(pixel_location, lens_offset, time, wavelength);
+
+    let color: LinSrgb = { primitive_testcount(&ray, scene, rng) };
     let color: Srgb = color.into_color_unclamped();
     let color: Srgb<u8> = color.into_format();
     color

@@ -144,7 +144,7 @@ impl<'scene> BVHNode<'scene> {
 }
 
 impl<'scene> BVHNode<'scene> {
-    /// Alternate hit method that maintains a depth count for the BVH traversals.
+    /// Alternate hit method that maintains a test count for the BVH traversals.
     pub fn bvh_testcount(
         &self,
         depth: &mut usize,
@@ -197,6 +197,81 @@ impl<'scene> BVHNode<'scene> {
                 }
                 hit_right
             }
+        }
+    }
+
+    /// Alternate hit method that maintains a test count for the primitives
+    pub fn primitive_testcount(
+        &'scene self,
+        count: &mut usize,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        rng: &mut SmallRng,
+    ) {
+        // If we do not hit the bounding box of current node, early return None
+        if !self.bounding_box.hit(ray, distance_min, distance_max) {
+            return;
+        }
+
+        // Otherwise we have hit the bounding box of this node, recurse to child nodes
+        Self::primitive_testcount_recurse_condition(
+            &self.left,
+            count,
+            ray,
+            distance_min,
+            distance_max,
+            rng,
+        );
+
+        Self::primitive_testcount_recurse_condition(
+            &self.right,
+            count,
+            ray,
+            distance_min,
+            distance_max,
+            rng,
+        );
+    }
+
+    fn primitive_testcount_recurse_condition(
+        bvhnode: &'scene Hitable, // BVHNode
+        count: &mut usize,
+        ray: &Ray,
+        distance_min: f32,
+        distance_max: f32,
+        rng: &mut SmallRng,
+    ) {
+        match bvhnode {
+            // These recurse
+            Hitable::BVHNode(x) => {
+                x.primitive_testcount(count, ray, distance_min, distance_max, rng);
+            }
+            Hitable::STL(x) => {
+                x.bvhnode
+                    .primitive_testcount(count, ray, distance_min, distance_max, rng);
+            }
+            Hitable::GLTF(x) => {
+                x.bvhnode
+                    .primitive_testcount(count, ray, distance_min, distance_max, rng);
+            }
+
+            // These are counted
+            Hitable::MovingSphere(_)
+            | Hitable::Quad(_)
+            | Hitable::Sphere(_)
+            | Hitable::ConstantMedium(_)
+            | Hitable::Triangle(_)
+            | Hitable::GLTFTriangle(_)
+            | Hitable::RotateY(_)
+            | Hitable::Translate(_) => {
+                // TODO: currently RotateY and Translate are counted wrong. They may contain more primitives!
+                *count += 1;
+            }
+            Hitable::Boxy(_) => {
+                *count += 6;
+            }
+            Hitable::Empty(_) => (),
         }
     }
 }
