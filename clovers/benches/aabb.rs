@@ -34,28 +34,6 @@ fn hit(bencher: divan::Bencher) {
         .bench_values(|(aabb, ray)| black_box(aabb.hit(&ray, Float::NEG_INFINITY, Float::INFINITY)))
 }
 
-#[divan::bench]
-fn hit_old(bencher: divan::Bencher) {
-    bencher
-        .with_inputs(random_aabb_and_ray)
-        .counter(1u32)
-        .bench_values(|(aabb, ray)| {
-            #[allow(deprecated)]
-            black_box(aabb.hit_old(&ray, Float::NEG_INFINITY, Float::INFINITY))
-        })
-}
-
-#[divan::bench]
-fn hit_new(bencher: divan::Bencher) {
-    bencher
-        .with_inputs(random_aabb_and_ray)
-        .counter(1u32)
-        .bench_values(|(aabb, ray)| {
-            #[allow(deprecated)]
-            black_box(aabb.hit_new(&ray, Float::NEG_INFINITY, Float::INFINITY))
-        })
-}
-
 // Helper functions
 
 fn random_intervals(rng: &mut SmallRng) -> (Interval, Interval, Interval) {
