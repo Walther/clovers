@@ -21,17 +21,17 @@ pub fn bvh_depth(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinSrgb {
 
 #[must_use]
 pub fn bvh_depth_to_color(depth: usize) -> LinSrgb {
-    let depth = depth as Float / 255.0;
     match depth {
-        // under 256
-        0.0..=1.0 => LinSrgb::new(depth, depth, depth),
-        // more than 256
-        1.0..=2.0 => LinSrgb::new(0.0, 0.0, 1.0),
-        // more than 512
-        2.0..=4.0 => LinSrgb::new(1.0, 0.0, 1.0),
-        // more than 1024
-        4.0.. => LinSrgb::new(1.0, 0.0, 0.0),
-        // negative floats
-        _ => LinSrgb::new(0.0, 0.0, 0.0),
+        // under 256, grayscale
+        0..=255 => {
+            let depth = depth as Float / 255.0;
+            LinSrgb::new(depth, depth, depth)
+        }
+        // more than 256, yellow
+        256..=511 => LinSrgb::new(1.0, 1.0, 0.0),
+        // more than 512, orange
+        512..=1023 => LinSrgb::new(1.0, 0.5, 0.0),
+        // more than 1024, red
+        1024.. => LinSrgb::new(1.0, 0.0, 0.0),
     }
 }
