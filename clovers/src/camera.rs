@@ -7,7 +7,7 @@ use crate::{ray::Ray, Float, Vec3, PI};
 use crate::{Direction, Position, Vec2};
 use nalgebra::Unit;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// The main [Camera] object used in the ray tracing.
 pub struct Camera {
@@ -101,7 +101,7 @@ impl Camera {
     /// Generates a new [Ray] from the camera
     #[must_use]
     pub fn get_ray(
-        self,
+        &self,
         pixel_uv: Vec2, // pixel location in image uv coordinates, range 0..1
         mut lens_offset: Vec2,
         time: Float,
