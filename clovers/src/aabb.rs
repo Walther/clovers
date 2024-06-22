@@ -89,9 +89,9 @@ impl AABB {
     #[must_use]
     pub fn surrounding_box(box0: &AABB, box1: &AABB) -> AABB {
         AABB {
-            x: Interval::new_from_intervals(box0.x, box1.x),
-            y: Interval::new_from_intervals(box0.y, box1.y),
-            z: Interval::new_from_intervals(box0.z, box1.z),
+            x: Interval::new_from_intervals(&box0.x, &box1.x),
+            y: Interval::new_from_intervals(&box0.y, &box1.y),
+            z: Interval::new_from_intervals(&box0.z, &box1.z),
         }
     }
 
@@ -100,17 +100,17 @@ impl AABB {
         // TODO: refactor
         let delta = EPSILON_RECT_THICKNESS;
         let new_x: Interval = if self.x.size() >= delta {
-            self.x
+            self.x.clone()
         } else {
             self.x.expand(delta)
         };
         let new_y: Interval = if self.y.size() >= delta {
-            self.y
+            self.y.clone()
         } else {
             self.y.expand(delta)
         };
         let new_z: Interval = if self.z.size() >= delta {
-            self.z
+            self.z.clone()
         } else {
             self.z.expand(delta)
         };
@@ -121,11 +121,11 @@ impl AABB {
     /// Returns the interval of the given axis.
     // TODO: this api is kind of annoying
     #[must_use]
-    pub fn axis(&self, n: usize) -> Interval {
+    pub fn axis(&self, n: usize) -> &Interval {
         match n {
-            0 => self.x,
-            1 => self.y,
-            2 => self.z,
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
             _ => panic!("AABB::axis called with invalid parameter: {n:?}"),
         }
     }

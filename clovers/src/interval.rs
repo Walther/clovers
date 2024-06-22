@@ -5,7 +5,7 @@ use core::ops::Add;
 use crate::Float;
 
 /// An interval structure.
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct Interval {
     /// Smallest value of the interval. Must be kept in order  
@@ -27,7 +27,7 @@ impl Interval {
     /// Constructs a new interval from two intervals
     // TODO: explanation, clarification
     #[must_use]
-    pub fn new_from_intervals(a: Interval, b: Interval) -> Self {
+    pub fn new_from_intervals(a: &Interval, b: &Interval) -> Self {
         Interval {
             min: a.min.min(b.min),
             max: a.max.max(b.max),
@@ -42,7 +42,7 @@ impl Interval {
 
     /// Returns the size of the interval
     #[must_use]
-    pub fn size(self) -> Float {
+    pub fn size(&self) -> Float {
         self.max - self.min
     }
 }

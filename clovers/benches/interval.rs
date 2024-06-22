@@ -31,7 +31,7 @@ fn new_from_intervals(bencher: divan::Bencher) {
             (ab, cd)
         })
         .counter(1u32)
-        .bench_values(|(ab, cd)| black_box(Interval::new_from_intervals(ab, cd)))
+        .bench_values(|(ab, cd)| black_box(Interval::new_from_intervals(&ab, &cd)))
 }
 
 #[divan::bench]
