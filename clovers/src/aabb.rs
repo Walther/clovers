@@ -129,6 +129,35 @@ impl AABB {
             _ => panic!("AABB::axis called with invalid parameter: {n:?}"),
         }
     }
+
+    /// Distance of a `Ray` to the bounding box.
+    ///
+    /// Returns `None` if the `AABB` is not hit, whether it is passed by the ray, or is behind the ray origin considering the ray direction.
+    ///
+    /// Based on the `IntersectAABB` method described at <https://jacco.ompf2.com/2022/04/18/how-to-build-a-bvh-part-2-faster-rays/>.
+    #[allow(clippy::similar_names)]
+    #[must_use]
+    pub fn distance(&self, ray: &Ray) -> Option<Float> {
+        let (box_min, box_max) = self.bounding_positions();
+        let (mut tmin, mut tmax);
+        let tx1 = (box_min.x - ray.origin.x) / ray.direction.x;
+        let tx2 = (box_max.x - ray.origin.x) / ray.direction.x;
+        tmin = Float::min(tx1, tx2);
+        tmax = Float::max(tx1, tx2);
+        let ty1 = (box_min.y - ray.origin.y) / ray.direction.y;
+        let ty2 = (box_max.y - ray.origin.y) / ray.direction.y;
+        tmin = Float::max(tmin, Float::min(ty1, ty2));
+        tmax = Float::min(tmax, Float::max(ty1, ty2));
+        let tz1 = (box_min.z - ray.origin.z) / ray.direction.z;
+        let tz2 = (box_max.z - ray.origin.z) / ray.direction.z;
+        tmin = Float::max(tmin, Float::min(tz1, tz2));
+        let tmax = Float::min(tmax, Float::max(tz1, tz2));
+        if tmax >= tmin /* && tmin < ray.t */ && tmax > 0.0 {
+            return Some(tmin);
+        };
+
+        None
+    }
 }
 
 impl Add<Vec3> for AABB {

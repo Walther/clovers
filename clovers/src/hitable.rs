@@ -7,7 +7,7 @@ use crate::objects::{GLTFTriangle, GLTF};
 
 use crate::{
     aabb::AABB,
-    bvhnode::BVHNode,
+    bvh::BVHNode,
     materials::MaterialTrait,
     objects::{Boxy, ConstantMedium, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle},
     ray::Ray,

@@ -77,7 +77,7 @@ use nalgebra::{
 
 // Internals
 pub mod aabb;
-pub mod bvhnode;
+pub mod bvh;
 pub mod camera;
 pub mod colorinit;
 pub mod hitable;

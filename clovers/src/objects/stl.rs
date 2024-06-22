@@ -7,7 +7,7 @@ use std::fs::OpenOptions;
 
 use crate::{
     aabb::AABB,
-    bvhnode::BVHNode,
+    bvh::BVHNode,
     hitable::{HitRecord, Hitable, HitableTrait},
     materials::{Material, MaterialInit, SharedMaterial},
     objects::Triangle,

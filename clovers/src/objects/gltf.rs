@@ -11,7 +11,7 @@ use tracing::debug;
 
 use crate::{
     aabb::AABB,
-    bvhnode::BVHNode,
+    bvh::BVHNode,
     hitable::{get_orientation, HitRecord, Hitable, HitableTrait},
     interval::Interval,
     materials::gltf::GLTFMaterial,

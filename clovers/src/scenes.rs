@@ -3,7 +3,7 @@
 use alloc::boxed::Box;
 
 use crate::{
-    bvhnode::BVHNode,
+    bvh::BVHNode,
     camera::{Camera, CameraInit},
     hitable::Hitable,
     materials::SharedMaterial,

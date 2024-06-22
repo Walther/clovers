@@ -1,7 +1,7 @@
 //! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
 
 use crate::{
-    bvhnode::BVHNode,
+    bvh::BVHNode,
     hitable::Hitable,
     materials::{Material, MaterialInit, SharedMaterial},
     Box,
