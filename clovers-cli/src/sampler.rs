@@ -55,7 +55,7 @@ impl Display for Sampler {
 }
 
 /// Various sampling dimensions used by the samplers
-#[derive(Clone, Copy)]
+#[derive(Clone, Debug)]
 pub enum SamplerDimension {
     PixelOffsetX,
     PixelOffsetY,
