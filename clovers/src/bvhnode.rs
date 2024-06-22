@@ -28,7 +28,7 @@ pub struct BVHNode<'scene> {
 impl<'scene> BVHNode<'scene> {
     /// Create a new `BVHNode` tree from a given list of [Object](crate::objects::Object)s
     #[must_use]
-    pub fn from_list(mut hitables: Vec<Hitable>, time_0: Float, time_1: Float) -> BVHNode {
+    pub fn from_list(mut hitables: Vec<Hitable>) -> BVHNode {
         // Initialize two child nodes
         let left: Box<Hitable>;
         let right: Box<Hitable>;
@@ -37,8 +37,7 @@ impl<'scene> BVHNode<'scene> {
 
         // What is the axis with the largest span?
         // TODO: horribly inefficient, improve!
-        let bounding: AABB =
-            vec_bounding_box(&hitables, time_0, time_1).expect("No bounding box for objects");
+        let bounding: AABB = vec_bounding_box(&hitables).expect("No bounding box for objects");
         let spans = [
             bounding.axis(0).size(),
             bounding.axis(1).size(),
@@ -57,7 +56,7 @@ impl<'scene> BVHNode<'scene> {
             // TODO: can this hack be removed?
             left = Box::new(hitables[0].clone());
             right = Box::new(Hitable::Empty(Empty {}));
-            let bounding_box = left.bounding_box(time_0, time_1).unwrap().clone(); // TODO: remove unwrap
+            let bounding_box = left.bounding_box().unwrap().clone(); // TODO: remove unwrap
             return BVHNode {
                 left,
                 right,
@@ -89,8 +88,8 @@ impl<'scene> BVHNode<'scene> {
                 right: Box::new(hitables[2].clone()),
                 bounding_box: AABB::surrounding_box(
                     // TODO: no unwrap?
-                    hitables[1].bounding_box(time_0, time_1).unwrap(),
-                    hitables[2].bounding_box(time_0, time_1).unwrap(),
+                    hitables[1].bounding_box().unwrap(),
+                    hitables[2].bounding_box().unwrap(),
                 ),
             }));
         } else {
@@ -100,18 +99,12 @@ impl<'scene> BVHNode<'scene> {
             // Split the vector; divide and conquer
             let mid = object_span / 2;
             let hitables_right = hitables.split_off(mid);
-            left = Box::new(Hitable::BVHNode(BVHNode::from_list(
-                hitables, time_0, time_1,
-            )));
-            right = Box::new(Hitable::BVHNode(BVHNode::from_list(
-                hitables_right,
-                time_0,
-                time_1,
-            )));
+            left = Box::new(Hitable::BVHNode(BVHNode::from_list(hitables)));
+            right = Box::new(Hitable::BVHNode(BVHNode::from_list(hitables_right)));
         }
 
-        let box_left = left.bounding_box(time_0, time_1);
-        let box_right = right.bounding_box(time_0, time_1);
+        let box_left = left.bounding_box();
+        let box_right = right.bounding_box();
 
         // Generate a bounding box and BVHNode if possible
         if let (Some(box_left), Some(box_right)) = (box_left, box_right) {
@@ -292,7 +285,7 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] of the objects within this [`BVHNode`].
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t11: Float) -> Option<&AABB> {
+    fn bounding_box(&self) -> Option<&AABB> {
         Some(&self.bounding_box)
     }
 
@@ -344,9 +337,8 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
 }
 
 fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
-    // TODO: proper time support?
-    let box_a: Option<&AABB> = a.bounding_box(0.0, 1.0);
-    let box_b: Option<&AABB> = b.bounding_box(0.0, 1.0);
+    let box_a: Option<&AABB> = a.bounding_box();
+    let box_b: Option<&AABB> = b.bounding_box();
 
     if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
         if box_a.axis(axis).min < box_b.axis(axis).min {
@@ -374,7 +366,7 @@ fn box_z_compare(a: &Hitable, b: &Hitable) -> Ordering {
 
 // TODO: inefficient, O(n) *and* gets called at every iteration of BVHNode creation => quadratic behavior
 #[must_use]
-fn vec_bounding_box(vec: &Vec<Hitable>, t0: Float, t1: Float) -> Option<AABB> {
+fn vec_bounding_box(vec: &Vec<Hitable>) -> Option<AABB> {
     if vec.is_empty() {
         return None;
     }
@@ -385,7 +377,7 @@ fn vec_bounding_box(vec: &Vec<Hitable>, t0: Float, t1: Float) -> Option<AABB> {
     // Go through all the objects, and expand the AABB
     for object in vec {
         // Check if the object has a box
-        let Some(bounding) = object.bounding_box(t0, t1) else {
+        let Some(bounding) = object.bounding_box() else {
             // No box found for the object, early return.
             // Having even one unbounded object in a list makes the entire list unbounded!
             return None;

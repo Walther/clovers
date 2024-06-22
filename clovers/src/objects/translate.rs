@@ -37,7 +37,7 @@ impl<'scene> Translate<'scene> {
     #[must_use]
     pub fn new(object: Box<Hitable<'scene>>, offset: Vec3) -> Self {
         // TODO: time
-        let aabb = object.bounding_box(0.0, 1.0).unwrap().clone() + offset;
+        let aabb = object.bounding_box().unwrap().clone() + offset;
         Translate {
             object,
             offset,
@@ -77,7 +77,7 @@ impl<'scene> HitableTrait for Translate<'scene> {
 
     /// Bounding box method for the [Translate] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for translation.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+    fn bounding_box(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 

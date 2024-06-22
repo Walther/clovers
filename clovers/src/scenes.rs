@@ -32,22 +32,16 @@ impl<'scene> Scene<'scene> {
     /// Creates a new [Scene] with the given parameters.
     #[must_use]
     pub fn new(
-        time_0: Float,
-        time_1: Float,
         camera: Camera,
         hitables: Vec<Hitable<'scene>>,
         priority_hitables: Vec<Hitable<'scene>>,
         background_color: Srgb,
     ) -> Scene<'scene> {
         Scene {
-            hitables: BVHNode::from_list(hitables, time_0, time_1),
+            hitables: BVHNode::from_list(hitables),
             camera,
             background_color,
-            priority_hitables: Hitable::BVHNode(BVHNode::from_list(
-                priority_hitables,
-                time_0,
-                time_1,
-            )),
+            priority_hitables: Hitable::BVHNode(BVHNode::from_list(priority_hitables)),
         }
     }
 }
@@ -120,12 +114,5 @@ pub fn initialize<'scene>(scene_file: SceneFile, width: u32, height: u32) -> Sce
         }
     }
 
-    Scene::new(
-        time_0,
-        time_1,
-        camera,
-        hitables,
-        priority_hitables,
-        background_color,
-    )
+    Scene::new(camera, hitables, priority_hitables, background_color)
 }

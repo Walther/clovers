@@ -39,6 +39,15 @@ impl AABB {
         }
     }
 
+    /// The inverse method for `AABB::new`: given an existing constructed `AABB`, returns the minimum coordinate and maximum coordinate on the opposing corners.
+    #[must_use]
+    pub fn bounding_positions(&self) -> (Position, Position) {
+        (
+            Position::new(self.x.min, self.y.min, self.z.min),
+            Position::new(self.x.max, self.y.max, self.z.max),
+        )
+    }
+
     #[allow(clippy::doc_link_with_quotes)]
     /// Given a [Ray], returns whether the ray hits the bounding box or not. Current method based on the "Axis-aligned bounding box class" of the [Raytracing The Next Week book](https://raytracing.github.io/books/RayTracingTheNextWeek.html).
     #[must_use]

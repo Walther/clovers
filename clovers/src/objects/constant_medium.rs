@@ -128,8 +128,8 @@ impl<'scene> HitableTrait for ConstantMedium<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] of the defining `boundary` object for the fog.
     #[must_use]
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<&AABB> {
-        self.boundary.bounding_box(t0, t1)
+    fn bounding_box(&self) -> Option<&AABB> {
+        self.boundary.bounding_box()
     }
 
     /// Returns a probability density function value based on the boundary object

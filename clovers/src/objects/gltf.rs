@@ -67,11 +67,11 @@ pub struct GLTF<'scene> {
 impl<'scene> GLTF<'scene> {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
-    pub fn new(gltf_init: GLTFInit, time_0: Float, time_1: Float) -> Self {
+    pub fn new(gltf_init: GLTFInit) -> Self {
         let triangles: Vec<Hitable> = gltf_init.into();
-        let bvhnode = BVHNode::from_list(triangles, time_0, time_1);
+        let bvhnode = BVHNode::from_list(triangles);
         // TODO: remove unwrap
-        let aabb = bvhnode.bounding_box(time_0, time_1).unwrap().clone();
+        let aabb = bvhnode.bounding_box().unwrap().clone();
 
         GLTF { bvhnode, aabb }
     }
@@ -92,7 +92,7 @@ impl<'scene> HitableTrait for GLTF<'scene> {
 
     /// Return the axis-aligned bounding box for the object
     #[must_use]
-    fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<&AABB> {
+    fn bounding_box(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
@@ -211,7 +211,7 @@ fn parse_mesh<'scene>(
                     }
                 }
 
-                let bvh: BVHNode = BVHNode::from_list(trianglelist, 0.0, 1.0);
+                let bvh: BVHNode = BVHNode::from_list(trianglelist);
                 objects.push(Hitable::BVHNode(bvh));
             }
             _ => unimplemented!(),
@@ -325,7 +325,7 @@ impl<'scene> HitableTrait for GLTFTriangle<'scene> {
         })
     }
 
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+    fn bounding_box(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 

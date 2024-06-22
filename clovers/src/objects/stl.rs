@@ -42,7 +42,7 @@ impl<'scene> HitableTrait for STL<'scene> {
 
     /// Return the axis-aligned bounding box for the object
     #[must_use]
-    fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<&AABB> {
+    fn bounding_box(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
@@ -138,13 +138,9 @@ pub fn initialize_stl<'scene>(
         hitable_list.push(Hitable::Triangle(triangle));
     }
 
-    // TODO: time
-    let time_0 = 0.0;
-    let time_1 = 1.0;
-
-    let bvhnode = BVHNode::from_list(hitable_list, time_0, time_1);
+    let bvhnode = BVHNode::from_list(hitable_list);
     // TODO: remove unwrap
-    let aabb = bvhnode.bounding_box(time_0, time_1).unwrap().clone();
+    let aabb = bvhnode.bounding_box().unwrap().clone();
 
     STL {
         bvhnode,

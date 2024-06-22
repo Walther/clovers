@@ -108,7 +108,7 @@ pub fn object_to_hitable(obj: Object, materials: &[SharedMaterial]) -> Hitable<'
                 .iter()
                 .map(|object| -> Hitable { object_to_hitable(object.clone(), materials) })
                 .collect();
-            let bvh = BVHNode::from_list(objects, 0.0, 1.0);
+            let bvh = BVHNode::from_list(objects);
             Hitable::BVHNode(bvh)
         }
         Object::Quad(x) => {
@@ -127,10 +127,7 @@ pub fn object_to_hitable(obj: Object, materials: &[SharedMaterial]) -> Hitable<'
         #[cfg(feature = "stl")]
         Object::STL(stl_init) => Hitable::STL(initialize_stl(stl_init, materials)),
         #[cfg(feature = "gl_tf")]
-        Object::GLTF(x) => {
-            // TODO: time
-            Hitable::GLTF(GLTF::new(x, 0.0, 1.0))
-        }
+        Object::GLTF(x) => Hitable::GLTF(GLTF::new(x)),
         Object::Translate(x) => {
             let obj = *x.object;
             let obj: Hitable = object_to_hitable(obj, materials);
