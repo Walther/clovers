@@ -40,7 +40,7 @@ pub fn colorize(
     // Send the ray to the scene, and see if it hits anything.
     // distance_min is set to an epsilon to avoid "shadow acne" that can happen when set to zero
     let Some(hit_record) = scene
-        .hitables
+        .bvh_root
         .hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng)
     else {
         // If the ray hits nothing, early return the background color.
@@ -88,10 +88,8 @@ pub fn colorize(
             // Multiple Importance Sampling:
 
             // Create a new PDF object from the priority hitables of the scene, given the current hit_record position
-            let light_ptr = PDF::HitablePDF(HitablePDF::new(
-                &scene.priority_hitables,
-                hit_record.position,
-            ));
+            let light_ptr =
+                PDF::HitablePDF(HitablePDF::new(&scene.mis_bvh_root, hit_record.position));
 
             // Create a mixture PDF from the above + the PDF from the scatter_record
             let mixture_pdf = MixturePDF::new(light_ptr, scatter_record.pdf_ptr);

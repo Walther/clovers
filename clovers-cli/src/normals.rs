@@ -10,7 +10,7 @@ use rand::rngs::SmallRng;
 #[must_use]
 pub fn normal_map(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinSrgb {
     let Some(hit_record) = scene
-        .hitables
+        .bvh_root
         .hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng)
     else {
         // If the ray hits nothing, early return black

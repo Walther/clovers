@@ -18,6 +18,6 @@ pub fn initialize<'scene>(
     let scene_file: SceneFile = serde_json::from_str(&contents)?;
     info!("Initializing the scene");
     let scene: Scene = scenes::initialize(scene_file, width, height);
-    info!("Count of nodes in the BVH tree: {}", scene.hitables.count());
+    info!("Count of nodes in the BVH tree: {}", scene.bvh_root.count());
     Ok(scene)
 }

@@ -1,5 +1,7 @@
 //! A collection of objects, camera, and other things necessary to describe the environment you wish to render.
 
+use std::time::Instant;
+
 use alloc::boxed::Box;
 
 use crate::{
@@ -19,13 +21,13 @@ use tracing::info;
 /// A representation of the scene that is being rendered.
 pub struct Scene<'scene> {
     /// Bounding-volume hierarchy of [Hitable] objects in the scene. This could, as currently written, be any [Hitable] - in practice, we place the root of the [`BVHNode`] tree here.
-    pub hitables: BVHNode<'scene>,
+    pub bvh_root: BVHNode<'scene>,
     /// The camera object used for rendering the scene.
     pub camera: Camera,
     /// The background color to use when the rays do not hit anything in the scene.
     pub background_color: Srgb, // TODO: make into Texture or something?
-    /// A [`BVHNode`] tree of prioritized objects - e.g. glass items or lights - that affect the biased sampling of the scene. Wrapped into a [Hitable] for convenience reasons (see various PDF functions).
-    pub priority_hitables: Hitable<'scene>,
+    /// A [`BVHNode`] tree of priority objects - e.g. glass items or lights - for multiple importance sampling. Wrapped into a [Hitable] for convenience reasons (see various PDF functions).
+    pub mis_bvh_root: Hitable<'scene>,
 }
 
 impl<'scene> Scene<'scene> {
@@ -37,11 +39,22 @@ impl<'scene> Scene<'scene> {
         priority_hitables: Vec<Hitable<'scene>>,
         background_color: Srgb,
     ) -> Scene<'scene> {
+        #[cfg(feature = "traces")]
+        info!("BVH tree build starting");
+        let start = Instant::now();
+        let bvh_root = BVHNode::from_list(hitables);
+        let end = Instant::now();
+        let duration = (end - start).as_millis();
+        #[cfg(feature = "traces")]
+        info!("BVH tree build done in {duration} ms");
+
+        let mis_bvh_root = Hitable::BVHNode(BVHNode::from_list(priority_hitables));
+
         Scene {
-            hitables: BVHNode::from_list(hitables),
+            bvh_root,
             camera,
             background_color,
-            priority_hitables: Hitable::BVHNode(BVHNode::from_list(priority_hitables)),
+            mis_bvh_root,
         }
     }
 }

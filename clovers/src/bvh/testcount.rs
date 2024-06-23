@@ -12,7 +12,7 @@ impl<'scene> BVHNode<'scene> {
     // NOTE: this must be kept in close alignment with the implementation of BVHNode::hit()!
     // TODO: maybe move the statistics counting to the method itself? Measure the impact?
     /// Alternate hit method that maintains a test count for the BVH traversals.
-    pub fn bvh_testcount(
+    pub fn testcount(
         &'scene self,
         depth: &mut usize,
         ray: &Ray,
@@ -98,13 +98,13 @@ fn recurse<'scene>(
     rng: &mut SmallRng,
 ) -> Option<HitRecord<'scene>> {
     match bvhnode {
-        Hitable::BVHNode(bvh) => bvh.bvh_testcount(depth, ray, distance_min, distance_max, rng),
+        Hitable::BVHNode(bvh) => bvh.testcount(depth, ray, distance_min, distance_max, rng),
         Hitable::STL(s) => s
             .bvhnode
-            .bvh_testcount(depth, ray, distance_min, distance_max, rng),
+            .testcount(depth, ray, distance_min, distance_max, rng),
         Hitable::GLTF(g) => g
             .bvhnode
-            .bvh_testcount(depth, ray, distance_min, distance_max, rng),
+            .testcount(depth, ray, distance_min, distance_max, rng),
         hitable => hitable.hit(ray, distance_min, distance_max, rng),
     }
 }

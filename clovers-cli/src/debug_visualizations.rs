@@ -9,8 +9,8 @@ use rand::rngs::SmallRng;
 pub fn bvh_testcount(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinSrgb {
     let mut depth = 0;
     scene
-        .hitables
-        .bvh_testcount(&mut depth, ray, EPSILON_SHADOW_ACNE, Float::MAX, rng);
+        .bvh_root
+        .testcount(&mut depth, ray, EPSILON_SHADOW_ACNE, Float::MAX, rng);
 
     bvh_testcount_to_color(depth)
 }
@@ -37,7 +37,7 @@ pub fn bvh_testcount_to_color(depth: usize) -> LinSrgb {
 pub fn primitive_testcount(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinSrgb {
     let mut depth = 0;
     scene
-        .hitables
+        .bvh_root
         .primitive_testcount(&mut depth, ray, EPSILON_SHADOW_ACNE, Float::MAX, rng);
 
     primitive_testcount_to_color(depth)

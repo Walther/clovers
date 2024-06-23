@@ -8,10 +8,10 @@ use crate::{
     Box,
 };
 
-mod bvh_testcount;
-mod from_list;
+mod build;
 mod hitable_trait;
 mod primitive_testcount;
+mod testcount;
 
 /// Bounding Volume Hierarchy Node.
 ///
@@ -24,6 +24,30 @@ pub struct BVHNode<'scene> {
     pub right: Box<Hitable<'scene>>,
     /// Bounding box containing both of the child nodes
     pub bounding_box: AABB,
+}
+
+impl<'scene> BVHNode<'scene> {
+    /// Create a new `BVHNode` tree from a given list of [Object](crate::objects::Object)s
+    #[must_use]
+    pub fn from_list(hitables: Vec<Hitable>) -> BVHNode {
+        // TODO: more alternative build algorithms
+        build::longest_axis_midpoint(hitables)
+    }
+
+    #[must_use]
+    /// Returns the count of the nodes in the tree
+    pub fn count(&self) -> usize {
+        let leftsum = match &*self.left {
+            Hitable::BVHNode(b) => b.count(),
+            _ => 1,
+        };
+        let rightsum = match &*self.right {
+            Hitable::BVHNode(b) => b.count(),
+            _ => 1,
+        };
+
+        leftsum + rightsum
+    }
 }
 
 // Internal helper functions
