@@ -19,7 +19,7 @@ use enum_dispatch::enum_dispatch;
 use rand::rngs::SmallRng;
 
 /// Represents a ray-object intersection, with plenty of data about the intersection.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct HitRecord<'a> {
     /// Distance from the ray origin to the hitpoint
     pub distance: Float,

@@ -6,11 +6,11 @@ use rand::rngs::SmallRng;
 
 /// Visualizes the BVH traversal count - how many BVH nodes needed to be tested for intersection?
 #[must_use]
-pub fn bvh_testcount(ray: &Ray, scene: &Scene) -> LinSrgb {
+pub fn bvh_testcount(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinSrgb {
     let mut depth = 0;
     scene
         .hitables
-        .bvh_testcount(&mut depth, ray, EPSILON_SHADOW_ACNE, Float::MAX);
+        .bvh_testcount(&mut depth, ray, EPSILON_SHADOW_ACNE, Float::MAX, rng);
 
     bvh_testcount_to_color(depth)
 }

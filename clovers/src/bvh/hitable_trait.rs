@@ -25,21 +25,55 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
             return None;
         }
 
-        // Otherwise we have hit the bounding box of this node, recurse to child nodes
-        let hit_left = self.left.hit(ray, distance_min, distance_max, rng);
-        let hit_right = self.right.hit(ray, distance_min, distance_max, rng);
+        // Check the distance to the bounding boxes
+        let (left_aabb_distance, right_aabb_distance) =
+            match (self.left.bounding_box(), self.right.bounding_box()) {
+                // Early returns, if there's no bounding box
+                (None, None) => return None,
+                (Some(_l), None) => return self.left.hit(ray, distance_min, distance_max, rng),
+                (None, Some(_r)) => return self.right.hit(ray, distance_min, distance_max, rng),
+                // If we have bounding boxes, get the distances
+                (Some(l), Some(r)) => (l.distance(ray), r.distance(ray)),
+            };
+        let (_closest_aabb_distance, furthest_aabb_distance) =
+            match (left_aabb_distance, right_aabb_distance) {
+                // Early return: neither child AABB can be hit with the ray
+                (None, None) => return None,
+                // Early return: only one child can be hit with the ray
+                (Some(_d), None) => return self.left.hit(ray, distance_min, distance_max, rng),
+                (None, Some(_d)) => return self.right.hit(ray, distance_min, distance_max, rng),
+                // Default case: both children can be hit with the ray, check the distance
+                (Some(l), Some(r)) => (Float::min(l, r), Float::max(l, r)),
+            };
+
+        // Check the closest first
+        let (closest_bvh, furthest_bvh) = if left_aabb_distance < right_aabb_distance {
+            (&self.left, &self.right)
+        } else {
+            (&self.right, &self.left)
+        };
+        let closest_bvh_hit = closest_bvh.hit(ray, distance_min, distance_max, rng);
+
+        // Is the hit closer than the closest point of the other AABB?
+        if let Some(ref hit_record) = closest_bvh_hit {
+            if hit_record.distance < furthest_aabb_distance {
+                return Some(hit_record.clone());
+            }
+        }
+        // Otherwise, check the other child too
+        let furthest_bvh_hit = furthest_bvh.hit(ray, distance_min, distance_max, rng);
 
         // Did we hit neither of the child nodes, one of them, or both?
         // Return the closest thing we hit
-        match (&hit_left, &hit_right) {
+        match (&closest_bvh_hit, &furthest_bvh_hit) {
             (None, None) => None,
-            (None, Some(_)) => hit_right,
-            (Some(_), None) => hit_left,
+            (None, Some(_)) => furthest_bvh_hit,
+            (Some(_), None) => closest_bvh_hit,
             (Some(left), Some(right)) => {
                 if left.distance < right.distance {
-                    return hit_left;
+                    return closest_bvh_hit;
                 }
-                hit_right
+                furthest_bvh_hit
             }
         }
     }
