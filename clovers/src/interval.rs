@@ -45,6 +45,12 @@ impl Interval {
     pub fn size(&self) -> Float {
         self.max - self.min
     }
+
+    /// Returns the center of this [`Interval`]
+    #[must_use]
+    pub fn center(&self) -> Float {
+        self.min + 0.5 * self.size()
+    }
 }
 
 impl Add<Float> for Interval {
@@ -52,5 +58,43 @@ impl Add<Float> for Interval {
 
     fn add(self, offset: Float) -> Self::Output {
         Interval::new(self.min + offset, self.max + offset)
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::float_cmp)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn center() {
+        let interval = Interval::new(0.0, 1.0);
+        let center = interval.center();
+        let expected = 0.5;
+        assert_eq!(center, expected);
+    }
+
+    #[test]
+    fn center_zero_crossing() {
+        let interval = Interval::new(-1.0, 1.0);
+        let center = interval.center();
+        let expected = 0.0;
+        assert_eq!(center, expected);
+    }
+
+    #[test]
+    fn size() {
+        let interval = Interval::new(0.0, 1.0);
+        let size = interval.size();
+        let expected = 1.0;
+        assert_eq!(size, expected);
+    }
+
+    #[test]
+    fn size_zero_crossing() {
+        let interval = Interval::new(-1.0, 1.0);
+        let size = interval.size();
+        let expected = 2.0;
+        assert_eq!(size, expected);
     }
 }
