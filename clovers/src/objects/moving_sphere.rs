@@ -2,11 +2,11 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, HitableTrait},
+    hitable::HitableTrait,
     materials::{Material, MaterialInit},
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, Position, PI,
+    Direction, Float, HitRecord, Position, PI,
 };
 use nalgebra::Unit;
 use rand::rngs::SmallRng;

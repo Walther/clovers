@@ -2,13 +2,13 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable, HitableTrait},
+    hitable::{Hitable, HitableTrait},
     materials::{isotropic::Isotropic, Material},
     random::random_unit_vector,
     ray::Ray,
     textures::Texture,
     wavelength::Wavelength,
-    Box, Direction, Float, Position, EPSILON_CONSTANT_MEDIUM,
+    Box, Direction, Float, HitRecord, Position, EPSILON_CONSTANT_MEDIUM,
 };
 use rand::rngs::SmallRng;
 use rand::Rng;

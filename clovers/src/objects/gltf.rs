@@ -12,12 +12,12 @@ use tracing::debug;
 use crate::{
     aabb::AABB,
     bvh::BVHNode,
-    hitable::{get_orientation, HitRecord, Hitable, HitableTrait},
+    hitable::{get_orientation, Hitable, HitableTrait},
     interval::Interval,
     materials::gltf::GLTFMaterial,
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, Position, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
+    Direction, Float, HitRecord, Position, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
 
 /// GLTF initialization structure

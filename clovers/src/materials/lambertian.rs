@@ -2,7 +2,7 @@
 
 use super::{MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
-    hitable::HitRecord,
+    HitRecord,
     pdf::{CosinePDF, PDF},
     ray::Ray,
     textures::{Texture, TextureTrait},

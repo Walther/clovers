@@ -30,9 +30,9 @@
 //!
 //! - Rendering is done by creating [`Ray`](ray::Ray)s and seeing what they hit
 //! - A [`Ray`](ray::Ray) has an origin and a direction
-//! - Every [`Object`](objects::Object) has a `hit()` method that takes a [Ray](ray::Ray) and returns an Option<[`HitRecord`](hitable::HitRecord)>
+//! - Every [`Object`](objects::Object) has a `hit()` method that takes a [Ray](ray::Ray) and returns an Option<[`HitRecord`](HitRecord)>
 //! - If you get None, use that information to colorize your pixel with a default color
-//! - If you get Some([`HitRecord`](hitable::HitRecord)), use its details to colorize your pixel
+//! - If you get Some([`HitRecord`](HitRecord)), use its details to colorize your pixel
 //! - You most likely also want to recurse: depending on the material, maybe `scatter()` and cast a new [`Ray`](ray::Ray)?
 //!
 //! You most likely want to repeat this process multiple times for each of your pixels: generating multiple samples per pixel results in a higher quality image.
@@ -81,6 +81,8 @@ pub mod bvh;
 pub mod camera;
 pub mod colorinit;
 pub mod hitable;
+pub mod hitrecord;
+pub use hitrecord::HitRecord;
 pub mod interval;
 pub mod materials;
 pub mod objects;

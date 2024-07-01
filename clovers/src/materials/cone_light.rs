@@ -2,7 +2,7 @@
 
 use super::{MaterialTrait, ScatterRecord};
 use crate::{
-    hitable::HitRecord,
+    HitRecord,
     ray::Ray,
     textures::{SolidColor, Texture, TextureTrait},
     Float, Position,

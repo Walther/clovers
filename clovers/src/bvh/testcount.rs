@@ -1,9 +1,9 @@
 use rand::rngs::SmallRng;
 
 use crate::{
-    hitable::{HitRecord, Hitable, HitableTrait},
+    hitable::{Hitable, HitableTrait},
     ray::Ray,
-    Float,
+    Float, HitRecord,
 };
 
 use super::BVHNode;

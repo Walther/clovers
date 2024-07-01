@@ -2,7 +2,7 @@
 
 use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
-    hitable::HitRecord,
+    HitRecord,
     pdf::{ZeroPDF, PDF},
     random::random_unit_vector,
     ray::Ray,

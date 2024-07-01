@@ -2,7 +2,7 @@
 
 use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
-    hitable::HitRecord,
+    HitRecord,
     pdf::{ZeroPDF, PDF},
     ray::Ray,
     Direction, Float,

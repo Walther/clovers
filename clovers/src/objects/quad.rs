@@ -5,7 +5,7 @@ use crate::hitable::HitableTrait;
 use crate::materials::MaterialInit;
 use crate::wavelength::Wavelength;
 use crate::{
-    aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
+    aabb::AABB, hitable::get_orientation, HitRecord, materials::Material, ray::Ray, Float,
     Vec3, EPSILON_RECT_THICKNESS,
 };
 use crate::{Direction, Displacement, Position, EPSILON_SHADOW_ACNE};

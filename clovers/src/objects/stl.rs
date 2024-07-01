@@ -8,12 +8,12 @@ use std::fs::OpenOptions;
 use crate::{
     aabb::AABB,
     bvh::BVHNode,
-    hitable::{HitRecord, Hitable, HitableTrait},
+    hitable::{Hitable, HitableTrait},
     materials::{Material, MaterialInit, SharedMaterial},
     objects::Triangle,
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Displacement, Float, Position, Vec3,
+    Direction, Displacement, Float, HitRecord, Position, Vec3,
 };
 
 /// Internal STL object representation after initialization. Contains the material for all triangles in it to avoid having n copies.

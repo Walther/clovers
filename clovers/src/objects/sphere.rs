@@ -2,12 +2,12 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, HitableTrait},
+    hitable::HitableTrait,
     materials::{Material, MaterialInit},
     onb::ONB,
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Displacement, Float, Position, Vec3, EPSILON_SHADOW_ACNE, PI,
+    Direction, Displacement, Float, HitRecord, Position, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use nalgebra::Unit;
 use rand::{rngs::SmallRng, Rng};

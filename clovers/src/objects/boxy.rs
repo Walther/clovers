@@ -3,11 +3,11 @@
 use super::Quad;
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable, HitableTrait},
+    hitable::{Hitable, HitableTrait},
     materials::{Material, MaterialInit},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Direction, Float, Position, Vec3,
+    Box, Direction, Float, HitRecord, Position, Vec3,
 };
 use rand::rngs::SmallRng;
 
