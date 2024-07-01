@@ -158,6 +158,14 @@ impl AABB {
 
         None
     }
+
+    /// Returns the area of this [`AABB`].
+    #[must_use]
+    pub fn area(&self) -> Float {
+        let (min, max) = self.bounding_positions();
+        let extent: Vec3 = max - min;
+        2.0 * (extent.x * extent.y + extent.y * extent.z + extent.x * extent.z)
+    }
 }
 
 impl Add<Vec3> for AABB {
@@ -165,5 +173,47 @@ impl Add<Vec3> for AABB {
 
     fn add(self, offset: Vec3) -> Self::Output {
         AABB::new(self.x + offset.x, self.y + offset.y, self.z + offset.z)
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::float_cmp)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn aabb_area_cube() {
+        let aabb = AABB::new(
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+        );
+        let area = aabb.area();
+        let expected = 6.0;
+        assert_eq!(area, expected);
+    }
+
+    #[test]
+    fn aabb_area_cuboid_positive() {
+        let aabb = AABB::new(
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 2.0),
+            Interval::new(0.0, 3.0),
+        );
+        let area = aabb.area();
+        let expected = 22.0;
+        assert_eq!(area, expected);
+    }
+
+    #[test]
+    fn aabb_area_cuboid_negative() {
+        let aabb = AABB::new(
+            Interval::new(-1.0, 0.0),
+            Interval::new(-2.0, 0.0),
+            Interval::new(-3.0, 0.0),
+        );
+        let area = aabb.area();
+        let expected = 22.0;
+        assert_eq!(area, expected);
     }
 }
