@@ -166,6 +166,12 @@ impl AABB {
         let extent: Vec3 = max - min;
         2.0 * (extent.x * extent.y + extent.y * extent.z + extent.x * extent.z)
     }
+
+    /// Returns the centroid of this [`AABB`].
+    #[must_use]
+    pub fn centroid(&self) -> Position {
+        Position::new(self.x.center(), self.y.center(), self.z.center())
+    }
 }
 
 impl Add<Vec3> for AABB {
@@ -182,7 +188,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn aabb_area_cube() {
+    fn area_cube() {
         let aabb = AABB::new(
             Interval::new(0.0, 1.0),
             Interval::new(0.0, 1.0),
@@ -194,7 +200,7 @@ mod tests {
     }
 
     #[test]
-    fn aabb_area_cuboid_positive() {
+    fn area_cuboid_positive() {
         let aabb = AABB::new(
             Interval::new(0.0, 1.0),
             Interval::new(0.0, 2.0),
@@ -206,7 +212,7 @@ mod tests {
     }
 
     #[test]
-    fn aabb_area_cuboid_negative() {
+    fn area_cuboid_negative() {
         let aabb = AABB::new(
             Interval::new(-1.0, 0.0),
             Interval::new(-2.0, 0.0),
@@ -215,5 +221,17 @@ mod tests {
         let area = aabb.area();
         let expected = 22.0;
         assert_eq!(area, expected);
+    }
+
+    #[test]
+    fn centroid() {
+        let aabb = AABB::new(
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+        );
+        let centroid = aabb.centroid();
+        let expected = Position::new(0.5, 0.5, 0.5);
+        assert_eq!(centroid, expected);
     }
 }
