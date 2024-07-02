@@ -66,6 +66,11 @@ impl<'scene> HitableTrait for STL<'scene> {
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         self.bvhnode.random(origin, rng)
     }
+
+    // TODO: correctness
+    fn centroid(&self) -> Position {
+        self.aabb.centroid()
+    }
 }
 
 /// STL structure. This gets converted into an internal representation using [Triangles](crate::objects::Triangle)

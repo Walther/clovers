@@ -171,6 +171,10 @@ impl<'scene> HitableTrait for Sphere<'scene> {
         let vec = Unit::new_normalize(vec);
         *uvw.local(vec)
     }
+
+    fn centroid(&self) -> Position {
+        self.center
+    }
 }
 
 /// Internal helper.

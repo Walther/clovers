@@ -173,6 +173,11 @@ impl<'scene> HitableTrait for Quad<'scene> {
                 + (rng.gen::<Float>() * self.v);
         point - origin
     }
+
+    // TODO: correctness
+    fn centroid(&self) -> Position {
+        self.q + (self.u / 2.0) + (self.v / 2.0)
+    }
 }
 
 #[must_use]

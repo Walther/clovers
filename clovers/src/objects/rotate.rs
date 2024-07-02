@@ -176,4 +176,9 @@ impl<'scene> HitableTrait for RotateY<'scene> {
         // TODO: fix
         0.0
     }
+
+    // TODO: correctness!
+    fn centroid(&self) -> Position {
+        self.object.centroid()
+    }
 }

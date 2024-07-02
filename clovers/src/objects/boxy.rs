@@ -129,4 +129,9 @@ impl<'scene> HitableTrait for Boxy<'scene> {
 
         sum
     }
+
+    // TODO: correctness for rotations/translations?
+    fn centroid(&self) -> Position {
+        self.aabb.centroid()
+    }
 }

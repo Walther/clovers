@@ -220,6 +220,11 @@ impl<'scene> HitableTrait for Triangle<'scene> {
 
         point - origin
     }
+
+    // TODO: correctness
+    fn centroid(&self) -> Position {
+        self.q + (self.u / 4.0) + (self.v / 4.0)
+    }
 }
 
 #[must_use]

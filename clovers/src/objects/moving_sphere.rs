@@ -177,4 +177,9 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
         // TODO: fix
         0.0
     }
+
+    fn centroid(&self) -> Position {
+        // TODO: proper time support
+        self.center(0.5)
+    }
 }

@@ -11,7 +11,7 @@ use crate::{
     objects::{Boxy, ConstantMedium, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle},
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Displacement, Float, HitRecord, Position,
+    Direction, Displacement, Float, HitRecord, Position, Vec3,
 };
 
 use enum_dispatch::enum_dispatch;
@@ -70,6 +70,10 @@ impl HitableTrait for Empty {
     ) -> Float {
         0.0
     }
+
+    fn centroid(&self) -> Position {
+        Vec3::new(0.0, 0.0, 0.0)
+    }
 }
 
 #[enum_dispatch]
@@ -107,6 +111,10 @@ pub trait HitableTrait {
             "HitableTrait::random called for a Hitable that has no implementation for it!"
         );
     }
+
+    /// Returns the center point of the hitable
+    #[must_use]
+    fn centroid(&self) -> Position;
 }
 
 /// Returns a tuple of `(front_face, normal)`. Used in lieu of `set_face_normal` in the Ray Tracing for the Rest Of Your Life book.

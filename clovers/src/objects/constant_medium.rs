@@ -145,4 +145,8 @@ impl<'scene> HitableTrait for ConstantMedium<'scene> {
         self.boundary
             .pdf_value(origin, direction, wavelength, time, rng)
     }
+
+    fn centroid(&self) -> Position {
+        self.boundary.centroid()
+    }
 }

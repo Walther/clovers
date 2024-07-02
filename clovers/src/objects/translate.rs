@@ -95,4 +95,9 @@ impl<'scene> HitableTrait for Translate<'scene> {
         self.object
             .pdf_value(origin + self.offset, direction, wavelength, time, rng)
     }
+
+    // TODO: correctness
+    fn centroid(&self) -> Position {
+        self.object.centroid() + self.offset
+    }
 }

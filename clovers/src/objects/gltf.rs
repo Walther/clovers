@@ -110,6 +110,11 @@ impl<'scene> HitableTrait for GLTF<'scene> {
         self.bvhnode
             .pdf_value(origin, direction, wavelength, time, rng)
     }
+
+    // TODO: correctness?
+    fn centroid(&self) -> Position {
+        self.aabb.centroid()
+    }
 }
 
 fn parse_node<'scene>(
@@ -356,6 +361,11 @@ impl<'scene> HitableTrait for GLTFTriangle<'scene> {
             }
             None => 0.0,
         }
+    }
+
+    // TODO: correctness
+    fn centroid(&self) -> Position {
+        self.q + (self.u / 4.0) + (self.v / 4.0)
     }
 }
 

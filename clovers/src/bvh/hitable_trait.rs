@@ -129,4 +129,9 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
             }
         }
     }
+
+    // TODO: remove?
+    fn centroid(&self) -> Position {
+        self.bounding_box.centroid()
+    }
 }
