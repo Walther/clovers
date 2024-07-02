@@ -28,6 +28,8 @@ mod sampler;
 #[doc(hidden)]
 mod validate;
 use validate::{validate, ValidateParams};
+#[doc(hidden)]
+pub mod scenefile;
 
 /// clovers 🍀 path tracing renderer
 #[derive(Parser)]

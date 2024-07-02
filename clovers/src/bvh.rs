@@ -20,12 +20,20 @@ pub struct BVHNode<'scene> {
     pub bounding_box: AABB,
 }
 
+/// The choice of algorithms used for constructing the Bounding Volume Hierarchy tree
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum BvhAlgorithm {
+    /// Splitting method based on the longest axis of the current `AABB`
+    LongestAxis,
+}
+
 impl<'scene> BVHNode<'scene> {
     /// Create a new `BVHNode` tree from a given list of [Object](crate::objects::Object)s
     #[must_use]
-    pub fn from_list(hitables: Vec<Hitable>) -> BVHNode {
-        // TODO: more alternative build algorithms
-        build::longest_axis_midpoint(hitables)
+    pub fn from_list(bvh_algorithm: BvhAlgorithm, hitables: Vec<Hitable>) -> BVHNode {
+        match bvh_algorithm {
+            BvhAlgorithm::LongestAxis => build::longest_axis_midpoint(hitables),
+        }
     }
 
     #[must_use]

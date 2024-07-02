@@ -7,7 +7,7 @@ use std::fs::OpenOptions;
 
 use crate::{
     aabb::AABB,
-    bvh::BVHNode,
+    bvh::{BVHNode, BvhAlgorithm},
     hitable::{Hitable, HitableTrait},
     materials::{Material, MaterialInit, SharedMaterial},
     objects::Triangle,
@@ -101,7 +101,7 @@ pub fn initialize_stl<'scene>(
         .unwrap();
     let mesh = stl_io::read_stl(&mut file).unwrap();
     let triangles = mesh.vertices;
-    let mut hitable_list = Vec::new();
+    let mut trianglelist = Vec::new();
     let material: &Material = match stl_init.material {
         MaterialInit::Shared(name) => &materials.iter().find(|m| m.name == name).unwrap().material,
         MaterialInit::Owned(m) => {
@@ -135,10 +135,10 @@ pub fn initialize_stl<'scene>(
         let c: Vec3 = c * stl_init.scale + stl_init.center;
 
         let triangle = Triangle::from_coordinates(a, b, c, material);
-        hitable_list.push(Hitable::Triangle(triangle));
+        trianglelist.push(Hitable::Triangle(triangle));
     }
-
-    let bvhnode = BVHNode::from_list(hitable_list);
+    // TODO: get rid of this
+    let bvhnode: BVHNode = BVHNode::from_list(BvhAlgorithm::LongestAxis, trianglelist);
     // TODO: remove unwrap
     let aabb = bvhnode.bounding_box().unwrap().clone();
 

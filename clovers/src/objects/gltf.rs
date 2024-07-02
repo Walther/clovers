@@ -11,7 +11,7 @@ use tracing::debug;
 
 use crate::{
     aabb::AABB,
-    bvh::BVHNode,
+    bvh::{BVHNode, BvhAlgorithm},
     hitable::{get_orientation, Hitable, HitableTrait},
     interval::Interval,
     materials::gltf::GLTFMaterial,
@@ -69,7 +69,8 @@ impl<'scene> GLTF<'scene> {
     /// Create a new STL object with the given initialization parameters.
     pub fn new(gltf_init: GLTFInit) -> Self {
         let triangles: Vec<Hitable> = gltf_init.into();
-        let bvhnode = BVHNode::from_list(triangles);
+        // TODO: probably move or remove this?
+        let bvhnode = BVHNode::from_list(BvhAlgorithm::LongestAxis, triangles);
         // TODO: remove unwrap
         let aabb = bvhnode.bounding_box().unwrap().clone();
 
@@ -211,7 +212,8 @@ fn parse_mesh<'scene>(
                     }
                 }
 
-                let bvh: BVHNode = BVHNode::from_list(trianglelist);
+                // TODO: get rid of this
+                let bvh: BVHNode = BVHNode::from_list(BvhAlgorithm::LongestAxis, trianglelist);
                 objects.push(Hitable::BVHNode(bvh));
             }
             _ => unimplemented!(),

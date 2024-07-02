@@ -2,11 +2,13 @@ use core::cmp::Ordering;
 
 use crate::{
     aabb::AABB,
-    bvh::BVHNode,
+    bvh::{BVHNode, BvhAlgorithm},
     hitable::{Empty, Hitable, HitableTrait},
 };
 
 pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
+    let bvh_algorithm = BvhAlgorithm::LongestAxis;
+
     // Initialize two child nodes
     let left: Box<Hitable>;
     let right: Box<Hitable>;
@@ -77,8 +79,14 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
         // Split the vector; divide and conquer
         let mid = object_span / 2;
         let hitables_right = hitables.split_off(mid);
-        left = Box::new(Hitable::BVHNode(BVHNode::from_list(hitables)));
-        right = Box::new(Hitable::BVHNode(BVHNode::from_list(hitables_right)));
+        left = Box::new(Hitable::BVHNode(BVHNode::from_list(
+            bvh_algorithm,
+            hitables,
+        )));
+        right = Box::new(Hitable::BVHNode(BVHNode::from_list(
+            bvh_algorithm,
+            hitables_right,
+        )));
     }
 
     let box_left = left.bounding_box();

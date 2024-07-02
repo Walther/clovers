@@ -38,9 +38,9 @@ pub struct Randomness {
 /// Enum of the supported samplers.
 #[derive(Copy, Clone, Debug, PartialEq, ValueEnum)]
 pub enum Sampler {
-    /// Blue noise based sampler, see [BlueSampler](blue::BlueSampler)
+    /// Blue noise based sampler
     Blue,
-    /// Random number generator based sampler, see [RandomSampler](random::RandomSampler)
+    /// Random number generator based sampler
     Random,
 }
 

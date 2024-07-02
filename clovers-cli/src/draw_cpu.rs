@@ -38,6 +38,7 @@ pub fn draw(
         max_depth: _,
         mode,
         sampler,
+        bvh: _,
     } = *render_options;
     let bar = progress_bar(height, quiet);
 
@@ -59,7 +60,7 @@ pub fn draw(
             for index in 0..width {
                 let index = index + row_index * width;
                 let pixel = match mode {
-                    RenderMode::Default => {
+                    RenderMode::PathTracing => {
                         render_pixel(scene, render_options, index, &mut rng, &mut *sampler)
                     }
                     RenderMode::NormalMap => {

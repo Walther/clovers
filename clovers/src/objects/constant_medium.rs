@@ -17,7 +17,7 @@ use super::Object;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// `ConstantMediumInit` structure describes the necessary data for constructing a [`ConstantMedium`]. Used with [serde] when importing [`SceneFiles`](crate::scenes::SceneFile).
+/// `ConstantMediumInit` structure describes the necessary data for constructing a [`ConstantMedium`].
 pub struct ConstantMediumInit {
     /// Used for multiple importance sampling
     #[cfg_attr(feature = "serde-derive", serde(default))]

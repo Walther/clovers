@@ -9,6 +9,7 @@ pub mod json_scene;
 pub mod normals;
 pub mod render;
 pub mod sampler;
+pub mod scenefile;
 
 // TODO: move this into a better place - but keep rustc happy with the imports
 /// Global options

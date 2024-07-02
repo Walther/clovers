@@ -1,7 +1,7 @@
 //! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
 
 use crate::{
-    bvh::BVHNode,
+    bvh::{BVHNode, BvhAlgorithm},
     hitable::Hitable,
     materials::{Material, MaterialInit, SharedMaterial},
     Box,
@@ -108,7 +108,8 @@ pub fn object_to_hitable(obj: Object, materials: &[SharedMaterial]) -> Hitable<'
                 .iter()
                 .map(|object| -> Hitable { object_to_hitable(object.clone(), materials) })
                 .collect();
-            let bvh = BVHNode::from_list(objects);
+            // TODO: get rid of this
+            let bvh: BVHNode = BVHNode::from_list(BvhAlgorithm::LongestAxis, objects);
             Hitable::BVHNode(bvh)
         }
         Object::Quad(x) => {

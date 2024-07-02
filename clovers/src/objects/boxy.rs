@@ -11,7 +11,7 @@ use crate::{
 };
 use rand::rngs::SmallRng;
 
-/// `BoxyInit` structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
+/// `BoxyInit` structure describes the necessary data for constructing a [Boxy].
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct BoxyInit {

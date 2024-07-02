@@ -20,7 +20,7 @@ pub struct RenderOptions {
     /// Input filename / location
     #[arg()]
     pub input: String,
-    /// Output filename / location. [default: ./renders/unix_timestamp.png]
+    /// Output filename / location. Defaults to ./renders/unix_timestamp.png
     #[arg(short, long)]
     pub output: Option<String>,
     /// Width of the image in pixels.
@@ -36,19 +36,32 @@ pub struct RenderOptions {
     #[arg(short = 'd', long, default_value = "64")]
     pub max_depth: u32,
     /// Rendering mode.
-    #[arg(short = 'm', long, default_value = "default")]
+    #[arg(short = 'm', long, default_value = "path-tracing")]
     pub mode: RenderMode,
     /// Sampler to use for rendering.
     #[arg(long, default_value = "random")]
     pub sampler: Sampler,
+    /// BVH construction algorithm.
+    #[arg(long, default_value = "longest-axis")]
+    pub bvh: BvhAlgorithm,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, ValueEnum)]
 pub enum RenderMode {
-    Default,
+    /// Full path tracing, the default
+    PathTracing,
+    /// Surface normals of the first hit
     NormalMap,
+    /// Debug view for BVH ray hit count
     BvhTestCount,
+    /// Debug view for primitive object ray hit count
     PrimitiveTestCount,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, ValueEnum)]
+pub enum BvhAlgorithm {
+    /// Split based on the longest axis of the current AABB
+    LongestAxis,
 }
 
 // CLI usage somehow not detected
@@ -67,6 +80,7 @@ pub(crate) fn render(
         max_depth,
         mode,
         sampler,
+        bvh,
     } = render_options;
 
     if debug {
@@ -101,13 +115,18 @@ pub(crate) fn render(
         panic!("the blue sampler only supports the following sample-per-pixel counts: [1, 2, 4, 8, 16, 32, 64, 128, 256]");
     }
 
+    // TODO: improve ergonomics?
+    let bvh_algorithm: clovers::bvh::BvhAlgorithm = match bvh {
+        BvhAlgorithm::LongestAxis => clovers::bvh::BvhAlgorithm::LongestAxis,
+    };
+
     let threads = std::thread::available_parallelism()?;
 
     info!("Reading the scene file");
     let path = Path::new(&input);
     let scene = match path.extension() {
         Some(ext) => match &ext.to_str() {
-            Some("json") => initialize(path, width, height),
+            Some("json") => initialize(path, bvh_algorithm, width, height),
             _ => panic!("Unknown file type"),
         },
         None => panic!("Unknown file type"),
@@ -148,7 +167,7 @@ pub(crate) fn render(
         "Comment\0Rendered with the clovers path tracing engine. Scene file {input} rendered using the {mode:?} rendering mode at {width}x{height} resolution"
     );
     let details = match mode {
-        RenderMode::Default => {
+        RenderMode::PathTracing => {
             format!(", {samples} samples per pixel, {max_depth} max ray bounce depth.")
         }
         _ => ".".to_owned(),

@@ -13,7 +13,7 @@ use super::Object;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// `TranslateInit` structure describes the necessary data for constructing a [Translate] object. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
+/// `TranslateInit` structure describes the necessary data for constructing a [Translate] object.
 pub struct TranslateInit {
     /// Used for multiple importance sampling
     #[cfg_attr(feature = "serde-derive", serde(default))]
