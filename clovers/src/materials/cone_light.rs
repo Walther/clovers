@@ -2,10 +2,9 @@
 
 use super::{MaterialTrait, ScatterRecord};
 use crate::{
-    HitRecord,
     ray::Ray,
     textures::{SolidColor, Texture, TextureTrait},
-    Float, Position,
+    Float, HitRecord, Position,
 };
 use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;

@@ -6,8 +6,7 @@ use crate::interval::Interval;
 use crate::materials::MaterialInit;
 use crate::wavelength::Wavelength;
 use crate::{
-    aabb::AABB, HitRecord, materials::Material, ray::Ray, Float, Vec3,
-    EPSILON_RECT_THICKNESS,
+    aabb::AABB, materials::Material, ray::Ray, Float, HitRecord, Vec3, EPSILON_RECT_THICKNESS,
 };
 use crate::{Direction, Displacement, Position, EPSILON_SHADOW_ACNE};
 use nalgebra::Unit;

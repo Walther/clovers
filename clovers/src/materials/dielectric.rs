@@ -2,10 +2,9 @@
 
 use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
-    HitRecord,
     pdf::{ZeroPDF, PDF},
     ray::Ray,
-    Direction, Float,
+    Direction, Float, HitRecord,
 };
 use palette::{white_point::E, Xyz};
 use rand::rngs::SmallRng;

@@ -4,7 +4,7 @@ use alloc::string::String;
 use core::fmt::Debug;
 use nalgebra::Unit;
 
-use crate::{HitRecord, pdf::PDF, ray::Ray, Direction, Float, Position, Vec3};
+use crate::{pdf::PDF, ray::Ray, Direction, Float, HitRecord, Position, Vec3};
 pub mod cone_light;
 pub mod dielectric;
 pub mod diffuse_light;
