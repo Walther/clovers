@@ -42,7 +42,7 @@ impl<'scene> HitableTrait for STL<'scene> {
 
     /// Return the axis-aligned bounding box for the object
     #[must_use]
-    fn bounding_box(&self) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
@@ -145,7 +145,7 @@ pub fn initialize_stl<'scene>(
     // TODO: get rid of this
     let bvhnode: BVHNode = BVHNode::from_list(BvhAlgorithm::LongestAxis, trianglelist);
     // TODO: remove unwrap
-    let aabb = bvhnode.bounding_box().unwrap().clone();
+    let aabb = bvhnode.aabb().unwrap().clone();
 
     STL {
         bvhnode,

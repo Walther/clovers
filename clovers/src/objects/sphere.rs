@@ -127,7 +127,7 @@ impl<'scene> HitableTrait for Sphere<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] for the sphere.
     #[must_use]
-    fn bounding_box(&self) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 

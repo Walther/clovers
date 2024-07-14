@@ -72,7 +72,7 @@ impl<'scene> GLTF<'scene> {
         // TODO: probably move or remove this?
         let bvhnode = BVHNode::from_list(BvhAlgorithm::LongestAxis, triangles);
         // TODO: remove unwrap
-        let aabb = bvhnode.bounding_box().unwrap().clone();
+        let aabb = bvhnode.aabb().unwrap().clone();
 
         GLTF { bvhnode, aabb }
     }
@@ -93,7 +93,7 @@ impl<'scene> HitableTrait for GLTF<'scene> {
 
     /// Return the axis-aligned bounding box for the object
     #[must_use]
-    fn bounding_box(&self) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
@@ -332,7 +332,7 @@ impl<'scene> HitableTrait for GLTFTriangle<'scene> {
         })
     }
 
-    fn bounding_box(&self) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 

@@ -36,7 +36,7 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
         // TODO: can this hack be removed?
         left = Box::new(hitables[0].clone());
         right = Box::new(Hitable::Empty(Empty {}));
-        let aabb = left.bounding_box().unwrap().clone(); // TODO: remove unwrap
+        let aabb = left.aabb().unwrap().clone(); // TODO: remove unwrap
         return BVHNode { left, right, aabb };
     } else if object_span == 2 {
         // If we are comparing two objects, perform the comparison
@@ -64,8 +64,8 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
             right: Box::new(hitables[2].clone()),
             aabb: AABB::combine(
                 // TODO: no unwrap?
-                hitables[1].bounding_box().unwrap(),
-                hitables[2].bounding_box().unwrap(),
+                hitables[1].aabb().unwrap(),
+                hitables[2].aabb().unwrap(),
             ),
         }));
     } else {
@@ -85,8 +85,8 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
         )));
     }
 
-    let box_left = left.bounding_box();
-    let box_right = right.bounding_box();
+    let box_left = left.aabb();
+    let box_right = right.aabb();
 
     // Generate a bounding box and BVHNode if possible
     if let (Some(box_left), Some(box_right)) = (box_left, box_right) {
@@ -101,8 +101,8 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
 // Internal helper functions
 
 fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
-    let box_a: Option<&AABB> = a.bounding_box();
-    let box_b: Option<&AABB> = b.bounding_box();
+    let box_a: Option<&AABB> = a.aabb();
+    let box_b: Option<&AABB> = b.aabb();
 
     if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
         if box_a.axis(axis).min < box_b.axis(axis).min {
@@ -141,7 +141,7 @@ fn vec_bounding_box(vec: &Vec<Hitable>) -> Option<AABB> {
     // Go through all the objects, and expand the AABB
     for object in vec {
         // Check if the object has a box
-        let Some(bounding) = object.bounding_box() else {
+        let Some(bounding) = object.aabb() else {
             // No box found for the object, early return.
             // Having even one unbounded object in a list makes the entire list unbounded!
             return None;

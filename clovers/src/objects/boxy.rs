@@ -106,7 +106,7 @@ impl<'scene> HitableTrait for Boxy<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] of the object.
     #[must_use]
-    fn bounding_box(&self) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 

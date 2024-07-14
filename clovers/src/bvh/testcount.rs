@@ -28,19 +28,19 @@ impl<'scene> BVHNode<'scene> {
         }
 
         // Check the distance to the bounding boxes
-        let (left_aabb_distance, right_aabb_distance) =
-            match (self.left.bounding_box(), self.right.bounding_box()) {
-                // Early returns, if there's no bounding box
-                (None, None) => return None,
-                (Some(_l), None) => {
-                    return recurse(&self.left, depth, ray, distance_min, distance_max, rng)
-                }
-                (None, Some(_r)) => {
-                    return recurse(&self.right, depth, ray, distance_min, distance_max, rng)
-                }
-                // If we have bounding boxes, get the distances
-                (Some(l), Some(r)) => (l.distance(ray), r.distance(ray)),
-            };
+        let (left_aabb_distance, right_aabb_distance) = match (self.left.aabb(), self.right.aabb())
+        {
+            // Early returns, if there's no bounding box
+            (None, None) => return None,
+            (Some(_l), None) => {
+                return recurse(&self.left, depth, ray, distance_min, distance_max, rng)
+            }
+            (None, Some(_r)) => {
+                return recurse(&self.right, depth, ray, distance_min, distance_max, rng)
+            }
+            // If we have bounding boxes, get the distances
+            (Some(l), Some(r)) => (l.distance(ray), r.distance(ray)),
+        };
         let (_closest_aabb_distance, furthest_aabb_distance) =
             match (left_aabb_distance, right_aabb_distance) {
                 // Early return: neither child AABB can be hit with the ray

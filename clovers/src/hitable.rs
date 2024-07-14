@@ -56,7 +56,7 @@ impl HitableTrait for Empty {
         None
     }
 
-    fn bounding_box(&self) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         None
     }
 
@@ -91,7 +91,7 @@ pub trait HitableTrait {
 
     #[must_use]
     /// Returns the bounding box of the entity.
-    fn bounding_box(&self) -> Option<&AABB>;
+    fn aabb(&self) -> Option<&AABB>;
 
     #[must_use]
     /// Probability density function value method, used for multiple importance sampling.

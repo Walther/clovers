@@ -26,15 +26,15 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
         }
 
         // Check the distance to the bounding boxes
-        let (left_aabb_distance, right_aabb_distance) =
-            match (self.left.bounding_box(), self.right.bounding_box()) {
-                // Early returns, if there's no bounding box
-                (None, None) => return None,
-                (Some(_l), None) => return self.left.hit(ray, distance_min, distance_max, rng),
-                (None, Some(_r)) => return self.right.hit(ray, distance_min, distance_max, rng),
-                // If we have bounding boxes, get the distances
-                (Some(l), Some(r)) => (l.distance(ray), r.distance(ray)),
-            };
+        let (left_aabb_distance, right_aabb_distance) = match (self.left.aabb(), self.right.aabb())
+        {
+            // Early returns, if there's no bounding box
+            (None, None) => return None,
+            (Some(_l), None) => return self.left.hit(ray, distance_min, distance_max, rng),
+            (None, Some(_r)) => return self.right.hit(ray, distance_min, distance_max, rng),
+            // If we have bounding boxes, get the distances
+            (Some(l), Some(r)) => (l.distance(ray), r.distance(ray)),
+        };
         let (_closest_aabb_distance, furthest_aabb_distance) =
             match (left_aabb_distance, right_aabb_distance) {
                 // Early return: neither child AABB can be hit with the ray
@@ -80,7 +80,7 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] of the objects within this [`BVHNode`].
     #[must_use]
-    fn bounding_box(&self) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 

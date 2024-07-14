@@ -166,7 +166,7 @@ impl<'scene> HitableTrait for Triangle<'scene> {
 
     /// Returns the bounding box of the triangle
     #[must_use]
-    fn bounding_box(&self) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         // TODO: this is from quad and not updated!
         // although i guess a triangle's aabb is the same as the quad's aabb in worst case
         Some(&self.aabb)
@@ -274,7 +274,7 @@ mod tests {
             &material,
         );
 
-        let aabb = triangle.bounding_box().expect("No AABB for the triangle");
+        let aabb = triangle.aabb().expect("No AABB for the triangle");
 
         let expected_aabb = AABB::new(
             Interval::new(0.0, 1.0),
@@ -313,7 +313,7 @@ mod tests {
             &material,
         );
 
-        let aabb = triangle.bounding_box().expect("No AABB for the triangle");
+        let aabb = triangle.aabb().expect("No AABB for the triangle");
 
         let expected_aabb = AABB::new(
             Interval::new(0.0, 1.0),
@@ -352,7 +352,7 @@ mod tests {
             &material,
         );
 
-        let aabb = triangle.bounding_box().expect("No AABB for the triangle");
+        let aabb = triangle.aabb().expect("No AABB for the triangle");
 
         let expected_aabb = AABB::new(
             Interval::new(-1.0, 0.0),
@@ -391,7 +391,7 @@ mod tests {
             &material,
         );
 
-        let aabb = triangle.bounding_box().expect("No AABB for the triangle");
+        let aabb = triangle.aabb().expect("No AABB for the triangle");
 
         let expected_aabb = AABB::new(
             Interval::new(-1.0, 0.0),

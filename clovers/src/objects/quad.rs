@@ -133,7 +133,7 @@ impl<'scene> HitableTrait for Quad<'scene> {
 
     /// Returns the bounding box of the quad
     #[must_use]
-    fn bounding_box(&self) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
