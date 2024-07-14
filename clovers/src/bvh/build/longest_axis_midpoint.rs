@@ -62,7 +62,7 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
         right = Box::new(Hitable::BVHNode(BVHNode {
             left: Box::new(hitables[1].clone()),
             right: Box::new(hitables[2].clone()),
-            aabb: AABB::surrounding_box(
+            aabb: AABB::combine(
                 // TODO: no unwrap?
                 hitables[1].bounding_box().unwrap(),
                 hitables[2].bounding_box().unwrap(),
@@ -90,7 +90,7 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
 
     // Generate a bounding box and BVHNode if possible
     if let (Some(box_left), Some(box_right)) = (box_left, box_right) {
-        let aabb = AABB::surrounding_box(box_left, box_right);
+        let aabb = AABB::combine(box_left, box_right);
 
         BVHNode { left, right, aabb }
     } else {
@@ -151,7 +151,7 @@ fn vec_bounding_box(vec: &Vec<Hitable>) -> Option<AABB> {
         match output_box {
             // If we do, expand it & recurse
             Some(old_box) => {
-                output_box = Some(AABB::surrounding_box(&old_box, bounding));
+                output_box = Some(AABB::combine(&old_box, bounding));
             }
             // Otherwise, set output box to be the newly-found box
             None => {

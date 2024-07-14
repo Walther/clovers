@@ -68,7 +68,7 @@ impl<'scene> MovingSphere<'scene> {
             center_1 + Position::new(radius, radius, radius),
         );
 
-        let aabb = AABB::surrounding_box(&box0, &box1);
+        let aabb = AABB::combine(&box0, &box1);
 
         MovingSphere {
             center_0,

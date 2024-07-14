@@ -87,7 +87,7 @@ impl AABB {
 
     /// Given two axis-aligned bounding boxes, return a new [AABB] that contains both.
     #[must_use]
-    pub fn surrounding_box(box0: &AABB, box1: &AABB) -> AABB {
+    pub fn combine(box0: &AABB, box1: &AABB) -> AABB {
         AABB {
             x: Interval::combine(&box0.x, &box1.x),
             y: Interval::combine(&box0.y, &box1.y),
