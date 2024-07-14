@@ -7,7 +7,7 @@ use crate::{interval::Interval, ray::Ray, Float, Position, Vec3, EPSILON_RECT_TH
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
 /// This is useful for creating bounding volume hierarchies, which is an optimization for reducing the time spent on calculating ray-object intersections.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Default)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct AABB {
     /// The bounding interval on the X axis
@@ -232,6 +232,14 @@ mod tests {
         );
         let centroid = aabb.centroid();
         let expected = Position::new(0.5, 0.5, 0.5);
+        assert_eq!(centroid, expected);
+    }
+
+    #[test]
+    fn default() {
+        let aabb = AABB::default();
+        let centroid = aabb.centroid();
+        let expected = Position::new(0.0, 0.0, 0.0);
         assert_eq!(centroid, expected);
     }
 }
