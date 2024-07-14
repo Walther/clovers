@@ -1,5 +1,3 @@
-use std::time::Instant;
-
 use std::boxed::Box;
 
 use clovers::{
@@ -81,18 +79,17 @@ impl SceneFile {
                 priority_hitables.push(hitable);
             } else {
                 let hitable = object_to_hitable(object, materials);
-                hitables.push(hitable.clone());
+                match hitable {
+                    // Flatten any lists we got. Potential sources: `GLTF`, `STL`
+                    Hitable::HitableList(mut l) => {
+                        hitables.append(&mut l.hitables);
+                    }
+                    _ => hitables.push(hitable.clone()),
+                };
             }
         }
         info!("All objects parsed");
-
-        info!("BVH tree build starting");
-        let start = Instant::now();
         let bvh_root = BVHNode::from_list(bvh_algorithm, hitables);
-        let end = Instant::now();
-        let duration = (end - start).as_millis();
-        info!("BVH tree build done in {duration} ms");
-
         let mis_bvh_root = Hitable::BVHNode(BVHNode::from_list(bvh_algorithm, priority_hitables));
 
         Scene {

@@ -53,14 +53,6 @@ fn primitive_testcount_recurse_condition(
         Hitable::BVHNode(x) => {
             x.primitive_testcount(count, ray, distance_min, distance_max, rng);
         }
-        Hitable::STL(x) => {
-            x.bvhnode
-                .primitive_testcount(count, ray, distance_min, distance_max, rng);
-        }
-        Hitable::GLTF(x) => {
-            x.bvhnode
-                .primitive_testcount(count, ray, distance_min, distance_max, rng);
-        }
 
         // These are counted
         Hitable::MovingSphere(_)
@@ -73,6 +65,9 @@ fn primitive_testcount_recurse_condition(
         | Hitable::Translate(_) => {
             // TODO: currently RotateY and Translate are counted wrong. They may contain more primitives!
             *count += 1;
+        }
+        Hitable::HitableList(l) => {
+            *count += l.hitables.len();
         }
         Hitable::Boxy(_) => {
             *count += 6;

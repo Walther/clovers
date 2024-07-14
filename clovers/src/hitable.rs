@@ -1,13 +1,11 @@
 //! An abstraction for things that can be hit by [Rays](crate::ray::Ray).
 
-#[cfg(feature = "stl")]
-use crate::objects::STL;
 #[cfg(feature = "gl_tf")]
-use crate::objects::{GLTFTriangle, GLTF};
+use crate::objects::GLTFTriangle;
 
 use crate::{
     aabb::AABB,
-    bvh::BVHNode,
+    bvh::{build::utils::vec_bounding_box, BVHNode},
     objects::{Boxy, ConstantMedium, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle},
     ray::Ray,
     wavelength::Wavelength,
@@ -29,15 +27,12 @@ pub enum Hitable<'scene> {
     Quad(Quad<'scene>),
     RotateY(RotateY<'scene>),
     Sphere(Sphere<'scene>),
-    #[cfg(feature = "stl")]
-    STL(STL<'scene>),
-    #[cfg(feature = "gl_tf")]
-    GLTF(GLTF<'scene>),
     Translate(Translate<'scene>),
     Triangle(Triangle<'scene>),
     Empty(Empty),
     #[cfg(feature = "gl_tf")]
     GLTFTriangle(GLTFTriangle<'scene>),
+    HitableList(HitableList<'scene>),
 }
 
 // TODO: remove horrible hack
@@ -128,4 +123,72 @@ pub fn get_orientation(ray: &Ray, outward_normal: Direction) -> (bool, Direction
     };
 
     (front_face, normal)
+}
+
+/// A list of `Hitable`s, occasionally used as the leaf of `BVHNode` when further splitting is not possible or beneficial.
+///
+/// Hopefully temporary.
+// TODO: remove?
+#[derive(Debug, Clone)]
+pub struct HitableList<'scene> {
+    /// Hitables in the list
+    pub hitables: Vec<Hitable<'scene>>,
+    aabb: AABB,
+}
+
+impl<'scene> HitableList<'scene> {
+    /// Creates a new [`HitableList`].
+    #[must_use]
+    pub fn new(hitables: Vec<Hitable<'scene>>) -> Self {
+        let aabb = vec_bounding_box(&hitables).unwrap();
+        Self { hitables, aabb }
+    }
+}
+
+// TODO: ideally, this impl should be removed entirely
+impl<'scene> HitableTrait for HitableList<'scene> {
+    #[must_use]
+    fn hit(
+        &self,
+        ray: &Ray,
+        distance_min: Float,
+        distance_max: Float,
+        rng: &mut SmallRng,
+    ) -> Option<HitRecord> {
+        let mut distance = Float::INFINITY;
+        let mut closest: Option<HitRecord> = None;
+        for hitable in &self.hitables {
+            let hit_record = hitable.hit(ray, distance_min, distance_max, rng)?;
+            if hit_record.distance < distance {
+                distance = hit_record.distance;
+                closest = Some(hit_record);
+            }
+        }
+
+        closest
+    }
+
+    #[must_use]
+    fn aabb(&self) -> Option<&AABB> {
+        Some(&self.aabb)
+    }
+
+    #[must_use]
+    fn pdf_value(
+        &self,
+        _origin: Position,
+        _direction: Direction,
+        _wavelength: Wavelength,
+        _time: Float,
+        _rng: &mut SmallRng,
+    ) -> Float {
+        // TODO: fix
+        0.0
+    }
+
+    #[must_use]
+    fn centroid(&self) -> Position {
+        // TODO: ideally, this shouldn't be used at all
+        self.aabb.centroid()
+    }
 }

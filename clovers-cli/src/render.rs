@@ -62,6 +62,8 @@ pub enum RenderMode {
 pub enum BvhAlgorithm {
     /// Split based on the longest axis of the current AABB
     LongestAxis,
+    /// Split based on the Surface Area Heuristic.
+    Sah,
 }
 
 // CLI usage somehow not detected
@@ -118,6 +120,7 @@ pub(crate) fn render(
     // TODO: improve ergonomics?
     let bvh_algorithm: clovers::bvh::BvhAlgorithm = match bvh {
         BvhAlgorithm::LongestAxis => clovers::bvh::BvhAlgorithm::LongestAxis,
+        BvhAlgorithm::Sah => clovers::bvh::BvhAlgorithm::Sah,
     };
 
     let threads = std::thread::available_parallelism()?;

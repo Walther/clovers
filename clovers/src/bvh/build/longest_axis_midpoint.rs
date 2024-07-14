@@ -2,18 +2,16 @@ use core::cmp::Ordering;
 
 use crate::{
     aabb::AABB,
-    bvh::{BVHNode, BvhAlgorithm},
+    bvh::BVHNode,
     hitable::{Empty, Hitable, HitableTrait},
 };
 
-pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
-    let bvh_algorithm = BvhAlgorithm::LongestAxis;
+use super::utils::{get_comparator, vec_bounding_box};
 
+pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
     // Initialize two child nodes
     let left: Box<Hitable>;
     let right: Box<Hitable>;
-
-    let comparators = [box_x_compare, box_y_compare, box_z_compare];
 
     // What is the axis with the largest span?
     // TODO: horribly inefficient, improve!
@@ -26,7 +24,7 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
     let largest = f32::max(f32::max(spans[0], spans[1]), spans[2]);
     #[allow(clippy::float_cmp)] // TODO: better code for picking the largest axis...
     let axis: usize = spans.iter().position(|&x| x == largest).unwrap();
-    let comparator = comparators[axis];
+    let comparator = get_comparator(axis);
 
     // How many objects do we have?
     let object_span = hitables.len();
@@ -75,14 +73,8 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
         // Split the vector; divide and conquer
         let mid = object_span / 2;
         let hitables_right = hitables.split_off(mid);
-        left = Box::new(Hitable::BVHNode(BVHNode::from_list(
-            bvh_algorithm,
-            hitables,
-        )));
-        right = Box::new(Hitable::BVHNode(BVHNode::from_list(
-            bvh_algorithm,
-            hitables_right,
-        )));
+        left = Box::new(Hitable::BVHNode(build(hitables)));
+        right = Box::new(Hitable::BVHNode(build(hitables_right)));
     }
 
     let box_left = left.aabb();
@@ -96,70 +88,4 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
     } else {
         panic!("No bounding box in bvh_node constructor");
     }
-}
-
-// Internal helper functions
-
-fn box_compare(a: &Hitable, b: &Hitable, axis: usize) -> Ordering {
-    let box_a: Option<&AABB> = a.aabb();
-    let box_b: Option<&AABB> = b.aabb();
-
-    if let (Some(box_a), Some(box_b)) = (box_a, box_b) {
-        if box_a.axis(axis).min < box_b.axis(axis).min {
-            Ordering::Less
-        } else {
-            // Default to greater, even if equal
-            Ordering::Greater
-        }
-    } else {
-        panic!("No bounding box to compare with.")
-    }
-}
-
-fn box_x_compare(a: &Hitable, b: &Hitable) -> Ordering {
-    box_compare(a, b, 0)
-}
-
-fn box_y_compare(a: &Hitable, b: &Hitable) -> Ordering {
-    box_compare(a, b, 1)
-}
-
-fn box_z_compare(a: &Hitable, b: &Hitable) -> Ordering {
-    box_compare(a, b, 2)
-}
-
-// TODO: inefficient, O(n) *and* gets called at every iteration of BVHNode creation => quadratic behavior
-#[must_use]
-fn vec_bounding_box(vec: &Vec<Hitable>) -> Option<AABB> {
-    if vec.is_empty() {
-        return None;
-    }
-
-    // Mutable AABB that we grow from zero
-    let mut output_box: Option<AABB> = None;
-
-    // Go through all the objects, and expand the AABB
-    for object in vec {
-        // Check if the object has a box
-        let Some(bounding) = object.aabb() else {
-            // No box found for the object, early return.
-            // Having even one unbounded object in a list makes the entire list unbounded!
-            return None;
-        };
-
-        // Do we have an output_box already saved?
-        match output_box {
-            // If we do, expand it & recurse
-            Some(old_box) => {
-                output_box = Some(AABB::combine(&old_box, bounding));
-            }
-            // Otherwise, set output box to be the newly-found box
-            None => {
-                output_box = Some(bounding.clone());
-            }
-        }
-    }
-
-    // Return the final combined output_box
-    output_box
 }

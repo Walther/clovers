@@ -11,7 +11,7 @@ use tracing::debug;
 
 use crate::{
     aabb::AABB,
-    bvh::{BVHNode, BvhAlgorithm},
+    bvh::build::utils::vec_bounding_box,
     hitable::{get_orientation, Hitable, HitableTrait},
     interval::Interval,
     materials::gltf::GLTFMaterial,
@@ -58,8 +58,8 @@ impl<'scene> From<GLTFInit> for Vec<Hitable<'scene>> {
 /// Internal GLTF object representation after initialization.
 #[derive(Debug, Clone)]
 pub struct GLTF<'scene> {
-    /// Bounding Volume Hierarchy tree for the object
-    pub bvhnode: BVHNode<'scene>,
+    /// Hitables of the `GLTF` object. Most likely a list of `GLTFTriangle`s.
+    pub hitables: Vec<Hitable<'scene>>,
     /// Axis-aligned bounding box of the object
     pub aabb: AABB,
 }
@@ -68,75 +68,33 @@ impl<'scene> GLTF<'scene> {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
     pub fn new(gltf_init: GLTFInit) -> Self {
-        let triangles: Vec<Hitable> = gltf_init.into();
-        // TODO: probably move or remove this?
-        let bvhnode = BVHNode::from_list(BvhAlgorithm::LongestAxis, triangles);
-        // TODO: remove unwrap
-        let aabb = bvhnode.aabb().unwrap().clone();
+        let hitables: Vec<Hitable> = gltf_init.into();
+        let aabb = vec_bounding_box(&hitables).unwrap();
 
-        GLTF { bvhnode, aabb }
-    }
-}
-
-impl<'scene> HitableTrait for GLTF<'scene> {
-    /// Hit method for the GLTF object
-    #[must_use]
-    fn hit(
-        &self,
-        ray: &Ray,
-        distance_min: f32,
-        distance_max: f32,
-        rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
-        self.bvhnode.hit(ray, distance_min, distance_max, rng)
-    }
-
-    /// Return the axis-aligned bounding box for the object
-    #[must_use]
-    fn aabb(&self) -> Option<&AABB> {
-        Some(&self.aabb)
-    }
-
-    /// Returns a probability density function value based on the object
-    #[must_use]
-    fn pdf_value(
-        &self,
-        origin: Position,
-        direction: Direction,
-        wavelength: Wavelength,
-        time: Float,
-        rng: &mut SmallRng,
-    ) -> Float {
-        self.bvhnode
-            .pdf_value(origin, direction, wavelength, time, rng)
-    }
-
-    // TODO: correctness?
-    fn centroid(&self) -> Position {
-        self.aabb.centroid()
+        GLTF { hitables, aabb }
     }
 }
 
 fn parse_node<'scene>(
     node: &Node,
-    objects: &mut Vec<Hitable<'scene>>,
+    hitables: &mut Vec<Hitable<'scene>>,
     buffers: &Vec<gltf::buffer::Data>,
     materials: &'scene Vec<gltf::Material>,
     images: &'scene Vec<Data>,
 ) {
     // Handle direct meshes
     if let Some(mesh) = node.mesh() {
-        parse_mesh(&mesh, objects, buffers, materials, images);
+        parse_mesh(&mesh, hitables, buffers, materials, images);
     }
     // Handle nesting
     for child in node.children() {
-        parse_node(&child, objects, buffers, materials, images);
+        parse_node(&child, hitables, buffers, materials, images);
     }
 }
 
 fn parse_mesh<'scene>(
     mesh: &Mesh,
-    objects: &mut Vec<Hitable<'scene>>,
+    hitables: &mut Vec<Hitable<'scene>>,
     buffers: &[gltf::buffer::Data],
     materials: &'scene [gltf::Material],
     images: &'scene [Data],
@@ -217,9 +175,7 @@ fn parse_mesh<'scene>(
                     }
                 }
 
-                // TODO: get rid of this
-                let bvh: BVHNode = BVHNode::from_list(BvhAlgorithm::LongestAxis, trianglelist);
-                objects.push(Hitable::BVHNode(bvh));
+                hitables.append(&mut trianglelist);
             }
             _ => unimplemented!(),
         }

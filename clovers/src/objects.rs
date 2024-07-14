@@ -1,8 +1,7 @@
 //! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
 
 use crate::{
-    bvh::{BVHNode, BvhAlgorithm},
-    hitable::Hitable,
+    hitable::{Hitable, HitableList},
     materials::{Material, MaterialInit, SharedMaterial},
     Box,
 };
@@ -108,9 +107,7 @@ pub fn object_to_hitable(obj: Object, materials: &[SharedMaterial]) -> Hitable<'
                 .iter()
                 .map(|object| -> Hitable { object_to_hitable(object.clone(), materials) })
                 .collect();
-            // TODO: get rid of this
-            let bvh: BVHNode = BVHNode::from_list(BvhAlgorithm::LongestAxis, objects);
-            Hitable::BVHNode(bvh)
+            Hitable::HitableList(HitableList::new(objects))
         }
         Object::Quad(x) => {
             let material = initialize_material(x.material, materials);
@@ -126,9 +123,15 @@ pub fn object_to_hitable(obj: Object, materials: &[SharedMaterial]) -> Hitable<'
             Hitable::Sphere(Sphere::new(x.center, x.radius, material))
         }
         #[cfg(feature = "stl")]
-        Object::STL(stl_init) => Hitable::STL(initialize_stl(stl_init, materials)),
+        Object::STL(stl_init) => {
+            let stl = initialize_stl(stl_init, materials);
+            Hitable::HitableList(HitableList::new(stl.hitables))
+        }
         #[cfg(feature = "gl_tf")]
-        Object::GLTF(x) => Hitable::GLTF(GLTF::new(x)),
+        Object::GLTF(x) => {
+            let gltf = GLTF::new(x);
+            Hitable::HitableList(HitableList::new(gltf.hitables))
+        }
         Object::Translate(x) => {
             let obj = *x.object;
             let obj: Hitable = object_to_hitable(obj, materials);

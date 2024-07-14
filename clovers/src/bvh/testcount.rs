@@ -99,12 +99,6 @@ fn recurse<'scene>(
 ) -> Option<HitRecord<'scene>> {
     match bvhnode {
         Hitable::BVHNode(bvh) => bvh.testcount(depth, ray, distance_min, distance_max, rng),
-        Hitable::STL(s) => s
-            .bvhnode
-            .testcount(depth, ray, distance_min, distance_max, rng),
-        Hitable::GLTF(g) => g
-            .bvhnode
-            .testcount(depth, ray, distance_min, distance_max, rng),
         hitable => hitable.hit(ray, distance_min, distance_max, rng),
     }
 }
