@@ -89,9 +89,9 @@ impl AABB {
     #[must_use]
     pub fn surrounding_box(box0: &AABB, box1: &AABB) -> AABB {
         AABB {
-            x: Interval::new_from_intervals(&box0.x, &box1.x),
-            y: Interval::new_from_intervals(&box0.y, &box1.y),
-            z: Interval::new_from_intervals(&box0.z, &box1.z),
+            x: Interval::combine(&box0.x, &box1.x),
+            y: Interval::combine(&box0.y, &box1.y),
+            z: Interval::combine(&box0.z, &box1.z),
         }
     }
 

@@ -27,7 +27,7 @@ impl Interval {
     /// Constructs a new interval from two intervals
     // TODO: explanation, clarification
     #[must_use]
-    pub fn new_from_intervals(a: &Interval, b: &Interval) -> Self {
+    pub fn combine(a: &Interval, b: &Interval) -> Self {
         Interval {
             min: a.min.min(b.min),
             max: a.max.max(b.max),
