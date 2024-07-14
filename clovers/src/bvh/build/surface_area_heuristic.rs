@@ -11,7 +11,7 @@ use crate::{
     Float,
 };
 
-use super::utils::get_comparator;
+use super::utils::{get_comparator, vec_bounding_box};
 
 /// Heavily inspired by the wonderful blog series <https://jacco.ompf2.com/2022/04/18/how-to-build-a-bvh-part-2-faster-rays/>.
 pub fn build(hitables: Vec<Hitable>) -> BVHNode {
@@ -88,15 +88,27 @@ pub fn build(hitables: Vec<Hitable>) -> BVHNode {
     }
 }
 
+#[allow(clippy::cast_precision_loss)]
 fn best_split(hitables: &Vec<Hitable>) -> (usize, Float) {
+    const SPLIT_COUNT: usize = 64;
+    const SPLIT_COUNT_F: Float = SPLIT_COUNT as Float;
+
     // determine split axis using SAH
     let mut best_axis = 0;
     let mut best_pos = 0.0;
     let mut best_cost = Float::INFINITY;
+    let aabb = vec_bounding_box(hitables).unwrap();
 
     for axis in 0..3 {
-        for hitable in hitables {
-            let candidate_pos = hitable.centroid()[axis];
+        let (bounds_min, bounds_max) = aabb.bounding_positions();
+        #[allow(clippy::float_cmp)]
+        if bounds_min[axis] == bounds_max[axis] {
+            continue;
+        };
+
+        let scale = (bounds_max[axis] - bounds_min[axis]) / SPLIT_COUNT_F;
+        for i in 0..SPLIT_COUNT {
+            let candidate_pos = bounds_min[axis] + (i as Float) * scale;
             let cost = evaluate_sah(hitables, axis, candidate_pos);
             if cost < best_cost {
                 best_pos = candidate_pos;
