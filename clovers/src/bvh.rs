@@ -17,7 +17,7 @@ pub struct BVHNode<'scene> {
     /// Right child of the `BVHNode`
     pub right: Box<Hitable<'scene>>,
     /// Bounding box containing both of the child nodes
-    pub bounding_box: AABB,
+    pub aabb: AABB,
 }
 
 /// The choice of algorithms used for constructing the Bounding Volume Hierarchy tree

@@ -36,12 +36,8 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
         // TODO: can this hack be removed?
         left = Box::new(hitables[0].clone());
         right = Box::new(Hitable::Empty(Empty {}));
-        let bounding_box = left.bounding_box().unwrap().clone(); // TODO: remove unwrap
-        return BVHNode {
-            left,
-            right,
-            bounding_box,
-        };
+        let aabb = left.bounding_box().unwrap().clone(); // TODO: remove unwrap
+        return BVHNode { left, right, aabb };
     } else if object_span == 2 {
         // If we are comparing two objects, perform the comparison
         // Insert the child nodes in order
@@ -66,7 +62,7 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
         right = Box::new(Hitable::BVHNode(BVHNode {
             left: Box::new(hitables[1].clone()),
             right: Box::new(hitables[2].clone()),
-            bounding_box: AABB::surrounding_box(
+            aabb: AABB::surrounding_box(
                 // TODO: no unwrap?
                 hitables[1].bounding_box().unwrap(),
                 hitables[2].bounding_box().unwrap(),
@@ -94,13 +90,9 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
 
     // Generate a bounding box and BVHNode if possible
     if let (Some(box_left), Some(box_right)) = (box_left, box_right) {
-        let bounding_box = AABB::surrounding_box(box_left, box_right);
+        let aabb = AABB::surrounding_box(box_left, box_right);
 
-        BVHNode {
-            left,
-            right,
-            bounding_box,
-        }
+        BVHNode { left, right, aabb }
     } else {
         panic!("No bounding box in bvh_node constructor");
     }

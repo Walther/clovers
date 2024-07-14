@@ -23,7 +23,7 @@ impl<'scene> BVHNode<'scene> {
         *depth += 1;
 
         // If we do not hit the bounding box of current node, early return None
-        if !self.bounding_box.hit(ray, distance_min, distance_max) {
+        if !self.aabb.hit(ray, distance_min, distance_max) {
             return None;
         }
 

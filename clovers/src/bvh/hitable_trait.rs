@@ -21,7 +21,7 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
         rng: &mut SmallRng,
     ) -> Option<HitRecord> {
         // If we do not hit the bounding box of current node, early return None
-        if !self.bounding_box.hit(ray, distance_min, distance_max) {
+        if !self.aabb.hit(ray, distance_min, distance_max) {
             return None;
         }
 
@@ -81,7 +81,7 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
     /// Returns the axis-aligned bounding box [AABB] of the objects within this [`BVHNode`].
     #[must_use]
     fn bounding_box(&self) -> Option<&AABB> {
-        Some(&self.bounding_box)
+        Some(&self.aabb)
     }
 
     /// Returns a probability density function value based on the children
@@ -132,6 +132,6 @@ impl<'scene> HitableTrait for BVHNode<'scene> {
 
     // TODO: remove?
     fn centroid(&self) -> Position {
-        self.bounding_box.centroid()
+        self.aabb.centroid()
     }
 }
