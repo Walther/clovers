@@ -20,6 +20,7 @@ pub fn build(hitables: Vec<Hitable>) -> BVHNode {
     let left: Box<Hitable>;
     let right: Box<Hitable>;
 
+    let aabb = vec_bounding_box(&hitables).unwrap();
     let count = hitables.len();
     let (axis, position) = best_split(&hitables);
 
@@ -27,12 +28,10 @@ pub fn build(hitables: Vec<Hitable>) -> BVHNode {
     if count == 1 {
         left = Box::new(hitables[0].clone());
         right = Box::new(Hitable::Empty(Empty {}));
-        let aabb = left.aabb().unwrap().clone(); // TODO: remove unwrap
         return BVHNode { left, right, aabb };
     } else if count == 2 {
         left = Box::new(hitables[0].clone());
         right = Box::new(hitables[1].clone());
-        let aabb = vec_bounding_box(&hitables).unwrap();
         return BVHNode { left, right, aabb };
     }
 
@@ -81,18 +80,26 @@ fn best_split(hitables: &Vec<Hitable>) -> (usize, Float) {
     let mut best_axis = 0;
     let mut best_pos = 0.0;
     let mut best_cost = Float::INFINITY;
-    let aabb = vec_bounding_box(hitables).unwrap();
-    let (bounds_min, bounds_max) = aabb.bounding_positions();
 
     for axis in 0..3 {
+        // find the splitting bounds based on the centroids of the hitables
+        // this is better than using the bounding box of the hitables
+        // because the bounding box can be much larger due to the size of the objects
+        let mut bounds_min = Float::INFINITY;
+        let mut bounds_max = Float::NEG_INFINITY;
+        for hitable in hitables {
+            bounds_min = Float::min(bounds_min, hitable.centroid()[axis]);
+            bounds_max = Float::max(bounds_max, hitable.centroid()[axis]);
+        }
+
         #[allow(clippy::float_cmp)]
-        if bounds_min[axis] == bounds_max[axis] {
+        if bounds_min == bounds_max {
             continue;
         };
 
-        let scale = (bounds_max[axis] - bounds_min[axis]) / SPLIT_COUNT_F;
+        let scale = (bounds_max - bounds_min) / SPLIT_COUNT_F;
         for i in 0..SPLIT_COUNT {
-            let candidate_pos = bounds_min[axis] + Float::from(i) * scale;
+            let candidate_pos = bounds_min + Float::from(i) * scale;
             let cost = evaluate_sah(hitables, axis, candidate_pos);
             if cost < best_cost {
                 found = true;
@@ -103,6 +110,7 @@ fn best_split(hitables: &Vec<Hitable>) -> (usize, Float) {
         }
     }
 
+    // TODO: fix this, if possible!
     #[cfg(feature = "tracing")]
     if !found {
         warn!("best_split did not find an improved split, returning defaults!");
