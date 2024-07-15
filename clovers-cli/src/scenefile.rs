@@ -61,7 +61,7 @@ impl SceneFile {
 
         // TODO: this isn't the greatest ergonomics, but it gets the job done for now
         for object in scene_file.objects {
-            if match &object {
+            let priority = match &object {
                 Object::Boxy(i) => i.priority,
                 Object::ConstantMedium(i) => i.priority,
                 Object::MovingSphere(i) => i.priority,
@@ -73,20 +73,26 @@ impl SceneFile {
                 Object::GLTF(i) => i.priority,
                 Object::Translate(i) => i.priority,
                 Object::Triangle(i) => i.priority,
-            } {
-                let hitable = object_to_hitable(object, materials);
-                hitables.push(hitable.clone());
-                priority_hitables.push(hitable);
-            } else {
-                let hitable = object_to_hitable(object, materials);
-                match hitable {
-                    // Flatten any lists we got. Potential sources: `GLTF`, `STL`
-                    Hitable::HitableList(mut l) => {
-                        hitables.append(&mut l.hitables);
+            };
+            let hitable = object_to_hitable(object, materials);
+
+            match hitable {
+                // Flatten any lists we got. Potential sources: `GLTF`, `STL`, `ObjectList`
+                Hitable::HitableList(l) => {
+                    let flattened = &mut l.flatten();
+                    hitables.append(&mut flattened.clone());
+                    if priority {
+                        priority_hitables.append(&mut flattened.clone());
                     }
-                    _ => hitables.push(hitable.clone()),
-                };
-            }
+                }
+                // Otherwise, push as-is
+                _ => {
+                    hitables.push(hitable.clone());
+                    if priority {
+                        priority_hitables.push(hitable.clone());
+                    }
+                }
+            };
         }
         info!("All objects parsed");
         let bvh_root = BVHNode::from_list(bvh_algorithm, hitables);

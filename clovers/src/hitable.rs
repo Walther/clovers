@@ -13,7 +13,7 @@ use crate::{
 };
 
 use enum_dispatch::enum_dispatch;
-use rand::rngs::SmallRng;
+use rand::{rngs::SmallRng, seq::IteratorRandom};
 
 /// Enumeration of all runtime entities that can be intersected aka "hit" by a [Ray].
 #[enum_dispatch(HitableTrait)]
@@ -143,6 +143,22 @@ impl<'scene> HitableList<'scene> {
         let aabb = vec_bounding_box(&hitables).unwrap();
         Self { hitables, aabb }
     }
+
+    /// Recursively flattens the `HitableList` into a `Vec<Hitable>`
+    #[must_use]
+    pub fn flatten(self) -> Vec<Hitable<'scene>> {
+        let mut flat: Vec<Hitable> = Vec::new();
+        for hitable in &self.hitables {
+            match hitable {
+                Hitable::HitableList(l) => {
+                    let mut flatten = l.clone().flatten();
+                    flat.append(&mut flatten);
+                }
+                h => flat.push(h.clone()),
+            }
+        }
+        flat
+    }
 }
 
 // TODO: ideally, this impl should be removed entirely
@@ -192,5 +208,10 @@ impl<'scene> HitableTrait for HitableList<'scene> {
         // Currently, this can be called when a `HitableList` is used as an object within a `Translate` or `RotateY`
         // Those should be removed too!
         self.aabb.centroid()
+    }
+
+    fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
+        let hitable = self.hitables.iter().choose(rng).unwrap();
+        hitable.random(origin, rng)
     }
 }
