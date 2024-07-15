@@ -188,7 +188,9 @@ impl<'scene> HitableTrait for HitableList<'scene> {
 
     #[must_use]
     fn centroid(&self) -> Position {
-        // TODO: ideally, this shouldn't be used at all
+        // TODO: ideally, this shouldn't be used at all!
+        // Currently, this can be called when a `HitableList` is used as an object within a `Translate` or `RotateY`
+        // Those should be removed too!
         self.aabb.centroid()
     }
 }
