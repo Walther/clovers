@@ -242,4 +242,47 @@ mod tests {
         let expected = Position::new(0.0, 0.0, 0.0);
         assert_eq!(centroid, expected);
     }
+
+    #[test]
+    fn combine_zero() {
+        let box0 = AABB::default();
+        let box1 = AABB::default();
+        let combined = AABB::combine(&box0, &box1);
+        let expected = AABB::default();
+        assert_eq!(combined, expected);
+    }
+
+    #[test]
+    fn combine_zero_unit() {
+        let box0 = AABB::default();
+        let box1 = AABB::new(
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+        );
+        let combined = AABB::combine(&box0, &box1);
+        let expected = box1;
+        assert_eq!(combined, expected);
+    }
+
+    #[test]
+    fn combine_positive_negative() {
+        let box0 = AABB::new(
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+        );
+        let box1 = AABB::new(
+            Interval::new(0.0, -1.0),
+            Interval::new(0.0, -1.0),
+            Interval::new(0.0, -1.0),
+        );
+        let combined = AABB::combine(&box0, &box1);
+        let expected = AABB::new(
+            Interval::new(-1.0, 1.0),
+            Interval::new(-1.0, 1.0),
+            Interval::new(-1.0, 1.0),
+        );
+        assert_eq!(combined, expected);
+    }
 }
