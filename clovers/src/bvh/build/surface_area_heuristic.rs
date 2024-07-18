@@ -46,11 +46,8 @@ pub fn build(hitables: Vec<Hitable>) -> BVHNode {
     };
 
     // If we have more than two nodes, split and recurse
-    let (axis, position) = best_split(&hitables);
-
-    let (hitables_left, hitables_right): (Vec<_>, Vec<_>) = hitables
-        .into_iter()
-        .partition(|hitable| hitable.centroid()[axis] <= position);
+    let (axis, position) = find_best_split(&hitables);
+    let (hitables_left, hitables_right) = do_split(hitables, axis, position);
 
     // Avoid infinite recursion
     if hitables_left.is_empty() {
@@ -76,7 +73,7 @@ pub fn build(hitables: Vec<Hitable>) -> BVHNode {
     BVHNode { left, right, aabb }
 }
 
-fn best_split(hitables: &Vec<Hitable>) -> (usize, Float) {
+fn find_best_split(hitables: &Vec<Hitable>) -> (usize, Float) {
     // TODO: configurable?
     const SPLIT_COUNT: u8 = 8;
     const SPLIT_COUNT_F: Float = SPLIT_COUNT as Float;
@@ -129,7 +126,15 @@ fn best_split(hitables: &Vec<Hitable>) -> (usize, Float) {
     (best_axis, best_pos)
 }
 
-fn evaluate_sah(hitables: &Vec<Hitable>, axis: usize, pos: Float) -> Float {
+fn do_split(hitables: Vec<Hitable>, axis: usize, position: f32) -> (Vec<Hitable>, Vec<Hitable>) {
+    let (hitables_left, hitables_right): (Vec<_>, Vec<_>) = hitables
+        .into_iter()
+        // NOTE: match comparison in evaluate_sah
+        .partition(|hitable| hitable.centroid()[axis] <= position);
+    (hitables_left, hitables_right)
+}
+
+fn evaluate_sah(hitables: &Vec<Hitable>, axis: usize, position: Float) -> Float {
     // determine triangle counts and bounds for this split candidate
     let mut left_box = AABB::default();
     let mut right_box = AABB::default();
@@ -137,7 +142,8 @@ fn evaluate_sah(hitables: &Vec<Hitable>, axis: usize, pos: Float) -> Float {
     let mut left_count = 0u64;
     let mut right_count = 0u64;
     for hitable in hitables {
-        if hitable.centroid()[axis] <= pos {
+        // NOTE: match comparison in do_split
+        if hitable.centroid()[axis] <= position {
             left_count += 1;
             left_box = AABB::combine(&left_box, hitable.aabb().unwrap()); // TODO: remove unwrap
         } else {
