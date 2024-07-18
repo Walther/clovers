@@ -22,7 +22,6 @@ pub fn build(hitables: Vec<Hitable>) -> BVHNode {
 
     let aabb = vec_bounding_box(&hitables).unwrap();
     let count = hitables.len();
-    let (axis, position) = best_split(&hitables);
 
     // Possible leaf nodes
     if count == 1 {
@@ -35,7 +34,9 @@ pub fn build(hitables: Vec<Hitable>) -> BVHNode {
         return BVHNode { left, right, aabb };
     }
 
-    // Split and recurse
+    // If we have more than two nodes, split and recurse
+    let (axis, position) = best_split(&hitables);
+
     let (hitables_left, hitables_right): (Vec<_>, Vec<_>) = hitables
         .into_iter()
         // NOTE: strict inequality; the object with the centroid at `pos` ends up in the right box
@@ -75,6 +76,11 @@ fn best_split(hitables: &Vec<Hitable>) -> (usize, Float) {
     // TODO: configurable?
     const SPLIT_COUNT: u8 = 8;
     const SPLIT_COUNT_F: Float = SPLIT_COUNT as Float;
+
+    #[cfg(feature = "tracing")]
+    if hitables.len() == 1 {
+        warn!("best_split trying to split a single hitable");
+    };
 
     let mut found = false;
     let mut best_axis = 0;
