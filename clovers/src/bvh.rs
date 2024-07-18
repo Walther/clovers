@@ -31,7 +31,7 @@ pub struct BVHNode<'scene> {
 pub enum BvhAlgorithm {
     /// Splitting method based on the longest axis of the current `AABB`
     #[default]
-    LongestAxis,
+    Lam,
     /// Splitting method based on the Surface Area Heuristic.
     ///
     /// Heavily inspired by the wonderful blog series <https://jacco.ompf2.com/2022/04/18/how-to-build-a-bvh-part-2-faster-rays/>.
@@ -49,7 +49,7 @@ impl<'scene> BVHNode<'scene> {
         );
         let start = Instant::now();
         let bvh = match bvh_algorithm {
-            BvhAlgorithm::LongestAxis => longest_axis_midpoint(hitables),
+            BvhAlgorithm::Lam => longest_axis_midpoint(hitables),
             BvhAlgorithm::Sah => surface_area_heuristic(hitables),
         };
         let end = Instant::now();

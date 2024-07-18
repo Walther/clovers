@@ -60,8 +60,8 @@ pub enum RenderMode {
 
 #[derive(Copy, Clone, Debug, PartialEq, ValueEnum)]
 pub enum BvhAlgorithm {
-    /// Split based on the longest axis of the current AABB
-    LongestAxis,
+    /// Split at the Longest Axis Midpoint of the current AABB
+    Lam,
     /// Split based on the Surface Area Heuristic.
     Sah,
 }
@@ -119,7 +119,7 @@ pub(crate) fn render(
 
     // TODO: improve ergonomics?
     let bvh_algorithm: clovers::bvh::BvhAlgorithm = match bvh {
-        BvhAlgorithm::LongestAxis => clovers::bvh::BvhAlgorithm::LongestAxis,
+        BvhAlgorithm::Lam => clovers::bvh::BvhAlgorithm::Lam,
         BvhAlgorithm::Sah => clovers::bvh::BvhAlgorithm::Sah,
     };
 
