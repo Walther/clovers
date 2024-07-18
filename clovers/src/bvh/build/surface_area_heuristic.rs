@@ -24,36 +24,48 @@ pub fn build(hitables: Vec<Hitable>) -> BVHNode {
     let count = hitables.len();
 
     // Possible leaf nodes
-    if count == 1 {
-        left = Box::new(hitables[0].clone());
-        right = Box::new(Hitable::Empty(Empty {}));
-        return BVHNode { left, right, aabb };
-    } else if count == 2 {
-        left = Box::new(hitables[0].clone());
-        right = Box::new(hitables[1].clone());
-        return BVHNode { left, right, aabb };
-    }
+    match count {
+        0 => {
+            #[cfg(feature = "tracing")]
+            warn!("building a BVHNode from zero hitables");
+            left = Box::new(Hitable::Empty(Empty {}));
+            right = Box::new(Hitable::Empty(Empty {}));
+            return BVHNode { left, right, aabb };
+        }
+        1 => {
+            left = Box::new(hitables[0].clone());
+            right = Box::new(Hitable::Empty(Empty {}));
+            return BVHNode { left, right, aabb };
+        }
+        2 => {
+            left = Box::new(hitables[0].clone());
+            right = Box::new(hitables[1].clone());
+            return BVHNode { left, right, aabb };
+        }
+        _ => (),
+    };
 
     // If we have more than two nodes, split and recurse
     let (axis, position) = best_split(&hitables);
 
     let (hitables_left, hitables_right): (Vec<_>, Vec<_>) = hitables
         .into_iter()
-        // NOTE: strict inequality; the object with the centroid at `pos` ends up in the right box
-        .partition(|hitable| hitable.centroid()[axis] < position);
+        .partition(|hitable| hitable.centroid()[axis] <= position);
 
     // Avoid infinite recursion
     if hitables_left.is_empty() {
+        #[cfg(feature = "tracing")]
+        warn!("hitables_left is empty");
         left = Box::new(Hitable::Empty(Empty {}));
         right = Box::new(Hitable::HitableList(HitableList::new(hitables_right)));
-        let aabb = right.aabb().unwrap().clone();
 
         return BVHNode { left, right, aabb };
     };
     if hitables_right.is_empty() {
+        #[cfg(feature = "tracing")]
+        warn!("hitables_right is empty");
         left = Box::new(Hitable::HitableList(HitableList::new(hitables_left)));
         right = Box::new(Hitable::Empty(Empty {}));
-        let aabb = left.aabb().unwrap().clone();
 
         return BVHNode { left, right, aabb };
     };
@@ -61,15 +73,7 @@ pub fn build(hitables: Vec<Hitable>) -> BVHNode {
     left = Box::new(Hitable::BVHNode(build(hitables_left)));
     right = Box::new(Hitable::BVHNode(build(hitables_right)));
 
-    // Generate a bounding box and BVHNode if possible
-    let box_left = left.aabb();
-    let box_right = right.aabb();
-    if let (Some(box_left), Some(box_right)) = (box_left, box_right) {
-        let aabb = AABB::combine(box_left, box_right);
-        BVHNode { left, right, aabb }
-    } else {
-        panic!("No bounding box in bvh_node constructor");
-    }
+    BVHNode { left, right, aabb }
 }
 
 fn best_split(hitables: &Vec<Hitable>) -> (usize, Float) {
@@ -133,8 +137,7 @@ fn evaluate_sah(hitables: &Vec<Hitable>, axis: usize, pos: Float) -> Float {
     let mut left_count = 0u64;
     let mut right_count = 0u64;
     for hitable in hitables {
-        // NOTE: strict inequality; the object with the centroid at `pos` ends up in the right box
-        if hitable.centroid()[axis] < pos {
+        if hitable.centroid()[axis] <= pos {
             left_count += 1;
             left_box = AABB::combine(&left_box, hitable.aabb().unwrap()); // TODO: remove unwrap
         } else {
