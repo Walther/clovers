@@ -44,8 +44,8 @@ fn primitive_testcount_recurse_condition(
     bvhnode: &Hitable, // BVHNode
     count: &mut usize,
     ray: &Ray,
-    distance_min: f32,
-    distance_max: f32,
+    distance_min: Float,
+    distance_max: Float,
     rng: &mut SmallRng,
 ) {
     match bvhnode {

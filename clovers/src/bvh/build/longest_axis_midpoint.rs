@@ -4,6 +4,7 @@ use crate::{
     aabb::AABB,
     bvh::BVHNode,
     hitable::{Empty, Hitable, HitableTrait},
+    Float,
 };
 
 use super::utils::{get_comparator, vec_bounding_box};
@@ -21,7 +22,7 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
         bounding.axis(1).size(),
         bounding.axis(2).size(),
     ];
-    let largest = f32::max(f32::max(spans[0], spans[1]), spans[2]);
+    let largest = Float::max(Float::max(spans[0], spans[1]), spans[2]);
     #[allow(clippy::float_cmp)] // TODO: better code for picking the largest axis...
     let axis: usize = spans.iter().position(|&x| x == largest).unwrap();
     let comparator = get_comparator(axis);
