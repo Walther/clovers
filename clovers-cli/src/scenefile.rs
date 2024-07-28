@@ -94,9 +94,12 @@ impl SceneFile {
                 }
             };
         }
-        info!("All objects parsed");
+        info!("All objects parsed into hitables");
+        info!("Building the BVH root for hitables");
         let bvh_root = BVHNode::from_list(bvh_algorithm, hitables);
+        info!("Building the MIS BVH root for priority hitables");
         let mis_bvh_root = Hitable::BVHNode(BVHNode::from_list(bvh_algorithm, priority_hitables));
+        info!("BVH root nodes built");
 
         Scene {
             camera,

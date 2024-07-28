@@ -1,5 +1,6 @@
 //! Bounding Volume Hierarchy acceleration structures and related utilities.
 
+use core::fmt::Display;
 use std::time::Instant;
 
 use build::{longest_axis_midpoint, surface_area_heuristic};
@@ -38,15 +39,27 @@ pub enum BvhAlgorithm {
     Sah,
 }
 
+impl Display for BvhAlgorithm {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            BvhAlgorithm::Lam => write!(f, "Longest Axis Midpoint"),
+            BvhAlgorithm::Sah => write!(f, "Surface Area Heuristic"),
+        }
+    }
+}
+
 impl<'scene> BVHNode<'scene> {
     /// Create a new `BVHNode` tree from a given list of [Object](crate::objects::Object)s
     #[must_use]
     pub fn from_list(bvh_algorithm: BvhAlgorithm, hitables: Vec<Hitable>) -> BVHNode {
         #[cfg(feature = "tracing")]
-        info!(
-            "BVH tree build starting for a list of {} hitables",
-            hitables.len()
-        );
+        {
+            info!("BVH tree build algorithm: {bvh_algorithm}");
+            info!(
+                "BVH tree build starting for a list of {} hitables",
+                hitables.len()
+            );
+        }
         let start = Instant::now();
         let bvh = match bvh_algorithm {
             BvhAlgorithm::Lam => longest_axis_midpoint(hitables),
