@@ -42,7 +42,7 @@ pub struct RenderOptions {
     #[arg(long, default_value = "random")]
     pub sampler: Sampler,
     /// BVH construction algorithm.
-    #[arg(long, default_value = "lam")]
+    #[arg(long, default_value = "sah")]
     pub bvh: BvhAlgorithm,
 }
 
