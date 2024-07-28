@@ -19,6 +19,7 @@ clovers = { path = "../clovers", features = [
   "stl",
   "traces",
   "gl_tf",
+  "ply",
 ], default-features = false }
 
 # External
