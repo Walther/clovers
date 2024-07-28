@@ -13,8 +13,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        run: rustup update --no-self-update stable
       - uses: Swatinem/rust-cache@v2
       - name: Build
         run: cargo build --verbose
@@ -23,8 +25,10 @@ jobs:
   render:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        run: rustup update --no-self-update stable
       - uses: extractions/setup-just@v1
       - uses: Swatinem/rust-cache@v2
       - name: Build release
@@ -38,16 +42,18 @@ jobs:
   cargo-deny:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        run: rustup update --no-self-update stable
       - uses: EmbarkStudios/cargo-deny-action@v1
   lint: # inspired by https://github.com/EmbarkStudios/rust-gpu/blob/main/.github/workflows/ci.yaml
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, rust-src
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        run: rustup update --no-self-update stable
       - name: Install rust-toolchain # cargo version is a random command that forces the installation of rust-toolchain
         run: cargo version
       - name: cargo fetch
