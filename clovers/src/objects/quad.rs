@@ -5,8 +5,8 @@ use crate::hitable::HitableTrait;
 use crate::materials::MaterialInit;
 use crate::wavelength::Wavelength;
 use crate::{
-    aabb::AABB, hitable::get_orientation, hitable::HitRecord, materials::Material, ray::Ray, Float,
-    Vec3, EPSILON_RECT_THICKNESS,
+    aabb::AABB, hitable::get_orientation, materials::Material, ray::Ray, Float, HitRecord, Vec3,
+    EPSILON_RECT_THICKNESS,
 };
 use crate::{Direction, Displacement, Position, EPSILON_SHADOW_ACNE};
 use nalgebra::Unit;
@@ -133,7 +133,7 @@ impl<'scene> HitableTrait for Quad<'scene> {
 
     /// Returns the bounding box of the quad
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
@@ -172,6 +172,11 @@ impl<'scene> HitableTrait for Quad<'scene> {
                 + (rng.gen::<Float>() * self.u)
                 + (rng.gen::<Float>() * self.v);
         point - origin
+    }
+
+    // TODO: correctness
+    fn centroid(&self) -> Position {
+        self.q + (self.u / 2.0) + (self.v / 2.0)
     }
 }
 

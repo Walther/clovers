@@ -2,13 +2,13 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable, HitableTrait},
+    hitable::{Hitable, HitableTrait},
     materials::{isotropic::Isotropic, Material},
     random::random_unit_vector,
     ray::Ray,
     textures::Texture,
     wavelength::Wavelength,
-    Box, Direction, Float, Position, EPSILON_CONSTANT_MEDIUM,
+    Box, Direction, Float, HitRecord, Position, EPSILON_CONSTANT_MEDIUM,
 };
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -17,7 +17,7 @@ use super::Object;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// `ConstantMediumInit` structure describes the necessary data for constructing a [`ConstantMedium`]. Used with [serde] when importing [`SceneFiles`](crate::scenes::SceneFile).
+/// `ConstantMediumInit` structure describes the necessary data for constructing a [`ConstantMedium`].
 pub struct ConstantMediumInit {
     /// Used for multiple importance sampling
     #[cfg_attr(feature = "serde-derive", serde(default))]
@@ -128,8 +128,8 @@ impl<'scene> HitableTrait for ConstantMedium<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] of the defining `boundary` object for the fog.
     #[must_use]
-    fn bounding_box(&self, t0: Float, t1: Float) -> Option<&AABB> {
-        self.boundary.bounding_box(t0, t1)
+    fn aabb(&self) -> Option<&AABB> {
+        self.boundary.aabb()
     }
 
     /// Returns a probability density function value based on the boundary object
@@ -144,5 +144,9 @@ impl<'scene> HitableTrait for ConstantMedium<'scene> {
     ) -> Float {
         self.boundary
             .pdf_value(origin, direction, wavelength, time, rng)
+    }
+
+    fn centroid(&self) -> Position {
+        self.boundary.centroid()
     }
 }

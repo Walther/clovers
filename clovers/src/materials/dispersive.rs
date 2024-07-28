@@ -17,11 +17,10 @@ use palette::Xyz;
 use rand::{rngs::SmallRng, Rng};
 
 use crate::{
-    hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float,
+    Direction, Float, HitRecord,
 };
 
 use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecord};

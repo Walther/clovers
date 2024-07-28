@@ -3,13 +3,17 @@
 #![deny(clippy::all)]
 
 // External imports
-use clap::{Args, Parser, Subcommand};
+use clap::{Parser, Subcommand};
+use clovers_runtime::GlobalOptions;
+use render::RenderOptions;
 use std::error::Error;
 
 // Internal imports
 use clovers::*;
 #[doc(hidden)]
 mod colorize;
+#[doc(hidden)]
+pub mod debug_visualizations;
 #[doc(hidden)]
 mod draw_cpu;
 #[doc(hidden)]
@@ -18,12 +22,14 @@ mod json_scene;
 pub mod normals;
 #[doc(hidden)]
 mod render;
-use render::{render, RenderParams};
+use render::render;
 #[doc(hidden)]
 mod sampler;
 #[doc(hidden)]
 mod validate;
 use validate::{validate, ValidateParams};
+#[doc(hidden)]
+pub mod scenefile;
 
 /// clovers 🍀 path tracing renderer
 #[derive(Parser)]
@@ -34,23 +40,12 @@ pub struct Cli {
     command: Commands,
 }
 
-#[derive(Args, Debug)]
-/// Global options
-pub struct GlobalOptions {
-    /// Enable some debug logging
-    #[clap(long)]
-    debug: bool,
-    /// Suppress most of the text output
-    #[clap(short, long)]
-    quiet: bool,
-}
-
 #[derive(Subcommand, Debug)]
 /// Subcommands for the CLI
 pub enum Commands {
     #[command(arg_required_else_help = true)]
     /// Render a given scene file
-    Render(RenderParams),
+    Render(RenderOptions),
     #[command(arg_required_else_help = true)]
     /// Validate a given scene file
     Validate(ValidateParams),

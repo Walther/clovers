@@ -5,7 +5,7 @@ use core::ops::Add;
 use crate::Float;
 
 /// An interval structure.
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Default)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct Interval {
     /// Smallest value of the interval. Must be kept in order  
@@ -27,7 +27,7 @@ impl Interval {
     /// Constructs a new interval from two intervals
     // TODO: explanation, clarification
     #[must_use]
-    pub fn new_from_intervals(a: Interval, b: Interval) -> Self {
+    pub fn combine(a: &Interval, b: &Interval) -> Self {
         Interval {
             min: a.min.min(b.min),
             max: a.max.max(b.max),
@@ -42,8 +42,14 @@ impl Interval {
 
     /// Returns the size of the interval
     #[must_use]
-    pub fn size(self) -> Float {
+    pub fn size(&self) -> Float {
         self.max - self.min
+    }
+
+    /// Returns the center of this [`Interval`]
+    #[must_use]
+    pub fn center(&self) -> Float {
+        self.min + 0.5 * self.size()
     }
 }
 
@@ -52,5 +58,43 @@ impl Add<Float> for Interval {
 
     fn add(self, offset: Float) -> Self::Output {
         Interval::new(self.min + offset, self.max + offset)
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::float_cmp)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn center() {
+        let interval = Interval::new(0.0, 1.0);
+        let center = interval.center();
+        let expected = 0.5;
+        assert_eq!(center, expected);
+    }
+
+    #[test]
+    fn center_zero_crossing() {
+        let interval = Interval::new(-1.0, 1.0);
+        let center = interval.center();
+        let expected = 0.0;
+        assert_eq!(center, expected);
+    }
+
+    #[test]
+    fn size() {
+        let interval = Interval::new(0.0, 1.0);
+        let size = interval.size();
+        let expected = 1.0;
+        assert_eq!(size, expected);
+    }
+
+    #[test]
+    fn size_zero_crossing() {
+        let interval = Interval::new(-1.0, 1.0);
+        let size = interval.size();
+        let expected = 2.0;
+        assert_eq!(size, expected);
     }
 }

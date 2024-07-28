@@ -30,9 +30,9 @@
 //!
 //! - Rendering is done by creating [`Ray`](ray::Ray)s and seeing what they hit
 //! - A [`Ray`](ray::Ray) has an origin and a direction
-//! - Every [`Object`](objects::Object) has a `hit()` method that takes a [Ray](ray::Ray) and returns an Option<[`HitRecord`](hitable::HitRecord)>
+//! - Every [`Object`](objects::Object) has a `hit()` method that takes a [Ray](ray::Ray) and returns an Option<[`HitRecord`]>
 //! - If you get None, use that information to colorize your pixel with a default color
-//! - If you get Some([`HitRecord`](hitable::HitRecord)), use its details to colorize your pixel
+//! - If you get Some([`HitRecord`]), use its details to colorize your pixel
 //! - You most likely also want to recurse: depending on the material, maybe `scatter()` and cast a new [`Ray`](ray::Ray)?
 //!
 //! You most likely want to repeat this process multiple times for each of your pixels: generating multiple samples per pixel results in a higher quality image.
@@ -77,10 +77,12 @@ use nalgebra::{
 
 // Internals
 pub mod aabb;
-pub mod bvhnode;
+pub mod bvh;
 pub mod camera;
 pub mod colorinit;
 pub mod hitable;
+pub mod hitrecord;
+pub use hitrecord::HitRecord;
 pub mod interval;
 pub mod materials;
 pub mod objects;
@@ -92,24 +94,6 @@ pub mod scenes;
 pub mod spectrum;
 pub mod textures;
 pub mod wavelength;
-
-/// Rendering options struct
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-pub struct RenderOpts {
-    /// Width of the render in pixels
-    pub width: u32,
-    /// Height of the render in pixels
-    pub height: u32,
-    /// Samples per pixel to render for multisampling. Higher number implies higher quality.
-    pub samples: u32,
-    /// Maximum ray bounce depth. Higher number implies higher quality.
-    pub max_depth: u32,
-    /// Optionally, suppress CLI output
-    pub quiet: bool,
-    /// Experimental render mode: return a normal map only instead of doing a full path trace render.
-    pub normalmap: bool,
-}
 
 // Handy aliases for internal use
 

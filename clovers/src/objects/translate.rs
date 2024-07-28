@@ -2,10 +2,10 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable, HitableTrait},
+    hitable::{Hitable, HitableTrait},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Direction, Float, Position, Vec3,
+    Box, Direction, Float, HitRecord, Position, Vec3,
 };
 use rand::rngs::SmallRng;
 
@@ -13,7 +13,7 @@ use super::Object;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// `TranslateInit` structure describes the necessary data for constructing a [Translate] object. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
+/// `TranslateInit` structure describes the necessary data for constructing a [Translate] object.
 pub struct TranslateInit {
     /// Used for multiple importance sampling
     #[cfg_attr(feature = "serde-derive", serde(default))]
@@ -37,7 +37,7 @@ impl<'scene> Translate<'scene> {
     #[must_use]
     pub fn new(object: Box<Hitable<'scene>>, offset: Vec3) -> Self {
         // TODO: time
-        let aabb = object.bounding_box(0.0, 1.0).unwrap().clone() + offset;
+        let aabb = object.aabb().unwrap().clone() + offset;
         Translate {
             object,
             offset,
@@ -77,7 +77,7 @@ impl<'scene> HitableTrait for Translate<'scene> {
 
     /// Bounding box method for the [Translate] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for translation.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
@@ -94,5 +94,10 @@ impl<'scene> HitableTrait for Translate<'scene> {
         // TODO: is this correct?
         self.object
             .pdf_value(origin + self.offset, direction, wavelength, time, rng)
+    }
+
+    // TODO: correctness
+    fn centroid(&self) -> Position {
+        self.object.centroid() + self.offset
     }
 }

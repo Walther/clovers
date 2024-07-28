@@ -2,18 +2,18 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, HitableTrait},
+    hitable::HitableTrait,
     materials::{Material, MaterialInit},
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, Position, PI,
+    Direction, Float, HitRecord, Position, PI,
 };
 use nalgebra::Unit;
 use rand::rngs::SmallRng;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// `SphereInit` structure describes the necessary data for constructing a [`Sphere`](super::Sphere). Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
+/// `SphereInit` structure describes the necessary data for constructing a [`Sphere`](super::Sphere).
 pub struct MovingSphereInit {
     /// Used for multiple importance sampling
     #[cfg_attr(feature = "serde-derive", serde(default))]
@@ -68,7 +68,7 @@ impl<'scene> MovingSphere<'scene> {
             center_1 + Position::new(radius, radius, radius),
         );
 
-        let aabb = AABB::surrounding_box(&box0, &box1);
+        let aabb = AABB::combine(&box0, &box1);
 
         MovingSphere {
             center_0,
@@ -162,7 +162,7 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
 
     /// Returns the axis-aligned bounding box of the [`MovingSphere`] object. This is the maximum possible bounding box of the entire span of the movement of the sphere, calculated from the two center positions and the radius.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
@@ -176,5 +176,10 @@ impl<'scene> HitableTrait for MovingSphere<'scene> {
     ) -> Float {
         // TODO: fix
         0.0
+    }
+
+    fn centroid(&self) -> Position {
+        // TODO: proper time support
+        self.center(0.5)
     }
 }

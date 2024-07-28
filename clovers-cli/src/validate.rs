@@ -1,4 +1,5 @@
 use clap::Args;
+use clovers::bvh::BvhAlgorithm;
 use std::{error::Error, path::Path};
 
 use crate::json_scene;
@@ -18,7 +19,7 @@ pub(crate) fn validate(params: ValidateParams) -> Result<(), Box<dyn Error>> {
     let path = Path::new(&input);
     let scene = match path.extension() {
         Some(ext) => match &ext.to_str() {
-            Some("json") => json_scene::initialize(path, 1, 1),
+            Some("json") => json_scene::initialize(path, BvhAlgorithm::default(), 1, 1),
             _ => panic!("Unknown file type"),
         },
         None => panic!("Unknown file type"),

@@ -1,9 +1,8 @@
-use std::f32::{INFINITY, NEG_INFINITY};
-
 use clovers::interval::Interval;
 use clovers::random::random_unit_vector;
 use clovers::ray::Ray;
 use clovers::wavelength::random_wavelength;
+use clovers::Float;
 use clovers::{aabb::*, Vec3};
 use divan::{black_box, AllocProfiler};
 use rand::rngs::SmallRng;
@@ -32,29 +31,7 @@ fn hit(bencher: divan::Bencher) {
     bencher
         .with_inputs(random_aabb_and_ray)
         .counter(1u32)
-        .bench_values(|(aabb, ray)| black_box(aabb.hit(&ray, NEG_INFINITY, INFINITY)))
-}
-
-#[divan::bench]
-fn hit_old(bencher: divan::Bencher) {
-    bencher
-        .with_inputs(random_aabb_and_ray)
-        .counter(1u32)
-        .bench_values(|(aabb, ray)| {
-            #[allow(deprecated)]
-            black_box(aabb.hit_old(&ray, NEG_INFINITY, INFINITY))
-        })
-}
-
-#[divan::bench]
-fn hit_new(bencher: divan::Bencher) {
-    bencher
-        .with_inputs(random_aabb_and_ray)
-        .counter(1u32)
-        .bench_values(|(aabb, ray)| {
-            #[allow(deprecated)]
-            black_box(aabb.hit_new(&ray, NEG_INFINITY, INFINITY))
-        })
+        .bench_values(|(aabb, ray)| black_box(aabb.hit(&ray, Float::NEG_INFINITY, Float::INFINITY)))
 }
 
 // Helper functions

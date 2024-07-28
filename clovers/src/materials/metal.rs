@@ -2,12 +2,11 @@
 
 use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
-    hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     random::random_unit_vector,
     ray::Ray,
     textures::{Texture, TextureTrait},
-    Direction, Float,
+    Direction, Float, HitRecord,
 };
 use nalgebra::Unit;
 use rand::prelude::SmallRng;

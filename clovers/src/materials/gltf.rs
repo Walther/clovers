@@ -12,11 +12,10 @@ use palette::{
 use rand::rngs::SmallRng;
 
 use crate::{
-    hitable::HitRecord,
     pdf::{ZeroPDF, PDF},
     random::random_unit_vector,
     ray::Ray,
-    Direction, Float, Vec2, Vec3, Vec4, PI,
+    Direction, Float, HitRecord, Vec2, Vec3, Vec4, PI,
 };
 
 use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};

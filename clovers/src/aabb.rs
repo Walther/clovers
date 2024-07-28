@@ -7,7 +7,7 @@ use crate::{interval::Interval, ray::Ray, Float, Position, Vec3, EPSILON_RECT_TH
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///
 /// This is useful for creating bounding volume hierarchies, which is an optimization for reducing the time spent on calculating ray-object intersections.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Default)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct AABB {
     /// The bounding interval on the X axis
@@ -39,75 +39,45 @@ impl AABB {
         }
     }
 
+    /// The inverse method for `AABB::new`: given an existing constructed `AABB`, returns the minimum coordinate and maximum coordinate on the opposing corners.
+    #[must_use]
+    pub fn bounding_positions(&self) -> (Position, Position) {
+        (
+            Position::new(self.x.min, self.y.min, self.z.min),
+            Position::new(self.x.max, self.y.max, self.z.max),
+        )
+    }
+
     #[allow(clippy::doc_link_with_quotes)]
-    /// Given a [Ray], returns whether the ray hits the bounding box or not. Current default method, based on ["An Optimized AABB Hit Method"](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
+    /// Given a [Ray], returns whether the ray hits the bounding box or not. Current method based on the "Axis-aligned bounding box class" of the [Raytracing The Next Week book](https://raytracing.github.io/books/RayTracingTheNextWeek.html).
     #[must_use]
     pub fn hit(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
-        // TODO: Create an improved hit method with more robust handling of zeroes. See https://github.com/RayTracing/raytracing.github.io/issues/927
-        // Both methods below are susceptible for NaNs and infinities, and have subtly different edge cases.
+        let ray_origin = ray.origin;
+        let ray_dir = ray.direction;
 
-        // "My adjusted method" - possibly more zero-resistant?
-        // TODO: validate
         for axis in 0..3 {
-            // If ray direction component is 0, invd becomes infinity.
-            // Ignore? False positive hit for aabb is probably better than false negative; the actual object can still be hit more accurately
-            let invd = 1.0 / ray.direction[axis];
-            if !invd.is_normal() {
-                continue;
-            }
-            // If the value in parenthesis ends up as zero, 0*inf can be NaN
-            let mut t0: Float = (self.axis(axis).min - ray.origin[axis]) * invd;
-            let mut t1: Float = (self.axis(axis).max - ray.origin[axis]) * invd;
-            if !t0.is_normal() || !t1.is_normal() {
-                continue;
-            }
-            if invd < 0.0 {
-                core::mem::swap(&mut t0, &mut t1);
-            }
-            tmin = if t0 > tmin { t0 } else { tmin };
-            tmax = if t1 < tmax { t1 } else { tmax };
-            if tmax <= tmin {
-                return false;
-            }
-        }
+            let ax = self.axis(axis);
+            let adinv = 1.0 / ray_dir[axis];
 
-        // If we have not missed on any axis, return true for the hit
-        true
-    }
+            let t0 = (ax.min - ray_origin[axis]) * adinv;
+            let t1 = (ax.max - ray_origin[axis]) * adinv;
 
-    /// Given a [Ray], returns whether the ray hits the bounding box or not. Old method from a GitHub issue. Exists mostly for testing purposes.
-    #[must_use]
-    #[deprecated]
-    pub fn hit_old(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
-        // "Old method"
-        for axis in 0..3 {
-            let invd = 1.0 / ray.direction[axis];
-            let mut t0: Float = (self.axis(axis).min - ray.origin[axis]) * invd;
-            let mut t1: Float = (self.axis(axis).max - ray.origin[axis]) * invd;
-            if invd < 0.0 {
-                core::mem::swap(&mut t0, &mut t1);
+            if t0 < t1 {
+                if t0 > tmin {
+                    tmin = t0;
+                };
+                if t1 < tmax {
+                    tmax = t1;
+                };
+            } else {
+                if t1 > tmin {
+                    tmin = t1;
+                };
+                if t0 < tmax {
+                    tmax = t0;
+                };
             }
-            tmin = if t0 > tmin { t0 } else { tmin };
-            tmax = if t1 < tmax { t1 } else { tmax };
-            if tmax <= tmin {
-                return false;
-            }
-        }
-        true
-    }
 
-    /// Given a [Ray], returns whether the ray hits the bounding box or not. Newer method from a GitHub issue. Exists mostly for testing purposes.
-    #[must_use]
-    #[deprecated]
-    pub fn hit_new(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
-        // "New method"
-        for axis in 0..3 {
-            let a = (self.axis(axis).min - ray.origin[axis]) / ray.direction[axis];
-            let b = (self.axis(axis).max - ray.origin[axis]) / ray.direction[axis];
-            let t0: Float = a.min(b);
-            let t1: Float = a.max(b);
-            tmin = t0.max(tmin);
-            tmax = t1.min(tmax);
             if tmax <= tmin {
                 return false;
             }
@@ -117,11 +87,11 @@ impl AABB {
 
     /// Given two axis-aligned bounding boxes, return a new [AABB] that contains both.
     #[must_use]
-    pub fn surrounding_box(box0: &AABB, box1: &AABB) -> AABB {
+    pub fn combine(box0: &AABB, box1: &AABB) -> AABB {
         AABB {
-            x: Interval::new_from_intervals(box0.x, box1.x),
-            y: Interval::new_from_intervals(box0.y, box1.y),
-            z: Interval::new_from_intervals(box0.z, box1.z),
+            x: Interval::combine(&box0.x, &box1.x),
+            y: Interval::combine(&box0.y, &box1.y),
+            z: Interval::combine(&box0.z, &box1.z),
         }
     }
 
@@ -130,17 +100,17 @@ impl AABB {
         // TODO: refactor
         let delta = EPSILON_RECT_THICKNESS;
         let new_x: Interval = if self.x.size() >= delta {
-            self.x
+            self.x.clone()
         } else {
             self.x.expand(delta)
         };
         let new_y: Interval = if self.y.size() >= delta {
-            self.y
+            self.y.clone()
         } else {
             self.y.expand(delta)
         };
         let new_z: Interval = if self.z.size() >= delta {
-            self.z
+            self.z.clone()
         } else {
             self.z.expand(delta)
         };
@@ -151,13 +121,56 @@ impl AABB {
     /// Returns the interval of the given axis.
     // TODO: this api is kind of annoying
     #[must_use]
-    pub fn axis(&self, n: usize) -> Interval {
+    pub fn axis(&self, n: usize) -> &Interval {
         match n {
-            0 => self.x,
-            1 => self.y,
-            2 => self.z,
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
             _ => panic!("AABB::axis called with invalid parameter: {n:?}"),
         }
+    }
+
+    /// Distance of a `Ray` to the bounding box.
+    ///
+    /// Returns `None` if the `AABB` is not hit, whether it is passed by the ray, or is behind the ray origin considering the ray direction.
+    ///
+    /// Based on the `IntersectAABB` method described at <https://jacco.ompf2.com/2022/04/18/how-to-build-a-bvh-part-2-faster-rays/>.
+    #[allow(clippy::similar_names)]
+    #[must_use]
+    pub fn distance(&self, ray: &Ray) -> Option<Float> {
+        let (box_min, box_max) = self.bounding_positions();
+        let (mut tmin, mut tmax);
+        let tx1 = (box_min.x - ray.origin.x) / ray.direction.x;
+        let tx2 = (box_max.x - ray.origin.x) / ray.direction.x;
+        tmin = Float::min(tx1, tx2);
+        tmax = Float::max(tx1, tx2);
+        let ty1 = (box_min.y - ray.origin.y) / ray.direction.y;
+        let ty2 = (box_max.y - ray.origin.y) / ray.direction.y;
+        tmin = Float::max(tmin, Float::min(ty1, ty2));
+        tmax = Float::min(tmax, Float::max(ty1, ty2));
+        let tz1 = (box_min.z - ray.origin.z) / ray.direction.z;
+        let tz2 = (box_max.z - ray.origin.z) / ray.direction.z;
+        tmin = Float::max(tmin, Float::min(tz1, tz2));
+        let tmax = Float::min(tmax, Float::max(tz1, tz2));
+        if tmax >= tmin /* && tmin < ray.t */ && tmax > 0.0 {
+            return Some(tmin);
+        };
+
+        None
+    }
+
+    /// Returns the area of this [`AABB`].
+    #[must_use]
+    pub fn area(&self) -> Float {
+        let (min, max) = self.bounding_positions();
+        let extent: Vec3 = max - min;
+        2.0 * (extent.x * extent.y + extent.y * extent.z + extent.x * extent.z)
+    }
+
+    /// Returns the centroid of this [`AABB`].
+    #[must_use]
+    pub fn centroid(&self) -> Position {
+        Position::new(self.x.center(), self.y.center(), self.z.center())
     }
 }
 
@@ -166,5 +179,110 @@ impl Add<Vec3> for AABB {
 
     fn add(self, offset: Vec3) -> Self::Output {
         AABB::new(self.x + offset.x, self.y + offset.y, self.z + offset.z)
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::float_cmp)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn area_cube() {
+        let aabb = AABB::new(
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+        );
+        let area = aabb.area();
+        let expected = 6.0;
+        assert_eq!(area, expected);
+    }
+
+    #[test]
+    fn area_cuboid_positive() {
+        let aabb = AABB::new(
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 2.0),
+            Interval::new(0.0, 3.0),
+        );
+        let area = aabb.area();
+        let expected = 22.0;
+        assert_eq!(area, expected);
+    }
+
+    #[test]
+    fn area_cuboid_negative() {
+        let aabb = AABB::new(
+            Interval::new(-1.0, 0.0),
+            Interval::new(-2.0, 0.0),
+            Interval::new(-3.0, 0.0),
+        );
+        let area = aabb.area();
+        let expected = 22.0;
+        assert_eq!(area, expected);
+    }
+
+    #[test]
+    fn centroid() {
+        let aabb = AABB::new(
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+        );
+        let centroid = aabb.centroid();
+        let expected = Position::new(0.5, 0.5, 0.5);
+        assert_eq!(centroid, expected);
+    }
+
+    #[test]
+    fn default() {
+        let aabb = AABB::default();
+        let centroid = aabb.centroid();
+        let expected = Position::new(0.0, 0.0, 0.0);
+        assert_eq!(centroid, expected);
+    }
+
+    #[test]
+    fn combine_zero() {
+        let box0 = AABB::default();
+        let box1 = AABB::default();
+        let combined = AABB::combine(&box0, &box1);
+        let expected = AABB::default();
+        assert_eq!(combined, expected);
+    }
+
+    #[test]
+    fn combine_zero_unit() {
+        let box0 = AABB::default();
+        let box1 = AABB::new(
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+        );
+        let combined = AABB::combine(&box0, &box1);
+        let expected = box1;
+        assert_eq!(combined, expected);
+    }
+
+    #[test]
+    fn combine_positive_negative() {
+        let box0 = AABB::new(
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+            Interval::new(0.0, 1.0),
+        );
+        let box1 = AABB::new(
+            Interval::new(0.0, -1.0),
+            Interval::new(0.0, -1.0),
+            Interval::new(0.0, -1.0),
+        );
+        let combined = AABB::combine(&box0, &box1);
+        let expected = AABB::new(
+            Interval::new(-1.0, 1.0),
+            Interval::new(-1.0, 1.0),
+            Interval::new(-1.0, 1.0),
+        );
+        assert_eq!(combined, expected);
     }
 }

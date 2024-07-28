@@ -2,11 +2,10 @@
 
 use super::{MaterialTrait, MaterialType, ScatterRecord};
 use crate::{
-    hitable::HitRecord,
     pdf::{CosinePDF, PDF},
     ray::Ray,
     textures::{Texture, TextureTrait},
-    Float, PI,
+    Float, HitRecord, PI,
 };
 use rand::prelude::SmallRng;
 

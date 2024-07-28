@@ -2,19 +2,19 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, HitableTrait},
+    hitable::HitableTrait,
     materials::{Material, MaterialInit},
     onb::ONB,
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Displacement, Float, Position, Vec3, EPSILON_SHADOW_ACNE, PI,
+    Direction, Displacement, Float, HitRecord, Position, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use nalgebra::Unit;
 use rand::{rngs::SmallRng, Rng};
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// `SphereInit` structure describes the necessary data for constructing a [Sphere]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
+/// `SphereInit` structure describes the necessary data for constructing a [Sphere].
 pub struct SphereInit {
     /// Used for multiple importance sampling
     #[cfg_attr(feature = "serde-derive", serde(default))]
@@ -127,7 +127,7 @@ impl<'scene> HitableTrait for Sphere<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] for the sphere.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
@@ -170,6 +170,10 @@ impl<'scene> HitableTrait for Sphere<'scene> {
         let vec = random_to_sphere(self.radius, distance_squared, rng);
         let vec = Unit::new_normalize(vec);
         *uvw.local(vec)
+    }
+
+    fn centroid(&self) -> Position {
+        self.center
     }
 }
 

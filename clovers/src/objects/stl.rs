@@ -2,70 +2,26 @@
 
 use alloc::string::String;
 use nalgebra::Rotation3;
-use rand::prelude::SmallRng;
 use std::fs::OpenOptions;
 
 use crate::{
     aabb::AABB,
-    bvhnode::BVHNode,
-    hitable::{HitRecord, Hitable, HitableTrait},
+    bvh::build::utils::vec_bounding_box,
+    hitable::Hitable,
     materials::{Material, MaterialInit, SharedMaterial},
     objects::Triangle,
-    ray::Ray,
-    wavelength::Wavelength,
-    Direction, Displacement, Float, Position, Vec3,
+    Float, Position, Vec3,
 };
 
 /// Internal STL object representation after initialization. Contains the material for all triangles in it to avoid having n copies.
 #[derive(Debug, Clone)]
 pub struct STL<'scene> {
-    /// Bounding Volume Hierarchy tree for the object
-    pub bvhnode: BVHNode<'scene>,
+    /// Primitives of the `STL` object. Most likely a list of `Triangle`s.
+    pub hitables: Vec<Hitable<'scene>>,
     /// Material for the object
     pub material: &'scene Material,
     /// Axis-aligned bounding box of the object
     pub aabb: AABB,
-}
-
-impl<'scene> HitableTrait for STL<'scene> {
-    /// Hit method for the STL object
-    #[must_use]
-    fn hit(
-        &self,
-        ray: &Ray,
-        distance_min: f32,
-        distance_max: f32,
-        rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
-        self.bvhnode.hit(ray, distance_min, distance_max, rng)
-    }
-
-    /// Return the axis-aligned bounding box for the object
-    #[must_use]
-    fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<&AABB> {
-        Some(&self.aabb)
-    }
-
-    /// Returns a probability density function value based on the object
-    #[must_use]
-    fn pdf_value(
-        &self,
-        origin: Position,
-        direction: Direction,
-        wavelength: Wavelength,
-        time: Float,
-        rng: &mut SmallRng,
-    ) -> Float {
-        self.bvhnode
-            .pdf_value(origin, direction, wavelength, time, rng)
-    }
-
-    // TODO: improve correctness & optimization!
-    /// Returns a random point on the surface of the object
-    #[must_use]
-    fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
-        self.bvhnode.random(origin, rng)
-    }
 }
 
 /// STL structure. This gets converted into an internal representation using [Triangles](crate::objects::Triangle)
@@ -101,7 +57,7 @@ pub fn initialize_stl<'scene>(
         .unwrap();
     let mesh = stl_io::read_stl(&mut file).unwrap();
     let triangles = mesh.vertices;
-    let mut hitable_list = Vec::new();
+    let mut hitables = Vec::new();
     let material: &Material = match stl_init.material {
         MaterialInit::Shared(name) => &materials.iter().find(|m| m.name == name).unwrap().material,
         MaterialInit::Owned(m) => {
@@ -135,19 +91,13 @@ pub fn initialize_stl<'scene>(
         let c: Vec3 = c * stl_init.scale + stl_init.center;
 
         let triangle = Triangle::from_coordinates(a, b, c, material);
-        hitable_list.push(Hitable::Triangle(triangle));
+        hitables.push(Hitable::Triangle(triangle));
     }
-
-    // TODO: time
-    let time_0 = 0.0;
-    let time_1 = 1.0;
-
-    let bvhnode = BVHNode::from_list(hitable_list, time_0, time_1);
     // TODO: remove unwrap
-    let aabb = bvhnode.bounding_box(time_0, time_1).unwrap().clone();
+    let aabb = vec_bounding_box(&hitables).unwrap();
 
     STL {
-        bvhnode,
+        hitables,
         material,
         aabb,
     }

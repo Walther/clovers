@@ -22,7 +22,7 @@ fn new(bencher: divan::Bencher) {
 }
 
 #[divan::bench]
-fn new_from_intervals(bencher: divan::Bencher) {
+fn combine(bencher: divan::Bencher) {
     bencher
         .with_inputs(|| {
             let mut rng = SmallRng::from_entropy();
@@ -31,7 +31,7 @@ fn new_from_intervals(bencher: divan::Bencher) {
             (ab, cd)
         })
         .counter(1u32)
-        .bench_values(|(ab, cd)| black_box(Interval::new_from_intervals(ab, cd)))
+        .bench_values(|(ab, cd)| black_box(Interval::combine(&ab, &cd)))
 }
 
 #[divan::bench]

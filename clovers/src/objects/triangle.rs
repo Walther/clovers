@@ -6,8 +6,7 @@ use crate::interval::Interval;
 use crate::materials::MaterialInit;
 use crate::wavelength::Wavelength;
 use crate::{
-    aabb::AABB, hitable::HitRecord, materials::Material, ray::Ray, Float, Vec3,
-    EPSILON_RECT_THICKNESS,
+    aabb::AABB, materials::Material, ray::Ray, Float, HitRecord, Vec3, EPSILON_RECT_THICKNESS,
 };
 use crate::{Direction, Displacement, Position, EPSILON_SHADOW_ACNE};
 use nalgebra::Unit;
@@ -167,7 +166,7 @@ impl<'scene> HitableTrait for Triangle<'scene> {
 
     /// Returns the bounding box of the triangle
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         // TODO: this is from quad and not updated!
         // although i guess a triangle's aabb is the same as the quad's aabb in worst case
         Some(&self.aabb)
@@ -221,6 +220,11 @@ impl<'scene> HitableTrait for Triangle<'scene> {
 
         point - origin
     }
+
+    // TODO: correctness
+    fn centroid(&self) -> Position {
+        self.q + (self.u / 4.0) + (self.v / 4.0)
+    }
 }
 
 #[must_use]
@@ -231,6 +235,7 @@ fn hit_ab(a: Float, b: Float) -> bool {
     (0.0..=1.0).contains(&a) && (0.0..=1.0).contains(&b) && (a + b <= 1.0)
 }
 
+// TODO: proptest!
 #[cfg(test)]
 mod tests {
     use alloc::boxed::Box;
@@ -242,8 +247,15 @@ mod tests {
 
     const TIME_0: Float = 0.0;
     const TIME_1: Float = 1.0;
-    const RAY: Ray = Ray {
-        origin: Position::new(0.0, 0.0, -1.0),
+    const RAY_POS: Ray = Ray {
+        origin: Position::new(0.01, 0.01, -1.0),
+        direction: Unit::new_unchecked(Vec3::new(0.0, 0.0, 1.0)),
+        time: TIME_0,
+        wavelength: 600,
+    };
+
+    const RAY_NEG: Ray = Ray {
+        origin: Position::new(-0.01, -0.01, -1.0),
         direction: Unit::new_unchecked(Vec3::new(0.0, 0.0, 1.0)),
         time: TIME_0,
         wavelength: 600,
@@ -262,9 +274,7 @@ mod tests {
             &material,
         );
 
-        let aabb = triangle
-            .bounding_box(TIME_0, TIME_1)
-            .expect("No AABB for the triangle");
+        let aabb = triangle.aabb().expect("No AABB for the triangle");
 
         let expected_aabb = AABB::new(
             Interval::new(0.0, 1.0),
@@ -274,15 +284,15 @@ mod tests {
 
         assert_eq!(aabb, &expected_aabb);
 
-        let boxhit = aabb.hit(&RAY, TIME_0, TIME_1);
+        let boxhit = aabb.hit(&RAY_POS, TIME_0, TIME_1);
         assert!(boxhit);
 
         let hit_record = triangle
-            .hit(&RAY, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
+            .hit(&RAY_POS, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
             .expect("No hit record for triangle and ray");
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
-        assert_eq!(hit_record.position, Vec3::new(0.0, 0.0, 0.0));
+        assert_eq!(hit_record.position, Vec3::new(0.01, 0.01, 0.0));
         assert_eq!(
             hit_record.normal,
             Unit::new_normalize(Vec3::new(0.0, 0.0, -1.0))
@@ -303,9 +313,7 @@ mod tests {
             &material,
         );
 
-        let aabb = triangle
-            .bounding_box(TIME_0, TIME_1)
-            .expect("No AABB for the triangle");
+        let aabb = triangle.aabb().expect("No AABB for the triangle");
 
         let expected_aabb = AABB::new(
             Interval::new(0.0, 1.0),
@@ -315,15 +323,15 @@ mod tests {
 
         assert_eq!(aabb, &expected_aabb);
 
-        let boxhit = aabb.hit(&RAY, TIME_0, TIME_1);
+        let boxhit = aabb.hit(&RAY_POS, TIME_0, TIME_1);
         assert!(boxhit);
 
         let hit_record = triangle
-            .hit(&RAY, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
+            .hit(&RAY_POS, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
             .expect("No hit record for triangle and ray");
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
-        assert_eq!(hit_record.position, Position::new(0.0, 0.0, 0.0));
+        assert_eq!(hit_record.position, Position::new(0.01, 0.01, 0.0));
         assert_eq!(
             hit_record.normal,
             Unit::new_normalize(Vec3::new(0.0, 0.0, -1.0))
@@ -344,9 +352,7 @@ mod tests {
             &material,
         );
 
-        let aabb = triangle
-            .bounding_box(TIME_0, TIME_1)
-            .expect("No AABB for the triangle");
+        let aabb = triangle.aabb().expect("No AABB for the triangle");
 
         let expected_aabb = AABB::new(
             Interval::new(-1.0, 0.0),
@@ -356,15 +362,15 @@ mod tests {
 
         assert_eq!(aabb, &expected_aabb);
 
-        let boxhit = aabb.hit(&RAY, TIME_0, TIME_1);
+        let boxhit = aabb.hit(&RAY_NEG, TIME_0, TIME_1);
         assert!(boxhit);
 
         let hit_record = triangle
-            .hit(&RAY, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
+            .hit(&RAY_NEG, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
             .expect("No hit record for triangle and ray");
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
-        assert_eq!(hit_record.position, Position::new(0.0, 0.0, 0.0));
+        assert_eq!(hit_record.position, Position::new(-0.01, -0.01, 0.0));
         assert_eq!(
             hit_record.normal,
             Unit::new_normalize(Vec3::new(0.0, 0.0, -1.0))
@@ -385,9 +391,7 @@ mod tests {
             &material,
         );
 
-        let aabb = triangle
-            .bounding_box(TIME_0, TIME_1)
-            .expect("No AABB for the triangle");
+        let aabb = triangle.aabb().expect("No AABB for the triangle");
 
         let expected_aabb = AABB::new(
             Interval::new(-1.0, 0.0),
@@ -397,15 +401,15 @@ mod tests {
 
         assert_eq!(aabb, &expected_aabb);
 
-        let boxhit = aabb.hit(&RAY, TIME_0, TIME_1);
+        let boxhit = aabb.hit(&RAY_NEG, TIME_0, TIME_1);
         assert!(boxhit);
 
         let hit_record = triangle
-            .hit(&RAY, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
+            .hit(&RAY_NEG, Float::NEG_INFINITY, Float::INFINITY, &mut rng)
             .expect("No hit record for triangle and ray");
 
         assert!(hit_record.distance - 1.0 <= Float::EPSILON);
-        assert_eq!(hit_record.position, Position::new(0.0, 0.0, 0.0));
+        assert_eq!(hit_record.position, Position::new(-0.01, -0.01, 0.0));
         assert_eq!(
             hit_record.normal,
             Unit::new_normalize(Vec3::new(0.0, 0.0, -1.0))

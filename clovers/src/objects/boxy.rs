@@ -3,15 +3,15 @@
 use super::Quad;
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable, HitableTrait},
+    hitable::{Hitable, HitableTrait},
     materials::{Material, MaterialInit},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Direction, Float, Position, Vec3,
+    Box, Direction, Float, HitRecord, Position, Vec3,
 };
 use rand::rngs::SmallRng;
 
-/// `BoxyInit` structure describes the necessary data for constructing a [Boxy]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
+/// `BoxyInit` structure describes the necessary data for constructing a [Boxy].
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 pub struct BoxyInit {
@@ -106,7 +106,7 @@ impl<'scene> HitableTrait for Boxy<'scene> {
 
     /// Returns the axis-aligned bounding box [AABB] of the object.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
@@ -128,5 +128,10 @@ impl<'scene> HitableTrait for Boxy<'scene> {
         });
 
         sum
+    }
+
+    // TODO: correctness for rotations/translations?
+    fn centroid(&self) -> Position {
+        self.aabb.centroid()
     }
 }

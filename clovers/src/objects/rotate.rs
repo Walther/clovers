@@ -2,10 +2,10 @@
 
 use crate::{
     aabb::AABB,
-    hitable::{HitRecord, Hitable, HitableTrait},
+    hitable::{Hitable, HitableTrait},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Direction, Float, Position, Vec3,
+    Box, Direction, Float, HitRecord, Position, Vec3,
 };
 use nalgebra::Unit;
 use rand::rngs::SmallRng;
@@ -14,7 +14,7 @@ use super::Object;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
-/// `RotateInit` structure describes the necessary data for constructing a [`RotateY`]. Used with [serde] when importing [`SceneFile`](crate::scenes::SceneFile)s.
+/// `RotateInit` structure describes the necessary data for constructing a [`RotateY`].
 pub struct RotateInit {
     /// Used for multiple importance sampling
     #[cfg_attr(feature = "serde-derive", serde(default))]
@@ -39,12 +39,10 @@ impl<'scene> RotateY<'scene> {
     #[must_use]
     pub fn new(object: Box<Hitable<'scene>>, angle: Float) -> Self {
         // TODO: add proper time support
-        let time_0: Float = 0.0;
-        let time_1: Float = 1.0;
         let radians: Float = angle.to_radians();
         let sin_theta: Float = radians.sin();
         let cos_theta: Float = radians.cos();
-        let bounding_box: Option<&AABB> = object.bounding_box(time_0, time_1);
+        let bounding_box: Option<&AABB> = object.aabb();
 
         // Does our object have a bounding box?
         let Some(bbox) = bounding_box else {
@@ -163,7 +161,7 @@ impl<'scene> HitableTrait for RotateY<'scene> {
 
     /// Bounding box method for the [`RotateY`] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for rotation.
     #[must_use]
-    fn bounding_box(&self, _t0: Float, _t1: Float) -> Option<&AABB> {
+    fn aabb(&self) -> Option<&AABB> {
         self.aabb.as_ref()
     }
 
@@ -177,5 +175,10 @@ impl<'scene> HitableTrait for RotateY<'scene> {
     ) -> Float {
         // TODO: fix
         0.0
+    }
+
+    // TODO: correctness!
+    fn centroid(&self) -> Position {
+        self.object.centroid()
     }
 }
