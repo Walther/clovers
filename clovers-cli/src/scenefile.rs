@@ -70,6 +70,7 @@ impl SceneFile {
                 Object::RotateY(i) => i.priority,
                 Object::Sphere(i) => i.priority,
                 Object::STL(i) => i.priority,
+                Object::PLY(i) => i.priority,
                 Object::GLTF(i) => i.priority,
                 Object::Translate(i) => i.priority,
                 Object::Triangle(i) => i.priority,
