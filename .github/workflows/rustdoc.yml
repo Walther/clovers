@@ -1,5 +1,3 @@
-# Borrowed from https://github.com/rust-analyzer/rust-analyzer/blob/faaec86ff0cf10dbd822a7abbeb381b3b5578141/.github/workflows/rustdoc.yaml
-
 name: rustdoc
 on:
   push:
@@ -19,17 +17,16 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, rust-src
+      - name: Install Rust toolchain
+        run: rustup update --no-self-update stable
 
       - name: Build Documentation
         run: cargo doc --all --no-deps
 
       - name: Deploy Docs
-        uses: peaceiris/actions-gh-pages@364c31d33bb99327c77b3a5438a83a357a6729ad # v3.4.0
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
