@@ -1,3 +1,1 @@
-*.ply binary
-ply/** linguist-vendored
-
+ply/**/*.ply binary linguist-generated
