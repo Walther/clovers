@@ -1,1 +1,1 @@
-ply/**/*.ply binary linguist-generated
+ply/**/*.ply -diff -merge -text linguist-generated
