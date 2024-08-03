@@ -1,0 +1,84 @@
+{
+  "time_0": 0,
+  "time_1": 1,
+  "background_color": [0.025, 0.025, 0.025],
+  "camera": {
+    "look_from": [0, 200, -800],
+    "look_at": [0, 200, 0],
+    "up": [0, 1, 0],
+    "vertical_fov": 40,
+    "aperture": 30,
+    "focus_distance": 650
+  },
+  "objects": [
+    {
+      "kind": "PLY",
+      "comment": "bunny",
+      "path": "ply/bunny.binary.ply",
+      "scale": 2500,
+      "center": [-45, -85, 0],
+      "rotation": [0, 200, 0],
+      "material": "white lambertian"
+    },
+    {
+      "kind": "Quad",
+      "comment": "floor",
+      "q": [-2000, 0.01, -500],
+      "u": [4000, 0, 0],
+      "v": [0, 0, 1000],
+      "material": "checkerboard"
+    },
+    {
+      "kind": "Quad",
+      "comment": "back wall",
+      "q": [-2000, 0, 500],
+      "u": [4000, 0, 0],
+      "v": [0, 1000, 0],
+      "material": "checkerboard"
+    },
+    {
+      "kind": "Sphere",
+      "center": [0, 800, -300],
+      "radius": 300,
+      "material": "lamp",
+      "comment": "big ceiling light",
+      "priority": true
+    }
+  ],
+  "materials": [
+    {
+      "name": "dark lambertian",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.3, 0.3, 0.3]
+      }
+    },
+    {
+      "name": "white lambertian",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.8, 0.8, 0.8]
+      }
+    },
+    {
+      "name": "checkerboard",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SpatialChecker",
+        "even": [0.8, 0.8, 0.8],
+        "odd": [0.3, 0.3, 0.3],
+        "density": 0.01
+      }
+    },
+    {
+      "name": "lamp",
+      "kind": "DiffuseLight",
+      "emit": {
+        "kind": "SolidColor",
+        "color": [5, 5, 5]
+      }
+    }
+  ]
+}

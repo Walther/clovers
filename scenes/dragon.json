@@ -1,78 +1,93 @@
 {
   "time_0": 0,
   "time_1": 1,
-  "background_color": [0, 0, 0],
+  "background_color": [0.025, 0.025, 0.025],
   "camera": {
-    "look_from": [0, 250, -800],
-    "look_at": [0, 250, 0],
+    "look_from": [0, 200, -800],
+    "look_at": [0, 200, 0],
     "up": [0, 1, 0],
     "vertical_fov": 40,
-    "aperture": 10,
-    "focus_distance": 800
+    "aperture": 30,
+    "focus_distance": 650
   },
   "objects": [
     {
-      "kind": "Quad",
-      "comment": "back wall",
-      "q": [-2000, 0, 800],
-      "u": [4000, 0, 0],
-      "v": [0, 1000, 0],
-      "material": {
-        "kind": "Lambertian",
-        "albedo": { "kind": "SolidColor", "color": [1, 1, 1] }
-      }
-    },
-    {
-      "kind": "STL",
+      "kind": "PLY",
       "comment": "dragon",
-      "path": "stl/dragon.stl",
-      "scale": 12,
-      "center": [0, 240, 250],
-      "rotation": [-90, -40, 0],
-      "material": {
-        "name": "Dense flint glass SF10",
-        "kind": "Dispersive",
-        "cauchy_a": 1.728,
-        "cauchy_b": 0.01342
-      }
+      "path": "ply/dragon.binary.ply",
+      "scale": 2500,
+      "center": [-45, -135, -100],
+      "rotation": [0, 200, 0],
+      "material": "white lambertian"
     },
     {
       "kind": "Quad",
-      "q": [-2000, 0, -200],
+      "comment": "floor",
+      "q": [-2000, 0.01, -500],
       "u": [4000, 0, 0],
       "v": [0, 0, 1000],
-      "comment": "floor",
-      "priority": false,
-      "material": {
-        "kind": "Lambertian",
-        "albedo": { "kind": "SolidColor", "color": [1, 1, 1] }
-      }
+      "material": "checkerboard"
     },
     {
       "kind": "Quad",
-      "q": [-200, 800, 100],
-      "u": [400, 0, 0],
-      "v": [0, 0, 400],
-      "material": {
-        "kind": "DiffuseLight",
-        "emit": { "kind": "SolidColor", "color": [7, 7, 7] }
-      },
+      "comment": "back wall",
+      "q": [-2000, 0, 500],
+      "u": [4000, 0, 0],
+      "v": [0, 1000, 0],
+      "material": "checkerboard"
+    },
+    {
+      "kind": "Sphere",
+      "center": [0, 800, -300],
+      "radius": 300,
+      "material": "lamp",
       "comment": "big ceiling light",
       "priority": true
     }
   ],
-  "priority_objects": [
+  "materials": [
     {
-      "kind": "Quad",
-      "q": [-200, 800, 100],
-      "u": [400, 0, 0],
-      "v": [0, 0, 400],
-      "material": {
-        "kind": "DiffuseLight",
-        "emit": { "kind": "SolidColor", "color": [7, 7, 7] }
+      "name": "dark lambertian",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.3, 0.3, 0.3]
+      }
+    },
+    {
+      "name": "white lambertian",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": [0.8, 0.8, 0.8]
+      }
+    },
+    {
+      "name": "checkerboard",
+      "kind": "Lambertian",
+      "albedo": {
+        "kind": "SpatialChecker",
+        "even": [0.8, 0.8, 0.8],
+        "odd": [0.3, 0.3, 0.3],
+        "density": 0.01
+      }
+    },
+    {
+      "name": "lamp",
+      "kind": "DiffuseLight",
+      "emit": {
+        "kind": "SolidColor",
+        "color": [5, 5, 5]
+      }
+    },
+    {
+      "name": "copper",
+      "kind": "Metal",
+      "albedo": {
+        "kind": "SolidColor",
+        "color": { "hex": "#b87333" }
       },
-      "comment": "big ceiling light",
-      "priority": true
+      "fuzz": 0.35
     }
   ]
 }

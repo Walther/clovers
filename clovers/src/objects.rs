@@ -11,6 +11,8 @@ pub mod constant_medium;
 #[cfg(feature = "gl_tf")]
 pub mod gltf;
 pub mod moving_sphere;
+#[cfg(feature = "ply")]
+pub mod ply;
 pub mod quad;
 pub mod rotate;
 pub mod sphere;
@@ -25,6 +27,8 @@ use alloc::vec::Vec;
 pub use boxy::*; // avoid keyword
 pub use constant_medium::*;
 pub use moving_sphere::*;
+#[cfg(feature = "ply")]
+pub use ply::*;
 pub use quad::*;
 pub use rotate::*;
 pub use sphere::*;
@@ -70,6 +74,9 @@ pub enum Object {
     #[cfg(feature = "stl")]
     /// STL object initializer
     STL(STLInit),
+    #[cfg(feature = "ply")]
+    /// PLY object initializer
+    PLY(PLYInit),
     #[cfg(feature = "gl_tf")]
     /// GLTF object initializer
     GLTF(GLTFInit),
@@ -126,6 +133,11 @@ pub fn object_to_hitable(obj: Object, materials: &[SharedMaterial]) -> Hitable<'
         Object::STL(stl_init) => {
             let stl = initialize_stl(stl_init, materials);
             Hitable::HitableList(HitableList::new(stl.hitables))
+        }
+        #[cfg(feature = "ply")]
+        Object::PLY(ply_init) => {
+            let ply = initialize_ply(ply_init, materials);
+            Hitable::HitableList(HitableList::new(ply.hitables))
         }
         #[cfg(feature = "gl_tf")]
         Object::GLTF(x) => {
