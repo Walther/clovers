@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `clovers/src/wavelength.rs`."><title>wavelength.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="clovers" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<a href="#2" id="2">2</a>
+<a href="#3" id="3">3</a>
+<a href="#4" id="4">4</a>
+<a href="#5" id="5">5</a>
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
+<a href="#48" id="48">48</a>
+<a href="#49" id="49">49</a>
+<a href="#50" id="50">50</a>
+<a href="#51" id="51">51</a>
+<a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! The fundamental building blocks of spectral rendering.
+
+</span><span class="kw">use </span>core::{array::from_fn, ops::Range};
+<span class="kw">use </span>palette::{white_point::E, Xyz};
+<span class="kw">use </span>rand::rngs::SmallRng;
+<span class="kw">use </span>rand_distr::uniform::SampleRange;
+
+<span class="kw">use </span><span class="kw">crate</span>::Float;
+
+<span class="doccomment">/// Wavelength in nanometers
+</span><span class="kw">pub type </span>Wavelength = usize;
+
+<span class="doccomment">/// The lower bound for the wavelengths, inclusive
+</span><span class="kw">pub const </span>MIN_WAVELENGTH: Wavelength = <span class="number">380</span>;
+<span class="doccomment">/// The upper bound for the wavelenghts, exclusive
+</span><span class="kw">pub const </span>MAX_WAVELENGTH: Wavelength = <span class="number">780</span>;
+<span class="doccomment">/// The range of wavelenghts used, inclusive low, exclusive high
+</span><span class="kw">pub const </span>SPECTRUM: Range&lt;Wavelength&gt; = MIN_WAVELENGTH..MAX_WAVELENGTH;
+<span class="doccomment">/// The length of the wavelength spectrum used
+</span><span class="kw">pub const </span>SPECTRUM_SIZE: usize = MAX_WAVELENGTH - MIN_WAVELENGTH;
+<span class="doccomment">/// The probability of picking a specific wavelength
+</span><span class="attr">#[allow(clippy::cast_precision_loss)]
+</span><span class="kw">pub const </span>WAVELENGTH_PROBABILITY: Float = <span class="number">1.0 </span>/ (SPECTRUM_SIZE <span class="kw">as </span>Float);
+<span class="doccomment">/// The count of wavelenghts used per ray in Hero Wavelength Sampling
+</span><span class="kw">pub const </span>WAVE_SAMPLE_COUNT: usize = <span class="number">4</span>;
+
+<span class="doccomment">/// Return a random wavelength, sampled uniformly from the visible spectrum.
+</span><span class="kw">pub fn </span>random_wavelength(rng: <span class="kw-2">&amp;mut </span>SmallRng) -&gt; Wavelength {
+    SPECTRUM.sample_single(rng)
+}
+
+<span class="comment">// TODO: clippy fixes possible?
+</span><span class="doccomment">/// Given a sample seed from a sampler, return the approximate wavelenght.
+</span><span class="attr">#[must_use]
+#[allow(clippy::cast_possible_truncation)]
+#[allow(clippy::cast_sign_loss)]
+#[allow(clippy::cast_precision_loss)]
+</span><span class="kw">pub fn </span>sample_wavelength(sample: Float) -&gt; Wavelength {
+    <span class="kw">let </span>pick = (sample * SPECTRUM_SIZE <span class="kw">as </span>Float).floor() <span class="kw">as </span>usize + MIN_WAVELENGTH;
+    <span class="macro">assert!</span>(pick &lt;= MAX_WAVELENGTH);
+    <span class="macro">assert!</span>(pick &gt;= MIN_WAVELENGTH);
+    pick
+}
+
+<span class="doccomment">/// Given a hero wavelength, create additional equidistant wavelengths in the visible spectrum. Returns an array of wavelengths, with the original hero wavelength as the first one.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>rotate_wavelength(hero: Wavelength) -&gt; [Wavelength; WAVE_SAMPLE_COUNT] {
+    from_fn(|j| {
+        (hero - MIN_WAVELENGTH + (j * SPECTRUM_SIZE / WAVE_SAMPLE_COUNT)) % SPECTRUM_SIZE
+            + MIN_WAVELENGTH
+    })
+}
+
+<span class="doccomment">/// Helper function adapted from &lt;https://en.wikipedia.org/wiki/CIE_1931_color_space#Analytical_approximation&gt;
+</span><span class="kw">fn </span>gaussian(x: Float, alpha: Float, mu: Float, sigma1: Float, sigma2: Float) -&gt; Float {
+    <span class="kw">let </span>t = (x - mu) / (<span class="kw">if </span>x &lt; mu { sigma1 } <span class="kw">else </span>{ sigma2 });
+    alpha * (-(t * t) / <span class="number">2.0</span>).exp()
+}
+
+<span class="doccomment">/// Helper function adapted from &lt;https://en.wikipedia.org/wiki/CIE_1931_color_space#Analytical_approximation&gt;
+</span><span class="attr">#[allow(clippy::cast_precision_loss)]
+#[must_use]
+</span><span class="kw">pub fn </span>wavelength_into_xyz(lambda: Wavelength) -&gt; Xyz&lt;E&gt; {
+    <span class="comment">// With the wavelength λ measured in nanometers, we then approximate the 1931 color matching functions:
+    </span><span class="kw">let </span>l: Float = lambda <span class="kw">as </span>Float;
+    <span class="kw">let </span>x = <span class="number">0.0 </span><span class="comment">// for readability of next lines
+        </span>+ gaussian(l, <span class="number">1.056</span>, <span class="number">599.8</span>, <span class="number">37.9</span>, <span class="number">31.0</span>)
+        + gaussian(l, <span class="number">0.362</span>, <span class="number">442.0</span>, <span class="number">16.0</span>, <span class="number">26.7</span>)
+        + gaussian(l, -<span class="number">0.065</span>, <span class="number">501.1</span>, <span class="number">20.4</span>, <span class="number">26.2</span>);
+    <span class="kw">let </span>y = gaussian(l, <span class="number">0.821</span>, <span class="number">568.8</span>, <span class="number">46.9</span>, <span class="number">40.5</span>) + gaussian(l, <span class="number">0.286</span>, <span class="number">530.9</span>, <span class="number">16.3</span>, <span class="number">31.1</span>);
+    <span class="kw">let </span>z = gaussian(l, <span class="number">1.217</span>, <span class="number">437.0</span>, <span class="number">11.8</span>, <span class="number">36.0</span>) + gaussian(l, <span class="number">0.681</span>, <span class="number">459.0</span>, <span class="number">26.0</span>, <span class="number">13.8</span>);
+
+    <span class="comment">// The functions above have been designed for the whitepoint E
+    </span>Xyz::&lt;E&gt;::new(x, y, z)
+}
+</code></pre></div></section></main></body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Sampler","SamplerDimension"],"mod":["blue","random"],"struct":["Randomness"],"trait":["SamplerTrait"]};
