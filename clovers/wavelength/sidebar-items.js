@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["MAX_WAVELENGTH","MIN_WAVELENGTH","SPECTRUM","SPECTRUM_SIZE","WAVELENGTH_PROBABILITY","WAVE_SAMPLE_COUNT"],"fn":["random_wavelength","rotate_wavelength","sample_wavelength","wavelength_into_xyz"],"type":["Wavelength"]};
