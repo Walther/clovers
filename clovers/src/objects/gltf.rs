@@ -72,7 +72,7 @@ impl<'scene> GLTF<'scene> {
     /// This method may panic if no finite bounding box can be created for the given `hitables`.
     pub fn new(gltf_init: GLTFInit) -> Self {
         let hitables: Vec<Hitable> = gltf_init.into();
-        let aabb = vec_bounding_box(&hitables).unwrap();
+        let aabb = vec_bounding_box(&hitables).expect("No bounding box for hitables");
 
         GLTF { hitables, aabb }
     }

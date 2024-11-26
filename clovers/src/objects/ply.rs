@@ -108,7 +108,7 @@ pub fn initialize_ply<'scene>(
         hitables.push(Hitable::Triangle(triangle));
     }
     // TODO: remove unwrap
-    let aabb = vec_bounding_box(&hitables).unwrap();
+    let aabb = vec_bounding_box(&hitables).expect("No bounding box for hitables");
 
     PLY {
         hitables,
