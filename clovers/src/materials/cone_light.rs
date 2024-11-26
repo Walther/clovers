@@ -65,8 +65,8 @@ impl MaterialTrait for ConeLight {
             emit
         } else {
             // Make sure that the front face of the lamp is tinted, even outside the main lighting angle
-            let (r, g, b) = emit.into_components();
-            let scaling_factor = r.max(g).max(b);
+            let (red, green, blue) = emit.into_components();
+            let scaling_factor = red.max(green).max(blue);
             if scaling_factor > 1.0 {
                 emit / scaling_factor
             } else {

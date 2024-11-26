@@ -203,6 +203,7 @@ pub struct GLTFTriangle<'scene> {
 
 impl<'scene> GLTFTriangle<'scene> {
     #[must_use]
+    #[allow(clippy::many_single_char_names)]
     /// Initialize a new GLTF object
     pub fn new(triangle: [Vec3; 3], material: &'scene GLTFMaterial<'scene>) -> Self {
         // TODO: mostly adapted from Triangle, verify correctness!

@@ -57,6 +57,7 @@ pub struct Quad<'scene> {
 impl<'scene> Quad<'scene> {
     /// Creates a new quad
     #[must_use]
+    #[allow(clippy::many_single_char_names)]
     pub fn new(q: Position, u: Vec3, v: Vec3, material: &'scene Material) -> Quad<'scene> {
         let n: Vec3 = u.cross(&v);
         let normal = Unit::new_normalize(n);

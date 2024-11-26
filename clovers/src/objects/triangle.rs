@@ -57,6 +57,7 @@ pub struct Triangle<'scene> {
 impl<'scene> Triangle<'scene> {
     /// Creates a new triangle from a coordinate point and two side vectors relative to the point
     #[must_use]
+    #[allow(clippy::many_single_char_names)]
     pub fn new(q: Position, u: Vec3, v: Vec3, material: &'scene Material) -> Triangle<'scene> {
         let n: Vec3 = u.cross(&v);
         let normal: Direction = Unit::new_normalize(n);
@@ -101,6 +102,7 @@ impl<'scene> Triangle<'scene> {
 
     /// Creates a new triangle from three Cartesian space coordinates
     #[must_use]
+    #[allow(clippy::many_single_char_names)]
     pub fn from_coordinates(
         a: Vec3,
         b: Vec3,
