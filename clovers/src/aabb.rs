@@ -122,12 +122,7 @@ impl AABB {
     // TODO: this api is kind of annoying
     #[must_use]
     pub fn axis(&self, n: usize) -> &Interval {
-        match n {
-            0 => &self.x,
-            1 => &self.y,
-            2 => &self.z,
-            _ => panic!("AABB::axis called with invalid parameter: {n:?}"),
-        }
+        [&self.x, &self.y, &self.z][n]
     }
 
     /// Distance of a `Ray` to the bounding box.

@@ -49,6 +49,9 @@ pub struct PLYInit {
 
 #[must_use]
 /// Initializes a PLY
+///
+/// # Panics
+/// This method may panic if a shared material is referenced in the object description, but cannot be found in the materials list.
 pub fn initialize_ply<'scene>(
     ply_init: PLYInit,
     materials: &'scene [SharedMaterial],
@@ -105,7 +108,7 @@ pub fn initialize_ply<'scene>(
         hitables.push(Hitable::Triangle(triangle));
     }
     // TODO: remove unwrap
-    let aabb = vec_bounding_box(&hitables).unwrap();
+    let aabb = vec_bounding_box(&hitables).expect("No bounding box for hitables");
 
     PLY {
         hitables,

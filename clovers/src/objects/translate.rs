@@ -34,6 +34,9 @@ pub struct Translate<'scene> {
 
 impl<'scene> Translate<'scene> {
     /// Creates a new `Translate` object. It wraps the given [Object] and has adjusted `hit()` and `bounding_box()` methods based on the `offset` given.
+    ///
+    /// # Panics
+    /// This method may panic if the given object does not have a valid `AABB`.
     #[must_use]
     pub fn new(object: Box<Hitable<'scene>>, offset: Vec3) -> Self {
         // TODO: time

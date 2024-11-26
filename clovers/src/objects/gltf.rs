@@ -67,9 +67,12 @@ pub struct GLTF<'scene> {
 impl<'scene> GLTF<'scene> {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
+    ///
+    /// # Panics
+    /// This method may panic if no finite bounding box can be created for the given `hitables`.
     pub fn new(gltf_init: GLTFInit) -> Self {
         let hitables: Vec<Hitable> = gltf_init.into();
-        let aabb = vec_bounding_box(&hitables).unwrap();
+        let aabb = vec_bounding_box(&hitables).expect("No bounding box for hitables");
 
         GLTF { hitables, aabb }
     }
@@ -200,6 +203,7 @@ pub struct GLTFTriangle<'scene> {
 
 impl<'scene> GLTFTriangle<'scene> {
     #[must_use]
+    #[allow(clippy::many_single_char_names)]
     /// Initialize a new GLTF object
     pub fn new(triangle: [Vec3; 3], material: &'scene GLTFMaterial<'scene>) -> Self {
         // TODO: mostly adapted from Triangle, verify correctness!

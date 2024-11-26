@@ -138,9 +138,12 @@ pub struct HitableList<'scene> {
 
 impl<'scene> HitableList<'scene> {
     /// Creates a new [`HitableList`].
+    ///
+    /// # Panics
+    /// This method may panic if no finite bounding box can be created for the given `hitables`.
     #[must_use]
     pub fn new(hitables: Vec<Hitable<'scene>>) -> Self {
-        let aabb = vec_bounding_box(&hitables).unwrap();
+        let aabb = vec_bounding_box(&hitables).expect("No bounding box for hitables");
         Self { hitables, aabb }
     }
 

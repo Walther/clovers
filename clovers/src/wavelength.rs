@@ -31,6 +31,9 @@ pub fn random_wavelength(rng: &mut SmallRng) -> Wavelength {
 
 // TODO: clippy fixes possible?
 /// Given a sample seed from a sampler, return the approximate wavelenght.
+///
+/// # Panics
+/// This method may panic if the runtime asserts are triggered. This would indicate a bug in the implementation.
 #[must_use]
 #[allow(clippy::cast_possible_truncation)]
 #[allow(clippy::cast_sign_loss)]
