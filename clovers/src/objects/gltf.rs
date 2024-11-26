@@ -67,6 +67,9 @@ pub struct GLTF<'scene> {
 impl<'scene> GLTF<'scene> {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
+    ///
+    /// # Panics
+    /// This method may panic if no finite bounding box can be created for the given `hitables`.
     pub fn new(gltf_init: GLTFInit) -> Self {
         let hitables: Vec<Hitable> = gltf_init.into();
         let aabb = vec_bounding_box(&hitables).unwrap();

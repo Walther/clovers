@@ -61,7 +61,6 @@
 #![deny(missing_docs)]
 // TODO: temporarily allowing some in order to get a majority of clippy::pedantic enabled
 #![allow(clippy::many_single_char_names)] // Lots of places with coordinates etc
-#![allow(clippy::missing_panics_doc)] // TODO: remove panics where feasible later
 #![allow(clippy::module_name_repetitions)]
 // no_std required for gpu accelerated rendering
 #![cfg_attr(not(feature = "std"), no_std)]

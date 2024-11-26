@@ -17,11 +17,7 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
     // What is the axis with the largest span?
     // TODO: horribly inefficient, improve!
     let bounding: AABB = vec_bounding_box(&hitables).expect("No bounding box for objects");
-    let spans = [
-        bounding.axis(0).size(),
-        bounding.axis(1).size(),
-        bounding.axis(2).size(),
-    ];
+    let spans = [bounding.x.size(), bounding.y.size(), bounding.z.size()];
     let largest = Float::max(Float::max(spans[0], spans[1]), spans[2]);
     #[allow(clippy::float_cmp)] // TODO: better code for picking the largest axis...
     let axis: usize = spans.iter().position(|&x| x == largest).unwrap();

@@ -49,6 +49,9 @@ pub struct PLYInit {
 
 #[must_use]
 /// Initializes a PLY
+///
+/// # Panics
+/// This method may panic if a shared material is referenced in the object description, but cannot be found in the materials list.
 pub fn initialize_ply<'scene>(
     ply_init: PLYInit,
     materials: &'scene [SharedMaterial],

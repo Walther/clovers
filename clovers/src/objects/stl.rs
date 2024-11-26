@@ -46,6 +46,9 @@ pub struct STLInit {
 
 #[must_use]
 /// Initializes an STL
+///
+/// # Panics
+/// This method may panic if the referenced .stl file cannot be opened or if it cannot be parsed.
 pub fn initialize_stl<'scene>(
     stl_init: STLInit,
     materials: &'scene [SharedMaterial],
