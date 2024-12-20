@@ -24,7 +24,7 @@ clovers = { path = "../clovers", features = [
 
 # External
 blue-noise-sampler = "0.1.0"
-clap = { version = "4.5.21", features = ["std", "derive"] }
+clap = { version = "4.5.23", features = ["std", "derive"] }
 human_format = "1.1.0"
 humantime = "2.1.0"
 image = { version = "0.25.5", features = ["png"], default-features = false }
@@ -37,12 +37,12 @@ palette = { version = "0.7.6", features = ["serializing"] }
 paste = { version = "1.0.15" }
 rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
 rayon = "1.10.0"
-serde = { version = "1.0.215", features = ["derive"], default-features = false }
+serde = { version = "1.0.216", features = ["derive"], default-features = false }
 serde_json = { version = "1.0", features = ["alloc"], default-features = false }
-time = { version = "0.3.36", default-features = false }
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["time"] }
+time = { version = "0.3.37", default-features = false }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["time"] }
 
 [dev-dependencies]
-divan = "0.1.16"
+divan = "0.1.17"
 proptest = "1"
