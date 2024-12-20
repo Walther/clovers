@@ -21,7 +21,7 @@ pub struct HitRecord<'a> {
     pub front_face: bool,
 }
 
-impl<'a> HitRecord<'a> {
+impl HitRecord<'_> {
     /// Sets the face normal of this [`HitRecord`].
     pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Direction) {
         self.front_face = ray.direction.dot(&outward_normal) < 0.0;

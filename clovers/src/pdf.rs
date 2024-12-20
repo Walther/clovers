@@ -89,7 +89,7 @@ impl<'scene> HitablePDF<'scene> {
     }
 }
 
-impl<'scene> PDFTrait for HitablePDF<'scene> {
+impl PDFTrait for HitablePDF<'_> {
     #[must_use]
     fn value(
         &self,
@@ -125,7 +125,7 @@ impl<'scene> MixturePDF<'scene> {
     }
 }
 
-impl<'scene> PDFTrait for MixturePDF<'scene> {
+impl PDFTrait for MixturePDF<'_> {
     #[must_use]
     fn value(
         &self,

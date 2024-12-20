@@ -60,7 +60,7 @@ impl<'scene> ConstantMedium<'scene> {
     }
 }
 
-impl<'scene> HitableTrait for ConstantMedium<'scene> {
+impl HitableTrait for ConstantMedium<'_> {
     /// Hit function for the [`ConstantMedium`] object. Returns a [`HitRecord`] if hit. TODO: explain the math for the fog
     #[must_use]
     fn hit(

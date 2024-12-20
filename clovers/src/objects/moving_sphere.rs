@@ -101,7 +101,7 @@ impl<'scene> MovingSphere<'scene> {
     }
 }
 
-impl<'scene> HitableTrait for MovingSphere<'scene> {
+impl HitableTrait for MovingSphere<'_> {
     /// Hit method for the [`MovingSphere`] object. First gets the interpolated center position at the given time, then follows the implementation of [Sphere](crate::objects::Sphere) object's hit method.
     #[must_use]
     fn hit(

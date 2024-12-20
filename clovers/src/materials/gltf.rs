@@ -32,7 +32,7 @@ pub struct GLTFMaterial<'scene> {
     bitangents: Option<[Vec3; 3]>,
 }
 
-impl<'scene> Default for GLTFMaterial<'scene> {
+impl Default for GLTFMaterial<'_> {
     fn default() -> Self {
         todo!()
     }
@@ -80,7 +80,7 @@ impl<'scene> GLTFMaterial<'scene> {
     }
 }
 
-impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
+impl MaterialTrait for GLTFMaterial<'_> {
     fn scatter(
         &self,
         ray: &Ray,
@@ -137,7 +137,7 @@ impl<'scene> MaterialTrait for GLTFMaterial<'scene> {
     }
 }
 
-impl<'scene> GLTFMaterial<'scene> {
+impl GLTFMaterial<'_> {
     fn sample_base_color(&self, hit_record: &HitRecord) -> LinSrgb {
         let base_color_texture = self
             .material

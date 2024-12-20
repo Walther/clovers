@@ -10,7 +10,7 @@ use crate::{
 
 use super::BVHNode;
 
-impl<'scene> HitableTrait for BVHNode<'scene> {
+impl HitableTrait for BVHNode<'_> {
     /// The main `hit` function for a [`BVHNode`]. Given a [Ray], and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the encased objects during that interval.
     #[must_use]
     fn hit(

@@ -64,7 +64,7 @@ pub struct GLTF<'scene> {
     pub aabb: AABB,
 }
 
-impl<'scene> GLTF<'scene> {
+impl GLTF<'_> {
     #[must_use]
     /// Create a new STL object with the given initialization parameters.
     ///
@@ -243,7 +243,7 @@ impl<'scene> GLTFTriangle<'scene> {
     }
 }
 
-impl<'scene> HitableTrait for GLTFTriangle<'scene> {
+impl HitableTrait for GLTFTriangle<'_> {
     fn hit(
         &self,
         ray: &Ray,

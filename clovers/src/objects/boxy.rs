@@ -82,7 +82,7 @@ impl<'scene> Boxy<'scene> {
     }
 }
 
-impl<'scene> HitableTrait for Boxy<'scene> {
+impl HitableTrait for Boxy<'_> {
     /// The main `hit` function for a [Boxy]. Given a [Ray], and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the object during that interval.
     #[must_use]
     fn hit(

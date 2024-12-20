@@ -159,7 +159,7 @@ pub fn object_to_hitable(obj: Object, materials: &[SharedMaterial]) -> Hitable<'
 fn initialize_material<'scene>(
     material_init: MaterialInit,
     materials: &'scene [SharedMaterial],
-) -> &Material {
+) -> &'scene Material {
     let material: &Material = match material_init {
         MaterialInit::Owned(m) => {
             // TODO: do not leak memory

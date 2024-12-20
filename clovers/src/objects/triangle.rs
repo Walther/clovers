@@ -117,7 +117,7 @@ impl<'scene> Triangle<'scene> {
     }
 }
 
-impl<'scene> HitableTrait for Triangle<'scene> {
+impl HitableTrait for Triangle<'_> {
     /// Hit method for the triangle
     #[must_use]
     fn hit(
