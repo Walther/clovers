@@ -4,7 +4,7 @@ use super::{MaterialTrait, ScatterRecord};
 use crate::{
     ray::Ray,
     textures::{SolidColor, Texture, TextureTrait},
-    Float, HitRecord, Position,
+    Float, HitRecord,
 };
 use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
@@ -41,14 +41,7 @@ impl MaterialTrait for ConeLight {
 
     /// Emission function for [`ConeLight`]. If the given [`HitRecord`] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.
     #[must_use]
-    fn emit(
-        &self,
-        ray: &Ray,
-        hit_record: &HitRecord,
-        u: Float,
-        v: Float,
-        position: Position,
-    ) -> Xyz<E> {
+    fn emit(&self, ray: &Ray, hit_record: &HitRecord) -> Xyz<E> {
         // If we don't hit the front face, return black
         if !hit_record.front_face {
             return Xyz::new(0.0, 0.0, 0.0);
@@ -60,7 +53,7 @@ impl MaterialTrait for ConeLight {
             / (ray.direction.magnitude() * hit_record.normal.magnitude()))
         .acos();
 
-        let emit = self.emit.color(u, v, position);
+        let emit = self.emit.color(hit_record);
         if angle <= spread_radians {
             emit
         } else {

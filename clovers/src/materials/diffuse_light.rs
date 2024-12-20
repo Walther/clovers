@@ -4,7 +4,7 @@ use super::{MaterialTrait, ScatterRecord};
 use crate::{
     ray::Ray,
     textures::{SolidColor, Texture, TextureTrait},
-    Float, HitRecord, Position,
+    HitRecord,
 };
 use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
@@ -39,16 +39,9 @@ impl MaterialTrait for DiffuseLight {
 
     /// Emission function for [`DiffuseLight`]. If the given [`HitRecord`] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.
     #[must_use]
-    fn emit(
-        &self,
-        _ray: &Ray,
-        hit_record: &HitRecord,
-        u: Float,
-        v: Float,
-        position: Position,
-    ) -> Xyz<E> {
+    fn emit(&self, _ray: &Ray, hit_record: &HitRecord) -> Xyz<E> {
         if hit_record.front_face {
-            self.emit.color(u, v, position)
+            self.emit.color(hit_record)
         } else {
             Xyz::new(0.0, 0.0, 0.0)
         }

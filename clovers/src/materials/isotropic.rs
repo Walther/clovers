@@ -26,9 +26,7 @@ impl MaterialTrait for Isotropic {
         hit_record: &HitRecord,
         _rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
-        let albedo = self
-            .albedo
-            .color(hit_record.u, hit_record.v, hit_record.position);
+        let albedo = self.albedo.color(hit_record);
 
         Some(ScatterRecord {
             material_type: MaterialType::Diffuse,

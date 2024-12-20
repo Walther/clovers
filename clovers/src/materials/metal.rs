@@ -40,9 +40,7 @@ impl MaterialTrait for Metal {
                 time: ray.time,
                 wavelength: ray.wavelength,
             }),
-            attenuation: self
-                .albedo
-                .color(hit_record.u, hit_record.v, hit_record.position),
+            attenuation: self.albedo.color(hit_record),
             material_type: MaterialType::Specular,
             pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()),
         })

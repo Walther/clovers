@@ -29,9 +29,7 @@ impl MaterialTrait for Lambertian {
         Some(ScatterRecord {
             material_type: MaterialType::Diffuse,
             specular_ray: None,
-            attenuation: self
-                .albedo
-                .color(hit_record.u, hit_record.v, hit_record.position),
+            attenuation: self.albedo.color(hit_record),
             pdf_ptr: PDF::CosinePDF(CosinePDF::new(hit_record.normal)),
         })
     }
