@@ -8,12 +8,12 @@ use crate::{
 
 use super::BVHNode;
 
-impl<'scene> BVHNode<'scene> {
+impl BVHNode<'_> {
     // NOTE: this must be kept in close alignment with the implementation of BVHNode::hit()!
     // TODO: maybe move the statistics counting to the method itself? Measure the impact?
     /// Alternate hit method that maintains a test count for the BVH traversals.
     pub fn testcount(
-        &'scene self,
+        &self,
         depth: &mut usize,
         ray: &Ray,
         distance_min: Float,

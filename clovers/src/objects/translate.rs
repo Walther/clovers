@@ -49,7 +49,7 @@ impl<'scene> Translate<'scene> {
     }
 }
 
-impl<'scene> HitableTrait for Translate<'scene> {
+impl HitableTrait for Translate<'_> {
     /// Hit method for the [Translate] object. Finds the translation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
     #[must_use]
     fn hit(

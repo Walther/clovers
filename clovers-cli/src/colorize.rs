@@ -49,13 +49,7 @@ pub fn colorize(
 
     // Get the emitted color from the surface that we just hit
     // TODO: spectral light sources!
-    let emitted = hit_record.material.emit(
-        ray,
-        &hit_record,
-        hit_record.u,
-        hit_record.v,
-        hit_record.position,
-    );
+    let emitted = hit_record.material.emit(ray, &hit_record);
     let tint: Xyz<E> = wavelength_into_xyz(ray.wavelength);
     let emitted = emitted * tint;
 

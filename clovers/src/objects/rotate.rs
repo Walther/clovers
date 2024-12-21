@@ -97,7 +97,7 @@ impl<'scene> RotateY<'scene> {
     }
 }
 
-impl<'scene> HitableTrait for RotateY<'scene> {
+impl HitableTrait for RotateY<'_> {
     /// Hit method for the [`RotateY`] object. Finds the rotation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
     #[must_use]
     fn hit(

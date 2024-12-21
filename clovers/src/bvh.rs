@@ -48,7 +48,7 @@ impl Display for BvhAlgorithm {
     }
 }
 
-impl<'scene> BVHNode<'scene> {
+impl BVHNode<'_> {
     /// Create a new `BVHNode` tree from a given list of [Object](crate::objects::Object)s
     #[must_use]
     pub fn from_list(bvh_algorithm: BvhAlgorithm, hitables: Vec<Hitable>) -> BVHNode {

@@ -83,7 +83,7 @@ impl<'scene> Quad<'scene> {
     }
 }
 
-impl<'scene> HitableTrait for Quad<'scene> {
+impl HitableTrait for Quad<'_> {
     /// Hit method for the quad rectangle
     #[must_use]
     fn hit(

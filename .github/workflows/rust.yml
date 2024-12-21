@@ -54,8 +54,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Install Rust toolchain
         run: rustup update --no-self-update stable
-      - name: Install rust-toolchain # cargo version is a random command that forces the installation of rust-toolchain
-        run: cargo version
       - name: cargo fetch
         run: cargo fetch
       - name: Rustfmt

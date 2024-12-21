@@ -65,7 +65,7 @@ impl<'scene> Sphere<'scene> {
     }
 }
 
-impl<'scene> HitableTrait for Sphere<'scene> {
+impl HitableTrait for Sphere<'_> {
     /// Hit method for the [Sphere] object. Returns a [`HitRecord`] if the given [Ray] intersects with the sphere at the given distance interval.
     #[must_use]
     fn hit(

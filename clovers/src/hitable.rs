@@ -165,7 +165,7 @@ impl<'scene> HitableList<'scene> {
 }
 
 // TODO: ideally, this impl should be removed entirely
-impl<'scene> HitableTrait for HitableList<'scene> {
+impl HitableTrait for HitableList<'_> {
     #[must_use]
     fn hit(
         &self,

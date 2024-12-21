@@ -7,10 +7,10 @@ use palette::white_point::E;
 use palette::Xyz;
 
 use super::TextureTrait;
-use crate::colorinit::ColorInit;
 #[cfg(feature = "serde-derive")]
 use crate::colorinit::TypedColorInit;
-use crate::{Float, Position, PI};
+use crate::{colorinit::ColorInit, HitRecord};
+use crate::{Float, PI};
 
 /// A standard checkered texture based on spatial 3D texturing.
 #[derive(Clone, Debug)]
@@ -82,7 +82,8 @@ impl SpatialChecker {
 impl TextureTrait for SpatialChecker {
     /// Evaluates the color at the given spatial position coordinate. Note that the `SpatialChecker` is spatial - surface coordinates are ignored.
     #[must_use]
-    fn color(&self, _u: Float, _v: Float, position: Position) -> Xyz<E> {
+    fn color(&self, hit_record: &HitRecord) -> Xyz<E> {
+        let position = hit_record.position;
         // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;
         let sines = 1.0 // cosmetic 1 for readability of following lines :)

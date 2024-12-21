@@ -4,7 +4,7 @@ use alloc::string::String;
 use core::fmt::Debug;
 use nalgebra::Unit;
 
-use crate::{pdf::PDF, ray::Ray, Direction, Float, HitRecord, Position, Vec3};
+use crate::{pdf::PDF, ray::Ray, Direction, Float, HitRecord, Vec3};
 pub mod cone_light;
 pub mod dielectric;
 pub mod diffuse_light;
@@ -71,14 +71,7 @@ pub trait MaterialTrait: Debug {
     }
 
     /// Returns the emissivity of the material at the given position. Defaults to black as most materials don't emit - override when needed.
-    fn emit(
-        &self,
-        _ray: &Ray,
-        _hit_record: &HitRecord,
-        _u: Float,
-        _v: Float,
-        _position: Position,
-    ) -> Xyz<E> {
+    fn emit(&self, _ray: &Ray, _hit_record: &HitRecord) -> Xyz<E> {
         Xyz::new(0.0, 0.0, 0.0)
     }
 }

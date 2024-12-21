@@ -30,7 +30,7 @@ impl BlueSampler {
     }
 }
 
-impl<'scene> SamplerTrait<'scene> for BlueSampler {
+impl SamplerTrait<'_> for BlueSampler {
     fn sample(&mut self, i: i32, j: i32, index: i32) -> Randomness {
         let pixel_offset = Vec2::new(
             (self.get)(i, j, index, SamplerDimension::PixelOffsetX),
