@@ -14,6 +14,7 @@ pub mod gltf;
 pub mod isotropic;
 pub mod lambertian;
 pub mod metal;
+pub mod thin_film;
 
 pub use cone_light::*;
 pub use dielectric::*;
@@ -25,6 +26,7 @@ pub use lambertian::*;
 pub use metal::*;
 use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
+pub use thin_film::*;
 
 /// Initialization structure for a `Material`. Either contains a `Material` by itself, or a String `name` to be found in a shared material list.
 #[derive(Debug, Clone)]
@@ -54,6 +56,43 @@ pub struct SharedMaterial {
     pub material: Material,
 }
 
+/// The main material struct for the renderer.
+///
+/// This is a wrapper type. It contains the common properties shared by all materials, and an `inner` field with properties and method implementations specific to each material [`Kind`].
+#[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Clone, Debug, Default)]
+pub struct Material {
+    /// The inner material with properties and method implementations specific to each material [`Kind`].
+    #[cfg_attr(feature = "serde-derive", serde(flatten))]
+    pub kind: Kind,
+    /// Optional thin film interference layer on top of the material
+    #[cfg_attr(feature = "serde-derive", serde(default))]
+    pub thin_film: Option<ThinFilm>,
+}
+
+impl MaterialTrait for Material {
+    fn scatter(
+        &self,
+        ray: &Ray,
+        hit_record: &HitRecord,
+        rng: &mut SmallRng,
+    ) -> Option<ScatterRecord> {
+        let mut scatter_record = self.kind.scatter(ray, hit_record, rng)?;
+        if let Some(f) = &self.thin_film {
+            scatter_record.attenuation *= f.interference(ray, hit_record);
+        };
+        Some(scatter_record)
+    }
+
+    fn scattering_pdf(&self, hit_record: &HitRecord, scattered: &Ray) -> Option<Float> {
+        self.kind.scattering_pdf(hit_record, scattered)
+    }
+
+    fn emit(&self, ray: &Ray, hit_record: &HitRecord) -> Xyz<E> {
+        self.kind.emit(ray, hit_record)
+    }
+}
+
 #[enum_dispatch]
 /// Trait for materials. Requires three function implementations: `scatter`, `scattering_pdf`, and `emit`.
 pub trait MaterialTrait: Debug {
@@ -80,8 +119,8 @@ pub trait MaterialTrait: Debug {
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
-/// A material enum. TODO: for ideal clean abstraction, this should be a trait. However, that comes with some additional considerations, including e.g. performance.
-pub enum Material {
+/// An enum for the material kind
+pub enum Kind {
     /// Dielectric material
     Dielectric(Dielectric),
     /// Dispersive material
@@ -98,7 +137,7 @@ pub enum Material {
     Isotropic(Isotropic),
 }
 
-impl Default for Material {
+impl Default for Kind {
     fn default() -> Self {
         Self::Lambertian(Lambertian::default())
     }
