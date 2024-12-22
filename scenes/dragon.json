@@ -18,7 +18,7 @@
       "scale": 2500,
       "center": [-45, -135, -100],
       "rotation": [0, 200, 0],
-      "material": "white lambertian"
+      "material": "iridescent"
     },
     {
       "kind": "Quad",
@@ -55,11 +55,15 @@
       }
     },
     {
-      "name": "white lambertian",
+      "name": "iridescent",
       "kind": "Lambertian",
       "albedo": {
         "kind": "SolidColor",
-        "color": [0.8, 0.8, 0.8]
+        "color": [0.6, 0.6, 0.6]
+      },
+      "thin_film": {
+        "refraction_index": 1.5,
+        "thickness": 256.0
       }
     },
     {
