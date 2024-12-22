@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["spectrum_xyz_to_p"],"mod":["spectra_xyz_5nm_380_780_097","spectrum_grid"]};
