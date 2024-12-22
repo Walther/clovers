@@ -1,9 +1,9 @@
-//! `ConstantMedium` object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
+//! `ConstantMedium` object. This should probably be a Material at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 
 use crate::{
     aabb::AABB,
     hitable::{Hitable, HitableTrait},
-    materials::{isotropic::Isotropic, Material},
+    materials::{isotropic::Isotropic, Kind},
     random::random_unit_vector,
     ray::Ray,
     textures::Texture,
@@ -41,10 +41,10 @@ fn default_density() -> Float {
 }
 
 #[derive(Debug, Clone)]
-/// `ConstantMedium` object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
+/// `ConstantMedium` object. This should probably be a Material at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 pub struct ConstantMedium<'scene> {
     boundary: Box<Hitable<'scene>>,
-    phase_function: Material,
+    phase_function: Kind,
     neg_inv_density: Float,
 }
 
@@ -54,7 +54,7 @@ impl<'scene> ConstantMedium<'scene> {
     pub fn new(boundary: Box<Hitable<'scene>>, density: Float, texture: Texture) -> Self {
         ConstantMedium {
             boundary,
-            phase_function: Material::Isotropic(Isotropic::new(texture)),
+            phase_function: Kind::Isotropic(Isotropic::new(texture)),
             neg_inv_density: -1.0 / density,
         }
     }
