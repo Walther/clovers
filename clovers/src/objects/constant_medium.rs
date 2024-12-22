@@ -1,4 +1,4 @@
-//! `ConstantMedium` object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
+//! `ConstantMedium` object. This should probably be a Material at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 
 use crate::{
     aabb::AABB,
@@ -41,7 +41,7 @@ fn default_density() -> Float {
 }
 
 #[derive(Debug, Clone)]
-/// `ConstantMedium` object. This should probably be a [Material] at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
+/// `ConstantMedium` object. This should probably be a Material at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 pub struct ConstantMedium<'scene> {
     boundary: Box<Hitable<'scene>>,
     phase_function: Kind,
