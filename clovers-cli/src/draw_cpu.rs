@@ -5,9 +5,8 @@ use clovers::Vec2;
 use clovers::{ray::Ray, scenes::Scene, Float};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use palette::chromatic_adaptation::AdaptInto;
-use palette::convert::IntoColorUnclamped;
 use palette::white_point::E;
-use palette::{LinSrgb, Srgb, Xyz};
+use palette::{LinSrgb, Xyz};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
@@ -27,7 +26,7 @@ pub fn draw(
     render_options: &RenderOptions,
     scene: &Scene,
     _sampler: Sampler,
-) -> Vec<Srgb<u8>> {
+) -> Vec<Xyz<E>> {
     let GlobalOptions { debug: _, quiet } = *global_options;
     let RenderOptions {
         input: _,
@@ -39,13 +38,14 @@ pub fn draw(
         mode,
         sampler,
         bvh: _,
+        format: _,
     } = *render_options;
     let bar = progress_bar(height, quiet);
 
     let height = height as usize;
     let width = width as usize;
 
-    let pixelbuffer: Vec<Srgb<u8>> = (0..height)
+    let pixelbuffer: Vec<Xyz<E>> = (0..height)
         .into_par_iter()
         .map(|row_index| {
             let mut sampler_rng = SmallRng::from_entropy();
@@ -99,7 +99,7 @@ fn render_pixel(
     index: usize,
     rng: &mut SmallRng,
     sampler: &mut dyn SamplerTrait,
-) -> Srgb<u8> {
+) -> Xyz<E> {
     let (x, y, width, height) = index_to_params(opts, index);
     let pixel_location = Vec2::new(x, y);
     let canvas_size = Vec2::new(width, height);
@@ -125,10 +125,7 @@ fn render_pixel(
             pixel_color += sample_color;
         }
     }
-    pixel_color /= opts.samples as Float;
-    let color: Srgb = pixel_color.adapt_into();
-    let color: Srgb<u8> = color.into_format();
-    color
+    pixel_color / opts.samples as Float
 }
 
 // Render a single pixel in normalmap mode
@@ -137,7 +134,7 @@ fn render_pixel_normalmap(
     opts: &RenderOptions,
     index: usize,
     rng: &mut SmallRng,
-) -> Srgb<u8> {
+) -> Xyz<E> {
     let (x, y, width, height) = index_to_params(opts, index);
     let color: LinSrgb = {
         let pixel_location = Vec2::new(x / width, y / height);
@@ -149,9 +146,7 @@ fn render_pixel_normalmap(
             .get_ray(pixel_location, lens_offset, time, wavelength);
         normal_map(&ray, scene, rng)
     };
-    let color: Srgb = color.into_color_unclamped();
-    let color: Srgb<u8> = color.into_format();
-    color
+    color.adapt_into()
 }
 
 // Render a single pixel in bvh test count visualization mode
@@ -161,7 +156,7 @@ fn render_pixel_bvhtestcount(
     index: usize,
     rng: &mut SmallRng,
     _sampler: &mut dyn SamplerTrait,
-) -> Srgb<u8> {
+) -> Xyz<E> {
     let (x, y, width, height) = index_to_params(render_options, index);
     let pixel_location = Vec2::new(x / width, y / height);
     let lens_offset = Vec2::new(0.0, 0.0);
@@ -171,10 +166,7 @@ fn render_pixel_bvhtestcount(
         .camera
         .get_ray(pixel_location, lens_offset, time, wavelength);
 
-    let color: LinSrgb = { bvh_testcount(&ray, scene, rng) };
-    let color: Srgb = color.into_color_unclamped();
-    let color: Srgb<u8> = color.into_format();
-    color
+    bvh_testcount(&ray, scene, rng)
 }
 
 // Render a single pixel in primitive test count visualization mode
@@ -184,7 +176,7 @@ fn render_pixel_primitivetestcount(
     index: usize,
     rng: &mut SmallRng,
     _sampler: &mut dyn SamplerTrait,
-) -> Srgb<u8> {
+) -> Xyz<E> {
     let (x, y, width, height) = index_to_params(render_options, index);
     let pixel_location = Vec2::new(x / width, y / height);
     let lens_offset = Vec2::new(0.0, 0.0);
@@ -194,10 +186,7 @@ fn render_pixel_primitivetestcount(
         .camera
         .get_ray(pixel_location, lens_offset, time, wavelength);
 
-    let color: LinSrgb = { primitive_testcount(&ray, scene, rng) };
-    let color: Srgb = color.into_color_unclamped();
-    let color: Srgb<u8> = color.into_format();
-    color
+    primitive_testcount(&ray, scene, rng)
 }
 
 fn index_to_params(opts: &RenderOptions, index: usize) -> (Float, Float, Float, Float) {
