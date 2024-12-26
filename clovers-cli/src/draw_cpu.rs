@@ -38,14 +38,17 @@ pub fn draw(
         mode,
         sampler,
         bvh: _,
-        format: _,
+        formats: _,
     } = *render_options;
     let bar = progress_bar(height, quiet);
 
     let height = height as usize;
     let width = width as usize;
 
-    let pixelbuffer: Vec<Xyz<E>> = (0..height)
+    // TODO: fix the coordinate system; this flips up<->down
+    let rows: Vec<usize> = (0..height).rev().collect();
+
+    let pixelbuffer: Vec<Xyz<E>> = rows
         .into_par_iter()
         .map(|row_index| {
             let mut sampler_rng = SmallRng::from_entropy();

@@ -16,9 +16,9 @@ use crate::GlobalOptions;
 #[derive(Args, Clone, Debug)]
 pub struct RenderOptions {
     /// Input filename / location
-    #[arg()]
+    #[arg(short, long)]
     pub input: String,
-    /// Output filename / location. Defaults to ./renders/unix_timestamp.png
+    /// Output file path, without extension. Defaults to `./renders/unix_timestamp`.
     #[arg(short, long)]
     pub output: Option<String>,
     /// Width of the image in pixels.
@@ -43,8 +43,9 @@ pub struct RenderOptions {
     #[arg(long, default_value = "sah")]
     pub bvh: BvhAlgorithm,
     /// File format selection for the output.
-    #[arg(short, long, default_value = "png")]
-    pub format: Format,
+    /// Multiple formats can be provided to save the same image in multiple formats.
+    #[arg(short, long, default_value = "png", num_args = 1..)]
+    pub formats: Vec<Format>,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, ValueEnum)]
@@ -69,10 +70,10 @@ pub enum BvhAlgorithm {
 
 #[derive(Copy, Clone, Debug, PartialEq, ValueEnum)]
 pub enum Format {
-    /// Portable Network Graphics, lossless SDR
+    /// Portable Network Graphics, lossless, standard dynamic range
     Png,
-    /// AV1 Image File Format, lossy HDR
-    Avif,
+    /// OpenEXR, high dynamic range
+    Exr,
 }
 
 // CLI usage somehow not detected
@@ -92,7 +93,7 @@ pub(crate) fn render(
         mode,
         sampler,
         bvh,
-        format,
+        ref formats,
     } = render_options;
 
     if debug {
@@ -153,28 +154,30 @@ pub(crate) fn render(
         println!("Finished render in {}", duration);
     }
 
-    let extension = match format {
-        Format::Png => "png",
-        Format::Avif => "avif",
-    };
+    for format in formats {
+        let extension = match format {
+            Format::Png => "png",
+            Format::Exr => "exr",
+        };
 
-    let target = match output {
-        Some(filename) => filename.to_owned(),
-        None => {
-            // Default to using a timestamp & `renders/` directory
-            let timestamp = OffsetDateTime::now_utc().unix_timestamp();
-            fs::create_dir_all("renders")?;
-            format!("renders/{timestamp}.{extension}")
-        }
-    };
+        let target = match output {
+            Some(filename) => format!("{filename}.{extension}"),
+            None => {
+                // Default to using a timestamp & `renders/` directory
+                let timestamp = OffsetDateTime::now_utc().unix_timestamp();
+                fs::create_dir_all("renders")?;
+                format!("renders/{timestamp}.{extension}")
+            }
+        };
 
-    match format {
-        Format::Png => write::png(pixelbuffer, &target, duration, render_options.clone()),
-        Format::Avif => todo!(),
-    }?;
+        match format {
+            Format::Png => write::png(&pixelbuffer, &target, &duration, &render_options),
+            Format::Exr => write::exr(&pixelbuffer, &target, &duration, &render_options),
+        }?;
 
-    info!("Image saved to {}", target);
-    println!("Image saved to: {}", target);
+        info!("Image saved to {}", target);
+        println!("Image saved to: {}", target);
+    }
 
     Ok(())
 }

@@ -1,19 +1,20 @@
 use std::fs::File;
 use std::io::Cursor;
 
+use clovers::Float;
 use humantime::FormattedDuration;
-use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
+use image::{ImageBuffer, ImageFormat, Rgb32FImage, RgbImage};
 use img_parts::png::{Png, PngChunk};
-use palette::{chromatic_adaptation::AdaptInto, white_point::E, Srgb, Xyz};
+use palette::{chromatic_adaptation::AdaptInto, white_point::E, Xyz};
 use tracing::info;
 
 use crate::render::{RenderMode, RenderOptions};
 
 pub fn png(
-    pixelbuffer: Vec<Xyz<E>>,
+    pixelbuffer: &[Xyz<E>],
     target: &String,
-    duration: FormattedDuration,
-    render_options: RenderOptions,
+    duration: &FormattedDuration,
+    render_options: &RenderOptions,
 ) -> Result<(), String> {
     let RenderOptions {
         input,
@@ -25,28 +26,25 @@ pub fn png(
         mode,
         sampler: _,
         bvh: _,
-        format: _,
+        formats: _,
     } = render_options;
+
     info!("Converting pixelbuffer to an image");
-    let mut img: RgbImage = ImageBuffer::new(width, height);
+    let mut img: RgbImage = ImageBuffer::new(*width, *height);
     img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
         let index = y * width + x;
-        let color: Srgb = pixelbuffer[index as usize].adapt_into();
-        let color: Srgb<u8> = color.into_format();
-        *pixel = Rgb([color.red, color.green, color.blue]);
+        let color: palette::Srgb<Float> = pixelbuffer[index as usize].adapt_into();
+        let color: palette::Srgb<u8> = color.into_format();
+        *pixel = image::Rgb([color.red, color.green, color.blue]);
     });
 
-    // Graphics assume origin at bottom left corner of the screen
-    // Our buffer writes pixels from top left corner. Simple fix, just flip it!
-    image::imageops::flip_vertical_in_place(&mut img);
-    // TODO: fix the coordinate system
-
     info!("Writing an image file");
-
     let mut bytes: Vec<u8> = Vec::new();
-    img.write_to(&mut Cursor::new(&mut bytes), ImageFormat::Png)
-        .or(Err("Unable to write bytes"))?;
-    let mut png = Png::from_bytes(bytes.into()).or(Err("Unable to write bytes"))?;
+    match img.write_to(&mut Cursor::new(&mut bytes), ImageFormat::Png) {
+        Ok(it) => it,
+        Err(err) => return Err(err.to_string()),
+    };
+    let mut png = Png::from_bytes(bytes.into()).or(Err("Unable to read bytes"))?;
 
     let common = format!(
         "Comment\0Rendered with the clovers path tracing engine. Scene file {input} rendered using the {mode:?} rendering mode at {width}x{height} resolution"
@@ -76,4 +74,36 @@ pub fn png(
         .or(Err("Unable to write to file"))?;
 
     Ok(())
+}
+
+pub fn exr(
+    pixelbuffer: &[Xyz<E>],
+    target: &String,
+    _duration: &FormattedDuration,
+    render_options: &RenderOptions,
+) -> Result<(), String> {
+    let RenderOptions {
+        input: _,
+        output: _,
+        width,
+        height,
+        samples: _,
+        max_depth: _,
+        mode: _,
+        sampler: _,
+        bvh: _,
+        formats: _,
+    } = render_options;
+    // TODO: metadata?
+
+    info!("Converting pixelbuffer to an image");
+    let mut img: Rgb32FImage = ImageBuffer::new(*width, *height);
+    img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
+        let index = y * width + x;
+        let color: palette::Srgb<Float> = pixelbuffer[index as usize].adapt_into();
+        *pixel = image::Rgb([color.red, color.green, color.blue]);
+    });
+
+    img.save_with_format(target, ImageFormat::OpenExr)
+        .or(Err("Unable to write to file".to_owned()))
 }
