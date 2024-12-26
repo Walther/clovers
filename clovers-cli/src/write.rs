@@ -100,7 +100,8 @@ pub fn exr(
     let mut img: Rgb32FImage = ImageBuffer::new(*width, *height);
     img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
         let index = y * width + x;
-        let color: palette::Srgb<Float> = pixelbuffer[index as usize].adapt_into();
+        // NOTE: EXR format expects linear rgb
+        let color: palette::LinSrgb<Float> = pixelbuffer[index as usize].adapt_into();
         *pixel = image::Rgb([color.red, color.green, color.blue]);
     });
 
