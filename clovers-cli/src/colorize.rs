@@ -7,13 +7,11 @@ use clovers::{
     ray::Ray,
     scenes::Scene,
     spectrum::spectrum_xyz_to_p,
-    wavelength::wavelength_into_xyz,
+    wavelength::{wavelength_into_xyz, Wavelength},
     Float, EPSILON_SHADOW_ACNE,
 };
 use nalgebra::Unit;
-use palette::{
-    chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, Clamp, Xyz,
-};
+use palette::{chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, Xyz};
 use rand::rngs::SmallRng;
 
 use crate::sampler::SamplerTrait;
@@ -47,21 +45,19 @@ pub fn colorize(
         return bg;
     };
 
+    let wavelength = ray.wavelength;
+
     // Get the emitted color from the surface that we just hit
-    // TODO: spectral light sources!
     let emitted = hit_record.material.emit(ray, &hit_record);
-    let tint: Xyz<E> = wavelength_into_xyz(ray.wavelength);
-    let emitted = emitted * tint;
+    let emitted = adjusted_emittance(emitted, wavelength);
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
         // No scatter, early return the emitted color only
         return emitted;
     };
-    // We have scattered, and received an attenuation from the material.
-    let wavelength = ray.wavelength;
-    let attenuation_factor = spectrum_xyz_to_p(wavelength, scatter_record.attenuation);
-    let attenuation = (scatter_record.attenuation * attenuation_factor).clamp();
+    // We have scattered, and received an attenuation from the material
+    let attenuation = adjusted_reflectance(scatter_record.attenuation, wavelength);
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {
@@ -123,9 +119,27 @@ pub fn colorize(
             // Tint and weight it according to the PDF
             let scattered = attenuation * scattering_pdf * recurse / pdf_val;
             // Ensure positive color
-            // let scattered = scattered.non_negative();
+            let scattered = to_positive(scattered);
             // Blend it all together
             emitted + scattered
         }
     }
+}
+
+fn adjusted_emittance(color: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
+    // TODO: spectral light sources!
+    // TODO: verify correctness!
+    let monochromatic: Xyz<E> = wavelength_into_xyz(wavelength);
+    color * monochromatic
+}
+
+fn adjusted_reflectance(color: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
+    // Ensure positive reflectance
+    let color = to_positive(color);
+    let coefficient = spectrum_xyz_to_p(wavelength, color);
+    color * coefficient
+}
+
+fn to_positive(color: Xyz<E>) -> Xyz<E> {
+    Xyz::new(color.x.max(0.0), color.y.max(0.0), color.z.max(0.0))
 }
