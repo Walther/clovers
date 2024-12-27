@@ -30,6 +30,8 @@ mod validate;
 use validate::{validate, ValidateParams};
 #[doc(hidden)]
 pub mod scenefile;
+#[doc(hidden)]
+mod write;
 
 /// clovers 🍀 path tracing renderer
 #[derive(Parser)]

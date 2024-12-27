@@ -10,6 +10,7 @@ pub mod normals;
 pub mod render;
 pub mod sampler;
 pub mod scenefile;
+pub mod write;
 
 // TODO: move this into a better place - but keep rustc happy with the imports
 /// Global options

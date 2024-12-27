@@ -1,11 +1,8 @@
-use clap::{Args, ValueEnum};
-use humantime::format_duration;
-use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
-use img_parts::png::{Png, PngChunk};
-use std::fs::File;
-use std::io::Cursor;
 use std::path::Path;
 use std::{error::Error, fs, time::Instant};
+
+use clap::{Args, ValueEnum};
+use humantime::format_duration;
 use time::OffsetDateTime;
 use tracing::{debug, info, Level};
 use tracing_subscriber::fmt::time::UtcTime;
@@ -13,14 +10,15 @@ use tracing_subscriber::fmt::time::UtcTime;
 use crate::draw_cpu;
 use crate::json_scene::initialize;
 use crate::sampler::Sampler;
+use crate::write;
 use crate::GlobalOptions;
 
-#[derive(Args, Debug)]
+#[derive(Args, Clone, Debug)]
 pub struct RenderOptions {
     /// Input filename / location
-    #[arg()]
+    #[arg(short, long)]
     pub input: String,
-    /// Output filename / location. Defaults to ./renders/unix_timestamp.png
+    /// Output file path, without extension. Defaults to `./renders/unix_timestamp`.
     #[arg(short, long)]
     pub output: Option<String>,
     /// Width of the image in pixels.
@@ -44,6 +42,10 @@ pub struct RenderOptions {
     /// BVH construction algorithm.
     #[arg(long, default_value = "sah")]
     pub bvh: BvhAlgorithm,
+    /// File format selection for the output.
+    /// Multiple formats can be provided to save the same image in multiple formats.
+    #[arg(short, long, default_value = "png", num_args = 1..)]
+    pub formats: Vec<Format>,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, ValueEnum)]
@@ -66,6 +68,14 @@ pub enum BvhAlgorithm {
     Sah,
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, ValueEnum)]
+pub enum Format {
+    /// Portable Network Graphics, lossless, standard dynamic range
+    Png,
+    /// OpenEXR, high dynamic range
+    Exr,
+}
+
 // CLI usage somehow not detected
 #[allow(dead_code)]
 pub(crate) fn render(
@@ -83,6 +93,7 @@ pub(crate) fn render(
         mode,
         sampler,
         bvh,
+        ref formats,
     } = render_options;
 
     if debug {
@@ -123,8 +134,6 @@ pub(crate) fn render(
         BvhAlgorithm::Sah => clovers::bvh::BvhAlgorithm::Sah,
     };
 
-    let threads = std::thread::available_parallelism()?;
-
     info!("Reading the scene file");
     let path = Path::new(&input);
     let scene = match path.extension() {
@@ -138,69 +147,37 @@ pub(crate) fn render(
     info!("Calling draw()");
     let start = Instant::now();
     let pixelbuffer = draw_cpu::draw(&global_options, &render_options, &scene, sampler);
-    info!("Drawing a pixelbuffer finished");
-
-    info!("Converting pixelbuffer to an image");
-    let mut img: RgbImage = ImageBuffer::new(width, height);
-    img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
-        let index = y * width + x;
-        *pixel = Rgb(pixelbuffer[index as usize].into());
-    });
-
-    // Graphics assume origin at bottom left corner of the screen
-    // Our buffer writes pixels from top left corner. Simple fix, just flip it!
-    image::imageops::flip_vertical_in_place(&mut img);
-    // TODO: fix the coordinate system
-
     let duration = Instant::now() - start;
-    let formatted_duration = format_duration(duration);
-    info!("Finished render in {}", formatted_duration);
-
+    let duration = format_duration(duration);
+    info!("Finished render in {}", duration);
     if !quiet {
-        println!("Finished render in {}", formatted_duration);
+        println!("Finished render in {}", duration);
     }
 
-    info!("Writing an image file");
+    for format in formats {
+        let extension = match format {
+            Format::Png => "png",
+            Format::Exr => "exr",
+        };
 
-    let mut bytes: Vec<u8> = Vec::new();
-    img.write_to(&mut Cursor::new(&mut bytes), ImageFormat::Png)?;
-    let mut png = Png::from_bytes(bytes.into())?;
+        let target = match output {
+            Some(filename) => format!("{filename}.{extension}"),
+            None => {
+                // Default to using a timestamp & `renders/` directory
+                let timestamp = OffsetDateTime::now_utc().unix_timestamp();
+                fs::create_dir_all("renders")?;
+                format!("renders/{timestamp}.{extension}")
+            }
+        };
 
-    let common = format!(
-        "Comment\0Rendered with the clovers path tracing engine. Scene file {input} rendered using the {mode:?} rendering mode at {width}x{height} resolution"
-    );
-    let details = match mode {
-        RenderMode::PathTracing => {
-            format!(", {samples} samples per pixel, {max_depth} max ray bounce depth.")
-        }
-        _ => ".".to_owned(),
-    };
-    let stats = format!("Rendering finished in {formatted_duration}, using {threads} threads.");
-    let comment = format!("{common}{details} {stats}");
+        match format {
+            Format::Png => write::png(&pixelbuffer, &target, &duration, &render_options),
+            Format::Exr => write::exr(&pixelbuffer, &target, &duration, &render_options),
+        }?;
 
-    let software = "Software\0https://github.com/walther/clovers".to_string();
-
-    for metadata in [comment, software] {
-        let bytes = metadata.as_bytes().to_owned();
-        let chunk = PngChunk::new([b't', b'E', b'X', b't'], bytes.into());
-        png.chunks_mut().push(chunk);
+        info!("Image saved to {}", target);
+        println!("Image saved to: {}", target);
     }
-
-    let target = match output {
-        Some(filename) => filename.to_owned(),
-        None => {
-            // Default to using a timestamp & `renders/` directory
-            let timestamp = OffsetDateTime::now_utc().unix_timestamp();
-            fs::create_dir_all("renders")?;
-            format!("renders/{}.png", timestamp)
-        }
-    };
-
-    let output = File::create(&target)?;
-    png.encoder().write_to(output)?;
-
-    info!("Image saved to {}", target);
-    println!("Image saved to: {}", target);
 
     Ok(())
 }

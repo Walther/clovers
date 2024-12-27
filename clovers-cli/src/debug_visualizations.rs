@@ -1,12 +1,12 @@
 //! Alternative rendering methods for debug visualization purposes.
 
 use clovers::{ray::Ray, scenes::Scene, Float, EPSILON_SHADOW_ACNE};
-use palette::LinSrgb;
+use palette::{chromatic_adaptation::AdaptInto, white_point::E, LinSrgb, Xyz};
 use rand::rngs::SmallRng;
 
 /// Visualizes the BVH traversal count - how many BVH nodes needed to be tested for intersection?
 #[must_use]
-pub fn bvh_testcount(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinSrgb {
+pub fn bvh_testcount(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> Xyz<E> {
     let mut depth = 0;
     scene
         .bvh_root
@@ -16,8 +16,8 @@ pub fn bvh_testcount(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinSrgb {
 }
 
 #[must_use]
-pub fn bvh_testcount_to_color(depth: usize) -> LinSrgb {
-    match depth {
+pub fn bvh_testcount_to_color(depth: usize) -> Xyz<E> {
+    let color: LinSrgb = match depth {
         // under 256, grayscale
         0..=255 => {
             let depth = depth as Float / 255.0;
@@ -29,12 +29,14 @@ pub fn bvh_testcount_to_color(depth: usize) -> LinSrgb {
         512..=1023 => LinSrgb::new(1.0, 0.5, 0.0),
         // more than 1024, red
         1024.. => LinSrgb::new(1.0, 0.0, 0.0),
-    }
+    };
+
+    color.adapt_into()
 }
 
 /// Visualizes the primitive traversal count - how many primitives needed to be tested for intersection?
 #[must_use]
-pub fn primitive_testcount(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinSrgb {
+pub fn primitive_testcount(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> Xyz<E> {
     let mut depth = 0;
     scene
         .bvh_root
@@ -44,8 +46,8 @@ pub fn primitive_testcount(ray: &Ray, scene: &Scene, rng: &mut SmallRng) -> LinS
 }
 
 #[must_use]
-pub fn primitive_testcount_to_color(depth: usize) -> LinSrgb {
-    match depth {
+pub fn primitive_testcount_to_color(depth: usize) -> Xyz<E> {
+    let color: LinSrgb = match depth {
         // under 256, grayscale
         0..=255 => {
             let depth = depth as Float / 255.0;
@@ -57,5 +59,7 @@ pub fn primitive_testcount_to_color(depth: usize) -> LinSrgb {
         512..=1023 => LinSrgb::new(1.0, 0.5, 0.0),
         // more than 1024, red
         1024.. => LinSrgb::new(1.0, 0.0, 0.0),
-    }
+    };
+
+    color.adapt_into()
 }

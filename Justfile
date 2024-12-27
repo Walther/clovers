@@ -15,7 +15,7 @@ all-scenes *ARGS:
   DATE=$(date -u +%s); \
   mkdir -p renders/$DATE; \
   for scene in $(ls scenes/ |grep json); \
-  do just cli render --output renders/$DATE/${scene%.json}.png {{ARGS}} scenes/$scene; \
+  do just cli render --output renders/$DATE/${scene%.json} {{ARGS}} -i scenes/$scene; \
   done;
 
 # Profiling helper
