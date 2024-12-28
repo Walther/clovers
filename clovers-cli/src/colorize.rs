@@ -27,8 +27,12 @@ pub fn colorize(
     rng: &mut SmallRng,
     sampler: &dyn SamplerTrait,
 ) -> Xyz<E> {
+    let wavelength = ray.wavelength;
+
     let bg: Xyz = scene.background_color.into_color_unclamped();
     let bg: Xyz<E> = bg.adapt_into();
+    let bg: Xyz<E> = adjusted_emittance(bg, wavelength);
+
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
         // Ray bounce limit reached, early return background_color
@@ -44,8 +48,6 @@ pub fn colorize(
         // If the ray hits nothing, early return the background color.
         return bg;
     };
-
-    let wavelength = ray.wavelength;
 
     // Get the emitted color from the surface that we just hit
     let emitted = hit_record.material.emit(ray, &hit_record);
@@ -133,11 +135,11 @@ fn adjusted_emittance(color: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
     color * monochromatic
 }
 
+/// Based on <https://en.wikipedia.org/wiki/CIE_1931_color_space#Reflective_and_transmissive_cases>
 fn adjusted_reflectance(color: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
-    // Ensure positive reflectance
-    let color = to_positive(color);
     let coefficient = spectrum_xyz_to_p(wavelength, color);
-    color * coefficient
+    let illuminant: Xyz<E> = Xyz::new(1.0, 1.0, 1.0);
+    illuminant * coefficient
 }
 
 fn to_positive(color: Xyz<E>) -> Xyz<E> {
