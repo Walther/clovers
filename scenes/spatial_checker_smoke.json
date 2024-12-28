@@ -41,7 +41,7 @@
       "kind": "DiffuseLight",
       "emit": {
         "kind": "SolidColor",
-        "color": [2.5, 2.5, 2.5]
+        "color": [4, 4, 4]
       }
     }
   ]
