@@ -7,7 +7,6 @@ use clovers::{
     ray::Ray,
     scenes::Scene,
     spectrum::spectrum_xyz_to_p,
-    wavelength::{wavelength_into_xyz, Wavelength},
     Float, EPSILON_SHADOW_ACNE,
 };
 use nalgebra::Unit;
@@ -16,7 +15,7 @@ use rand::rngs::SmallRng;
 
 use crate::sampler::SamplerTrait;
 
-/// The main coloring function. Sends a [`Ray`] to the [`Scene`], sees if it hits anything, and eventually returns a color. Taking into account the [Material](clovers::materials::Material) that is hit, the method recurses with various adjustments, with a new [`Ray`] started from the location that was hit.
+/// The main coloring function. Sends a [`Ray`] to the [`Scene`], sees if it hits anything, and eventually returns a spectral intensity. Taking into account the [Material](clovers::materials::Material) that is hit, the method recurses with various adjustments, with a new [`Ray`] started from the location that was hit.
 #[must_use]
 #[allow(clippy::only_used_in_recursion)] // TODO: use sampler in more places!
 pub fn colorize(
@@ -26,12 +25,12 @@ pub fn colorize(
     max_depth: u32,
     rng: &mut SmallRng,
     sampler: &dyn SamplerTrait,
-) -> Xyz<E> {
+) -> Float {
     let wavelength = ray.wavelength;
 
     let bg: Xyz = scene.background_color.into_color_unclamped();
     let bg: Xyz<E> = bg.adapt_into();
-    let bg: Xyz<E> = adjusted_emittance(bg, wavelength);
+    let bg: Float = spectrum_xyz_to_p(wavelength, bg);
 
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
@@ -50,8 +49,8 @@ pub fn colorize(
     };
 
     // Get the emitted color from the surface that we just hit
-    let emitted = hit_record.material.emit(ray, &hit_record);
-    let emitted = adjusted_emittance(emitted, wavelength);
+    let emitted: Xyz<E> = hit_record.material.emit(ray, &hit_record);
+    let emitted: Float = spectrum_xyz_to_p(wavelength, emitted);
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
@@ -59,7 +58,7 @@ pub fn colorize(
         return emitted;
     };
     // We have scattered, and received an attenuation from the material
-    let attenuation = adjusted_reflectance(scatter_record.attenuation, wavelength);
+    let attenuation = spectrum_xyz_to_p(wavelength, scatter_record.attenuation);
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {
@@ -120,28 +119,8 @@ pub fn colorize(
             let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng, sampler);
             // Tint and weight it according to the PDF
             let scattered = attenuation * scattering_pdf * recurse / pdf_val;
-            // Ensure positive color
-            let scattered = to_positive(scattered);
             // Blend it all together
             emitted + scattered
         }
     }
-}
-
-fn adjusted_emittance(color: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
-    // TODO: spectral light sources!
-    // TODO: verify correctness!
-    let monochromatic: Xyz<E> = wavelength_into_xyz(wavelength);
-    color * monochromatic
-}
-
-/// Based on <https://en.wikipedia.org/wiki/CIE_1931_color_space#Reflective_and_transmissive_cases>
-fn adjusted_reflectance(color: Xyz<E>, wavelength: Wavelength) -> Xyz<E> {
-    let coefficient = spectrum_xyz_to_p(wavelength, color);
-    let illuminant: Xyz<E> = Xyz::new(1.0, 1.0, 1.0);
-    illuminant * coefficient
-}
-
-fn to_positive(color: Xyz<E>) -> Xyz<E> {
-    Xyz::new(color.x.max(0.0), color.y.max(0.0), color.z.max(0.0))
 }
