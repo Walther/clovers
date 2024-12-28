@@ -15,10 +15,10 @@ use rand::rngs::SmallRng;
 
 use crate::sampler::SamplerTrait;
 
-/// The main coloring function. Sends a [`Ray`] to the [`Scene`], sees if it hits anything, and eventually returns a spectral intensity. Taking into account the [Material](clovers::materials::Material) that is hit, the method recurses with various adjustments, with a new [`Ray`] started from the location that was hit.
+/// The main path tracing function. Sends a [`Ray`] to the [`Scene`], sees if it hits anything, and eventually returns a spectral intensity. Taking into account the [Material](clovers::materials::Material) that is hit, the method recurses with various adjustments, with a new [`Ray`] started from the location that was hit.
 #[must_use]
 #[allow(clippy::only_used_in_recursion)] // TODO: use sampler in more places!
-pub fn colorize(
+pub fn trace(
     ray: &Ray,
     scene: &Scene,
     depth: u32,
@@ -64,7 +64,7 @@ pub fn colorize(
     match scatter_record.material_type {
         MaterialType::Specular => {
             // If we hit a specular material, generate a specular ray, and multiply it with the attenuation
-            let specular = colorize(
+            let specular = trace(
                 // a scatter_record from a specular material should always have this ray
                 &scatter_record.specular_ray.unwrap(),
                 scene,
@@ -116,7 +116,7 @@ pub fn colorize(
             };
 
             // Recurse for the scattering ray
-            let recurse = colorize(&scatter_ray, scene, depth + 1, max_depth, rng, sampler);
+            let recurse = trace(&scatter_ray, scene, depth + 1, max_depth, rng, sampler);
             // Tint and weight it according to the PDF
             let scattered = attenuation * scattering_pdf * recurse / pdf_val;
             // Blend it all together
