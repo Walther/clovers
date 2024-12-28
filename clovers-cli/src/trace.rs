@@ -31,8 +31,8 @@ pub fn trace(
 
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
-        // Ray bounce limit reached, early return background_color
-        return bg;
+        // Ray bounce limit reached, early return zero emissivity
+        return 0.0;
     }
 
     // Send the ray to the scene, and see if it hits anything.
@@ -41,7 +41,7 @@ pub fn trace(
         .bvh_root
         .hit(ray, EPSILON_SHADOW_ACNE, Float::MAX, rng)
     else {
-        // If the ray hits nothing, early return the background color.
+        // If the ray hits nothing, early return the background color as emissivity
         return bg;
     };
 
