@@ -4,8 +4,9 @@ resolver = "2"
 members = ["clovers", "clovers-cli"]
 
 [profile.release]
-codegen-units = 1
-lto = "fat"
+# TODO: temporarily disabled due to slow build times during dev
+# codegen-units = 1
+# lto = "fat"
 
 [profile.profiling]
 inherits = "release"
