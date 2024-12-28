@@ -10,7 +10,7 @@ use clovers::{
     Float, EPSILON_SHADOW_ACNE,
 };
 use nalgebra::Unit;
-use palette::{chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, Xyz};
+use palette::{white_point::E, Xyz};
 use rand::rngs::SmallRng;
 
 use crate::sampler::SamplerTrait;
@@ -27,10 +27,7 @@ pub fn trace(
     sampler: &dyn SamplerTrait,
 ) -> Float {
     let wavelength = ray.wavelength;
-
-    let bg: Xyz = scene.background_color.into_color_unclamped();
-    let bg: Xyz<E> = bg.adapt_into();
-    let bg: Float = spectrum_xyz_to_p(wavelength, bg);
+    let bg: Float = spectrum_xyz_to_p(wavelength, scene.background);
 
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
