@@ -6,9 +6,7 @@ proptest! {
   fn converts_all_wavelengths(lambda in SPECTRUM) {
       let _ = wavelength_into_xyz(lambda);
   }
-}
 
-proptest! {
   #[test]
   fn rotates_all_wavelengths(lambda in SPECTRUM) {
       let mut waves = rotate_wavelength(lambda);
@@ -18,5 +16,12 @@ proptest! {
       let diff = a.abs_diff(b);
       prop_assert_eq!(diff, b.abs_diff(c));
       prop_assert_eq!(diff, c.abs_diff(d));
+  }
+
+
+  #[test]
+  fn hero_always_first(lambda in SPECTRUM) {
+      let waves = rotate_wavelength(lambda);
+      prop_assert_eq!(lambda, waves[0]);
   }
 }

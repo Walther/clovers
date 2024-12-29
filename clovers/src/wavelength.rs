@@ -49,8 +49,8 @@ pub fn sample_wavelength(sample: Float) -> Wavelength {
 #[must_use]
 pub fn rotate_wavelength(hero: Wavelength) -> [Wavelength; WAVE_SAMPLE_COUNT] {
     from_fn(|j| {
-        (hero - MIN_WAVELENGTH + (j * SPECTRUM_SIZE / WAVE_SAMPLE_COUNT)) % SPECTRUM_SIZE
-            + MIN_WAVELENGTH
+        let step = j * SPECTRUM_SIZE / WAVE_SAMPLE_COUNT;
+        MIN_WAVELENGTH + (hero - MIN_WAVELENGTH + step) % SPECTRUM_SIZE
     })
 }
 

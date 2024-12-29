@@ -91,6 +91,10 @@ impl MaterialTrait for Material {
     fn emit(&self, ray: &Ray, hit_record: &HitRecord) -> Xyz<E> {
         self.kind.emit(ray, hit_record)
     }
+
+    fn is_wavelength_dependent(&self) -> bool {
+        self.thin_film.is_some() || self.kind.is_wavelength_dependent()
+    }
 }
 
 #[enum_dispatch]
@@ -112,6 +116,11 @@ pub trait MaterialTrait: Debug {
     /// Returns the emissivity of the material at the given position. Defaults to black as most materials don't emit - override when needed.
     fn emit(&self, _ray: &Ray, _hit_record: &HitRecord) -> Xyz<E> {
         Xyz::new(0.0, 0.0, 0.0)
+    }
+
+    /// Returns true if the material has wavelength-dependent scattering, like dispersion or iridescence.
+    fn is_wavelength_dependent(&self) -> bool {
+        false
     }
 }
 

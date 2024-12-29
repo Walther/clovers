@@ -1,6 +1,8 @@
 //! An opinionated method for drawing a scene using the CPU for rendering.
 
-use clovers::wavelength::{random_wavelength, wavelength_into_xyz};
+use clovers::wavelength::{
+    random_wavelength, rotate_wavelength, wavelength_into_xyz, WAVE_SAMPLE_COUNT,
+};
 use clovers::Vec2;
 use clovers::{ray::Ray, scenes::Scene, Float};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
@@ -123,13 +125,23 @@ fn render_pixel(
         let ray: Ray = scene
             .camera
             .get_ray(pixel_uv, lens_offset, time, wavelength);
-        let spectral_power: Float = trace(&ray, scene, 0, max_depth, rng, sampler);
-        // TODO: find and debug more sources of NaNs!
-        if spectral_power.is_normal() && spectral_power.is_sign_positive() {
-            let sample_color = wavelength_into_xyz(ray.wavelength);
-            pixel_color += sample_color * spectral_power;
+        let waves = rotate_wavelength(wavelength);
+        let spectral_powers = trace(&ray, scene, 0, max_depth, rng, sampler);
+        // Does our path have terminated wavelengths, i.e. does the path include a dispersive material?
+        if spectral_powers[1..].iter().all(|&p| p == 0.0) {
+            // Yes; colorize based on hero wavelength only
+            pixel_color += wavelength_into_xyz(waves[0]) * spectral_powers[0];
+        } else {
+            // No; colorize by all wavelengths, dividing by count
+            for i in 0..WAVE_SAMPLE_COUNT {
+                if spectral_powers[i].is_normal() && spectral_powers[i].is_sign_positive() {
+                    pixel_color += wavelength_into_xyz(waves[i]) * spectral_powers[i]
+                        / WAVE_SAMPLE_COUNT as Float;
+                }
+            }
         }
     }
+
     pixel_color / opts.samples as Float
 }
 
