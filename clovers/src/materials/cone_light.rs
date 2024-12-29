@@ -4,9 +4,10 @@ use super::{MaterialTrait, ScatterRecord};
 use crate::{
     ray::Ray,
     textures::{SolidColor, Texture, TextureTrait},
+    wavelength::Wavelength,
     Float, HitRecord,
 };
-use palette::{white_point::E, Xyz};
+use palette::Xyz;
 use rand::prelude::SmallRng;
 
 /// A cone light material. The material emits light if the incoming ray is within a certain amount of degrees from the surface normal.
@@ -41,10 +42,10 @@ impl MaterialTrait for ConeLight {
 
     /// Emission function for [`ConeLight`]. If the given [`HitRecord`] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.
     #[must_use]
-    fn emit(&self, ray: &Ray, hit_record: &HitRecord) -> Xyz<E> {
+    fn emit(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         // If we don't hit the front face, return black
         if !hit_record.front_face {
-            return Xyz::new(0.0, 0.0, 0.0);
+            return 0.0;
         }
 
         // We have hit the front. Calculate the angle of incidence
@@ -53,18 +54,12 @@ impl MaterialTrait for ConeLight {
             / (ray.direction.magnitude() * hit_record.normal.magnitude()))
         .acos();
 
-        let emit = self.emit.color(hit_record);
+        let emit = self.emit.emit(ray, wavelength, hit_record);
         if angle <= spread_radians {
             emit
         } else {
             // Make sure that the front face of the lamp is tinted, even outside the main lighting angle
-            let (red, green, blue) = emit.into_components();
-            let scaling_factor = red.max(green).max(blue);
-            if scaling_factor > 1.0 {
-                emit / scaling_factor
-            } else {
-                emit
-            }
+            emit.clamp(0.0, 1.0)
         }
     }
 }

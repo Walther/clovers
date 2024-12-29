@@ -31,10 +31,15 @@ serde = { version = "1.0.216", features = [
 ], default-features = false, optional = true }
 stl_io = { version = "0.8.3", optional = true }
 tracing = { version = "0.1.41", optional = true }
+phf = { version = "0.11.2", default-features = false }
 
 [dev-dependencies]
 divan = "0.1.17"
 proptest = "1"
+
+[build-dependencies]
+phf = { version = "0.11.2", default-features = false }
+phf_codegen = "0.11.2"
 
 [[bench]]
 name = "random"

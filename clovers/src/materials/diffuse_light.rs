@@ -4,9 +4,10 @@ use super::{MaterialTrait, ScatterRecord};
 use crate::{
     ray::Ray,
     textures::{SolidColor, Texture, TextureTrait},
-    HitRecord,
+    wavelength::Wavelength,
+    Float, HitRecord,
 };
-use palette::{white_point::E, Xyz};
+use palette::Xyz;
 use rand::prelude::SmallRng;
 
 /// A diffuse light material. On this material, rays never scatter - the material always emits a color based on its texture.
@@ -39,11 +40,11 @@ impl MaterialTrait for DiffuseLight {
 
     /// Emission function for [`DiffuseLight`]. If the given [`HitRecord`] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.
     #[must_use]
-    fn emit(&self, _ray: &Ray, hit_record: &HitRecord) -> Xyz<E> {
+    fn emit(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         if hit_record.front_face {
-            self.emit.color(hit_record)
+            self.emit.emit(ray, wavelength, hit_record)
         } else {
-            Xyz::new(0.0, 0.0, 0.0)
+            0.0
         }
     }
 }

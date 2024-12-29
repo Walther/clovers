@@ -4,7 +4,7 @@ use alloc::string::String;
 use core::fmt::Debug;
 use nalgebra::Unit;
 
-use crate::{pdf::PDF, ray::Ray, Direction, Float, HitRecord, Vec3};
+use crate::{pdf::PDF, ray::Ray, wavelength::Wavelength, Direction, Float, HitRecord, Vec3};
 pub mod cone_light;
 pub mod dielectric;
 pub mod diffuse_light;
@@ -88,8 +88,8 @@ impl MaterialTrait for Material {
         self.kind.scattering_pdf(hit_record, scattered)
     }
 
-    fn emit(&self, ray: &Ray, hit_record: &HitRecord) -> Xyz<E> {
-        self.kind.emit(ray, hit_record)
+    fn emit(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        self.kind.emit(ray, wavelength, hit_record)
     }
 
     fn is_wavelength_dependent(&self) -> bool {
@@ -113,9 +113,9 @@ pub trait MaterialTrait: Debug {
         None
     }
 
-    /// Returns the emissivity of the material at the given position. Defaults to black as most materials don't emit - override when needed.
-    fn emit(&self, _ray: &Ray, _hit_record: &HitRecord) -> Xyz<E> {
-        Xyz::new(0.0, 0.0, 0.0)
+    /// Returns the spectral power of the material sampled at the given wavelength. Defaults to zero, override for emissive materials.
+    fn emit(&self, _ray: &Ray, _wavelength: Wavelength, _hit_record: &HitRecord) -> Float {
+        0.0
     }
 
     /// Returns true if the material has wavelength-dependent scattering, like dispersion or iridescence.

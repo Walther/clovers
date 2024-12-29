@@ -97,8 +97,8 @@
       "name": "lamp",
       "kind": "DiffuseLight",
       "emit": {
-        "kind": "SolidColor",
-        "color": [4, 4, 4]
+        "kind": "IlluminantD50",
+        "intensity": 0.5
       }
     },
     {

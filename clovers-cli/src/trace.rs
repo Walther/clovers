@@ -11,7 +11,6 @@ use clovers::{
     Float, EPSILON_SHADOW_ACNE,
 };
 use nalgebra::Unit;
-use palette::{white_point::E, Xyz};
 use rand::rngs::SmallRng;
 
 use crate::sampler::SamplerTrait;
@@ -49,8 +48,11 @@ pub fn trace(
     };
 
     // Get the emitted color from the surface that we just hit
-    let emitted: Xyz<E> = hit_record.material.emit(ray, &hit_record);
-    let emitted = spectral_powers(emitted, wavelengths);
+    let emitted = std::array::from_fn(|i| {
+        hit_record
+            .material
+            .emit(ray, wavelengths[i], &hit_record)
+    });
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {

@@ -80,6 +80,7 @@ pub mod camera;
 pub mod colorinit;
 pub mod hitable;
 pub mod hitrecord;
+pub mod illuminants;
 pub use hitrecord::HitRecord;
 pub mod interval;
 pub mod materials;
