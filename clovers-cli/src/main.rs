@@ -11,8 +11,6 @@ use std::error::Error;
 // Internal imports
 use clovers::*;
 #[doc(hidden)]
-mod colorize;
-#[doc(hidden)]
 pub mod debug_visualizations;
 #[doc(hidden)]
 mod draw_cpu;
@@ -22,16 +20,19 @@ mod json_scene;
 pub mod normals;
 #[doc(hidden)]
 mod render;
-use render::render;
 #[doc(hidden)]
 mod sampler;
 #[doc(hidden)]
-mod validate;
-use validate::{validate, ValidateParams};
-#[doc(hidden)]
 pub mod scenefile;
 #[doc(hidden)]
+mod trace;
+#[doc(hidden)]
+mod validate;
+#[doc(hidden)]
 mod write;
+
+use render::render;
+use validate::{validate, ValidateParams};
 
 /// clovers 🍀 path tracing renderer
 #[derive(Parser)]

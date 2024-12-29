@@ -27,7 +27,7 @@ fn default_index() -> Float {
 }
 
 fn default_color() -> Xyz<E> {
-    Xyz::new(100.0, 100.0, 100.0)
+    Xyz::new(1.0, 1.0, 1.0)
 }
 
 impl MaterialTrait for Dielectric {

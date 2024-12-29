@@ -1,6 +1,6 @@
 //! An opinionated method for drawing a scene using the CPU for rendering.
 
-use clovers::wavelength::random_wavelength;
+use clovers::wavelength::{random_wavelength, wavelength_into_xyz};
 use clovers::Vec2;
 use clovers::{ray::Ray, scenes::Scene, Float};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
@@ -11,13 +11,13 @@ use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
-use crate::colorize::colorize;
 use crate::debug_visualizations::{bvh_testcount, primitive_testcount};
 use crate::normals::normal_map;
 use crate::render::{RenderMode, RenderOptions};
 use crate::sampler::blue::BlueSampler;
 use crate::sampler::random::RandomSampler;
 use crate::sampler::{Randomness, Sampler, SamplerTrait};
+use crate::trace::trace;
 use crate::GlobalOptions;
 
 /// The main drawing function, returns a `Vec<Srgb>` as a pixelbuffer.
@@ -123,9 +123,11 @@ fn render_pixel(
         let ray: Ray = scene
             .camera
             .get_ray(pixel_uv, lens_offset, time, wavelength);
-        let sample_color: Xyz<E> = colorize(&ray, scene, 0, max_depth, rng, sampler);
-        if sample_color.x.is_finite() && sample_color.y.is_finite() && sample_color.z.is_finite() {
-            pixel_color += sample_color;
+        let spectral_power: Float = trace(&ray, scene, 0, max_depth, rng, sampler);
+        // TODO: find and debug more sources of NaNs!
+        if spectral_power.is_normal() && spectral_power.is_sign_positive() {
+            let sample_color = wavelength_into_xyz(ray.wavelength);
+            pixel_color += sample_color * spectral_power;
         }
     }
     pixel_color / opts.samples as Float

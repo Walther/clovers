@@ -24,3 +24,40 @@ pub fn spectrum_xyz_to_p(lambda: Wavelength, xyz: Xyz<E>) -> Float {
     let p = p as Float;
     p
 }
+
+#[cfg(test)]
+#[allow(clippy::float_cmp)]
+mod unit {
+    use palette::{white_point::E, Xyz};
+
+    use super::spectrum_xyz_to_p;
+
+    #[test]
+    fn equal_energy() {
+        let lambda = 600;
+        let xyz: Xyz<E> = Xyz::new(1.0, 1.0, 1.0);
+        let p = spectrum_xyz_to_p(lambda, xyz);
+        // FIXME: floating point accuracy
+        assert_eq!(1.000_000_7, p);
+    }
+
+    #[test]
+    #[allow(clippy::float_cmp)]
+    fn zero() {
+        let lambda = 600;
+        let xyz: Xyz<E> = Xyz::new(0.0, 0.0, 0.0);
+        let p = spectrum_xyz_to_p(lambda, xyz);
+        // FIXME: floating point accuracy
+        assert_eq!(0.0, p);
+    }
+
+    #[test]
+    #[allow(clippy::float_cmp)]
+    fn two() {
+        let lambda = 600;
+        let xyz: Xyz<E> = Xyz::new(2.0, 2.0, 2.0);
+        let p = spectrum_xyz_to_p(lambda, xyz);
+        // FIXME: floating point accuracy
+        assert_eq!(2.000_001_4, p);
+    }
+}

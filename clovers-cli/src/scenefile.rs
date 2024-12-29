@@ -10,7 +10,9 @@ use clovers::{
     Float, Vec,
 };
 
-use palette::Srgb;
+use palette::{
+    chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, Srgb, Xyz,
+};
 use tracing::info;
 
 // TODO: better naming
@@ -37,7 +39,9 @@ impl SceneFile {
     ) -> Scene<'scene> {
         let time_0 = scene_file.time_0;
         let time_1 = scene_file.time_1;
-        let background_color = scene_file.background_color;
+
+        let background: Xyz = scene_file.background_color.into_color_unclamped();
+        let background: Xyz<E> = background.adapt_into();
 
         #[allow(clippy::cast_precision_loss)]
         let camera = Camera::new(
@@ -106,7 +110,7 @@ impl SceneFile {
             camera,
             bvh_root,
             mis_bvh_root,
-            background_color,
+            background,
         }
     }
 }

@@ -2,7 +2,7 @@
 
 use crate::{bvh::BVHNode, camera::Camera, hitable::Hitable};
 
-use palette::Srgb;
+use palette::{white_point::E, Xyz};
 
 #[derive(Debug)]
 /// A representation of the scene that is being rendered.
@@ -12,7 +12,7 @@ pub struct Scene<'scene> {
     /// The camera object used for rendering the scene.
     pub camera: Camera,
     /// The background color to use when the rays do not hit anything in the scene.
-    pub background_color: Srgb, // TODO: make into Texture or something?
+    pub background: Xyz<E>, // TODO: add support for environment maps / HDRI / skyboxes
     /// A [`BVHNode`] tree of priority objects - e.g. glass items or lights - for multiple importance sampling. Wrapped into a [Hitable] for convenience reasons (see various PDF functions).
     pub mis_bvh_root: Hitable<'scene>,
 }

@@ -47,14 +47,6 @@
   ],
   "materials": [
     {
-      "name": "dark lambertian",
-      "kind": "Lambertian",
-      "albedo": {
-        "kind": "SolidColor",
-        "color": [0.3, 0.3, 0.3]
-      }
-    },
-    {
       "name": "iridescent",
       "kind": "Lambertian",
       "albedo": {
@@ -81,17 +73,8 @@
       "kind": "DiffuseLight",
       "emit": {
         "kind": "SolidColor",
-        "color": [5, 5, 5]
+        "color": [4, 4, 4]
       }
-    },
-    {
-      "name": "copper",
-      "kind": "Metal",
-      "albedo": {
-        "kind": "SolidColor",
-        "color": { "hex": "#b87333" }
-      },
-      "fuzz": 0.35
     }
   ]
 }

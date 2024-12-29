@@ -2,14 +2,14 @@
   "time_0": 0,
   "time_1": 1,
   "camera": {
-    "look_from": [-0.2, 0.1, -0.2],
+    "look_from": [-0.175, 0.1, -0.175],
     "look_at": [0.0, 0.0, 0.0],
     "up": [0, 1, 0],
     "vertical_fov": 60.0,
     "aperture": 0,
     "focus_distance": 10.0
   },
-  "background_color": [0.3, 0.3, 0.3],
+  "background_color": [0.7, 0.7, 0.7],
   "objects": [
     {
       "kind": "GLTF",
@@ -29,7 +29,7 @@
       "kind": "DiffuseLight",
       "emit": {
         "kind": "SolidColor",
-        "color": [2.0, 2.0, 2.0]
+        "color": [2, 2, 2]
       }
     }
   ]

@@ -22,7 +22,7 @@ let scene = {
 };
 
 // Big light for smooth lighting of the entire scene
-let brightness = 2.5;
+let brightness = 2.0;
 let lamp_material = {
   name: "big lamp",
   kind: "DiffuseLight",
