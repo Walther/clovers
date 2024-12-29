@@ -6,7 +6,8 @@ use clovers::{
     pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
     ray::Ray,
     scenes::Scene,
-    spectrum::spectrum_xyz_to_p,
+    spectrum::{spectral_power, spectral_powers},
+    wavelength::{rotate_wavelength, WAVE_SAMPLE_COUNT},
     Float, EPSILON_SHADOW_ACNE,
 };
 use nalgebra::Unit;
@@ -25,14 +26,16 @@ pub fn trace(
     max_depth: u32,
     rng: &mut SmallRng,
     sampler: &dyn SamplerTrait,
-) -> Float {
-    let wavelength = ray.wavelength;
-    let bg: Float = spectrum_xyz_to_p(wavelength, scene.background);
+) -> [Float; WAVE_SAMPLE_COUNT] {
+    let hero = ray.wavelength;
+    let wavelengths = rotate_wavelength(hero);
+
+    let bg = spectral_powers(scene.background, wavelengths);
 
     // Have we reached the maximum recursion i.e. ray bounce depth?
     if depth > max_depth {
         // Ray bounce limit reached, early return zero emissivity
-        return 0.0;
+        return [0.0; WAVE_SAMPLE_COUNT];
     }
 
     // Send the ray to the scene, and see if it hits anything.
@@ -47,7 +50,7 @@ pub fn trace(
 
     // Get the emitted color from the surface that we just hit
     let emitted: Xyz<E> = hit_record.material.emit(ray, &hit_record);
-    let emitted: Float = spectrum_xyz_to_p(wavelength, emitted);
+    let emitted = spectral_powers(emitted, wavelengths);
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
@@ -55,22 +58,23 @@ pub fn trace(
         return emitted;
     };
     // We have scattered, and received an attenuation from the material
-    let attenuation = spectrum_xyz_to_p(wavelength, scatter_record.attenuation);
+    // Are we on a dispersive material? If so, terminate other wavelengths
+    let attenuations = match hit_record.material.is_wavelength_dependent() {
+        true => {
+            let mut ret = [0.0; WAVE_SAMPLE_COUNT];
+            ret[0] = spectral_power(scatter_record.attenuation, hero);
+            ret
+        }
+        false => spectral_powers(scatter_record.attenuation, wavelengths),
+    };
 
     // Check the material type and recurse accordingly:
     match scatter_record.material_type {
         MaterialType::Specular => {
-            // If we hit a specular material, generate a specular ray, and multiply it with the attenuation
-            let specular = trace(
-                // a scatter_record from a specular material should always have this ray
-                &scatter_record.specular_ray.unwrap(),
-                scene,
-                depth + 1,
-                max_depth,
-                rng,
-                sampler,
-            );
-            specular * attenuation
+            // If we hit a specular material, recurse with a specular ray, and multiply it with the attenuation
+            let scatter_ray = scatter_record.specular_ray.unwrap();
+            let specular = trace(&scatter_ray, scene, depth + 1, max_depth, rng, sampler);
+            std::array::from_fn(|i| specular[i] * attenuations[i])
         }
         MaterialType::Diffuse => {
             // Multiple Importance Sampling:
@@ -95,12 +99,7 @@ pub fn trace(
 
             // Get the distribution value for the PDF
             // TODO: improve correctness & optimization!
-            let pdf_val = mixture_pdf.value(scatter_ray.direction, ray.wavelength, ray.time, rng);
-            if pdf_val <= 0.0 {
-                // scattering impossible, prevent division by zero below
-                // for more ctx, see https://github.com/RayTracing/raytracing.github.io/issues/979#issuecomment-1034517236
-                return emitted;
-            }
+            let mis_pdf_value = mixture_pdf.value(direction, hero, ray.time, rng);
 
             // Calculate the PDF weighting for the scatter
             // TODO: improve correctness & optimization!
@@ -114,10 +113,9 @@ pub fn trace(
 
             // Recurse for the scattering ray
             let recurse = trace(&scatter_ray, scene, depth + 1, max_depth, rng, sampler);
-            // Tint and weight it according to the PDF
-            let scattered = attenuation * scattering_pdf * recurse / pdf_val;
-            // Blend it all together
-            emitted + scattered
+            std::array::from_fn(|i| {
+                emitted[i] + recurse[i] * attenuations[i] * scattering_pdf / mis_pdf_value
+            })
         }
     }
 }

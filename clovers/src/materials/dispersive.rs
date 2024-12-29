@@ -117,4 +117,8 @@ impl MaterialTrait for Dispersive {
     }
 
     // TODO: should this material provide a `scattering_pdf` function?
+
+    fn is_wavelength_dependent(&self) -> bool {
+        true
+    }
 }

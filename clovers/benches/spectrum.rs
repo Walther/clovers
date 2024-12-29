@@ -20,9 +20,9 @@ fn xyz_to_p(bencher: divan::Bencher) {
         .with_inputs(|| {
             let mut rng = SmallRng::from_entropy();
             let wave = random_wavelength(&mut rng);
-            let xyz: Xyz<E> = Xyz::new(1.0, 1.0, 1.0);
-            (wave, xyz)
+            let color: Xyz<E> = Xyz::new(1.0, 1.0, 1.0);
+            (wave, color)
         })
         .counter(1u32)
-        .bench_values(|(wave, xyz)| black_box(spectrum_xyz_to_p(wave, xyz)))
+        .bench_values(|(wave, color)| black_box(spectral_power(color, wave)))
 }
