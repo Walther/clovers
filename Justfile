@@ -31,6 +31,14 @@ test:
 bench *ARGS:
   cargo bench --quiet {{ARGS}}
 
+compare *ARGS:
+  git stash; \
+  cargo b -r -q; \
+  just cli render {{ARGS}} --output renders/before; \
+  git stash pop; \
+  cargo b -r -q; \
+  just cli render {{ARGS}} --output renders/after;
+
 # Verify no_std compatibility
 nostd:
   cargo clippy -q --release --package clovers --lib --no-default-features
