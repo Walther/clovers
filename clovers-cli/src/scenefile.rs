@@ -80,24 +80,26 @@ impl SceneFile {
                 Object::Triangle(i) => i.priority,
             };
             let hitable = object_to_hitable(object, materials);
-
-            match hitable {
-                // Flatten any lists we got. Potential sources: `GLTF`, `STL`, `ObjectList`
-                Hitable::HitableList(l) => {
-                    let flattened = &mut l.flatten();
-                    hitables.append(&mut flattened.clone());
-                    if priority {
-                        priority_hitables.append(&mut flattened.clone());
+            // If we get a HitableList, flatten it
+            if let Hitable::HitableList(l) = hitable {
+                for h in l.hitables {
+                    if let Hitable::HitableList(_) = h {
+                        panic!("Recursing too hard in scene initialization")
                     }
+                    if priority {
+                        // FIXME: remove this and then remove Clone from Hitable
+                        priority_hitables.push(h.clone());
+                    }
+                    hitables.push(h);
                 }
+            } else {
                 // Otherwise, push as-is
-                _ => {
-                    hitables.push(hitable.clone());
-                    if priority {
-                        priority_hitables.push(hitable.clone());
-                    }
+                if priority {
+                    // FIXME: remove this and then remove Clone from Hitable
+                    priority_hitables.push(hitable.clone());
                 }
-            };
+                hitables.push(hitable);
+            }
         }
         info!("All objects parsed into hitables");
         info!("Building the BVH root for hitables");

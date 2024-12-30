@@ -5,7 +5,7 @@
 use palette::{white_point::E, Xyz};
 
 use crate::{
-    wavelength::{Wavelength, WAVE_SAMPLE_COUNT},
+    wavelength::{Wavelength, MIN_WAVELENGTH, SPECTRUM_SIZE, WAVE_SAMPLE_COUNT},
     Float,
 };
 
@@ -13,6 +13,33 @@ use self::spectra_xyz_5nm_380_780_097::equal_energy_reflectance;
 
 pub mod spectra_xyz_5nm_380_780_097;
 pub mod spectrum_grid;
+
+/// Spectral Power Distribution
+#[derive(Debug, Clone)]
+pub struct SPD {
+    table: Box<[Float; SPECTRUM_SIZE]>,
+}
+
+impl SPD {
+    /// Precomputes a new spectral power distrubtion for a given color.
+    #[must_use]
+    pub fn new(color: Xyz<E>) -> Self {
+        let mut table = [0.0; SPECTRUM_SIZE];
+        for (index, power) in table.iter_mut().enumerate() {
+            *power = spectral_power(color, MIN_WAVELENGTH + index);
+        }
+        Self {
+            table: Box::new(table),
+        }
+    }
+
+    /// Evaluate the spectral power at the given wavelength.
+    #[must_use]
+    pub fn get(&self, wavelength: Wavelength) -> Float {
+        let index = wavelength - MIN_WAVELENGTH;
+        self.table[index]
+    }
+}
 
 /// Evaluate the spectrum at the given wavelength for the given XYZ color
 #[must_use]

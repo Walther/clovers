@@ -111,8 +111,8 @@ pub fn object_to_hitable(obj: Object, materials: &[SharedMaterial]) -> Hitable<'
         Object::ObjectList(x) => {
             let objects: Vec<Hitable> = x
                 .objects
-                .iter()
-                .map(|object| -> Hitable { object_to_hitable(object.clone(), materials) })
+                .into_iter()
+                .map(|object| -> Hitable { object_to_hitable(object, materials) })
                 .collect();
             Hitable::HitableList(HitableList::new(objects))
         }

@@ -8,14 +8,14 @@ use tracing::warn;
 use crate::{
     aabb::AABB,
     bvh::BVHNode,
-    hitable::{Empty, Hitable, HitableList, HitableTrait},
+    hitable::{Empty, Hitable, HitableTrait},
     Float,
 };
 
 use super::utils::vec_bounding_box;
 
 /// Heavily inspired by the wonderful blog series <https://jacco.ompf2.com/2022/04/18/how-to-build-a-bvh-part-2-faster-rays/>.
-pub fn build(hitables: Vec<Hitable>) -> BVHNode {
+pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
     // Initialize two child nodes
     let left: Box<Hitable>;
     let right: Box<Hitable>;
@@ -33,13 +33,13 @@ pub fn build(hitables: Vec<Hitable>) -> BVHNode {
             return BVHNode { left, right, aabb };
         }
         1 => {
-            left = Box::new(hitables[0].clone());
+            left = Box::new(hitables.remove(0));
             right = Box::new(Hitable::Empty(Empty {}));
             return BVHNode { left, right, aabb };
         }
         2 => {
-            left = Box::new(hitables[0].clone());
-            right = Box::new(hitables[1].clone());
+            left = Box::new(hitables.remove(0));
+            right = Box::new(hitables.remove(0));
             return BVHNode { left, right, aabb };
         }
         _ => (),
@@ -47,22 +47,27 @@ pub fn build(hitables: Vec<Hitable>) -> BVHNode {
 
     // If we have more than two nodes, split and recurse
     let (axis, position) = find_best_split(&hitables);
-    let (hitables_left, hitables_right) = do_split(hitables, axis, position);
+    let (mut hitables_left, mut hitables_right): (Vec<Hitable>, Vec<Hitable>) = hitables
+        .into_iter()
+        // NOTE: match comparison in evaluate_sah
+        .partition(|hitable| hitable.centroid()[axis] <= position);
 
     // Avoid infinite recursion
     if hitables_left.is_empty() {
         #[cfg(feature = "tracing")]
-        warn!("hitables_left is empty");
-        left = Box::new(Hitable::Empty(Empty {}));
-        right = Box::new(Hitable::HitableList(HitableList::new(hitables_right)));
+        warn!("hitables_left is empty, bvh tree might become deep");
+        let h = hitables_right.remove(0);
+        left = Box::new(h);
+        right = Box::new(Hitable::BVHNode(build(hitables_right)));
 
         return BVHNode { left, right, aabb };
     };
     if hitables_right.is_empty() {
         #[cfg(feature = "tracing")]
-        warn!("hitables_right is empty");
-        left = Box::new(Hitable::HitableList(HitableList::new(hitables_left)));
-        right = Box::new(Hitable::Empty(Empty {}));
+        warn!("hitables_right is empty, bvh tree might become deep");
+        let h = hitables_left.remove(0);
+        left = Box::new(Hitable::BVHNode(build(hitables_left)));
+        right = Box::new(h);
 
         return BVHNode { left, right, aabb };
     };
@@ -124,14 +129,6 @@ fn find_best_split(hitables: &Vec<Hitable>) -> (usize, Float) {
     }
 
     (best_axis, best_pos)
-}
-
-fn do_split(hitables: Vec<Hitable>, axis: usize, position: f32) -> (Vec<Hitable>, Vec<Hitable>) {
-    let (hitables_left, hitables_right): (Vec<_>, Vec<_>) = hitables
-        .into_iter()
-        // NOTE: match comparison in evaluate_sah
-        .partition(|hitable| hitable.centroid()[axis] <= position);
-    (hitables_left, hitables_right)
 }
 
 fn evaluate_sah(hitables: &Vec<Hitable>, axis: usize, position: Float) -> Float {

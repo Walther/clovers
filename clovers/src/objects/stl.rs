@@ -54,10 +54,7 @@ pub fn initialize_stl<'scene>(
     materials: &'scene [SharedMaterial],
 ) -> STL<'scene> {
     // TODO: error handling!
-    let mut file = OpenOptions::new()
-        .read(true)
-        .open(stl_init.path.clone())
-        .unwrap();
+    let mut file = OpenOptions::new().read(true).open(stl_init.path).unwrap();
     let mesh = stl_io::read_stl(&mut file).unwrap();
     let triangles = mesh.vertices;
     let mut hitables = Vec::new();

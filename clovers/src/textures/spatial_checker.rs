@@ -9,7 +9,7 @@ use super::TextureTrait;
 #[cfg(feature = "serde-derive")]
 use crate::colorinit::TypedColorInit;
 use crate::ray::Ray;
-use crate::spectrum::spectral_power;
+use crate::spectrum::SPD;
 use crate::wavelength::Wavelength;
 use crate::{colorinit::ColorInit, HitRecord};
 use crate::{Float, PI};
@@ -30,12 +30,8 @@ pub struct SpatialCheckerInit {
 }
 
 impl From<SpatialCheckerInit> for SpatialChecker {
-    fn from(value: SpatialCheckerInit) -> Self {
-        SpatialChecker {
-            even: value.even.into(),
-            odd: value.odd.into(),
-            density: value.density,
-        }
+    fn from(init: SpatialCheckerInit) -> Self {
+        SpatialChecker::new(init.even, init.odd, init.density)
     }
 }
 
@@ -45,9 +41,11 @@ impl From<SpatialCheckerInit> for SpatialChecker {
 #[cfg_attr(feature = "serde-derive", serde(from = "SpatialCheckerInit"))]
 pub struct SpatialChecker {
     /// Uniform color for the even-numbered checkers of the texture.
-    pub even: Xyz<E>,
+    #[cfg_attr(feature = "serde-derive", serde(skip))]
+    even: SPD,
     /// Uniform color for the odd-numbered checkers of the texture.
-    pub odd: Xyz<E>,
+    #[cfg_attr(feature = "serde-derive", serde(skip))]
+    odd: SPD,
     /// Controls the density of the checkered pattern. Default value is 1.0, which corresponds to filling a 1.0 unit cube in the coordinate system with one color of the pattern. Even values preferred - odd values may create a visually thicker stripe due to two stripes with same color being next to each other.
     pub density: Float,
 }
@@ -73,11 +71,9 @@ impl SpatialChecker {
     /// Create a new `SpatialChecker` object with the specified colors and density.
     #[must_use]
     pub fn new(color1: impl Into<Xyz<E>>, color2: impl Into<Xyz<E>>, density: Float) -> Self {
-        SpatialChecker {
-            even: color1.into(),
-            odd: color2.into(),
-            density,
-        }
+        let even = SPD::new(color1.into());
+        let odd = SPD::new(color2.into());
+        SpatialChecker { even, odd, density }
     }
 }
 
@@ -92,9 +88,9 @@ impl TextureTrait for SpatialChecker {
             * (density * position.y).sin()
             * (density * position.z).sin();
         if sines < 0.0 {
-            spectral_power(self.odd, wavelength)
+            self.odd.get(wavelength)
         } else {
-            spectral_power(self.even, wavelength)
+            self.even.get(wavelength)
         }
     }
 }
