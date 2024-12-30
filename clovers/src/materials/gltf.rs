@@ -3,7 +3,7 @@
 #![allow(clippy::pedantic)]
 
 #[cfg(feature = "gl_tf")]
-use gltf::{image::Data, Material};
+use gltf::image::Data;
 use nalgebra::Unit;
 use palette::{
     chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, LinSrgb, Srgb,
@@ -15,6 +15,9 @@ use crate::{
     pdf::{ZeroPDF, PDF},
     random::random_unit_vector,
     ray::Ray,
+    spectrum::spectral_power,
+    textures::TextureTrait,
+    wavelength::Wavelength,
     Direction, Float, HitRecord, Vec2, Vec3, Vec4, PI,
 };
 
@@ -23,30 +26,24 @@ use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
 #[derive(Debug, Clone)]
 // #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
 /// GLTF Material wrapper type
-pub struct GLTFMaterial<'scene> {
-    material: &'scene Material<'scene>,
+pub struct GLTFMaterial {
+    material: &'static gltf::Material<'static>,
     tex_coords: [[Float; 2]; 3],
-    images: &'scene [Data],
+    images: &'static [Data],
     tangents: Option<[Vec3; 3]>,
     normals: Option<[Vec3; 3]>,
     bitangents: Option<[Vec3; 3]>,
 }
 
-impl Default for GLTFMaterial<'_> {
-    fn default() -> Self {
-        todo!()
-    }
-}
-
-impl<'scene> GLTFMaterial<'scene> {
+impl GLTFMaterial {
     /// Initialize a new GLTF material wrapper
     #[must_use]
     pub fn new(
-        material: &'scene Material,
+        material: &'static gltf::Material,
         tex_coords: [[Float; 2]; 3],
         normals: Option<[[Float; 3]; 3]>,
         tangents: Option<[[Float; 4]; 3]>,
-        images: &'scene [Data],
+        images: &'static [Data],
     ) -> Self {
         let normals: Option<[Vec3; 3]> = normals.map(|ns| ns.map(Vec3::from));
         let tangents: Option<[Vec4; 3]> = tangents.map(|ns| ns.map(Vec4::from));
@@ -80,24 +77,17 @@ impl<'scene> GLTFMaterial<'scene> {
     }
 }
 
-impl MaterialTrait for GLTFMaterial<'_> {
+impl MaterialTrait for GLTFMaterial {
     fn scatter(
         &self,
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
-        let base_color: LinSrgb = self.sample_base_color(hit_record);
-        let emissive: LinSrgb = self.sample_emissive(hit_record).into_color_unclamped();
         let (metalness, roughness) = self.sample_metalness_roughness(hit_record);
         let normal: Direction = self.sample_normal(hit_record);
-        let occlusion: Float = self.sample_occlusion(hit_record);
 
-        // TODO: full color model
-        let attenuation: LinSrgb = emissive + base_color * occlusion;
-        let attenuation: Xyz<E> = attenuation.adapt_into();
-
-        // TODO: better metalness model
+        // TODO: correct scatter model
         if metalness > 0.0 {
             // TODO: borrowed from metal, should this be different?
             let reflected: Direction = reflect(ray.direction, normal);
@@ -111,14 +101,12 @@ impl MaterialTrait for GLTFMaterial<'_> {
                     time: ray.time,
                     wavelength: ray.wavelength,
                 }),
-                attenuation,
                 material_type: MaterialType::Specular,
                 pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()),
             })
         } else {
             Some(ScatterRecord {
                 specular_ray: None,
-                attenuation,
                 material_type: MaterialType::Diffuse,
                 pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()),
             })
@@ -135,9 +123,36 @@ impl MaterialTrait for GLTFMaterial<'_> {
             Some(cosine / PI)
         }
     }
+
+    #[must_use]
+    fn emit(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        self.emit(ray, wavelength, hit_record)
+    }
+
+    #[must_use]
+    fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        self.color(ray, wavelength, hit_record)
+    }
 }
 
-impl GLTFMaterial<'_> {
+impl GLTFMaterial {
+    #[must_use]
+    fn color(&self, _ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        let base_color: LinSrgb = self.sample_base_color(hit_record);
+        let occlusion: Float = self.sample_occlusion(hit_record);
+        // TODO: full color model
+        let attenuation: LinSrgb = base_color * occlusion;
+        let attenuation: Xyz<E> = attenuation.adapt_into();
+        spectral_power(attenuation, wavelength)
+    }
+
+    #[must_use]
+    fn emit(&self, _ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        // TODO: full color model
+        let emission: Xyz<E> = self.sample_emissive(hit_record).adapt_into();
+        spectral_power(emission, wavelength)
+    }
+
     fn sample_base_color(&self, hit_record: &HitRecord) -> LinSrgb {
         let base_color_texture = self
             .material
@@ -168,16 +183,20 @@ impl GLTFMaterial<'_> {
             .emissive_texture()
             .map(|info| &self.images[info.texture().source().index()]);
         // TODO: proper fully correct coloring
-        let emissive = match &emissive_texture {
+        match &emissive_texture {
             Some(texture) => {
                 let (x, y) = self.sample_texture_coords(hit_record, texture);
-                get_color_srgb(texture, x, y)
-            }
-            None => Srgb::new(1.0, 1.0, 1.0),
-        };
-        let emissive_factor: Srgb = self.material.emissive_factor().into();
+                let emissive: Srgb = get_color_srgb(texture, x, y);
+                let factor: [Float; 3] = self.material.emissive_factor();
 
-        (emissive * emissive_factor).into_color_unclamped()
+                Srgb::new(
+                    emissive.red * factor[0],
+                    emissive.green * factor[0],
+                    emissive.blue * factor[0],
+                )
+            }
+            None => Srgb::new(0.0, 0.0, 0.0),
+        }
     }
 
     fn sample_metalness_roughness(&self, hit_record: &HitRecord) -> (Float, Float) {
@@ -296,6 +315,19 @@ impl GLTFMaterial<'_> {
         let x = x.floor() as usize;
         let y = y.floor() as usize;
         (x, y)
+    }
+}
+
+// TODO: better ideas?
+impl TextureTrait for &GLTFMaterial {
+    #[must_use]
+    fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        GLTFMaterial::color(self, ray, wavelength, hit_record)
+    }
+
+    #[must_use]
+    fn emit(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        GLTFMaterial::emit(self, ray, wavelength, hit_record)
     }
 }
 

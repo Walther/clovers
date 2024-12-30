@@ -1,10 +1,13 @@
 //! A solid color texture.
 
-use palette::{convert::IntoColorUnclamped, white_point::E, Xyz};
+use palette::{white_point::E, Xyz};
 
 use super::TextureTrait;
 use crate::colorinit::ColorInit;
-use crate::HitRecord;
+use crate::ray::Ray;
+use crate::spectrum::spectral_power;
+use crate::wavelength::Wavelength;
+use crate::{Float, HitRecord};
 
 /// Initialization structure for a solid color texture.
 #[derive(Clone, Debug)]
@@ -34,8 +37,8 @@ pub struct SolidColor {
 impl TextureTrait for SolidColor {
     /// Evaluates the color ignoring the given surface coordinates and spatial position - always returns the solid color.
     #[must_use]
-    fn color(&self, _hit_record: &HitRecord) -> Xyz<E> {
-        self.color.into_color_unclamped()
+    fn color(&self, _ray: &Ray, wavelength: Wavelength, _hit_record: &HitRecord) -> Float {
+        spectral_power(self.color, wavelength)
     }
 }
 

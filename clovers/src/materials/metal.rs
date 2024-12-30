@@ -6,6 +6,7 @@ use crate::{
     random::random_unit_vector,
     ray::Ray,
     textures::{Texture, TextureTrait},
+    wavelength::Wavelength,
     Direction, Float, HitRecord,
 };
 use nalgebra::Unit;
@@ -40,13 +41,17 @@ impl MaterialTrait for Metal {
                 time: ray.time,
                 wavelength: ray.wavelength,
             }),
-            attenuation: self.albedo.color(hit_record),
             material_type: MaterialType::Specular,
             pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()),
         })
     }
 
     // TODO: should this material provide a `scattering_pdf` function?
+
+    #[must_use]
+    fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        self.albedo.color(ray, wavelength, hit_record)
+    }
 }
 
 impl Metal {

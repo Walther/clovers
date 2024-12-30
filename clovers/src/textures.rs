@@ -4,9 +4,11 @@ pub mod solid_color;
 pub mod spatial_checker;
 pub mod surface_checker;
 
-use crate::illuminants::{D50, D65};
+use crate::{
+    illuminants::{D50, D65},
+    materials::gltf::GLTFMaterial,
+};
 use enum_dispatch::enum_dispatch;
-use palette::{white_point::E, Xyz};
 pub use solid_color::*;
 pub use spatial_checker::*;
 pub use surface_checker::*;
@@ -25,6 +27,10 @@ pub enum Texture {
     SpatialChecker(SpatialChecker),
     /// SurfaceChecker texture
     SurfaceChecker(SurfaceChecker),
+    /// GLTF material as a texture - a bit of a hack
+    #[cfg(feature = "gltf")]
+    #[cfg_attr(feature = "serde-derive", serde(skip))]
+    GLTFTexture(&'static GLTFMaterial),
     /// D50 Standard Illuminant
     IlluminantD50(D50),
     /// D65 Standard Illuminant
@@ -32,12 +38,14 @@ pub enum Texture {
 }
 
 #[enum_dispatch]
-pub(crate) trait TextureTrait {
-    /// Evaluates the color of the texture at the given surface coordinates or spatial coordinate.
+/// The main texture trait
+pub trait TextureTrait {
+    /// Returns the spectral reflectance of the texture sampled at the given wavelength at the given location.
     #[must_use]
-    fn color(&self, hit_record: &HitRecord) -> Xyz<E>;
+    fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float;
 
     /// Returns the spectral power of the texture sampled at the given wavelength. Defaults to none, override for emissive textures.
+    #[must_use]
     fn emit(&self, _ray: &Ray, _wavelength: Wavelength, _hit_record: &HitRecord) -> Float {
         0.0
     }

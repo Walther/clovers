@@ -13,7 +13,6 @@ Dense flint glass SF10 	    1.7280 	    0.01342
 
 // TODO: consider other options, e.g. Sellmeier https://en.wikipedia.org/wiki/Sellmeier_equation
 
-use palette::Xyz;
 use rand::{rngs::SmallRng, Rng};
 
 use crate::{
@@ -76,8 +75,6 @@ impl MaterialTrait for Dispersive {
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
         // Calculate refractive index based on the wavelength of the incoming material
-        // TODO: colored dispersive glass?
-        let attenuation = Xyz::new(1.0, 1.0, 1.0);
         let refractive_index = self.refractive_index(ray.wavelength);
         let refraction_ratio: Float = if hit_record.front_face {
             1.0 / refractive_index
@@ -110,7 +107,6 @@ impl MaterialTrait for Dispersive {
         Some(ScatterRecord {
             material_type: MaterialType::Specular,
             specular_ray: Some(specular_ray),
-            attenuation,
             pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()), //TODO: ugly hack due to nullptr in original tutorial
         })
         // End copied
@@ -120,5 +116,10 @@ impl MaterialTrait for Dispersive {
 
     fn is_wavelength_dependent(&self) -> bool {
         true
+    }
+
+    #[must_use]
+    fn color(&self, _ray: &Ray, _wavelength: Wavelength, _hit_record: &HitRecord) -> Float {
+        1.0
     }
 }

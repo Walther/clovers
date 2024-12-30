@@ -37,9 +37,12 @@ pub struct {output} {{
 
 impl TextureTrait for {output} {{
     #[must_use]
-    fn color(&self, _hit_record: &HitRecord) -> Xyz<E> {{
-        // FIXME:
-        Xyz::new(1.0, 1.0, 1.0)
+    fn color(&self, _ray: &Ray, wavelength: Wavelength, _hit_record: &HitRecord) -> Float {{
+        let color = match {output}.get(&wavelength) {{
+            Some(&p) => p * self.intensity,
+            None => 0.0,
+        }};
+        color.clamp(0.0, 1.0)
     }}
 
     #[must_use]

@@ -1,8 +1,5 @@
 //! Spectral power distributions of various illuminants.
 
-use palette::white_point::E;
-use palette::Xyz;
-
 use crate::ray::Ray;
 use crate::textures::TextureTrait;
 use crate::wavelength::Wavelength;

@@ -54,13 +54,24 @@ impl MaterialTrait for ConeLight {
             / (ray.direction.magnitude() * hit_record.normal.magnitude()))
         .acos();
 
-        let emit = self.emit.emit(ray, wavelength, hit_record);
-        if angle <= spread_radians {
-            emit
-        } else {
-            // Make sure that the front face of the lamp is tinted, even outside the main lighting angle
-            emit.clamp(0.0, 1.0)
+        if angle > spread_radians {
+            return 0.0;
         }
+
+        // HACK: current scene file format allows non-illuminants as light sources. These textures have no `emit()`, use `color()` instead.
+        match self.emit {
+            Texture::SolidColor(_) | Texture::SpatialChecker(_) | Texture::SurfaceChecker(_) => {
+                self.emit.color(ray, wavelength, hit_record)
+            }
+            Texture::GLTFTexture(_) | Texture::IlluminantD50(_) | Texture::IlluminantD65(_) => {
+                self.emit.emit(ray, wavelength, hit_record)
+            }
+        }
+    }
+
+    #[must_use]
+    fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        self.emit.color(ray, wavelength, hit_record).clamp(0.0, 1.0)
     }
 }
 

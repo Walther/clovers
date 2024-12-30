@@ -24,7 +24,6 @@ use enum_dispatch::enum_dispatch;
 pub use isotropic::*;
 pub use lambertian::*;
 pub use metal::*;
-use palette::{white_point::E, Xyz};
 use rand::prelude::SmallRng;
 pub use thin_film::*;
 
@@ -77,11 +76,7 @@ impl MaterialTrait for Material {
         hit_record: &HitRecord,
         rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
-        let mut scatter_record = self.kind.scatter(ray, hit_record, rng)?;
-        if let Some(f) = &self.thin_film {
-            scatter_record.attenuation *= f.interference(ray, hit_record);
-        };
-        Some(scatter_record)
+        self.kind.scatter(ray, hit_record, rng)
     }
 
     fn scattering_pdf(&self, hit_record: &HitRecord, scattered: &Ray) -> Option<Float> {
@@ -94,6 +89,17 @@ impl MaterialTrait for Material {
 
     fn is_wavelength_dependent(&self) -> bool {
         self.thin_film.is_some() || self.kind.is_wavelength_dependent()
+    }
+
+    #[must_use]
+    /// Returns the spectral reflectance of the material's texture at the given parameters.
+    fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        let thin_film = match &self.thin_film {
+            Some(t) => t.interference(ray.direction, wavelength, hit_record),
+            None => 1.0,
+        };
+        // TODO: is multiplication correct here?
+        self.kind.color(ray, wavelength, hit_record) * thin_film
     }
 }
 
@@ -117,6 +123,10 @@ pub trait MaterialTrait: Debug {
     fn emit(&self, _ray: &Ray, _wavelength: Wavelength, _hit_record: &HitRecord) -> Float {
         0.0
     }
+
+    /// Returns the spectral reflectance of the material sampled with the given parameters.
+    #[must_use]
+    fn color(&self, _ray: &Ray, wavelength: Wavelength, _hit_record: &HitRecord) -> Float;
 
     /// Returns true if the material has wavelength-dependent scattering, like dispersion or iridescence.
     fn is_wavelength_dependent(&self) -> bool {
@@ -168,8 +178,6 @@ pub struct ScatterRecord<'ray> {
     pub material_type: MaterialType,
     /// Direction of a generated specular ray
     pub specular_ray: Option<Ray>,
-    /// Current color to take into account when following the scattered ray for futher iterations
-    pub attenuation: Xyz<E>,
     /// Probability density function to use with the [`ScatterRecord`].
     // TODO: understand & explain
     pub pdf_ptr: PDF<'ray>,

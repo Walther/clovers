@@ -5,6 +5,7 @@ use crate::{
     pdf::{CosinePDF, PDF},
     ray::Ray,
     textures::{Texture, TextureTrait},
+    wavelength::Wavelength,
     Float, HitRecord, PI,
 };
 use rand::prelude::SmallRng;
@@ -29,7 +30,6 @@ impl MaterialTrait for Lambertian {
         Some(ScatterRecord {
             material_type: MaterialType::Diffuse,
             specular_ray: None,
-            attenuation: self.albedo.color(hit_record),
             pdf_ptr: PDF::CosinePDF(CosinePDF::new(hit_record.normal)),
         })
     }
@@ -44,6 +44,11 @@ impl MaterialTrait for Lambertian {
         } else {
             Some(cosine / PI)
         }
+    }
+
+    #[must_use]
+    fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        self.albedo.color(ray, wavelength, hit_record)
     }
 }
 

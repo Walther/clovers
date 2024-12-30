@@ -1,12 +1,14 @@
 //! Checkered texture based on the surface coordinates of an object.
 
-use palette::convert::IntoColorUnclamped;
 use palette::white_point::E;
 use palette::Xyz;
 
 use super::TextureTrait;
 #[cfg(feature = "serde-derive")]
 use crate::colorinit::TypedColorInit;
+use crate::ray::Ray;
+use crate::spectrum::spectral_power;
+use crate::wavelength::Wavelength;
 use crate::{colorinit::ColorInit, HitRecord};
 use crate::{Float, PI};
 
@@ -80,16 +82,16 @@ impl SurfaceChecker {
 impl TextureTrait for SurfaceChecker {
     /// Evaluates the color at the given surface position coordinates. Note that `SurfaceChecker` is surface-based, and thus ignores the spatial position coordinate.
     #[must_use]
-    fn color(&self, hit_record: &HitRecord) -> Xyz<E> {
+    fn color(&self, _ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;
         let sines = 1.0 // cosmetic 1 for readability of following lines :)
               * (density * hit_record.u).sin()
               * (density * hit_record.v).sin();
         if sines < 0.0 {
-            self.odd.into_color_unclamped()
+            spectral_power(self.odd, wavelength)
         } else {
-            self.even.into_color_unclamped()
+            spectral_power(self.even, wavelength)
         }
     }
 }
