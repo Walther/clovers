@@ -6,12 +6,11 @@ use clovers::{
     pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
     ray::Ray,
     scenes::Scene,
-    spectrum::{spectral_power, spectral_powers},
+    spectrum::spectral_powers,
     wavelength::{rotate_wavelength, WAVE_SAMPLE_COUNT},
     Float, EPSILON_SHADOW_ACNE,
 };
 use nalgebra::Unit;
-use palette::{white_point::E, Xyz};
 use rand::rngs::SmallRng;
 
 use crate::sampler::SamplerTrait;
@@ -49,8 +48,8 @@ pub fn trace(
     };
 
     // Get the emitted color from the surface that we just hit
-    let emitted: Xyz<E> = hit_record.material.emit(ray, &hit_record);
-    let emitted = spectral_powers(emitted, wavelengths);
+    let emitted =
+        std::array::from_fn(|i| hit_record.material.emit(ray, wavelengths[i], &hit_record));
 
     // Do we scatter?
     let Some(scatter_record) = hit_record.material.scatter(ray, &hit_record, rng) else {
@@ -62,10 +61,12 @@ pub fn trace(
     let attenuations = match hit_record.material.is_wavelength_dependent() {
         true => {
             let mut ret = [0.0; WAVE_SAMPLE_COUNT];
-            ret[0] = spectral_power(scatter_record.attenuation, hero);
+            ret[0] = hit_record.material.color(ray, hero, &hit_record);
             ret
         }
-        false => spectral_powers(scatter_record.attenuation, wavelengths),
+        false => {
+            std::array::from_fn(|i| hit_record.material.color(ray, wavelengths[i], &hit_record))
+        }
     };
 
     // Check the material type and recurse accordingly:

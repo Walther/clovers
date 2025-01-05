@@ -146,22 +146,6 @@ impl<'scene> HitableList<'scene> {
         let aabb = vec_bounding_box(&hitables).expect("No bounding box for hitables");
         Self { hitables, aabb }
     }
-
-    /// Recursively flattens the `HitableList` into a `Vec<Hitable>`
-    #[must_use]
-    pub fn flatten(self) -> Vec<Hitable<'scene>> {
-        let mut flat: Vec<Hitable> = Vec::new();
-        for hitable in &self.hitables {
-            match hitable {
-                Hitable::HitableList(l) => {
-                    let mut flatten = l.clone().flatten();
-                    flat.append(&mut flatten);
-                }
-                h => flat.push(h.clone()),
-            }
-        }
-        flat
-    }
 }
 
 // TODO: ideally, this impl should be removed entirely

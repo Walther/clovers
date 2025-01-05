@@ -2,13 +2,15 @@
 
 // TODO: object-aligned spatial checker?
 
-use palette::convert::IntoColorUnclamped;
 use palette::white_point::E;
 use palette::Xyz;
 
 use super::TextureTrait;
 #[cfg(feature = "serde-derive")]
 use crate::colorinit::TypedColorInit;
+use crate::ray::Ray;
+use crate::spectrum::SPD;
+use crate::wavelength::Wavelength;
 use crate::{colorinit::ColorInit, HitRecord};
 use crate::{Float, PI};
 
@@ -28,12 +30,8 @@ pub struct SpatialCheckerInit {
 }
 
 impl From<SpatialCheckerInit> for SpatialChecker {
-    fn from(value: SpatialCheckerInit) -> Self {
-        SpatialChecker {
-            even: value.even.into(),
-            odd: value.odd.into(),
-            density: value.density,
-        }
+    fn from(init: SpatialCheckerInit) -> Self {
+        SpatialChecker::new(init.even, init.odd, init.density)
     }
 }
 
@@ -43,9 +41,11 @@ impl From<SpatialCheckerInit> for SpatialChecker {
 #[cfg_attr(feature = "serde-derive", serde(from = "SpatialCheckerInit"))]
 pub struct SpatialChecker {
     /// Uniform color for the even-numbered checkers of the texture.
-    pub even: Xyz<E>,
+    #[cfg_attr(feature = "serde-derive", serde(skip))]
+    even: SPD,
     /// Uniform color for the odd-numbered checkers of the texture.
-    pub odd: Xyz<E>,
+    #[cfg_attr(feature = "serde-derive", serde(skip))]
+    odd: SPD,
     /// Controls the density of the checkered pattern. Default value is 1.0, which corresponds to filling a 1.0 unit cube in the coordinate system with one color of the pattern. Even values preferred - odd values may create a visually thicker stripe due to two stripes with same color being next to each other.
     pub density: Float,
 }
@@ -71,29 +71,26 @@ impl SpatialChecker {
     /// Create a new `SpatialChecker` object with the specified colors and density.
     #[must_use]
     pub fn new(color1: impl Into<Xyz<E>>, color2: impl Into<Xyz<E>>, density: Float) -> Self {
-        SpatialChecker {
-            even: color1.into(),
-            odd: color2.into(),
-            density,
-        }
+        let even = SPD::new(color1.into());
+        let odd = SPD::new(color2.into());
+        SpatialChecker { even, odd, density }
     }
 }
 
 impl TextureTrait for SpatialChecker {
     /// Evaluates the color at the given spatial position coordinate. Note that the `SpatialChecker` is spatial - surface coordinates are ignored.
     #[must_use]
-    fn color(&self, hit_record: &HitRecord) -> Xyz<E> {
+    fn color(&self, _ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         let position = hit_record.position;
-        // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
         let density = self.density * PI;
         let sines = 1.0 // cosmetic 1 for readability of following lines :)
             * (density * position.x).sin()
             * (density * position.y).sin()
             * (density * position.z).sin();
         if sines < 0.0 {
-            self.odd.into_color_unclamped()
+            self.odd.get(wavelength)
         } else {
-            self.even.into_color_unclamped()
+            self.even.get(wavelength)
         }
     }
 }

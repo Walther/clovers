@@ -31,15 +31,15 @@ pub struct GLTFInit {
     pub path: String,
 }
 
-impl<'scene> From<GLTFInit> for Vec<Hitable<'scene>> {
+impl From<GLTFInit> for Vec<Hitable<'static>> {
     fn from(gltf: GLTFInit) -> Self {
         let mut hitables: Vec<Hitable> = Vec::new();
 
         // Go through the objects in the gltf file
         let (document, buffers, images) = gltf::import(gltf.path).unwrap();
-        let document: &'scene gltf::Document = Box::leak(Box::new(document));
-        let images: &'scene Vec<Data> = Box::leak(Box::new(images));
-        let materials: &'scene Vec<gltf::Material> =
+        let document: &'static gltf::Document = Box::leak(Box::new(document));
+        let images: &'static Vec<Data> = Box::leak(Box::new(images));
+        let materials: &'static Vec<gltf::Material> =
             Box::leak(Box::new(document.materials().collect()));
 
         for scene in document.scenes() {
@@ -78,12 +78,12 @@ impl GLTF<'_> {
     }
 }
 
-fn parse_node<'scene>(
+fn parse_node(
     node: &Node,
-    hitables: &mut Vec<Hitable<'scene>>,
+    hitables: &mut Vec<Hitable<'static>>,
     buffers: &Vec<gltf::buffer::Data>,
-    materials: &'scene Vec<gltf::Material>,
-    images: &'scene Vec<Data>,
+    materials: &'static Vec<gltf::Material>,
+    images: &'static Vec<Data>,
 ) {
     // Handle direct meshes
     if let Some(mesh) = node.mesh() {
@@ -95,12 +95,12 @@ fn parse_node<'scene>(
     }
 }
 
-fn parse_mesh<'scene>(
+fn parse_mesh(
     mesh: &Mesh,
-    hitables: &mut Vec<Hitable<'scene>>,
+    hitables: &mut Vec<Hitable<'static>>,
     buffers: &[gltf::buffer::Data],
-    materials: &'scene [gltf::Material],
-    images: &'scene [Data],
+    materials: &'static [gltf::Material],
+    images: &'static [Data],
 ) {
     debug!("found mesh");
     for primitive in mesh.primitives() {
@@ -168,7 +168,7 @@ fn parse_mesh<'scene>(
                         });
 
                         // TODO: don't leak memory
-                        let material: &'scene GLTFMaterial = Box::leak(Box::new(
+                        let material: &'static GLTFMaterial = Box::leak(Box::new(
                             GLTFMaterial::new(material, tex_coords, normals, tangents, images),
                         ));
 
@@ -191,7 +191,7 @@ pub struct GLTFTriangle<'scene> {
     /// Axis-aligned bounding box of the object
     pub aabb: AABB,
     /// Material of the object
-    pub material: &'scene GLTFMaterial<'scene>,
+    pub material: &'scene GLTFMaterial,
     q: Vec3,
     u: Vec3,
     v: Vec3,
@@ -205,7 +205,7 @@ impl<'scene> GLTFTriangle<'scene> {
     #[must_use]
     #[allow(clippy::many_single_char_names)]
     /// Initialize a new GLTF object
-    pub fn new(triangle: [Vec3; 3], material: &'scene GLTFMaterial<'scene>) -> Self {
+    pub fn new(triangle: [Vec3; 3], material: &'scene GLTFMaterial) -> Self {
         // TODO: mostly adapted from Triangle, verify correctness!
 
         let [a, b, c] = triangle;

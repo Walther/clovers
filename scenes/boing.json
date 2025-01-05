@@ -31,8 +31,8 @@
       "name": "lamp",
       "kind": "DiffuseLight",
       "emit": {
-        "kind": "SolidColor",
-        "color": [2.5, 2.5, 2.5]
+        "kind": "IlluminantD65",
+        "intensity": 0.06
       }
     },
     {

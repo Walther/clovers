@@ -29,7 +29,7 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
     if object_span == 1 {
         // If we only have one object, add one and an empty object.
         // TODO: can this hack be removed?
-        left = Box::new(hitables[0].clone());
+        left = Box::new(hitables.remove(0));
         right = Box::new(Hitable::Empty(Empty {}));
         let aabb = left.aabb().unwrap().clone(); // TODO: remove unwrap
         return BVHNode { left, right, aabb };
@@ -38,12 +38,12 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
         // Insert the child nodes in order
         match comparator(&hitables[0], &hitables[1]) {
             Ordering::Less => {
-                left = Box::new(hitables[0].clone());
-                right = Box::new(hitables[1].clone());
+                left = Box::new(hitables.remove(0));
+                right = Box::new(hitables.remove(0)); // Second item is at index 0 after first removal
             }
             Ordering::Greater => {
-                left = Box::new(hitables[1].clone());
-                right = Box::new(hitables[0].clone());
+                left = Box::new(hitables.remove(1));
+                right = Box::new(hitables.remove(0));
             }
             Ordering::Equal => {
                 // TODO: what should happen here?
@@ -53,15 +53,14 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
     } else if object_span == 3 {
         // Three objects: create one bare object and one BVHNode with two objects
         hitables.sort_by(comparator);
-        left = Box::new(hitables[0].clone());
+        left = Box::new(hitables.remove(0));
+        let rl = hitables.remove(0);
+        let rr = hitables.remove(0);
+        let aabb = AABB::combine(rl.aabb().unwrap(), rr.aabb().unwrap());
         right = Box::new(Hitable::BVHNode(BVHNode {
-            left: Box::new(hitables[1].clone()),
-            right: Box::new(hitables[2].clone()),
-            aabb: AABB::combine(
-                // TODO: no unwrap?
-                hitables[1].aabb().unwrap(),
-                hitables[2].aabb().unwrap(),
-            ),
+            left: Box::new(rl),
+            right: Box::new(rr),
+            aabb,
         }));
     } else {
         // Otherwise, recurse

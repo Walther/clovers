@@ -1,12 +1,14 @@
 //! Checkered texture based on the surface coordinates of an object.
 
-use palette::convert::IntoColorUnclamped;
 use palette::white_point::E;
 use palette::Xyz;
 
 use super::TextureTrait;
 #[cfg(feature = "serde-derive")]
 use crate::colorinit::TypedColorInit;
+use crate::ray::Ray;
+use crate::spectrum::SPD;
+use crate::wavelength::Wavelength;
 use crate::{colorinit::ColorInit, HitRecord};
 use crate::{Float, PI};
 
@@ -27,11 +29,7 @@ pub struct SurfaceCheckerInit {
 
 impl From<SurfaceCheckerInit> for SurfaceChecker {
     fn from(value: SurfaceCheckerInit) -> Self {
-        SurfaceChecker {
-            even: value.even.into(),
-            odd: value.odd.into(),
-            density: value.density,
-        }
+        SurfaceChecker::new(value.even, value.odd, value.density)
     }
 }
 
@@ -41,11 +39,13 @@ impl From<SurfaceCheckerInit> for SurfaceChecker {
 /// A standard checkered texture based on 2D surface UV coordinates.
 pub struct SurfaceChecker {
     /// Uniform color for the even-numbered checkers of the texture.
-    pub(crate) even: Xyz<E>,
+    #[cfg_attr(feature = "serde-derive", serde(skip))]
+    even: SPD,
     /// Uniform color for the odd-numbered checkers of the texture.
-    pub(crate) odd: Xyz<E>,
+    #[cfg_attr(feature = "serde-derive", serde(skip))]
+    odd: SPD,
     /// Controls the density of the checkered pattern. Default value is 10, which corresponds to using 10 tiles over the width of the object. On spheres, this means 10 tiles around the sphere.
-    pub(crate) density: Float,
+    pub density: Float,
 }
 
 #[cfg(feature = "serde-derive")]
@@ -69,27 +69,24 @@ impl SurfaceChecker {
     /// Create a new `SurfaceChecker` object with the specified colors and density.
     #[must_use]
     pub fn new(color1: impl Into<Xyz<E>>, color2: impl Into<Xyz<E>>, density: Float) -> Self {
-        SurfaceChecker {
-            even: color1.into(),
-            odd: color2.into(),
-            density,
-        }
+        let even = SPD::new(color1.into());
+        let odd = SPD::new(color2.into());
+        SurfaceChecker { even, odd, density }
     }
 }
 
 impl TextureTrait for SurfaceChecker {
     /// Evaluates the color at the given surface position coordinates. Note that `SurfaceChecker` is surface-based, and thus ignores the spatial position coordinate.
     #[must_use]
-    fn color(&self, hit_record: &HitRecord) -> Xyz<E> {
-        // TODO: convert ahead-of-time. NOTE: take into account serde-i-fication; not enough to do in `new` alone
+    fn color(&self, _ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         let density = self.density * PI;
         let sines = 1.0 // cosmetic 1 for readability of following lines :)
               * (density * hit_record.u).sin()
               * (density * hit_record.v).sin();
         if sines < 0.0 {
-            self.odd.into_color_unclamped()
+            self.odd.get(wavelength)
         } else {
-            self.even.into_color_unclamped()
+            self.even.get(wavelength)
         }
     }
 }

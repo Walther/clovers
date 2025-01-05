@@ -5,6 +5,7 @@ use crate::{
     pdf::{SpherePDF, PDF},
     ray::Ray,
     textures::{Texture, TextureTrait},
+    wavelength::Wavelength,
     Float, HitRecord, PI,
 };
 use rand::prelude::SmallRng;
@@ -23,15 +24,12 @@ impl MaterialTrait for Isotropic {
     fn scatter(
         &self,
         _ray: &Ray,
-        hit_record: &HitRecord,
+        _hit_record: &HitRecord,
         _rng: &mut SmallRng,
     ) -> Option<ScatterRecord> {
-        let albedo = self.albedo.color(hit_record);
-
         Some(ScatterRecord {
             material_type: MaterialType::Diffuse,
             specular_ray: None,
-            attenuation: albedo,
             pdf_ptr: PDF::SpherePDF(SpherePDF::new()),
         })
     }
@@ -40,6 +38,11 @@ impl MaterialTrait for Isotropic {
     #[must_use]
     fn scattering_pdf(&self, _hit_record: &HitRecord, _scattered: &Ray) -> Option<Float> {
         Some(1.0 / (4.0 * PI))
+    }
+
+    #[must_use]
+    fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
+        self.albedo.color(ray, wavelength, hit_record)
     }
 }
 

@@ -4,6 +4,8 @@ use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecor
 use crate::{
     pdf::{ZeroPDF, PDF},
     ray::Ray,
+    spectrum::spectral_power,
+    wavelength::Wavelength,
     Direction, Float, HitRecord,
 };
 use palette::{white_point::E, Xyz};
@@ -69,27 +71,23 @@ impl MaterialTrait for Dielectric {
         Some(ScatterRecord {
             material_type: MaterialType::Specular,
             specular_ray: Some(specular_ray),
-            attenuation: self.color,
             pdf_ptr: PDF::ZeroPDF(ZeroPDF::new()), //TODO: ugly hack due to nullptr in original tutorial
         })
     }
 
     // TODO: should this material provide a `scattering_pdf` function?
-}
 
-impl Dielectric {
-    /// Creates a new [Dielectric] material with the given refractive index and color.
     #[must_use]
-    pub fn new(refractive_index: Float, color: impl Into<Xyz<E>>) -> Self {
-        Dielectric {
-            refractive_index,
-            color: color.into(),
-        }
+    fn color(&self, _ray: &Ray, wavelength: Wavelength, _hit_record: &HitRecord) -> Float {
+        spectral_power(self.color, wavelength)
     }
 }
 
 impl Default for Dielectric {
     fn default() -> Self {
-        Dielectric::new(default_index(), default_color())
+        Dielectric {
+            refractive_index: default_index(),
+            color: default_color(),
+        }
     }
 }
