@@ -63,9 +63,7 @@ impl MaterialTrait for ConeLight {
             Texture::SolidColor(_) | Texture::SpatialChecker(_) | Texture::SurfaceChecker(_) => {
                 self.emit.color(ray, wavelength, hit_record)
             }
-            Texture::GLTFTexture(_) | Texture::IlluminantD50(_) | Texture::IlluminantD65(_) => {
-                self.emit.emit(ray, wavelength, hit_record)
-            }
+            _ => self.emit.emit(ray, wavelength, hit_record),
         }
     }
 

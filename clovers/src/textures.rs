@@ -4,10 +4,7 @@ pub mod solid_color;
 pub mod spatial_checker;
 pub mod surface_checker;
 
-use crate::{
-    illuminants::{D50, D65},
-    materials::gltf::GLTFMaterial,
-};
+use crate::{illuminants::*, materials::gltf::GLTFMaterial};
 use enum_dispatch::enum_dispatch;
 pub use solid_color::*;
 pub use spatial_checker::*;
@@ -35,6 +32,24 @@ pub enum Texture {
     IlluminantD50(D50),
     /// D65 Standard Illuminant
     IlluminantD65(D65),
+    /// LED-B1 Standard Illuminant
+    IlluminantLedB1(LED_B1),
+    /// LED-B2 Standard Illuminant
+    IlluminantLedB2(LED_B2),
+    /// LED-B3 Standard Illuminant
+    IlluminantLedB3(LED_B3),
+    /// LED-B4 Standard Illuminant
+    IlluminantLedB4(LED_B4),
+    /// LED-B5 Standard Illuminant
+    IlluminantLedB5(LED_B5),
+    /// LED-BH1 Standard Illuminant
+    IlluminantLedBH1(LED_BH1),
+    /// LED-RGB1 Standard Illuminant
+    IlluminantLedRGB1(LED_RGB1),
+    /// LED-V1 Standard Illuminant
+    IlluminantLedV1(LED_V1),
+    /// LED-V2 Standard Illuminant
+    IlluminantLedV2(LED_V2),
 }
 
 #[enum_dispatch]
