@@ -1,6 +1,9 @@
-# clovers 🍀 ray tracing in rust 🦀
+# clovers 🍀
 
-![Raytraced render with a lot of fancy objects! metal-based checkerboard floor with a slight fuzziness to it, teal-colored matte teapot on the left, pink matte bunny on the right, golden metal dragon in the back center, a dark metal sphere with slight fuzziness and a hovering clear glass sphere in the front center, and a slightly ominous tall tower of fog in the back left](scene.png)
+Physically based spectral path tracing renderer with a focus on high-quality offline rendering
+
+![a giant floating glass prism, a small glass sphere, and lights interacting in a virtual scene. the white light gets split by the prism and throws a spectral rainbow on the gray floor](dispersive.jpg)
+![the stanford dragon model rendered in iridescent colors, a subtle blend of orange with a hint of magenta](dragon.jpg)
 
 ## Usage
 
