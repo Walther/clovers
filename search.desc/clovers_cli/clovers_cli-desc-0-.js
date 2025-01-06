@@ -1,0 +1,1 @@
+searchState.loadedDescShard("clovers_cli", 0, "Command Line Interface for the <code>clovers</code> raytracing renderer.\nclovers 🍀 path tracing renderer\nSubcommands for the CLI\nRender a given scene file\nValidate a given scene file\nReturns the argument unchanged.\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nCalls <code>U::from(self)</code>.")
