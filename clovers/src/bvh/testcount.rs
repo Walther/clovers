@@ -17,7 +17,7 @@ impl BVHNode<'_> {
         depth: &mut usize,
         ray: &Ray,
         distance_min: Float,
-        distance_max: Float,
+        mut distance_max: Float,
         rng: &mut SmallRng,
     ) -> Option<HitRecord> {
         *depth += 1;
@@ -64,8 +64,11 @@ impl BVHNode<'_> {
         };
         let closest_bvh_hit = recurse(closest_bvh, depth, ray, distance_min, distance_max, rng);
 
-        // Is the hit closer than the closest point of the other AABB?
+        // Do we hit the closer AABB?
         if let Some(ref hit_record) = closest_bvh_hit {
+            // Update distance_max with the distance of confirmed hit
+            distance_max = hit_record.distance;
+            // Is the hit closer than the closest point of the other AABB?
             if hit_record.distance < furthest_aabb_distance {
                 return Some(hit_record.clone());
             }

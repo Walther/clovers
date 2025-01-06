@@ -17,7 +17,7 @@ impl HitableTrait for BVHNode<'_> {
         &self,
         ray: &Ray,
         distance_min: Float,
-        distance_max: Float,
+        mut distance_max: Float,
         rng: &mut SmallRng,
     ) -> Option<HitRecord> {
         // If we do not hit the bounding box of current node, early return None
@@ -54,8 +54,11 @@ impl HitableTrait for BVHNode<'_> {
         };
         let closest_bvh_hit = closest_bvh.hit(ray, distance_min, distance_max, rng);
 
-        // Is the hit closer than the closest point of the other AABB?
+        // Do we hit the closer AABB?
         if let Some(ref hit_record) = closest_bvh_hit {
+            // Update distance_max with the distance of confirmed hit
+            distance_max = hit_record.distance;
+            // Is the hit closer than the closest point of the other AABB?
             if hit_record.distance < furthest_aabb_distance {
                 return Some(hit_record.clone());
             }
