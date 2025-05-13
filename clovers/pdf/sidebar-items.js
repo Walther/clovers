@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["PDF"],"struct":["CosinePDF","HitablePDF","MixturePDF","SpherePDF","ZeroPDF"],"trait":["PDFTrait"]};
