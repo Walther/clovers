@@ -207,8 +207,8 @@ impl HitableTrait for Triangle<'_> {
     #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         // Random square coordinate
-        let mut a = rng.gen::<Float>();
-        let mut b = rng.gen::<Float>();
+        let mut a = rng.random::<Float>();
+        let mut b = rng.random::<Float>();
 
         // If we're beyond the diagonal, rotate around a point by flipping on both axes
         if a + b > 1.0 {
@@ -265,7 +265,7 @@ mod tests {
 
     #[test]
     fn xy_unit_triangle() {
-        let mut rng = SmallRng::from_entropy();
+        let mut rng = SmallRng::from_os_rng();
         let material = Box::default();
 
         // Unit triangle at origin
@@ -304,7 +304,7 @@ mod tests {
 
     #[test]
     fn yx_unit_triangle() {
-        let mut rng = SmallRng::from_entropy();
+        let mut rng = SmallRng::from_os_rng();
         let material = Box::default();
 
         // Unit triangle at origin, u and v coords swapped
@@ -343,7 +343,7 @@ mod tests {
 
     #[test]
     fn neg_xy_unit_triangle() {
-        let mut rng = SmallRng::from_entropy();
+        let mut rng = SmallRng::from_os_rng();
         let material: Box<Material> = Box::default();
 
         // Unit triangle at origin, u and v coords swapped
@@ -382,7 +382,7 @@ mod tests {
 
     #[test]
     fn neg_yx_unit_triangle() {
-        let mut rng = SmallRng::from_entropy();
+        let mut rng = SmallRng::from_os_rng();
         let material: Box<Material> = Box::default();
 
         // Unit triangle at origin, u and v coords swapped

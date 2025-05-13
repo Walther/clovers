@@ -54,7 +54,7 @@ impl MaterialTrait for Dielectric {
             reflect(direction, hit_record.normal)
         } else {
             let reflect_probability: Float = schlick(cos_theta, refraction_ratio);
-            if rng.gen::<Float>() < reflect_probability {
+            if rng.random::<Float>() < reflect_probability {
                 reflect(direction, hit_record.normal)
             } else {
                 // Refracted

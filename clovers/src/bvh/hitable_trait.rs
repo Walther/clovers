@@ -124,7 +124,7 @@ impl HitableTrait for BVHNode<'_> {
             (_, Hitable::Empty(_)) => self.left.random(origin, rng),
             (Hitable::Empty(_), _) => self.right.random(origin, rng),
             (_, _) => {
-                if rng.gen::<bool>() {
+                if rng.random::<bool>() {
                     self.left.random(origin, rng)
                 } else {
                     self.right.random(origin, rng)

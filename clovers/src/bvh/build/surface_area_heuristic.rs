@@ -43,7 +43,7 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
             return BVHNode { left, right, aabb };
         }
         _ => (),
-    };
+    }
 
     // If we have more than two nodes, split and recurse
     let (axis, position) = find_best_split(&hitables);
@@ -61,7 +61,7 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
         right = Box::new(Hitable::BVHNode(build(hitables_right)));
 
         return BVHNode { left, right, aabb };
-    };
+    }
     if hitables_right.is_empty() {
         #[cfg(feature = "tracing")]
         warn!("hitables_right is empty, bvh tree might become deep");
@@ -70,7 +70,7 @@ pub fn build(mut hitables: Vec<Hitable>) -> BVHNode {
         right = Box::new(h);
 
         return BVHNode { left, right, aabb };
-    };
+    }
 
     left = Box::new(Hitable::BVHNode(build(hitables_left)));
     right = Box::new(Hitable::BVHNode(build(hitables_right)));
@@ -86,7 +86,7 @@ fn find_best_split(hitables: &Vec<Hitable>) -> (usize, Float) {
     #[cfg(feature = "tracing")]
     if hitables.len() == 1 {
         warn!("best_split trying to split a single hitable");
-    };
+    }
 
     let mut found = false;
     let mut best_axis = 0;
@@ -107,7 +107,7 @@ fn find_best_split(hitables: &Vec<Hitable>) -> (usize, Float) {
         #[allow(clippy::float_cmp)]
         if bounds_min == bounds_max {
             continue;
-        };
+        }
 
         let scale = (bounds_max - bounds_min) / SPLIT_COUNT_F;
         for i in 0..SPLIT_COUNT {

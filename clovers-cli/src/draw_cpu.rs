@@ -53,13 +53,13 @@ pub fn draw(
     let pixelbuffer: Vec<Xyz<E>> = rows
         .into_par_iter()
         .map(|row_index| {
-            let mut sampler_rng = SmallRng::from_entropy();
+            let mut sampler_rng = SmallRng::from_os_rng();
             let mut sampler: Box<dyn SamplerTrait> = match sampler {
                 Sampler::Blue => Box::new(BlueSampler::new(samples)),
                 Sampler::Random => Box::new(RandomSampler::new(&mut sampler_rng)),
             };
 
-            let mut rng = SmallRng::from_entropy();
+            let mut rng = SmallRng::from_os_rng();
             let mut row = Vec::with_capacity(width);
 
             for index in 0..width {
@@ -157,7 +157,7 @@ fn render_pixel_normalmap(
         let pixel_location = Vec2::new(x / width, y / height);
         let lens_offset = Vec2::new(0.0, 0.0);
         let wavelength = random_wavelength(rng);
-        let time = rng.gen();
+        let time = rng.random();
         let ray: Ray = scene
             .camera
             .get_ray(pixel_location, lens_offset, time, wavelength);
@@ -178,7 +178,7 @@ fn render_pixel_bvhtestcount(
     let pixel_location = Vec2::new(x / width, y / height);
     let lens_offset = Vec2::new(0.0, 0.0);
     let wavelength = random_wavelength(rng);
-    let time = rng.gen();
+    let time = rng.random();
     let ray: Ray = scene
         .camera
         .get_ray(pixel_location, lens_offset, time, wavelength);
@@ -198,7 +198,7 @@ fn render_pixel_primitivetestcount(
     let pixel_location = Vec2::new(x / width, y / height);
     let lens_offset = Vec2::new(0.0, 0.0);
     let wavelength = random_wavelength(rng);
-    let time = rng.gen();
+    let time = rng.random();
     let ray: Ray = scene
         .camera
         .get_ray(pixel_location, lens_offset, time, wavelength);

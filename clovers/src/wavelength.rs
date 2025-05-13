@@ -25,8 +25,13 @@ pub const WAVELENGTH_PROBABILITY: Float = 1.0 / (SPECTRUM_SIZE as Float);
 pub const WAVE_SAMPLE_COUNT: usize = 4;
 
 /// Return a random wavelength, sampled uniformly from the visible spectrum.
+///
+/// # Panics
+/// This method may panic if the runtime fails to get a single sample out of the spectrum. This would indicate a bug in the implementation.
 pub fn random_wavelength(rng: &mut SmallRng) -> Wavelength {
-    SPECTRUM.sample_single(rng)
+    SPECTRUM
+        .sample_single(rng)
+        .expect("Failed to acquire a random wavelength")
 }
 
 // TODO: clippy fixes possible?

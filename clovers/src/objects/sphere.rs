@@ -179,8 +179,8 @@ impl HitableTrait for Sphere<'_> {
 
 /// Internal helper.
 fn random_to_sphere(radius: Float, distance_squared: Float, rng: &mut SmallRng) -> Vec3 {
-    let r1: Float = rng.gen();
-    let r2: Float = rng.gen();
+    let r1: Float = rng.random();
+    let r2: Float = rng.random();
     let z = 1.0 + r2 * ((1.0 - radius * radius / distance_squared).sqrt() - 1.0);
 
     let phi = 2.0 * PI * r1;

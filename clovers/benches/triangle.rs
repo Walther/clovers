@@ -30,7 +30,7 @@ fn new(bencher: divan::Bencher) {
 fn hit(bencher: divan::Bencher) {
     bencher
         .with_inputs(|| {
-            let rng = SmallRng::from_entropy();
+            let rng = SmallRng::from_os_rng();
             let (triangle, ray) = random_triangle_and_ray();
             (triangle, ray, rng)
         })
@@ -45,7 +45,7 @@ fn hit(bencher: divan::Bencher) {
 }
 
 fn random_vec(rng: &mut SmallRng) -> Vec3 {
-    Vec3::new(rng.gen(), rng.gen(), rng.gen())
+    Vec3::new(rng.random(), rng.random(), rng.random())
 }
 
 fn random_3_coords(rng: &mut SmallRng) -> (Vec3, Vec3, Vec3) {
@@ -56,7 +56,7 @@ fn random_3_coords(rng: &mut SmallRng) -> (Vec3, Vec3, Vec3) {
 }
 
 fn random_triangle_ingredients() -> (Vec3, Vec3, Vec3, &'static Material) {
-    let mut rng = SmallRng::from_entropy();
+    let mut rng = SmallRng::from_os_rng();
     let material: &'static Material = Box::leak(Box::default());
     let (a, b, c) = random_3_coords(&mut rng);
     (a, b, c, material)
@@ -68,11 +68,11 @@ fn random_triangle() -> Triangle<'static> {
 }
 
 fn random_ray() -> Ray {
-    let mut rng = SmallRng::from_entropy();
+    let mut rng = SmallRng::from_os_rng();
     black_box(Ray {
         origin: Vec3::new(0.0, 0.0, 0.0),
         direction: random_unit_vector(&mut rng),
-        time: rng.gen(),
+        time: rng.random(),
         wavelength: random_wavelength(&mut rng),
     })
 }

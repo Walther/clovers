@@ -13,7 +13,7 @@ fn main() {
 #[divan::bench]
 fn random(bencher: divan::Bencher) {
     bencher
-        .with_inputs(SmallRng::from_entropy)
+        .with_inputs(SmallRng::from_os_rng)
         .counter(1u32)
         .bench_values(|mut rng| black_box(random_wavelength(&mut rng)))
 }
@@ -22,7 +22,7 @@ fn random(bencher: divan::Bencher) {
 fn rotate(bencher: divan::Bencher) {
     bencher
         .with_inputs(|| {
-            let mut rng = SmallRng::from_entropy();
+            let mut rng = SmallRng::from_os_rng();
             random_wavelength(&mut rng)
         })
         .counter(1u32)
@@ -33,7 +33,7 @@ fn rotate(bencher: divan::Bencher) {
 fn into_xyz(bencher: divan::Bencher) {
     bencher
         .with_inputs(|| {
-            let mut rng = SmallRng::from_entropy();
+            let mut rng = SmallRng::from_os_rng();
             random_wavelength(&mut rng)
         })
         .counter(1u32)

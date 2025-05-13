@@ -170,8 +170,8 @@ impl HitableTrait for Quad<'_> {
     #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         let point: Position = self.q // world-coordinate corner + random distances along edge vectors
-                + (rng.gen::<Float>() * self.u)
-                + (rng.gen::<Float>() * self.v);
+                + (rng.random::<Float>() * self.u)
+                + (rng.random::<Float>() * self.v);
         point - origin
     }
 
