@@ -23,8 +23,8 @@ pub fn random_in_unit_disk(rng: &mut SmallRng) -> Vec2 {
 /// Internal helper.
 #[must_use]
 pub fn random_cosine_direction(rng: &mut SmallRng) -> Direction {
-    let r1: Float = rng.gen();
-    let r2: Float = rng.gen();
+    let r1: Float = rng.random();
+    let r2: Float = rng.random();
     let z = (1.0 - r2).sqrt();
 
     let phi = 2.0 * PI * r1;

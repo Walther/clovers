@@ -38,7 +38,10 @@ indicatif = { version = "0.17.11", features = [
 nalgebra = { version = "0.33.2" }
 palette = { version = "0.7.6", features = ["serializing"] }
 paste = { version = "1.0.15" }
-rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
+rand = { version = "0.9.1", features = [
+  "small_rng",
+  "thread_rng",
+], default-features = false }
 rayon = "1.10.0"
 serde = { version = "1.0.219", features = ["derive"], default-features = false }
 serde_json = { version = "1.0", features = ["alloc"], default-features = false }

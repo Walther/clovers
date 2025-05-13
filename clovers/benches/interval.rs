@@ -14,8 +14,8 @@ fn main() {
 fn new(bencher: divan::Bencher) {
     bencher
         .with_inputs(|| {
-            let mut rng = SmallRng::from_entropy();
-            (rng.gen(), rng.gen())
+            let mut rng = SmallRng::from_os_rng();
+            (rng.random(), rng.random())
         })
         .counter(1u32)
         .bench_values(|(a, b)| black_box(Interval::new(a, b)))
@@ -25,7 +25,7 @@ fn new(bencher: divan::Bencher) {
 fn combine(bencher: divan::Bencher) {
     bencher
         .with_inputs(|| {
-            let mut rng = SmallRng::from_entropy();
+            let mut rng = SmallRng::from_os_rng();
             let ab = random_interval(&mut rng);
             let cd = random_interval(&mut rng);
             (ab, cd)
@@ -38,9 +38,9 @@ fn combine(bencher: divan::Bencher) {
 fn expand(bencher: divan::Bencher) {
     bencher
         .with_inputs(|| {
-            let mut rng = SmallRng::from_entropy();
+            let mut rng = SmallRng::from_os_rng();
             let ab = random_interval(&mut rng);
-            let delta = rng.gen();
+            let delta = rng.random();
             (ab, delta)
         })
         .counter(1u32)
@@ -51,7 +51,7 @@ fn expand(bencher: divan::Bencher) {
 fn size(bencher: divan::Bencher) {
     bencher
         .with_inputs(|| {
-            let mut rng = SmallRng::from_entropy();
+            let mut rng = SmallRng::from_os_rng();
             random_interval(&mut rng)
         })
         .counter(1u32)
@@ -61,6 +61,6 @@ fn size(bencher: divan::Bencher) {
 // Helper functions
 
 fn random_interval(rng: &mut SmallRng) -> Interval {
-    let (a, b) = (rng.gen(), rng.gen());
+    let (a, b) = (rng.random(), rng.random());
     Interval::new(a, b)
 }

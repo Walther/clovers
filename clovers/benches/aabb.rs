@@ -19,7 +19,7 @@ fn main() {
 fn new(bencher: divan::Bencher) {
     bencher
         .with_inputs(|| {
-            let mut rng = SmallRng::from_entropy();
+            let mut rng = SmallRng::from_os_rng();
             random_intervals(&mut rng)
         })
         .counter(1u32)
@@ -38,12 +38,12 @@ fn hit(bencher: divan::Bencher) {
 
 fn random_intervals(rng: &mut SmallRng) -> (Interval, Interval, Interval) {
     let (a, b, c, d, e, f) = black_box((
-        rng.gen(),
-        rng.gen(),
-        rng.gen(),
-        rng.gen(),
-        rng.gen(),
-        rng.gen(),
+        rng.random(),
+        rng.random(),
+        rng.random(),
+        rng.random(),
+        rng.random(),
+        rng.random(),
     ));
     let ab = Interval::new(a, b);
     let cd = Interval::new(c, d);
@@ -60,13 +60,13 @@ fn random_ray(rng: &mut SmallRng) -> Ray {
     black_box(Ray {
         origin: Vec3::new(0.0, 0.0, 0.0),
         direction: random_unit_vector(rng),
-        time: rng.gen(),
+        time: rng.random(),
         wavelength: random_wavelength(rng),
     })
 }
 
 fn random_aabb_and_ray() -> (AABB, Ray) {
-    let mut rng = SmallRng::from_entropy();
+    let mut rng = SmallRng::from_os_rng();
     let aabb = black_box(random_aabb(&mut rng));
     let ray = black_box(random_ray(&mut rng));
     (aabb, ray)

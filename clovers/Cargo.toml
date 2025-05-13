@@ -24,8 +24,11 @@ gltf = { version = "1.4.1", optional = true }
 nalgebra = { version = "0.33.2" }
 palette = { version = "0.7.6", features = ["serializing"] }
 ply-rs = { version = "0.1.3", optional = true }
-rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
-rand_distr = { version = "0.4.3", features = ["std_math"] }
+rand = { version = "0.9.1", features = [
+  "small_rng",
+  "thread_rng",
+], default-features = false }
+rand_distr = { version = "0.5.1", features = ["std_math"] }
 serde = { version = "1.0.219", features = [
   "derive",
 ], default-features = false, optional = true }

@@ -140,7 +140,7 @@ impl PDFTrait for MixturePDF<'_> {
 
     #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Position {
-        if rng.gen::<bool>() {
+        if rng.random::<bool>() {
             self.pdf1.generate(rng)
         } else {
             self.pdf2.generate(rng)

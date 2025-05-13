@@ -18,7 +18,7 @@ fn main() {
 fn xyz_to_p(bencher: divan::Bencher) {
     bencher
         .with_inputs(|| {
-            let mut rng = SmallRng::from_entropy();
+            let mut rng = SmallRng::from_os_rng();
             let wave = random_wavelength(&mut rng);
             let color: Xyz<E> = Xyz::new(1.0, 1.0, 1.0);
             (wave, color)

@@ -18,9 +18,9 @@ impl<'scene> RandomSampler<'scene> {
 
 impl<'scene> SamplerTrait<'scene> for RandomSampler<'scene> {
     fn sample(&mut self, _i: i32, _j: i32, _index: i32) -> Randomness {
-        let pixel_offset = Vec2::new(self.rng.gen(), self.rng.gen());
+        let pixel_offset = Vec2::new(self.rng.random(), self.rng.random());
         let lens_offset = random_in_unit_disk(self.rng);
-        let time = self.rng.gen();
+        let time = self.rng.random();
         let wavelength = random_wavelength(self.rng);
 
         Randomness {
@@ -38,6 +38,6 @@ impl<'scene> SamplerTrait<'scene> for RandomSampler<'scene> {
         _index: i32,
         _dimension: super::SamplerDimension,
     ) -> clovers::Float {
-        self.rng.gen()
+        self.rng.random()
     }
 }
