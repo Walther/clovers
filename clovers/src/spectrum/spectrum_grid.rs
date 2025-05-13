@@ -58,7 +58,7 @@ pub(super) fn spectrum_xyz_to_p(lambda: f64, xyz: [f64; 3]) -> f64 {
     // TODO: can this alloc be removed?
 
     // get linearly interpolated spectral power for the corner vertices:
-    let mut p = core::iter::repeat(0.0).take(num).collect::<Vec<_>>();
+    let mut p = std::iter::repeat_n(0.0, num).collect::<Vec<_>>();
     // this clamping is only necessary if lambda is not sure to be >= spectrum_sample_min and <= spectrum_sample_max:
     let sb: f64 = //fminf(spectrum_num_samples-1e-4, fmaxf(0.0,
         (lambda - spectrum_sample_min)/(spectrum_sample_max-spectrum_sample_min) * (spectrum_num_samples_f-1.0); //));
