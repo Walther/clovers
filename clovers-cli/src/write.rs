@@ -43,7 +43,7 @@ pub fn png(
     match img.write_to(&mut Cursor::new(&mut bytes), ImageFormat::Png) {
         Ok(it) => it,
         Err(err) => return Err(err.to_string()),
-    };
+    }
     let mut png = Png::from_bytes(bytes.into()).or(Err("Unable to read bytes"))?;
 
     let common = format!(

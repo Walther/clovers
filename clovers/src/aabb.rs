@@ -65,17 +65,17 @@ impl AABB {
             if t0 < t1 {
                 if t0 > tmin {
                     tmin = t0;
-                };
+                }
                 if t1 < tmax {
                     tmax = t1;
-                };
+                }
             } else {
                 if t1 > tmin {
                     tmin = t1;
-                };
+                }
                 if t0 < tmax {
                     tmax = t0;
-                };
+                }
             }
 
             if tmax <= tmin {
@@ -149,7 +149,7 @@ impl AABB {
         let tmax = Float::min(tmax, Float::max(tz1, tz2));
         if tmax >= tmin /* && tmin < ray.t */ && tmax > 0.0 {
             return Some(tmin);
-        };
+        }
 
         None
     }
