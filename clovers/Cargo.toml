@@ -26,20 +26,20 @@ palette = { version = "0.7.6", features = ["serializing"] }
 ply-rs = { version = "0.1.3", optional = true }
 rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
 rand_distr = { version = "0.4.3", features = ["std_math"] }
-serde = { version = "1.0.216", features = [
+serde = { version = "1.0.219", features = [
   "derive",
 ], default-features = false, optional = true }
-stl_io = { version = "0.8.3", optional = true }
+stl_io = { version = "0.8.5", optional = true }
 tracing = { version = "0.1.41", optional = true }
-phf = { version = "0.11.2", default-features = false }
+phf = { version = "0.11.3", default-features = false }
 
 [dev-dependencies]
-divan = "0.1.17"
+divan = "0.1.21"
 proptest = "1"
 
 [build-dependencies]
-phf = { version = "0.11.2", default-features = false }
-phf_codegen = "0.11.2"
+phf = { version = "0.11.3", default-features = false }
+phf_codegen = "0.11.3"
 
 [[bench]]
 name = "random"
