@@ -2,11 +2,11 @@
 
 #![allow(clippy::cast_precision_loss)]
 
-use palette::{white_point::E, Xyz};
+use palette::{Xyz, white_point::E};
 
 use crate::{
-    wavelength::{Wavelength, MIN_WAVELENGTH, SPECTRUM_SIZE, WAVE_SAMPLE_COUNT},
     Float,
+    wavelength::{MIN_WAVELENGTH, SPECTRUM_SIZE, WAVE_SAMPLE_COUNT, Wavelength},
 };
 
 use self::spectra_xyz_5nm_380_780_097::equal_energy_reflectance;
@@ -67,7 +67,7 @@ pub fn spectral_powers(
 #[cfg(test)]
 #[allow(clippy::float_cmp)]
 mod unit {
-    use palette::{white_point::E, Xyz};
+    use palette::{Xyz, white_point::E};
 
     use super::spectral_power;
 

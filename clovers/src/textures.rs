@@ -12,7 +12,7 @@ pub use solid_color::*;
 pub use spatial_checker::*;
 pub use surface_checker::*;
 
-use crate::{ray::Ray, wavelength::Wavelength, Float, HitRecord};
+use crate::{Float, HitRecord, ray::Ray, wavelength::Wavelength};
 
 #[enum_dispatch(TextureTrait)]
 #[derive(Clone, Debug)]

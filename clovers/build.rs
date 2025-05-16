@@ -16,8 +16,17 @@ fn main() {
     write_illuminant(d65, "D65");
 
     let leds = include_str!("src/illuminants/CIE_illum_LEDs_1nm.csv");
-    let [led_b1, led_b2, led_b3, led_b4, led_b5, led_bh1, led_rgb1, led_v1, led_v2] =
-        parse_leds(leds);
+    let [
+        led_b1,
+        led_b2,
+        led_b3,
+        led_b4,
+        led_b5,
+        led_bh1,
+        led_rgb1,
+        led_v1,
+        led_v2,
+    ] = parse_leds(leds);
 
     write_illuminant(led_b1, "LED_B1");
     write_illuminant(led_b2, "LED_B2");
@@ -30,8 +39,35 @@ fn main() {
     write_illuminant(led_v2, "LED_V2");
 
     let fluorescents = include_str!("src/illuminants/CIE_illum_FLs_1nm.csv");
-    let [fl1, fl2, fl3, fl4, fl5, fl6, fl7, fl8, fl9, fl10, fl11, fl12, fl3_1, fl3_2, fl3_3, fl3_4, fl3_5, fl3_6, fl3_7, fl3_8, fl3_9, fl3_10, fl3_11, fl3_12, fl3_13, fl3_14, fl3_15] =
-        parse_fluorescents(fluorescents);
+    let [
+        fl1,
+        fl2,
+        fl3,
+        fl4,
+        fl5,
+        fl6,
+        fl7,
+        fl8,
+        fl9,
+        fl10,
+        fl11,
+        fl12,
+        fl3_1,
+        fl3_2,
+        fl3_3,
+        fl3_4,
+        fl3_5,
+        fl3_6,
+        fl3_7,
+        fl3_8,
+        fl3_9,
+        fl3_10,
+        fl3_11,
+        fl3_12,
+        fl3_13,
+        fl3_14,
+        fl3_15,
+    ] = parse_fluorescents(fluorescents);
     write_illuminant(fl1, "FL1");
     write_illuminant(fl2, "FL2");
     write_illuminant(fl3, "FL3");

@@ -1,13 +1,13 @@
 //! A metal material.
 
-use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
+use super::{MaterialTrait, MaterialType, ScatterRecord, reflect};
 use crate::{
-    pdf::{ZeroPDF, PDF},
+    Direction, Float, HitRecord,
+    pdf::{PDF, ZeroPDF},
     random::random_unit_vector,
     ray::Ray,
     textures::{Texture, TextureTrait},
     wavelength::Wavelength,
-    Direction, Float, HitRecord,
 };
 use nalgebra::Unit;
 use rand::prelude::SmallRng;

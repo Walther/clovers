@@ -1,6 +1,6 @@
 use rand::rngs::SmallRng;
 
-use crate::{hitable::Hitable, ray::Ray, Float};
+use crate::{Float, hitable::Hitable, ray::Ray};
 
 use super::BVHNode;
 

@@ -2,7 +2,7 @@
 
 use crate::{bvh::BVHNode, camera::Camera, hitable::Hitable};
 
-use palette::{white_point::E, Xyz};
+use palette::{Xyz, white_point::E};
 
 #[derive(Debug)]
 /// A representation of the scene that is being rendered.

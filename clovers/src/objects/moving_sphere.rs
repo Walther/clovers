@@ -1,12 +1,12 @@
 //! A moving sphere object.
 
 use crate::{
+    Direction, Float, HitRecord, PI, Position,
     aabb::AABB,
     hitable::HitableTrait,
     materials::{Material, MaterialInit},
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, HitRecord, Position, PI,
 };
 use nalgebra::Unit;
 use rand::rngs::SmallRng;

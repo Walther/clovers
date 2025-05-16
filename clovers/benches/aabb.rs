@@ -1,12 +1,9 @@
-use clovers::interval::Interval;
-use clovers::random::random_unit_vector;
-use clovers::ray::Ray;
-use clovers::wavelength::random_wavelength;
-use clovers::Float;
-use clovers::{aabb::*, Vec3};
-use divan::{black_box, AllocProfiler};
-use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use clovers::{
+    Float, Vec3, aabb::*, interval::Interval, random::random_unit_vector, ray::Ray,
+    wavelength::random_wavelength,
+};
+use divan::{AllocProfiler, black_box};
+use rand::{Rng, SeedableRng, rngs::SmallRng};
 
 #[global_allocator]
 static ALLOC: AllocProfiler = AllocProfiler::system();

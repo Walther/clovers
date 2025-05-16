@@ -1,5 +1,5 @@
 use clovers::{spectrum::*, wavelength::SPECTRUM};
-use palette::{white_point::E, Xyz};
+use palette::{Xyz, white_point::E};
 use proptest::prelude::*;
 
 proptest! {

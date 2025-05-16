@@ -1,14 +1,14 @@
 //! An opinionated colorize method. Given a [Ray] and a [Scene], evaluates the ray's path and returns a color.
 
 use clovers::{
+    EPSILON_SHADOW_ACNE, Float,
     hitable::HitableTrait,
     materials::MaterialType,
-    pdf::{HitablePDF, MixturePDF, PDFTrait, PDF},
+    pdf::{HitablePDF, MixturePDF, PDF, PDFTrait},
     ray::Ray,
     scenes::Scene,
     spectrum::spectral_powers,
-    wavelength::{rotate_wavelength, WAVE_SAMPLE_COUNT},
-    Float, EPSILON_SHADOW_ACNE,
+    wavelength::{WAVE_SAMPLE_COUNT, rotate_wavelength},
 };
 use nalgebra::Unit;
 use rand::rngs::SmallRng;

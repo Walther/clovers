@@ -1,17 +1,17 @@
 use std::boxed::Box;
 
 use clovers::{
+    Float, Vec,
     bvh::{BVHNode, BvhAlgorithm},
     camera::{Camera, CameraInit},
     hitable::Hitable,
     materials::SharedMaterial,
-    objects::{object_to_hitable, Object},
+    objects::{Object, object_to_hitable},
     scenes::Scene,
-    Float, Vec,
 };
 
 use palette::{
-    chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, Srgb, Xyz,
+    Srgb, Xyz, chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E,
 };
 use tracing::info;
 

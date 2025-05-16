@@ -5,7 +5,7 @@ use clovers::Float;
 use humantime::FormattedDuration;
 use image::{ImageBuffer, ImageFormat, Rgb32FImage, RgbImage};
 use img_parts::png::{Png, PngChunk};
-use palette::{chromatic_adaptation::AdaptInto, white_point::E, Xyz};
+use palette::{Xyz, chromatic_adaptation::AdaptInto, white_point::E};
 use tracing::info;
 
 use crate::render::{RenderMode, RenderOptions};

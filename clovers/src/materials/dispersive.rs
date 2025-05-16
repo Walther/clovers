@@ -13,16 +13,16 @@ Dense flint glass SF10 	    1.7280 	    0.01342
 
 // TODO: consider other options, e.g. Sellmeier https://en.wikipedia.org/wiki/Sellmeier_equation
 
-use rand::{rngs::SmallRng, Rng};
+use rand::{Rng, rngs::SmallRng};
 
 use crate::{
-    pdf::{ZeroPDF, PDF},
+    Direction, Float, HitRecord,
+    pdf::{PDF, ZeroPDF},
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, HitRecord,
 };
 
-use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecord};
+use super::{MaterialTrait, MaterialType, ScatterRecord, reflect, refract, schlick};
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]

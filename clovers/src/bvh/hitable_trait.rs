@@ -1,11 +1,11 @@
-use rand::{rngs::SmallRng, Rng};
+use rand::{Rng, rngs::SmallRng};
 
 use crate::{
+    Direction, Displacement, Float, HitRecord, Position,
     aabb::AABB,
     hitable::{Hitable, HitableTrait},
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Displacement, Float, HitRecord, Position,
 };
 
 use super::BVHNode;

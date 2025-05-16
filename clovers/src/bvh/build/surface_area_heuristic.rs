@@ -6,10 +6,10 @@
 use tracing::warn;
 
 use crate::{
+    Float,
     aabb::AABB,
     bvh::BVHNode,
     hitable::{Empty, Hitable, HitableTrait},
-    Float,
 };
 
 use super::utils::vec_bounding_box;

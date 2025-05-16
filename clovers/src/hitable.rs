@@ -4,12 +4,12 @@
 use crate::objects::GLTFTriangle;
 
 use crate::{
+    Direction, Displacement, Float, HitRecord, Position, Vec3,
     aabb::AABB,
-    bvh::{build::utils::vec_bounding_box, BVHNode},
+    bvh::{BVHNode, build::utils::vec_bounding_box},
     objects::{Boxy, ConstantMedium, MovingSphere, Quad, RotateY, Sphere, Translate, Triangle},
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Displacement, Float, HitRecord, Position, Vec3,
 };
 
 use enum_dispatch::enum_dispatch;

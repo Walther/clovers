@@ -2,12 +2,12 @@
 
 use super::Quad;
 use crate::{
+    Box, Direction, Float, HitRecord, Position, Vec3,
     aabb::AABB,
     hitable::{Hitable, HitableTrait},
     materials::{Material, MaterialInit},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Direction, Float, HitRecord, Position, Vec3,
 };
 use rand::rngs::SmallRng;
 

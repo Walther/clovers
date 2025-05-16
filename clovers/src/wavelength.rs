@@ -1,7 +1,7 @@
 //! The fundamental building blocks of spectral rendering.
 
 use core::{array::from_fn, ops::Range};
-use palette::{white_point::E, Xyz};
+use palette::{Xyz, white_point::E};
 use rand::rngs::SmallRng;
 use rand_distr::uniform::SampleRange;
 

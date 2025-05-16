@@ -2,7 +2,7 @@
 
 use core::ops::Add;
 
-use crate::{interval::Interval, ray::Ray, Float, Position, Vec3, EPSILON_RECT_THICKNESS};
+use crate::{EPSILON_RECT_THICKNESS, Float, Position, Vec3, interval::Interval, ray::Ray};
 
 /// Axis-aligned bounding box Defined by two opposing corners, each of which are a [Vec3].
 ///

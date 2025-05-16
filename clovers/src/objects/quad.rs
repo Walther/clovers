@@ -4,14 +4,13 @@
 use crate::hitable::HitableTrait;
 use crate::materials::MaterialInit;
 use crate::wavelength::Wavelength;
+use crate::{Direction, Displacement, EPSILON_SHADOW_ACNE, Position};
 use crate::{
-    aabb::AABB, hitable::get_orientation, materials::Material, ray::Ray, Float, HitRecord, Vec3,
-    EPSILON_RECT_THICKNESS,
+    EPSILON_RECT_THICKNESS, Float, HitRecord, Vec3, aabb::AABB, hitable::get_orientation,
+    materials::Material, ray::Ray,
 };
-use crate::{Direction, Displacement, Position, EPSILON_SHADOW_ACNE};
 use nalgebra::Unit;
-use rand::rngs::SmallRng;
-use rand::Rng;
+use rand::{Rng, rngs::SmallRng};
 
 /// Initialization structure for a Quad object.
 #[derive(Clone, Debug)]

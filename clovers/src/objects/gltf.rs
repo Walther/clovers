@@ -3,21 +3,21 @@
 use alloc::string::String;
 use alloc::vec::Vec;
 #[cfg(feature = "gl_tf")]
-use gltf::{image::Data, Mesh, Node};
+use gltf::{Mesh, Node, image::Data};
 use nalgebra::Unit;
 use rand::rngs::SmallRng;
 #[cfg(feature = "traces")]
 use tracing::debug;
 
 use crate::{
+    Direction, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE, Float, HitRecord, Position, Vec3,
     aabb::AABB,
     bvh::build::utils::vec_bounding_box,
-    hitable::{get_orientation, Hitable, HitableTrait},
+    hitable::{Hitable, HitableTrait, get_orientation},
     interval::Interval,
     materials::gltf::GLTFMaterial,
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, HitRecord, Position, Vec3, EPSILON_RECT_THICKNESS, EPSILON_SHADOW_ACNE,
 };
 
 /// GLTF initialization structure

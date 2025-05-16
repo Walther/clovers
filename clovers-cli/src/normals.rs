@@ -1,7 +1,7 @@
 //! Alternative rendering method. Only returns a normalmap of the image, colorized using standard conventions.
 
 use clovers::{
-    hitable::HitableTrait, ray::Ray, scenes::Scene, Direction, Float, Vec3, EPSILON_SHADOW_ACNE,
+    Direction, EPSILON_SHADOW_ACNE, Float, Vec3, hitable::HitableTrait, ray::Ray, scenes::Scene,
 };
 use palette::LinSrgb;
 use rand::rngs::SmallRng;
@@ -28,9 +28,11 @@ pub fn normal_to_color(normal: Direction) -> LinSrgb {
     // TODO: figure out a good coordinate system to use... See also https://twitter.com/FreyaHolmer/status/1325556229410861056
     let normal: Vec3 = Vec3::new(-normal.x, normal.y, -normal.z);
     // TODO: verify correctness
-    let r = 0.5 + 0.5 * normal.x; // X -1 to 1 = 0.0 to 1.0
-    let g = 0.5 + 0.5 * normal.y; // Y -1 to 1 = 0.0 to 1.0
-                                  // Z  0 to 1 = 0.0 to 1.0
+    // X -1 to 1 = 0.0 to 1.0
+    let r = 0.5 + 0.5 * normal.x;
+    // Y -1 to 1 = 0.0 to 1.0
+    let g = 0.5 + 0.5 * normal.y;
+    // Z  0 to 1 = 0.0 to 1.0
     let b = if normal.z < 0.0 { 0.0 } else { normal.z };
 
     LinSrgb::new(r, g, b)

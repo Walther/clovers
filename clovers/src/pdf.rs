@@ -3,15 +3,14 @@
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
 use crate::{
+    Box, Direction, Float, PI, Position,
     hitable::{Hitable, HitableTrait},
     onb::ONB,
     random::{random_cosine_direction, random_unit_vector},
     wavelength::Wavelength,
-    Box, Direction, Float, Position, PI,
 };
 use enum_dispatch::enum_dispatch;
-use rand::rngs::SmallRng;
-use rand::Rng;
+use rand::{Rng, rngs::SmallRng};
 
 #[enum_dispatch(PDFTrait)]
 #[derive(Debug, Clone)]
@@ -60,11 +59,7 @@ impl PDFTrait for CosinePDF {
         _rng: &mut SmallRng,
     ) -> Float {
         let cosine = direction.normalize().dot(&self.uvw.w);
-        if cosine <= 0.0 {
-            0.0
-        } else {
-            cosine / PI
-        }
+        if cosine <= 0.0 { 0.0 } else { cosine / PI }
     }
 
     fn generate(&self, rng: &mut SmallRng) -> Position {

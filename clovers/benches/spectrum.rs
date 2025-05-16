@@ -1,11 +1,7 @@
-use clovers::spectrum::*;
-use clovers::wavelength::*;
-use divan::black_box;
-use divan::AllocProfiler;
-use palette::white_point::E;
-use palette::Xyz;
-use rand::rngs::SmallRng;
-use rand::SeedableRng;
+use clovers::{spectrum::*, wavelength::*};
+use divan::{AllocProfiler, black_box};
+use palette::{Xyz, white_point::E};
+use rand::{SeedableRng, rngs::SmallRng};
 
 #[global_allocator]
 static ALLOC: AllocProfiler = AllocProfiler::system();

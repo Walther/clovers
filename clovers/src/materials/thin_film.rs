@@ -2,7 +2,7 @@
 
 use core::f32::consts::PI;
 
-use crate::{wavelength::Wavelength, Direction, Float, HitRecord};
+use crate::{Direction, Float, HitRecord, wavelength::Wavelength};
 
 #[derive(Clone, Debug)]
 /// An iridescence feature based on thin-film interference.

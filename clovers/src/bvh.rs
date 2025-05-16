@@ -7,7 +7,7 @@ use build::{longest_axis_midpoint, surface_area_heuristic};
 #[cfg(feature = "tracing")]
 use tracing::info;
 
-use crate::{aabb::AABB, hitable::Hitable, Box};
+use crate::{Box, aabb::AABB, hitable::Hitable};
 
 pub(crate) mod build;
 mod hitable_trait;

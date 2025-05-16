@@ -1,17 +1,16 @@
 //! `ConstantMedium` object. This should probably be a Material at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 
 use crate::{
+    Box, Direction, EPSILON_CONSTANT_MEDIUM, Float, HitRecord, Position,
     aabb::AABB,
     hitable::{Hitable, HitableTrait},
-    materials::{isotropic::Isotropic, Kind},
+    materials::{Kind, isotropic::Isotropic},
     random::random_unit_vector,
     ray::Ray,
     textures::Texture,
     wavelength::Wavelength,
-    Box, Direction, Float, HitRecord, Position, EPSILON_CONSTANT_MEDIUM,
 };
-use rand::rngs::SmallRng;
-use rand::Rng;
+use rand::{Rng, rngs::SmallRng};
 
 use super::Object;
 

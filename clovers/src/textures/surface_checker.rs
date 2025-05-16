@@ -1,7 +1,7 @@
 //! Checkered texture based on the surface coordinates of an object.
 
-use palette::white_point::E;
 use palette::Xyz;
+use palette::white_point::E;
 
 use super::TextureTrait;
 #[cfg(feature = "serde-derive")]
@@ -9,8 +9,8 @@ use crate::colorinit::TypedColorInit;
 use crate::ray::Ray;
 use crate::spectrum::SPD;
 use crate::wavelength::Wavelength;
-use crate::{colorinit::ColorInit, HitRecord};
 use crate::{Float, PI};
+use crate::{HitRecord, colorinit::ColorInit};
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]

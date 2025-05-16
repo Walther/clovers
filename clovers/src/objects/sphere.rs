@@ -1,16 +1,16 @@
 //! A sphere object.
 
 use crate::{
+    Direction, Displacement, EPSILON_SHADOW_ACNE, Float, HitRecord, PI, Position, Vec3,
     aabb::AABB,
     hitable::HitableTrait,
     materials::{Material, MaterialInit},
     onb::ONB,
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Displacement, Float, HitRecord, Position, Vec3, EPSILON_SHADOW_ACNE, PI,
 };
 use nalgebra::Unit;
-use rand::{rngs::SmallRng, Rng};
+use rand::{Rng, rngs::SmallRng};
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]

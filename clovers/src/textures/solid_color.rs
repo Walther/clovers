@@ -1,6 +1,6 @@
 //! A solid color texture.
 
-use palette::{white_point::E, Xyz};
+use palette::{Xyz, white_point::E};
 
 use super::TextureTrait;
 use crate::colorinit::ColorInit;

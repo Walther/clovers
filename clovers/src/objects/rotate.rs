@@ -1,11 +1,11 @@
 //! Utility object for rotating another object.
 
 use crate::{
+    Box, Direction, Float, HitRecord, Position, Vec3,
     aabb::AABB,
     hitable::{Hitable, HitableTrait},
     ray::Ray,
     wavelength::Wavelength,
-    Box, Direction, Float, HitRecord, Position, Vec3,
 };
 use nalgebra::Unit;
 use rand::rngs::SmallRng;

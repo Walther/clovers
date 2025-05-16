@@ -1,16 +1,15 @@
 //! A dielectric material. This resembles glass and other transparent and reflective materials.
 
-use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecord};
+use super::{MaterialTrait, MaterialType, ScatterRecord, reflect, refract, schlick};
 use crate::{
-    pdf::{ZeroPDF, PDF},
+    Direction, Float, HitRecord,
+    pdf::{PDF, ZeroPDF},
     ray::Ray,
     spectrum::spectral_power,
     wavelength::Wavelength,
-    Direction, Float, HitRecord,
 };
-use palette::{white_point::E, Xyz};
-use rand::rngs::SmallRng;
-use rand::Rng;
+use palette::{Xyz, white_point::E};
+use rand::{Rng, rngs::SmallRng};
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]

@@ -4,14 +4,14 @@ use std::{error::Error, fs, time::Instant};
 use clap::{Args, ValueEnum};
 use humantime::format_duration;
 use time::OffsetDateTime;
-use tracing::{debug, info, Level};
+use tracing::{Level, debug, info};
 use tracing_subscriber::fmt::time::UtcTime;
 
+use crate::GlobalOptions;
 use crate::draw_cpu;
 use crate::json_scene::initialize;
 use crate::sampler::Sampler;
 use crate::write;
-use crate::GlobalOptions;
 
 #[derive(Args, Clone, Debug)]
 pub struct RenderOptions {
@@ -125,7 +125,9 @@ pub(crate) fn render(
     }
 
     if sampler == Sampler::Blue && !([1, 2, 4, 8, 16, 32, 64, 128, 256].contains(&samples)) {
-        panic!("the blue sampler only supports the following sample-per-pixel counts: [1, 2, 4, 8, 16, 32, 64, 128, 256]");
+        panic!(
+            "the blue sampler only supports the following sample-per-pixel counts: [1, 2, 4, 8, 16, 32, 64, 128, 256]"
+        );
     }
 
     // TODO: improve ergonomics?

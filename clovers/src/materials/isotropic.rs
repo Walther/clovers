@@ -1,14 +1,16 @@
 //! Isotropic material.
 
-use super::{MaterialTrait, MaterialType, ScatterRecord};
+use rand::prelude::SmallRng;
+
 use crate::{
-    pdf::{SpherePDF, PDF},
+    Float, HitRecord, PI,
+    pdf::{PDF, SpherePDF},
     ray::Ray,
     textures::{Texture, TextureTrait},
     wavelength::Wavelength,
-    Float, HitRecord, PI,
 };
-use rand::prelude::SmallRng;
+
+use super::{MaterialTrait, MaterialType, ScatterRecord};
 
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]

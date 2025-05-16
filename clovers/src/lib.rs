@@ -69,8 +69,8 @@ pub use alloc::vec::Vec;
 
 // Externals
 use nalgebra::{
-    base::{Vector2, Vector3, Vector4},
     Unit,
+    base::{Vector2, Vector3, Vector4},
 };
 
 // Internals

@@ -1,15 +1,9 @@
-use clovers::hitable::HitableTrait;
-use clovers::materials::Material;
-use clovers::objects::Triangle;
-use clovers::random::random_unit_vector;
-use clovers::ray::Ray;
-use clovers::wavelength::random_wavelength;
-use clovers::Float;
-use clovers::Vec3;
-use divan::black_box;
-use divan::AllocProfiler;
-use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use clovers::{
+    Float, Vec3, hitable::HitableTrait, materials::Material, objects::Triangle,
+    random::random_unit_vector, ray::Ray, wavelength::random_wavelength,
+};
+use divan::{AllocProfiler, black_box};
+use rand::{Rng, SeedableRng, rngs::SmallRng};
 
 #[global_allocator]
 static ALLOC: AllocProfiler = AllocProfiler::system();

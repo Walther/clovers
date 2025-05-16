@@ -1,9 +1,9 @@
 use rand::rngs::SmallRng;
 
 use crate::{
+    Float, HitRecord,
     hitable::{Hitable, HitableTrait},
     ray::Ray,
-    Float, HitRecord,
 };
 
 use super::BVHNode;
@@ -33,10 +33,10 @@ impl BVHNode<'_> {
             // Early returns, if there's no bounding box
             (None, None) => return None,
             (Some(_l), None) => {
-                return recurse(&self.left, depth, ray, distance_min, distance_max, rng)
+                return recurse(&self.left, depth, ray, distance_min, distance_max, rng);
             }
             (None, Some(_r)) => {
-                return recurse(&self.right, depth, ray, distance_min, distance_max, rng)
+                return recurse(&self.right, depth, ray, distance_min, distance_max, rng);
             }
             // If we have bounding boxes, get the distances
             (Some(l), Some(r)) => (l.distance(ray), r.distance(ray)),
@@ -47,10 +47,10 @@ impl BVHNode<'_> {
                 (None, None) => return None,
                 // Early return: only one child can be hit with the ray
                 (Some(_d), None) => {
-                    return recurse(&self.left, depth, ray, distance_min, distance_max, rng)
+                    return recurse(&self.left, depth, ray, distance_min, distance_max, rng);
                 }
                 (None, Some(_d)) => {
-                    return recurse(&self.right, depth, ray, distance_min, distance_max, rng)
+                    return recurse(&self.right, depth, ray, distance_min, distance_max, rng);
                 }
                 // Default case: both children can be hit with the ray, check the distance
                 (Some(l), Some(r)) => (Float::min(l, r), Float::max(l, r)),
