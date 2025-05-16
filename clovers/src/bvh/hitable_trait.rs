@@ -104,15 +104,12 @@ impl HitableTrait for BVHNode<'_> {
             (Hitable::Empty(_), _) => self
                 .right
                 .pdf_value(origin, direction, wavelength, time, rng),
-            (_, _) => {
-                (self
-                    .left
-                    .pdf_value(origin, direction, wavelength, time, rng)
-                    + self
-                        .right
-                        .pdf_value(origin, direction, wavelength, time, rng))
-                    / 2.0
-            }
+            (_, _) => Float::midpoint(
+                self.left
+                    .pdf_value(origin, direction, wavelength, time, rng),
+                self.right
+                    .pdf_value(origin, direction, wavelength, time, rng),
+            ),
         }
     }
 
