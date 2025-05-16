@@ -67,7 +67,6 @@ impl<'scene> Sphere<'scene> {
 
 impl HitableTrait for Sphere<'_> {
     /// Hit method for the [Sphere] object. Returns a [`HitRecord`] if the given [Ray] intersects with the sphere at the given distance interval.
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
@@ -126,13 +125,11 @@ impl HitableTrait for Sphere<'_> {
     }
 
     /// Returns the axis-aligned bounding box [AABB] for the sphere.
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
     /// Returns the probability density function for the sphere? TODO: what does this do again and how
-    #[must_use]
     fn pdf_value(
         &self,
         origin: Position,
@@ -162,7 +159,6 @@ impl HitableTrait for Sphere<'_> {
 
     // TODO: improve correctness & optimization!
     /// Utility function from Ray Tracing: The Rest of Your Life.
-    #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         let offset: Position = self.center - origin;
         let distance_squared: Float = offset.norm_squared();

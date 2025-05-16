@@ -118,7 +118,6 @@ impl MaterialTrait for Dispersive {
         true
     }
 
-    #[must_use]
     fn color(&self, _ray: &Ray, _wavelength: Wavelength, _hit_record: &HitRecord) -> Float {
         1.0
     }

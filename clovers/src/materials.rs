@@ -91,7 +91,6 @@ impl MaterialTrait for Material {
         self.thin_film.is_some() || self.kind.is_wavelength_dependent()
     }
 
-    #[must_use]
     /// Returns the spectral reflectance of the material's texture at the given parameters.
     fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         let thin_film = match &self.thin_film {

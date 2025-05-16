@@ -20,7 +20,6 @@ pub struct Lambertian {
 
 impl MaterialTrait for Lambertian {
     /// Returns None, if ray is absorbed. Otherwise, returns a ray, albedo of what was hit, and (?) a value used for probability density function based sampling
-    #[must_use]
     fn scatter(
         &self,
         _ray: &Ray,
@@ -46,7 +45,6 @@ impl MaterialTrait for Lambertian {
         }
     }
 
-    #[must_use]
     fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         self.albedo.color(ray, wavelength, hit_record)
     }

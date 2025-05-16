@@ -30,7 +30,6 @@ impl Default for ConeLight {
 
 impl MaterialTrait for ConeLight {
     /// Scatter method for the [`ConeLight`] material. Always returns `None`, as diffuse light does not scatter.
-    #[must_use]
     fn scatter(
         &self,
         _ray: &Ray,
@@ -41,7 +40,6 @@ impl MaterialTrait for ConeLight {
     }
 
     /// Emission function for [`ConeLight`]. If the given [`HitRecord`] has been hit on the `front_face`, emit a color based on the texture and surface coordinates. Otherwise, emit pure black.
-    #[must_use]
     fn emit(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         // If we don't hit the front face, return black
         if !hit_record.front_face {
@@ -67,7 +65,6 @@ impl MaterialTrait for ConeLight {
         }
     }
 
-    #[must_use]
     fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         self.emit.color(ray, wavelength, hit_record).clamp(0.0, 1.0)
     }

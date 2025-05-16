@@ -79,7 +79,6 @@ impl SpatialChecker {
 
 impl TextureTrait for SpatialChecker {
     /// Evaluates the color at the given spatial position coordinate. Note that the `SpatialChecker` is spatial - surface coordinates are ignored.
-    #[must_use]
     fn color(&self, _ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         let position = hit_record.position;
         let density = self.density * PI;

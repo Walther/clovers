@@ -112,11 +112,9 @@ pub enum Texture {
 /// The main texture trait
 pub trait TextureTrait {
     /// Returns the spectral reflectance of the texture sampled at the given wavelength at the given location.
-    #[must_use]
     fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float;
 
     /// Returns the spectral power of the texture sampled at the given wavelength. Defaults to none, override for emissive textures.
-    #[must_use]
     fn emit(&self, _ray: &Ray, _wavelength: Wavelength, _hit_record: &HitRecord) -> Float {
         0.0
     }

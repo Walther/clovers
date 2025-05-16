@@ -34,7 +34,6 @@ pub struct SolidColor {
 
 impl TextureTrait for SolidColor {
     /// Evaluates the color ignoring the given surface coordinates and spatial position - always returns the solid color.
-    #[must_use]
     fn color(&self, _ray: &Ray, wavelength: Wavelength, _hit_record: &HitRecord) -> Float {
         self.spectrum.get(wavelength)
     }

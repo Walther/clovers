@@ -77,7 +77,6 @@ impl SurfaceChecker {
 
 impl TextureTrait for SurfaceChecker {
     /// Evaluates the color at the given surface position coordinates. Note that `SurfaceChecker` is surface-based, and thus ignores the spatial position coordinate.
-    #[must_use]
     fn color(&self, _ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         let density = self.density * PI;
         let sines = 1.0 // cosmetic 1 for readability of following lines :)
