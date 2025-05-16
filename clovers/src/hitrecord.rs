@@ -1,6 +1,6 @@
 //! The main data structure returned for every surface intersection.
 
-use crate::{materials::MaterialTrait, ray::Ray, Direction, Float, Position};
+use crate::{Direction, Float, Position, materials::MaterialTrait, ray::Ray};
 
 /// Represents a ray-object intersection, with plenty of data about the intersection.
 #[derive(Clone, Debug)]

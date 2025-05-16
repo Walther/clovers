@@ -4,14 +4,13 @@
 use crate::hitable::HitableTrait;
 use crate::materials::MaterialInit;
 use crate::wavelength::Wavelength;
+use crate::{Direction, Displacement, EPSILON_SHADOW_ACNE, Position};
 use crate::{
-    aabb::AABB, hitable::get_orientation, materials::Material, ray::Ray, Float, HitRecord, Vec3,
-    EPSILON_RECT_THICKNESS,
+    EPSILON_RECT_THICKNESS, Float, HitRecord, Vec3, aabb::AABB, hitable::get_orientation,
+    materials::Material, ray::Ray,
 };
-use crate::{Direction, Displacement, Position, EPSILON_SHADOW_ACNE};
 use nalgebra::Unit;
-use rand::rngs::SmallRng;
-use rand::Rng;
+use rand::{Rng, rngs::SmallRng};
 
 /// Initialization structure for a Quad object.
 #[derive(Clone, Debug)]
@@ -85,7 +84,6 @@ impl<'scene> Quad<'scene> {
 
 impl HitableTrait for Quad<'_> {
     /// Hit method for the quad rectangle
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
@@ -133,13 +131,11 @@ impl HitableTrait for Quad<'_> {
     }
 
     /// Returns the bounding box of the quad
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
-    #[must_use]
     fn pdf_value(
         &self,
         origin: Position,
@@ -167,7 +163,6 @@ impl HitableTrait for Quad<'_> {
     }
 
     /// Returns a random point on the quadrilateral surface
-    #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         let point: Position = self.q // world-coordinate corner + random distances along edge vectors
                 + (rng.random::<Float>() * self.u)

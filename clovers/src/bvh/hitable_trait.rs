@@ -1,18 +1,17 @@
-use rand::{rngs::SmallRng, Rng};
+use rand::{Rng, rngs::SmallRng};
 
 use crate::{
+    Direction, Displacement, Float, HitRecord, Position,
     aabb::AABB,
     hitable::{Hitable, HitableTrait},
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Displacement, Float, HitRecord, Position,
 };
 
 use super::BVHNode;
 
 impl HitableTrait for BVHNode<'_> {
     /// The main `hit` function for a [`BVHNode`]. Given a [Ray], and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the encased objects during that interval.
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
@@ -82,13 +81,11 @@ impl HitableTrait for BVHNode<'_> {
     }
 
     /// Returns the axis-aligned bounding box [AABB] of the objects within this [`BVHNode`].
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
     /// Returns a probability density function value based on the children
-    #[must_use]
     fn pdf_value(
         &self,
         origin: Position,
@@ -104,21 +101,17 @@ impl HitableTrait for BVHNode<'_> {
             (Hitable::Empty(_), _) => self
                 .right
                 .pdf_value(origin, direction, wavelength, time, rng),
-            (_, _) => {
-                (self
-                    .left
-                    .pdf_value(origin, direction, wavelength, time, rng)
-                    + self
-                        .right
-                        .pdf_value(origin, direction, wavelength, time, rng))
-                    / 2.0
-            }
+            (_, _) => Float::midpoint(
+                self.left
+                    .pdf_value(origin, direction, wavelength, time, rng),
+                self.right
+                    .pdf_value(origin, direction, wavelength, time, rng),
+            ),
         }
     }
 
     // TODO: improve correctness & optimization!
     /// Returns a random point on the surface of one of the children
-    #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         match (&*self.left, &*self.right) {
             (_, Hitable::Empty(_)) => self.left.random(origin, rng),

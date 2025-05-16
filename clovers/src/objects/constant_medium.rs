@@ -1,17 +1,16 @@
 //! `ConstantMedium` object. This should probably be a Material at some point, but this will do for now. This is essentially a fog with a known size, shape and density.
 
 use crate::{
+    Box, Direction, EPSILON_CONSTANT_MEDIUM, Float, HitRecord, Position,
     aabb::AABB,
     hitable::{Hitable, HitableTrait},
-    materials::{isotropic::Isotropic, Kind},
+    materials::{Kind, isotropic::Isotropic},
     random::random_unit_vector,
     ray::Ray,
     textures::Texture,
     wavelength::Wavelength,
-    Box, Direction, Float, HitRecord, Position, EPSILON_CONSTANT_MEDIUM,
 };
-use rand::rngs::SmallRng;
-use rand::Rng;
+use rand::{Rng, rngs::SmallRng};
 
 use super::Object;
 
@@ -62,7 +61,6 @@ impl<'scene> ConstantMedium<'scene> {
 
 impl HitableTrait for ConstantMedium<'_> {
     /// Hit function for the [`ConstantMedium`] object. Returns a [`HitRecord`] if hit. TODO: explain the math for the fog
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
@@ -127,13 +125,11 @@ impl HitableTrait for ConstantMedium<'_> {
     }
 
     /// Returns the axis-aligned bounding box [AABB] of the defining `boundary` object for the fog.
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         self.boundary.aabb()
     }
 
     /// Returns a probability density function value based on the boundary object
-    #[must_use]
     fn pdf_value(
         &self,
         origin: Position,

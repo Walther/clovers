@@ -3,15 +3,14 @@
 #![allow(missing_docs)] // TODO: Lots of undocumented things for now
 
 use crate::{
+    Box, Direction, Float, PI, Position,
     hitable::{Hitable, HitableTrait},
     onb::ONB,
     random::{random_cosine_direction, random_unit_vector},
     wavelength::Wavelength,
-    Box, Direction, Float, Position, PI,
 };
 use enum_dispatch::enum_dispatch;
-use rand::rngs::SmallRng;
-use rand::Rng;
+use rand::{Rng, rngs::SmallRng};
 
 #[enum_dispatch(PDFTrait)]
 #[derive(Debug, Clone)]
@@ -25,7 +24,6 @@ pub enum PDF<'scene> {
 
 #[enum_dispatch]
 pub trait PDFTrait {
-    #[must_use]
     fn value(
         &self,
         direction: Direction,
@@ -35,7 +33,6 @@ pub trait PDFTrait {
     ) -> Float;
 
     // TODO: verify correctness & explain for all impls
-    #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Position;
 }
 
@@ -54,7 +51,6 @@ impl CosinePDF {
 }
 
 impl PDFTrait for CosinePDF {
-    #[must_use]
     fn value(
         &self,
         direction: Direction,
@@ -63,14 +59,9 @@ impl PDFTrait for CosinePDF {
         _rng: &mut SmallRng,
     ) -> Float {
         let cosine = direction.normalize().dot(&self.uvw.w);
-        if cosine <= 0.0 {
-            0.0
-        } else {
-            cosine / PI
-        }
+        if cosine <= 0.0 { 0.0 } else { cosine / PI }
     }
 
-    #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Position {
         *self.uvw.local(random_cosine_direction(rng))
     }
@@ -90,7 +81,6 @@ impl<'scene> HitablePDF<'scene> {
 }
 
 impl PDFTrait for HitablePDF<'_> {
-    #[must_use]
     fn value(
         &self,
         direction: Direction,
@@ -102,7 +92,6 @@ impl PDFTrait for HitablePDF<'_> {
             .pdf_value(self.origin, direction, wavelength, time, rng)
     }
 
-    #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Position {
         self.hitable.random(self.origin, rng)
     }
@@ -126,7 +115,6 @@ impl<'scene> MixturePDF<'scene> {
 }
 
 impl PDFTrait for MixturePDF<'_> {
-    #[must_use]
     fn value(
         &self,
         direction: Direction,
@@ -138,7 +126,6 @@ impl PDFTrait for MixturePDF<'_> {
             + 0.5 * self.pdf2.value(direction, wavelength, time, rng)
     }
 
-    #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Position {
         if rng.random::<bool>() {
             self.pdf1.generate(rng)
@@ -159,7 +146,6 @@ impl SpherePDF {
 }
 
 impl PDFTrait for SpherePDF {
-    #[must_use]
     fn value(
         &self,
         _direction: Direction,
@@ -170,7 +156,6 @@ impl PDFTrait for SpherePDF {
         1.0 / (4.0 * PI)
     }
 
-    #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Position {
         // TODO: verify correctness! radius?
         *random_unit_vector(rng)
@@ -189,7 +174,6 @@ impl ZeroPDF {
 }
 
 impl PDFTrait for ZeroPDF {
-    #[must_use]
     fn value(
         &self,
         _direction: Direction,
@@ -200,7 +184,6 @@ impl PDFTrait for ZeroPDF {
         0.0
     }
 
-    #[must_use]
     fn generate(&self, rng: &mut SmallRng) -> Position {
         *random_unit_vector(rng)
     }

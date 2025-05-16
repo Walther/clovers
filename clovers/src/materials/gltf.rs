@@ -6,22 +6,22 @@
 use gltf::image::Data;
 use nalgebra::Unit;
 use palette::{
-    chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped, white_point::E, LinSrgb, Srgb,
-    Srgba, Xyz,
+    LinSrgb, Srgb, Srgba, Xyz, chromatic_adaptation::AdaptInto, convert::IntoColorUnclamped,
+    white_point::E,
 };
 use rand::rngs::SmallRng;
 
 use crate::{
-    pdf::{ZeroPDF, PDF},
+    Direction, Float, HitRecord, PI, Vec2, Vec3, Vec4,
+    pdf::{PDF, ZeroPDF},
     random::random_unit_vector,
     ray::Ray,
     spectrum::spectral_power,
     textures::TextureTrait,
     wavelength::Wavelength,
-    Direction, Float, HitRecord, Vec2, Vec3, Vec4, PI,
 };
 
-use super::{reflect, MaterialTrait, MaterialType, ScatterRecord};
+use super::{MaterialTrait, MaterialType, ScatterRecord, reflect};
 
 #[derive(Debug, Clone)]
 // #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -124,12 +124,10 @@ impl MaterialTrait for GLTFMaterial {
         }
     }
 
-    #[must_use]
     fn emit(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         self.emit(ray, wavelength, hit_record)
     }
 
-    #[must_use]
     fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         self.color(ray, wavelength, hit_record)
     }
@@ -320,12 +318,10 @@ impl GLTFMaterial {
 
 // TODO: better ideas?
 impl TextureTrait for &GLTFMaterial {
-    #[must_use]
     fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         GLTFMaterial::color(self, ray, wavelength, hit_record)
     }
 
-    #[must_use]
     fn emit(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         GLTFMaterial::emit(self, ray, wavelength, hit_record)
     }

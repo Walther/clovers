@@ -3,7 +3,7 @@
 use std::fmt::Display;
 
 use clap::ValueEnum;
-use clovers::{wavelength::Wavelength, Float, Vec2};
+use clovers::{Float, Vec2, wavelength::Wavelength};
 
 pub mod blue;
 pub mod random;

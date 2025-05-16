@@ -3,8 +3,7 @@
 #![allow(clippy::too_many_arguments)] // TODO: Camera::new() has a lot of arguments.
 
 use crate::wavelength::Wavelength;
-use crate::{ray::Ray, Float, Vec3, PI};
-use crate::{Direction, Position, Vec2};
+use crate::{Direction, Float, PI, Position, Vec2, Vec3, ray::Ray};
 use nalgebra::Unit;
 
 #[derive(Clone, Debug)]

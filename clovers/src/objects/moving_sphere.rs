@@ -1,12 +1,12 @@
 //! A moving sphere object.
 
 use crate::{
+    Direction, Float, HitRecord, PI, Position,
     aabb::AABB,
     hitable::HitableTrait,
     materials::{Material, MaterialInit},
     ray::Ray,
     wavelength::Wavelength,
-    Direction, Float, HitRecord, Position, PI,
 };
 use nalgebra::Unit;
 use rand::rngs::SmallRng;
@@ -103,7 +103,6 @@ impl<'scene> MovingSphere<'scene> {
 
 impl HitableTrait for MovingSphere<'_> {
     /// Hit method for the [`MovingSphere`] object. First gets the interpolated center position at the given time, then follows the implementation of [Sphere](crate::objects::Sphere) object's hit method.
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
@@ -161,7 +160,6 @@ impl HitableTrait for MovingSphere<'_> {
     }
 
     /// Returns the axis-aligned bounding box of the [`MovingSphere`] object. This is the maximum possible bounding box of the entire span of the movement of the sphere, calculated from the two center positions and the radius.
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }

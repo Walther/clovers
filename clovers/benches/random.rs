@@ -1,7 +1,6 @@
-use clovers::{random::*, Vec3};
-use divan::{black_box, AllocProfiler};
-use rand::rngs::SmallRng;
-use rand::SeedableRng;
+use clovers::{Vec3, random::*};
+use divan::{AllocProfiler, black_box};
+use rand::{SeedableRng, rngs::SmallRng};
 
 #[global_allocator]
 static ALLOC: AllocProfiler = AllocProfiler::system();
