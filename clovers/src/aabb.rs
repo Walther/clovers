@@ -48,7 +48,6 @@ impl AABB {
         )
     }
 
-    #[allow(clippy::doc_link_with_quotes)]
     /// Given a [Ray], returns whether the ray hits the bounding box or not. Current method based on the "Axis-aligned bounding box class" of the [Raytracing The Next Week book](https://raytracing.github.io/books/RayTracingTheNextWeek.html).
     #[must_use]
     pub fn hit(&self, ray: &Ray, mut tmin: Float, mut tmax: Float) -> bool {
