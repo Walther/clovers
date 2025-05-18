@@ -4,7 +4,7 @@ use alloc::string::String;
 use core::fmt::Debug;
 use nalgebra::Unit;
 
-use crate::{pdf::PDF, ray::Ray, wavelength::Wavelength, Direction, Float, HitRecord, Vec3};
+use crate::{Direction, Float, HitRecord, Vec3, pdf::PDF, ray::Ray, wavelength::Wavelength};
 pub mod cone_light;
 pub mod dielectric;
 pub mod diffuse_light;
@@ -91,7 +91,6 @@ impl MaterialTrait for Material {
         self.thin_film.is_some() || self.kind.is_wavelength_dependent()
     }
 
-    #[must_use]
     /// Returns the spectral reflectance of the material's texture at the given parameters.
     fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         let thin_film = match &self.thin_film {

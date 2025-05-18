@@ -32,7 +32,7 @@ mod validate;
 mod write;
 
 use render::render;
-use validate::{validate, ValidateParams};
+use validate::{ValidateParams, validate};
 
 /// clovers 🍀 path tracing renderer
 #[derive(Parser)]

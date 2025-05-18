@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Install Rust toolchain
         run: rustup update --no-self-update stable
-      - uses: EmbarkStudios/cargo-deny-action@v1
+      - uses: EmbarkStudios/cargo-deny-action@v2
   lint: # inspired by https://github.com/EmbarkStudios/rust-gpu/blob/main/.github/workflows/ci.yaml
     runs-on: ubuntu-latest
     steps:

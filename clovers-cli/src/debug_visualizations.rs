@@ -1,7 +1,7 @@
 //! Alternative rendering methods for debug visualization purposes.
 
-use clovers::{ray::Ray, scenes::Scene, Float, EPSILON_SHADOW_ACNE};
-use palette::{chromatic_adaptation::AdaptInto, white_point::E, LinSrgb, Xyz};
+use clovers::{EPSILON_SHADOW_ACNE, Float, ray::Ray, scenes::Scene};
+use palette::{LinSrgb, Xyz, chromatic_adaptation::AdaptInto, white_point::E};
 use rand::rngs::SmallRng;
 
 /// Visualizes the BVH traversal count - how many BVH nodes needed to be tested for intersection?

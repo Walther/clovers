@@ -2,7 +2,7 @@
 //!
 //! Utilizes library code from <https://github.com/Jasper-Bekkers/blue-noise-sampler>.
 
-use clovers::{wavelength::sample_wavelength, Float, Vec2, PI};
+use clovers::{Float, PI, Vec2, wavelength::sample_wavelength};
 
 use super::*;
 

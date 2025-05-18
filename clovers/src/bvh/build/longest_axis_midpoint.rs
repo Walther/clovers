@@ -1,10 +1,10 @@
 use core::cmp::Ordering;
 
 use crate::{
+    Float,
     aabb::AABB,
     bvh::BVHNode,
     hitable::{Empty, Hitable, HitableTrait},
-    Float,
 };
 
 use super::utils::{get_comparator, vec_bounding_box};

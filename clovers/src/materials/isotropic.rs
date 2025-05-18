@@ -1,14 +1,16 @@
 //! Isotropic material.
 
-use super::{MaterialTrait, MaterialType, ScatterRecord};
+use rand::prelude::SmallRng;
+
 use crate::{
-    pdf::{SpherePDF, PDF},
+    Float, HitRecord, PI,
+    pdf::{PDF, SpherePDF},
     ray::Ray,
     textures::{Texture, TextureTrait},
     wavelength::Wavelength,
-    Float, HitRecord, PI,
 };
-use rand::prelude::SmallRng;
+
+use super::{MaterialTrait, MaterialType, ScatterRecord};
 
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -20,7 +22,6 @@ pub struct Isotropic {
 
 impl MaterialTrait for Isotropic {
     /// Returns a [`ScatterRecord`] based on the [`HitRecord`] coordinates and the given [Texture], or [None] if the ray did not hit the material.
-    #[must_use]
     fn scatter(
         &self,
         _ray: &Ray,
@@ -35,12 +36,10 @@ impl MaterialTrait for Isotropic {
     }
 
     /// Returns the scattering probability density function for the [Isotropic] material
-    #[must_use]
     fn scattering_pdf(&self, _hit_record: &HitRecord, _scattered: &Ray) -> Option<Float> {
         Some(1.0 / (4.0 * PI))
     }
 
-    #[must_use]
     fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         self.albedo.color(ray, wavelength, hit_record)
     }

@@ -8,12 +8,12 @@ use ply_rs::{
 };
 
 use crate::{
+    Float, Position, Vec3,
     aabb::AABB,
     bvh::build::utils::vec_bounding_box,
     hitable::Hitable,
     materials::{Material, MaterialInit, SharedMaterial},
     objects::Triangle,
-    Float, Position, Vec3,
 };
 
 /// Internal PLY object representation after initialization. Contains the material for all triangles in it to avoid having n copies.

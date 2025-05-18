@@ -1,16 +1,15 @@
 //! A dielectric material. This resembles glass and other transparent and reflective materials.
 
-use super::{reflect, refract, schlick, MaterialTrait, MaterialType, ScatterRecord};
+use super::{MaterialTrait, MaterialType, ScatterRecord, reflect, refract, schlick};
 use crate::{
-    pdf::{ZeroPDF, PDF},
+    Direction, Float, HitRecord,
+    pdf::{PDF, ZeroPDF},
     ray::Ray,
     spectrum::spectral_power,
     wavelength::Wavelength,
-    Direction, Float, HitRecord,
 };
-use palette::{white_point::E, Xyz};
-use rand::rngs::SmallRng;
-use rand::Rng;
+use palette::{Xyz, white_point::E};
+use rand::{Rng, rngs::SmallRng};
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde-derive", derive(serde::Serialize, serde::Deserialize))]
@@ -34,7 +33,6 @@ fn default_color() -> Xyz<E> {
 
 impl MaterialTrait for Dielectric {
     /// Scatter method for the Dielectric material. Given a `ray` and a `hit_record`, evaluate a [`ScatterRecord`] based on possible reflection or refraction.
-    #[must_use]
     fn scatter(
         &self,
         ray: &Ray,
@@ -77,7 +75,6 @@ impl MaterialTrait for Dielectric {
 
     // TODO: should this material provide a `scattering_pdf` function?
 
-    #[must_use]
     fn color(&self, _ray: &Ray, wavelength: Wavelength, _hit_record: &HitRecord) -> Float {
         spectral_power(self.color, wavelength)
     }

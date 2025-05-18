@@ -1,18 +1,19 @@
 //! An opinionated method for drawing a scene using the CPU for rendering.
 
-use clovers::wavelength::{
-    random_wavelength, rotate_wavelength, wavelength_into_xyz, WAVE_SAMPLE_COUNT,
+use clovers::{
+    Float, Vec2,
+    ray::Ray,
+    scenes::Scene,
+    wavelength::{WAVE_SAMPLE_COUNT, random_wavelength, rotate_wavelength, wavelength_into_xyz},
 };
-use clovers::Vec2;
-use clovers::{ray::Ray, scenes::Scene, Float};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 use palette::chromatic_adaptation::AdaptInto;
 use palette::white_point::E;
 use palette::{LinSrgb, Xyz};
-use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use rand::{Rng, SeedableRng, rngs::SmallRng};
 use rayon::prelude::*;
 
+use crate::GlobalOptions;
 use crate::debug_visualizations::{bvh_testcount, primitive_testcount};
 use crate::normals::normal_map;
 use crate::render::{RenderMode, RenderOptions};
@@ -20,7 +21,6 @@ use crate::sampler::blue::BlueSampler;
 use crate::sampler::random::RandomSampler;
 use crate::sampler::{Randomness, Sampler, SamplerTrait};
 use crate::trace::trace;
-use crate::GlobalOptions;
 
 /// The main drawing function, returns a `Vec<Srgb>` as a pixelbuffer.
 pub fn draw(

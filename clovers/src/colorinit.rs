@@ -4,9 +4,9 @@ use alloc::string::String;
 use core::str::FromStr;
 
 use palette::{
+    LinSrgb, Oklch, Srgb, Xyz,
     chromatic_adaptation::AdaptInto,
     white_point::{D65, E},
-    LinSrgb, Oklch, Srgb, Xyz,
 };
 
 use crate::Float;

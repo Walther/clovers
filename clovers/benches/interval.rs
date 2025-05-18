@@ -1,7 +1,6 @@
 use clovers::interval::*;
-use divan::{black_box, AllocProfiler};
-use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
+use divan::{AllocProfiler, black_box};
+use rand::{Rng, SeedableRng, rngs::SmallRng};
 
 #[global_allocator]
 static ALLOC: AllocProfiler = AllocProfiler::system();

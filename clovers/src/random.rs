@@ -1,9 +1,8 @@
 //! Various internal helper functions for getting specific kinds of random values.
 
-use crate::{Direction, Float, Vec2, Vec3, PI};
+use crate::{Direction, Float, PI, Vec2, Vec3};
 use nalgebra::Unit;
-use rand::rngs::SmallRng;
-use rand::Rng;
+use rand::{Rng, rngs::SmallRng};
 use rand_distr::{Distribution, UnitDisc, UnitSphere};
 
 /// Internal helper.

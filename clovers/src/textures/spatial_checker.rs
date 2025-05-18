@@ -2,8 +2,8 @@
 
 // TODO: object-aligned spatial checker?
 
-use palette::white_point::E;
 use palette::Xyz;
+use palette::white_point::E;
 
 use super::TextureTrait;
 #[cfg(feature = "serde-derive")]
@@ -11,8 +11,8 @@ use crate::colorinit::TypedColorInit;
 use crate::ray::Ray;
 use crate::spectrum::SPD;
 use crate::wavelength::Wavelength;
-use crate::{colorinit::ColorInit, HitRecord};
 use crate::{Float, PI};
+use crate::{HitRecord, colorinit::ColorInit};
 
 /// A standard checkered texture based on spatial 3D texturing.
 #[derive(Clone, Debug)]
@@ -79,7 +79,6 @@ impl SpatialChecker {
 
 impl TextureTrait for SpatialChecker {
     /// Evaluates the color at the given spatial position coordinate. Note that the `SpatialChecker` is spatial - surface coordinates are ignored.
-    #[must_use]
     fn color(&self, _ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         let position = hit_record.position;
         let density = self.density * PI;

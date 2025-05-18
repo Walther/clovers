@@ -1,9 +1,9 @@
 //! Various literal objects and meta-object utilities for creating content in [Scenes](crate::scenes::Scene).
 
 use crate::{
+    Box,
     hitable::{Hitable, HitableList},
     materials::{Material, MaterialInit, SharedMaterial},
-    Box,
 };
 
 pub mod boxy; // avoid keyword
