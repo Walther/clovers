@@ -140,19 +140,19 @@ pub trait MaterialTrait: Debug {
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
 /// An enum for the material kind
 pub enum Kind {
-    /// Dielectric material
+    /// `Dielectric` material
     Dielectric(Dielectric),
-    /// Dispersive material
+    /// `Dispersive` material
     Dispersive(Dispersive),
-    /// Lambertian material
+    /// `Lambertian` material
     Lambertian(Lambertian),
-    /// ConeLight material
+    /// `ConeLight` material
     ConeLight(ConeLight),
-    /// DiffuseLight material
+    /// `DiffuseLight` material
     DiffuseLight(DiffuseLight),
-    /// Metal material
+    /// `Metal` material
     Metal(Metal),
-    /// Isotropic material
+    /// `Isotropic` material
     Isotropic(Isotropic),
 }
 
