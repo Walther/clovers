@@ -34,13 +34,12 @@ fn default_color() -> Xyz<E> {
 
 impl MaterialTrait for Dielectric {
     /// Scatter method for the Dielectric material. Given a `ray` and a `hit_record`, evaluate a [`ScatterRecord`] based on possible reflection or refraction.
-    #[must_use]
     fn scatter(
         &self,
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'_>> {
         let refraction_ratio: Float = if hit_record.front_face {
             1.0 / self.refractive_index
         } else {
@@ -77,7 +76,6 @@ impl MaterialTrait for Dielectric {
 
     // TODO: should this material provide a `scattering_pdf` function?
 
-    #[must_use]
     fn color(&self, _ray: &Ray, wavelength: Wavelength, _hit_record: &HitRecord) -> Float {
         spectral_power(self.color, wavelength)
     }

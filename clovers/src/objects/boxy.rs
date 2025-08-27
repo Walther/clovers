@@ -84,16 +84,15 @@ impl<'scene> Boxy<'scene> {
 
 impl HitableTrait for Boxy<'_> {
     /// The main `hit` function for a [Boxy]. Given a [Ray], and an interval `distance_min` and `distance_max`, returns either `None` or `Some(HitRecord)` based on whether the ray intersects with the object during that interval.
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         // start with an empty hit_record, hit all sides, return closest
-        let mut hit_record: Option<HitRecord> = None;
+        let mut hit_record: Option<HitRecord<'_>> = None;
         let mut closest = distance_max;
         for hitable in &*self.sides {
             if let Some(record) = hitable.hit(ray, distance_min, closest, rng) {
@@ -105,14 +104,12 @@ impl HitableTrait for Boxy<'_> {
     }
 
     /// Returns the axis-aligned bounding box [AABB] of the object.
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
     // TODO: improve correctness & optimization!
     /// Returns a probability density function value?
-    #[must_use]
     fn pdf_value(
         &self,
         origin: Position,

@@ -47,7 +47,7 @@ impl HitableTrait for Empty {
         _distance_min: Float,
         _distance_max: Float,
         _rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         None
     }
 
@@ -74,7 +74,6 @@ impl HitableTrait for Empty {
 #[enum_dispatch]
 /// The main trait for entities that can be intersect aka "hit" by a [Ray].
 pub trait HitableTrait {
-    #[must_use]
     /// The main intersection method.
     fn hit(
         &self,
@@ -82,13 +81,11 @@ pub trait HitableTrait {
         distance_min: Float,
         distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord>;
+    ) -> Option<HitRecord<'_>>;
 
-    #[must_use]
     /// Returns the bounding box of the entity.
     fn aabb(&self) -> Option<&AABB>;
 
-    #[must_use]
     /// Probability density function value method, used for multiple importance sampling.
     fn pdf_value(
         &self,
@@ -99,7 +96,6 @@ pub trait HitableTrait {
         rng: &mut SmallRng,
     ) -> Float;
 
-    #[must_use]
     /// Random point on the entity, used for multiple importance sampling.
     fn random(&self, _origin: Position, _rng: &mut SmallRng) -> Displacement {
         unimplemented!(
@@ -108,7 +104,6 @@ pub trait HitableTrait {
     }
 
     /// Returns the center point of the hitable
-    #[must_use]
     fn centroid(&self) -> Position;
 }
 
@@ -150,16 +145,15 @@ impl<'scene> HitableList<'scene> {
 
 // TODO: ideally, this impl should be removed entirely
 impl HitableTrait for HitableList<'_> {
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         let mut distance = Float::INFINITY;
-        let mut closest: Option<HitRecord> = None;
+        let mut closest: Option<HitRecord<'_>> = None;
         for hitable in &self.hitables {
             let hit_record = hitable.hit(ray, distance_min, distance_max, rng)?;
             if hit_record.distance < distance {
@@ -171,12 +165,10 @@ impl HitableTrait for HitableList<'_> {
         closest
     }
 
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
-    #[must_use]
     fn pdf_value(
         &self,
         _origin: Position,
@@ -189,7 +181,6 @@ impl HitableTrait for HitableList<'_> {
         0.0
     }
 
-    #[must_use]
     fn centroid(&self) -> Position {
         // TODO: ideally, this shouldn't be used at all!
         // Currently, this can be called when a `HitableList` is used as an object within a `Translate` or `RotateY`

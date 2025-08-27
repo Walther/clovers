@@ -83,7 +83,6 @@ pub struct {output} {{
 }}
 
 impl TextureTrait for {output} {{
-    #[must_use]
     fn color(&self, _ray: &Ray, wavelength: Wavelength, _hit_record: &HitRecord) -> Float {{
         let color = match {output}.get(&wavelength) {{
             Some(&p) => p * self.intensity,
@@ -92,7 +91,6 @@ impl TextureTrait for {output} {{
         color.clamp(0.0, 1.0)
     }}
 
-    #[must_use]
     fn emit(
         &self,
         _ray: &Ray,

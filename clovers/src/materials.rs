@@ -75,7 +75,7 @@ impl MaterialTrait for Material {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'_>> {
         self.kind.scatter(ray, hit_record, rng)
     }
 
@@ -91,7 +91,6 @@ impl MaterialTrait for Material {
         self.thin_film.is_some() || self.kind.is_wavelength_dependent()
     }
 
-    #[must_use]
     /// Returns the spectral reflectance of the material's texture at the given parameters.
     fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         let thin_film = match &self.thin_film {
@@ -112,7 +111,7 @@ pub trait MaterialTrait: Debug {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
-    ) -> Option<ScatterRecord>;
+    ) -> Option<ScatterRecord<'_>>;
 
     /// TODO: explain
     fn scattering_pdf(&self, _hit_record: &HitRecord, _scattered: &Ray) -> Option<Float> {
@@ -140,19 +139,19 @@ pub trait MaterialTrait: Debug {
 #[cfg_attr(feature = "serde-derive", serde(tag = "kind"))]
 /// An enum for the material kind
 pub enum Kind {
-    /// Dielectric material
+    /// `Dielectric` material
     Dielectric(Dielectric),
-    /// Dispersive material
+    /// `Dispersive` material
     Dispersive(Dispersive),
-    /// Lambertian material
+    /// `Lambertian` material
     Lambertian(Lambertian),
-    /// ConeLight material
+    /// `ConeLight` material
     ConeLight(ConeLight),
-    /// DiffuseLight material
+    /// `DiffuseLight` material
     DiffuseLight(DiffuseLight),
-    /// Metal material
+    /// `Metal` material
     Metal(Metal),
-    /// Isotropic material
+    /// `Isotropic` material
     Isotropic(Isotropic),
 }
 

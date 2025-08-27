@@ -119,14 +119,13 @@ impl<'scene> Triangle<'scene> {
 
 impl HitableTrait for Triangle<'_> {
     /// Hit method for the triangle
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
         distance_min: Float,
         distance_max: Float,
         _rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         let denom = self.normal.dot(&ray.direction);
 
         // No hit if the ray is parallel to the plane.
@@ -167,7 +166,6 @@ impl HitableTrait for Triangle<'_> {
     }
 
     /// Returns the bounding box of the triangle
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         // TODO: this is from quad and not updated!
         // although i guess a triangle's aabb is the same as the quad's aabb in worst case
@@ -175,7 +173,6 @@ impl HitableTrait for Triangle<'_> {
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
-    #[must_use]
     fn pdf_value(
         &self,
         origin: Position,
@@ -204,7 +201,6 @@ impl HitableTrait for Triangle<'_> {
     }
 
     /// Returns a random point on the triangle surface
-    #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         // Random square coordinate
         let mut a = rng.random::<Float>();
