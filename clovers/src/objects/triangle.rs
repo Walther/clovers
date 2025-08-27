@@ -125,7 +125,7 @@ impl HitableTrait for Triangle<'_> {
         distance_min: Float,
         distance_max: Float,
         _rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         let denom = self.normal.dot(&ray.direction);
 
         // No hit if the ray is parallel to the plane.

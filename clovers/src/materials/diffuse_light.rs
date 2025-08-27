@@ -33,7 +33,7 @@ impl MaterialTrait for DiffuseLight {
         _ray: &Ray,
         _hit_record: &HitRecord,
         _rng: &mut SmallRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'_>> {
         None
     }
 

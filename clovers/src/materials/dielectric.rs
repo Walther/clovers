@@ -39,7 +39,7 @@ impl MaterialTrait for Dielectric {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'_>> {
         let refraction_ratio: Float = if hit_record.front_face {
             1.0 / self.refractive_index
         } else {

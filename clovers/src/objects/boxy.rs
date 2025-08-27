@@ -90,9 +90,9 @@ impl HitableTrait for Boxy<'_> {
         distance_min: Float,
         distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         // start with an empty hit_record, hit all sides, return closest
-        let mut hit_record: Option<HitRecord> = None;
+        let mut hit_record: Option<HitRecord<'_>> = None;
         let mut closest = distance_max;
         for hitable in &*self.sides {
             if let Some(record) = hitable.hit(ray, distance_min, closest, rng) {

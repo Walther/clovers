@@ -105,7 +105,7 @@ impl HitableTrait for RotateY<'_> {
         distance_min: Float,
         distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         let mut origin: Position = ray.origin;
         let mut direction: Vec3 = *ray.direction;
 

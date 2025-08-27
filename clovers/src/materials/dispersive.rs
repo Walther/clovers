@@ -73,7 +73,7 @@ impl MaterialTrait for Dispersive {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'_>> {
         // Calculate refractive index based on the wavelength of the incoming material
         let refractive_index = self.refractive_index(ray.wavelength);
         let refraction_ratio: Float = if hit_record.front_face {

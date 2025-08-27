@@ -19,7 +19,7 @@ impl BVHNode<'_> {
         distance_min: Float,
         mut distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         *depth += 1;
 
         // If we do not hit the bounding box of current node, early return None

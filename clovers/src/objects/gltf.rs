@@ -250,7 +250,7 @@ impl HitableTrait for GLTFTriangle<'_> {
         distance_min: Float,
         distance_max: Float,
         _rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         // TODO: mostly adapted from Triangle, verify correctness!
 
         let denom = self.normal.dot(&ray.direction);

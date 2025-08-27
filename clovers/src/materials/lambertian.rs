@@ -25,7 +25,7 @@ impl MaterialTrait for Lambertian {
         _ray: &Ray,
         hit_record: &HitRecord,
         _rng: &mut SmallRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'_>> {
         Some(ScatterRecord {
             material_type: MaterialType::Diffuse,
             specular_ray: None,

@@ -68,7 +68,7 @@ impl HitableTrait for ConstantMedium<'_> {
         distance_min: Float,
         distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         // TODO: explain how the fog works.
 
         let mut rec1 = self

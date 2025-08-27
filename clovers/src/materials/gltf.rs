@@ -83,7 +83,7 @@ impl MaterialTrait for GLTFMaterial {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'_>> {
         let (metalness, roughness) = self.sample_metalness_roughness(hit_record);
         let normal: Direction = self.sample_normal(hit_record);
 

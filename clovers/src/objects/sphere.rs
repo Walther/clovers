@@ -73,7 +73,7 @@ impl HitableTrait for Sphere<'_> {
         distance_min: Float,
         distance_max: Float,
         _rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         let oc: Position = ray.origin - self.center;
         let a: Float = ray.direction.norm_squared();
         let half_b: Float = oc.dot(&ray.direction);

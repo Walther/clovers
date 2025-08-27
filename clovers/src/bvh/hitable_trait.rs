@@ -18,7 +18,7 @@ impl HitableTrait for BVHNode<'_> {
         distance_min: Float,
         mut distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         // If we do not hit the bounding box of current node, early return None
         if !self.aabb.hit(ray, distance_min, distance_max) {
             return None;

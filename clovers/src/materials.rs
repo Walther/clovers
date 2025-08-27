@@ -75,7 +75,7 @@ impl MaterialTrait for Material {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'_>> {
         self.kind.scatter(ray, hit_record, rng)
     }
 
@@ -111,7 +111,7 @@ pub trait MaterialTrait: Debug {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
-    ) -> Option<ScatterRecord>;
+    ) -> Option<ScatterRecord<'_>>;
 
     /// TODO: explain
     fn scattering_pdf(&self, _hit_record: &HitRecord, _scattered: &Ray) -> Option<Float> {

@@ -47,7 +47,7 @@ impl HitableTrait for Empty {
         _distance_min: Float,
         _distance_max: Float,
         _rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         None
     }
 
@@ -81,7 +81,7 @@ pub trait HitableTrait {
         distance_min: Float,
         distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord>;
+    ) -> Option<HitRecord<'_>>;
 
     /// Returns the bounding box of the entity.
     fn aabb(&self) -> Option<&AABB>;
@@ -151,9 +151,9 @@ impl HitableTrait for HitableList<'_> {
         distance_min: Float,
         distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         let mut distance = Float::INFINITY;
-        let mut closest: Option<HitRecord> = None;
+        let mut closest: Option<HitRecord<'_>> = None;
         for hitable in &self.hitables {
             let hit_record = hitable.hit(ray, distance_min, distance_max, rng)?;
             if hit_record.distance < distance {

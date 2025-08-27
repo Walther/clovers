@@ -29,7 +29,7 @@ impl MaterialTrait for Metal {
         ray: &Ray,
         hit_record: &HitRecord,
         rng: &mut SmallRng,
-    ) -> Option<ScatterRecord> {
+    ) -> Option<ScatterRecord<'_>> {
         let reflected: Direction = reflect(ray.direction, hit_record.normal);
         let direction = *reflected + self.fuzz * *random_unit_vector(rng);
         let direction = Unit::new_normalize(direction);

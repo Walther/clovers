@@ -57,7 +57,7 @@ impl HitableTrait for Translate<'_> {
         distance_min: Float,
         distance_max: Float,
         rng: &mut SmallRng,
-    ) -> Option<HitRecord> {
+    ) -> Option<HitRecord<'_>> {
         let moved_ray = Ray {
             origin: ray.origin - self.offset,
             direction: ray.direction,
