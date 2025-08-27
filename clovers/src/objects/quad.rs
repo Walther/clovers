@@ -85,7 +85,6 @@ impl<'scene> Quad<'scene> {
 
 impl HitableTrait for Quad<'_> {
     /// Hit method for the quad rectangle
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
@@ -133,13 +132,11 @@ impl HitableTrait for Quad<'_> {
     }
 
     /// Returns the bounding box of the quad
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
     /// Returns a probability density function value? // TODO: understand & explain
-    #[must_use]
     fn pdf_value(
         &self,
         origin: Position,
@@ -167,7 +164,6 @@ impl HitableTrait for Quad<'_> {
     }
 
     /// Returns a random point on the quadrilateral surface
-    #[must_use]
     fn random(&self, origin: Position, rng: &mut SmallRng) -> Displacement {
         let point: Position = self.q // world-coordinate corner + random distances along edge vectors
                 + (rng.random::<Float>() * self.u)

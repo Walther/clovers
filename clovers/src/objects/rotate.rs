@@ -99,7 +99,6 @@ impl<'scene> RotateY<'scene> {
 
 impl HitableTrait for RotateY<'_> {
     /// Hit method for the [`RotateY`] object. Finds the rotation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
@@ -160,7 +159,6 @@ impl HitableTrait for RotateY<'_> {
     }
 
     /// Bounding box method for the [`RotateY`] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for rotation.
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         self.aabb.as_ref()
     }

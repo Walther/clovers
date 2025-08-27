@@ -62,7 +62,6 @@ impl<'scene> ConstantMedium<'scene> {
 
 impl HitableTrait for ConstantMedium<'_> {
     /// Hit function for the [`ConstantMedium`] object. Returns a [`HitRecord`] if hit. TODO: explain the math for the fog
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
@@ -127,13 +126,11 @@ impl HitableTrait for ConstantMedium<'_> {
     }
 
     /// Returns the axis-aligned bounding box [AABB] of the defining `boundary` object for the fog.
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         self.boundary.aabb()
     }
 
     /// Returns a probability density function value based on the boundary object
-    #[must_use]
     fn pdf_value(
         &self,
         origin: Position,

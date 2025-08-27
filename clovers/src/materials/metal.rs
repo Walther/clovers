@@ -24,7 +24,6 @@ pub struct Metal {
 
 impl MaterialTrait for Metal {
     /// Scatter function for the [Metal] material. Metal always reflects, and a specular ray is calculated with some randomness adjusted by the `fuzz` factor. This means the metal can be made more shiny or more matte. The returned [`ScatterRecord`] will have a probability density function of [`ZeroPDF`] and material type of [`MaterialType::Specular`]
-    #[must_use]
     fn scatter(
         &self,
         ray: &Ray,
@@ -47,8 +46,6 @@ impl MaterialTrait for Metal {
     }
 
     // TODO: should this material provide a `scattering_pdf` function?
-
-    #[must_use]
     fn color(&self, ray: &Ray, wavelength: Wavelength, hit_record: &HitRecord) -> Float {
         self.albedo.color(ray, wavelength, hit_record)
     }

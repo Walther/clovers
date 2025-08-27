@@ -51,7 +51,6 @@ impl<'scene> Translate<'scene> {
 
 impl HitableTrait for Translate<'_> {
     /// Hit method for the [Translate] object. Finds the translation-adjusted [`HitRecord`] for the possible intersection of the [Ray] with the encased [Object].
-    #[must_use]
     fn hit(
         &self,
         ray: &Ray,
@@ -79,13 +78,11 @@ impl HitableTrait for Translate<'_> {
     }
 
     /// Bounding box method for the [Translate] object. Finds the axis-aligned bounding box [AABB] for the encased [Object] after adjusting for translation.
-    #[must_use]
     fn aabb(&self) -> Option<&AABB> {
         Some(&self.aabb)
     }
 
     /// Returns a probability density function value based on the inner object
-    #[must_use]
     fn pdf_value(
         &self,
         origin: Position,
