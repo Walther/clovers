@@ -116,18 +116,18 @@ fn floaty(f: &str) -> String {
     }
 }
 
-fn parse_pairs(input: &str) -> OrderedMap<usize> {
+fn parse_pairs(input: &str) -> OrderedMap<'_, usize> {
     let mut builder: OrderedMap<usize> = OrderedMap::new();
 
     for line in input.lines() {
         let (wavelength, power) = line.split_once(',').unwrap();
         let wavelength: usize = wavelength.parse().unwrap();
-        builder.entry(wavelength, &floaty(power));
+        builder.entry(wavelength, floaty(power));
     }
     builder
 }
 
-fn parse_leds(input: &str) -> [OrderedMap<usize>; 9] {
+fn parse_leds(input: &str) -> [OrderedMap<'_, usize>; 9] {
     let mut led_b1: OrderedMap<usize> = OrderedMap::new();
     let mut led_b2: OrderedMap<usize> = OrderedMap::new();
     let mut led_b3: OrderedMap<usize> = OrderedMap::new();
@@ -157,7 +157,7 @@ fn parse_leds(input: &str) -> [OrderedMap<usize>; 9] {
     ]
 }
 
-fn parse_fluorescents(input: &str) -> [OrderedMap<usize>; 27] {
+fn parse_fluorescents(input: &str) -> [OrderedMap<'_, usize>; 27] {
     let mut fl1: OrderedMap<usize> = OrderedMap::new();
     let mut fl2: OrderedMap<usize> = OrderedMap::new();
     let mut fl3: OrderedMap<usize> = OrderedMap::new();
@@ -190,33 +190,33 @@ fn parse_fluorescents(input: &str) -> [OrderedMap<usize>; 27] {
         let split: Vec<&str> = line.split(',').collect();
         let wavelength: usize = split[0].parse().unwrap();
 
-        fl1.entry(wavelength, &floaty(split[1]));
-        fl2.entry(wavelength, &floaty(split[2]));
-        fl3.entry(wavelength, &floaty(split[3]));
-        fl4.entry(wavelength, &floaty(split[4]));
-        fl5.entry(wavelength, &floaty(split[5]));
-        fl6.entry(wavelength, &floaty(split[6]));
-        fl7.entry(wavelength, &floaty(split[7]));
-        fl8.entry(wavelength, &floaty(split[8]));
-        fl9.entry(wavelength, &floaty(split[9]));
-        fl10.entry(wavelength, &floaty(split[10]));
-        fl11.entry(wavelength, &floaty(split[11]));
-        fl12.entry(wavelength, &floaty(split[12]));
-        fl3_1.entry(wavelength, &floaty(split[13]));
-        fl3_2.entry(wavelength, &floaty(split[14]));
-        fl3_3.entry(wavelength, &floaty(split[15]));
-        fl3_4.entry(wavelength, &floaty(split[16]));
-        fl3_5.entry(wavelength, &floaty(split[17]));
-        fl3_6.entry(wavelength, &floaty(split[18]));
-        fl3_7.entry(wavelength, &floaty(split[19]));
-        fl3_8.entry(wavelength, &floaty(split[20]));
-        fl3_9.entry(wavelength, &floaty(split[21]));
-        fl3_10.entry(wavelength, &floaty(split[22]));
-        fl3_11.entry(wavelength, &floaty(split[23]));
-        fl3_12.entry(wavelength, &floaty(split[24]));
-        fl3_13.entry(wavelength, &floaty(split[25]));
-        fl3_14.entry(wavelength, &floaty(split[26]));
-        fl3_15.entry(wavelength, &floaty(split[27]));
+        fl1.entry(wavelength, floaty(split[1]));
+        fl2.entry(wavelength, floaty(split[2]));
+        fl3.entry(wavelength, floaty(split[3]));
+        fl4.entry(wavelength, floaty(split[4]));
+        fl5.entry(wavelength, floaty(split[5]));
+        fl6.entry(wavelength, floaty(split[6]));
+        fl7.entry(wavelength, floaty(split[7]));
+        fl8.entry(wavelength, floaty(split[8]));
+        fl9.entry(wavelength, floaty(split[9]));
+        fl10.entry(wavelength, floaty(split[10]));
+        fl11.entry(wavelength, floaty(split[11]));
+        fl12.entry(wavelength, floaty(split[12]));
+        fl3_1.entry(wavelength, floaty(split[13]));
+        fl3_2.entry(wavelength, floaty(split[14]));
+        fl3_3.entry(wavelength, floaty(split[15]));
+        fl3_4.entry(wavelength, floaty(split[16]));
+        fl3_5.entry(wavelength, floaty(split[17]));
+        fl3_6.entry(wavelength, floaty(split[18]));
+        fl3_7.entry(wavelength, floaty(split[19]));
+        fl3_8.entry(wavelength, floaty(split[20]));
+        fl3_9.entry(wavelength, floaty(split[21]));
+        fl3_10.entry(wavelength, floaty(split[22]));
+        fl3_11.entry(wavelength, floaty(split[23]));
+        fl3_12.entry(wavelength, floaty(split[24]));
+        fl3_13.entry(wavelength, floaty(split[25]));
+        fl3_14.entry(wavelength, floaty(split[26]));
+        fl3_15.entry(wavelength, floaty(split[27]));
     }
 
     [
