@@ -11,6 +11,9 @@ Cargo.lock
 **/renders/*
 !/renders/.gitignore
 
+# Plots generated for debugging purposes
+plots/*
+
 # oh macos
 .DS_Store
 
