@@ -38,6 +38,7 @@ phf = { version = "0.13.1", default-features = false }
 
 [dev-dependencies]
 divan = "0.1.21"
+plotly = "0.13.5"
 proptest = "1"
 
 [build-dependencies]
