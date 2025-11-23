@@ -32,7 +32,7 @@ pub fn random_cosine_direction(rng: &mut SmallRng) -> Direction {
     let y = phi.sin() * r2.sqrt();
 
     let v: Vec3 = Vec3::new(x, y, z);
-    Unit::new_normalize(v)
+    Unit::new_unchecked(v)
 }
 
 /// Internal helper.
