@@ -2,8 +2,13 @@ use std::fs::File;
 use std::io::Cursor;
 
 use clovers::Float;
+use exr::{
+    image::{Encoding, Layer, PixelImage},
+    meta::attribute::Chromaticities,
+    prelude::{LayerAttributes, WritableImage},
+};
 use humantime::FormattedDuration;
-use image::{ImageBuffer, ImageFormat, Rgb32FImage, RgbImage};
+use image::{ImageBuffer, ImageFormat, RgbImage};
 use img_parts::png::{Png, PngChunk};
 use palette::{chromatic_adaptation::AdaptInto, white_point::E, Xyz};
 use tracing::info;
@@ -60,7 +65,7 @@ pub fn png(
     let stats = format!("Rendering finished in {duration}, using {threads} threads.");
     let comment = format!("{common}{details} {stats}");
 
-    let software = "Software\0https://github.com/walther/clovers".to_string();
+    let software = "Software\0clovers".to_string();
 
     for metadata in [comment, software] {
         let bytes = metadata.as_bytes().to_owned();
@@ -76,35 +81,45 @@ pub fn png(
     Ok(())
 }
 
-pub fn exr(
-    pixelbuffer: &[Xyz<E>],
-    target: &String,
-    _duration: &FormattedDuration,
-    render_options: &RenderOptions,
-) -> Result<(), String> {
-    let RenderOptions {
-        input: _,
-        output: _,
-        width,
-        height,
-        samples: _,
-        max_depth: _,
-        mode: _,
-        sampler: _,
-        bvh: _,
-        formats: _,
-    } = render_options;
-    // TODO: metadata?
-
+/// Save the pixelbuffer as an OpenEXR file.
+///
+/// From the specification:
+/// > In an OpenEXR file whose pixels represent CIE XYZ tristimulus values,
+/// > the pixels’ X, Y and Z components should be stored in the file’s R, G and B channels.
+/// > The file header should contain a chromaticities attribute with the following values:
+/// > |       | CIE x,y  |
+/// > |-------|----------|
+/// > | red   |     1, 0 |
+/// > | green |     0, 1 |
+/// > | blue  |     0, 0 |
+/// > | white | 1/3, 1/3 |
+/// <cite><https://openexr.com/en/latest/TechnicalIntroduction.html#cie-xyz-color></cite>
+pub fn exr(pixelbuffer: &[Xyz<E>], width: u32, height: u32, target: &String) -> Result<(), String> {
     info!("Converting pixelbuffer to an image");
-    let mut img: Rgb32FImage = ImageBuffer::new(*width, *height);
-    img.enumerate_pixels_mut().for_each(|(x, y, pixel)| {
-        let index = y * width + x;
-        // NOTE: EXR format expects linear rgb
-        let color: palette::LinSrgb<Float> = pixelbuffer[index as usize].adapt_into();
-        *pixel = image::Rgb([color.red, color.green, color.blue]);
+    let dimensions = (width as usize, height as usize);
+    let layer_attributes = LayerAttributes {
+        // capture_date: todo!(),
+        software_name: Some("clovers".into()),
+        ..Default::default()
+    };
+    let encoding = Encoding::SMALL_FAST_LOSSLESS;
+    let channels = exr::prelude::SpecificChannels::build()
+        .with_channel::<f32>("R")
+        .with_channel::<f32>("G")
+        .with_channel::<f32>("B")
+        .with_pixel_fn(|coord| {
+            let index = coord.y() * width as usize + coord.x();
+            let pixel: Xyz<E> = pixelbuffer[index];
+            pixel.into_components()
+        });
+    let mut image =
+        PixelImage::from_layer(Layer::new(dimensions, layer_attributes, encoding, channels));
+    image.attributes.chromaticities = Some(Chromaticities {
+        red: (1.0, 0.0).into(),
+        green: (0.0, 1.0).into(),
+        blue: (0.0, 0.0).into(),
+        white: (1.0 / 3.0, 1.0 / 3.0).into(),
     });
-
-    img.save_with_format(target, ImageFormat::OpenExr)
-        .or(Err("Unable to write to file".to_owned()))
+    image.write().to_file(target).unwrap();
+    Ok(())
 }

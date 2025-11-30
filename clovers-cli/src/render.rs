@@ -172,7 +172,7 @@ pub(crate) fn render(
 
         match format {
             Format::Png => write::png(&pixelbuffer, &target, &duration, &render_options),
-            Format::Exr => write::exr(&pixelbuffer, &target, &duration, &render_options),
+            Format::Exr => write::exr(&pixelbuffer, width, height, &target),
         }?;
 
         info!("Image saved to {}", target);
