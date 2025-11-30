@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["blue_sample_spp1","blue_sample_spp128","blue_sample_spp16","blue_sample_spp2","blue_sample_spp256","blue_sample_spp32","blue_sample_spp4","blue_sample_spp64","blue_sample_spp8"],"struct":["BlueSampler"]};

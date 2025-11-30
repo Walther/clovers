@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["spectral_power","spectral_powers"],"mod":["spectra_xyz_5nm_380_780_097","spectrum_grid"],"struct":["SPD"]};

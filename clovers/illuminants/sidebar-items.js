@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["D50","D65","FL1","FL10","FL11","FL12","FL2","FL3","FL3_1","FL3_10","FL3_11","FL3_12","FL3_13","FL3_14","FL3_15","FL3_2","FL3_3","FL3_4","FL3_5","FL3_6","FL3_7","FL3_8","FL3_9","FL4","FL5","FL6","FL7","FL8","FL9","LED_B1","LED_B2","LED_B3","LED_B4","LED_B5","LED_BH1","LED_RGB1","LED_V1","LED_V2"]};
