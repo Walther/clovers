@@ -25,12 +25,10 @@ clovers = { path = "../clovers", features = [
 # External
 blue-noise-sampler = "0.1.0"
 clap = { version = "4.5.51", features = ["std", "derive"] }
+exr = "1.74.0"
 human_format = "1.1.0"
 humantime = "2.3.0"
-image = { version = "0.25.9", features = [
-  "png",
-  "exr",
-], default-features = false }
+image = { version = "0.25.9", features = ["png"], default-features = false }
 img-parts = "0.4.0"
 indicatif = { version = "0.18.3", features = [
   "rayon",
