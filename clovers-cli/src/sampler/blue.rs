@@ -4,7 +4,7 @@
 
 use clovers::{wavelength::sample_wavelength, Float, Vec2, PI};
 
-use super::*;
+use super::{SamplerDimension, SamplerTrait, Randomness};
 
 pub struct BlueSampler {
     get: fn(i32, i32, i32, SamplerDimension) -> Float,
