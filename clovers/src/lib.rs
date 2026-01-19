@@ -59,8 +59,6 @@
 #![deny(unused_qualifications)]
 #![deny(missing_debug_implementations)]
 #![deny(missing_docs)]
-// TODO: temporarily allowing some in order to get a majority of clippy::pedantic enabled
-#![allow(clippy::module_name_repetitions)]
 // no_std required for gpu accelerated rendering
 #![cfg_attr(not(feature = "std"), no_std)]
 extern crate alloc;

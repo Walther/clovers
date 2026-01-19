@@ -1,3 +1,5 @@
+#![allow(clippy::similar_names)]
+
 use std::env;
 use std::fs::File;
 use std::io::{BufWriter, Write};
@@ -10,58 +12,58 @@ use phf_codegen::OrderedMap;
 fn main() {
     let d50 = include_str!("src/illuminants/CIE_std_illum_D50.csv");
     let d50 = parse_pairs(d50);
-    write_illuminant(d50, "D50");
+    write_illuminant(&d50, "D50");
     let d65 = include_str!("src/illuminants/CIE_std_illum_D65.csv");
     let d65 = parse_pairs(d65);
-    write_illuminant(d65, "D65");
+    write_illuminant(&d65, "D65");
 
     let leds = include_str!("src/illuminants/CIE_illum_LEDs_1nm.csv");
     let [led_b1, led_b2, led_b3, led_b4, led_b5, led_bh1, led_rgb1, led_v1, led_v2] =
         parse_leds(leds);
 
-    write_illuminant(led_b1, "LED_B1");
-    write_illuminant(led_b2, "LED_B2");
-    write_illuminant(led_b3, "LED_B3");
-    write_illuminant(led_b4, "LED_B4");
-    write_illuminant(led_b5, "LED_B5");
-    write_illuminant(led_bh1, "LED_BH1");
-    write_illuminant(led_rgb1, "LED_RGB1");
-    write_illuminant(led_v1, "LED_V1");
-    write_illuminant(led_v2, "LED_V2");
+    write_illuminant(&led_b1, "LED_B1");
+    write_illuminant(&led_b2, "LED_B2");
+    write_illuminant(&led_b3, "LED_B3");
+    write_illuminant(&led_b4, "LED_B4");
+    write_illuminant(&led_b5, "LED_B5");
+    write_illuminant(&led_bh1, "LED_BH1");
+    write_illuminant(&led_rgb1, "LED_RGB1");
+    write_illuminant(&led_v1, "LED_V1");
+    write_illuminant(&led_v2, "LED_V2");
 
     let fluorescents = include_str!("src/illuminants/CIE_illum_FLs_1nm.csv");
     let [fl1, fl2, fl3, fl4, fl5, fl6, fl7, fl8, fl9, fl10, fl11, fl12, fl3_1, fl3_2, fl3_3, fl3_4, fl3_5, fl3_6, fl3_7, fl3_8, fl3_9, fl3_10, fl3_11, fl3_12, fl3_13, fl3_14, fl3_15] =
         parse_fluorescents(fluorescents);
-    write_illuminant(fl1, "FL1");
-    write_illuminant(fl2, "FL2");
-    write_illuminant(fl3, "FL3");
-    write_illuminant(fl4, "FL4");
-    write_illuminant(fl5, "FL5");
-    write_illuminant(fl6, "FL6");
-    write_illuminant(fl7, "FL7");
-    write_illuminant(fl8, "FL8");
-    write_illuminant(fl9, "FL9");
-    write_illuminant(fl10, "FL10");
-    write_illuminant(fl11, "FL11");
-    write_illuminant(fl12, "FL12");
-    write_illuminant(fl3_1, "FL3_1");
-    write_illuminant(fl3_2, "FL3_2");
-    write_illuminant(fl3_3, "FL3_3");
-    write_illuminant(fl3_4, "FL3_4");
-    write_illuminant(fl3_5, "FL3_5");
-    write_illuminant(fl3_6, "FL3_6");
-    write_illuminant(fl3_7, "FL3_7");
-    write_illuminant(fl3_8, "FL3_8");
-    write_illuminant(fl3_9, "FL3_9");
-    write_illuminant(fl3_10, "FL3_10");
-    write_illuminant(fl3_11, "FL3_11");
-    write_illuminant(fl3_12, "FL3_12");
-    write_illuminant(fl3_13, "FL3_13");
-    write_illuminant(fl3_14, "FL3_14");
-    write_illuminant(fl3_15, "FL3_15");
+    write_illuminant(&fl1, "FL1");
+    write_illuminant(&fl2, "FL2");
+    write_illuminant(&fl3, "FL3");
+    write_illuminant(&fl4, "FL4");
+    write_illuminant(&fl5, "FL5");
+    write_illuminant(&fl6, "FL6");
+    write_illuminant(&fl7, "FL7");
+    write_illuminant(&fl8, "FL8");
+    write_illuminant(&fl9, "FL9");
+    write_illuminant(&fl10, "FL10");
+    write_illuminant(&fl11, "FL11");
+    write_illuminant(&fl12, "FL12");
+    write_illuminant(&fl3_1, "FL3_1");
+    write_illuminant(&fl3_2, "FL3_2");
+    write_illuminant(&fl3_3, "FL3_3");
+    write_illuminant(&fl3_4, "FL3_4");
+    write_illuminant(&fl3_5, "FL3_5");
+    write_illuminant(&fl3_6, "FL3_6");
+    write_illuminant(&fl3_7, "FL3_7");
+    write_illuminant(&fl3_8, "FL3_8");
+    write_illuminant(&fl3_9, "FL3_9");
+    write_illuminant(&fl3_10, "FL3_10");
+    write_illuminant(&fl3_11, "FL3_11");
+    write_illuminant(&fl3_12, "FL3_12");
+    write_illuminant(&fl3_13, "FL3_13");
+    write_illuminant(&fl3_14, "FL3_14");
+    write_illuminant(&fl3_15, "FL3_15");
 }
 
-fn write_illuminant(builder: OrderedMap<usize>, output: &str) {
+fn write_illuminant(builder: &OrderedMap<usize>, output: &str) {
     let outpath = Path::new(&env::var("OUT_DIR").unwrap()).join(format!("{output}.rs"));
     let mut outfile = BufWriter::new(File::create(&outpath).unwrap());
     let data = builder.build();
@@ -105,7 +107,7 @@ impl TextureTrait for {output} {{
 }}
 "#
     )
-    .unwrap()
+    .unwrap();
 }
 
 fn floaty(f: &str) -> String {

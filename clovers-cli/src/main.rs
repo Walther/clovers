@@ -9,7 +9,6 @@ use render::RenderOptions;
 use std::error::Error;
 
 // Internal imports
-use clovers::*;
 #[doc(hidden)]
 pub mod debug_visualizations;
 #[doc(hidden)]

@@ -215,9 +215,9 @@ fn index_to_params(opts: &RenderOptions, index: usize) -> (Float, Float, Float, 
 }
 
 fn progress_bar(height: u32, quiet: bool) -> ProgressBar {
-    let bar = ProgressBar::new(height as u64);
+    let bar = ProgressBar::new(u64::from(height));
     if quiet {
-        bar.set_draw_target(ProgressDrawTarget::hidden())
+        bar.set_draw_target(ProgressDrawTarget::hidden());
     } else {
         bar.set_style(ProgressStyle::default_bar().template(
             "Elapsed:   {elapsed_precise}\nRows:      {bar} {pos}/{len}\nRemaining: {eta_precise}",
