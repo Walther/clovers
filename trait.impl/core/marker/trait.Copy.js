@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["clovers",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.92.0/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"clovers/bvh/enum.BvhAlgorithm.html\" title=\"enum clovers::bvh::BvhAlgorithm\">BvhAlgorithm</a>"]]],["clovers_runtime",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.92.0/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"clovers_runtime/render/enum.BvhAlgorithm.html\" title=\"enum clovers_runtime::render::BvhAlgorithm\">BvhAlgorithm</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.92.0/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"clovers_runtime/render/enum.Format.html\" title=\"enum clovers_runtime::render::Format\">Format</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.92.0/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"clovers_runtime/render/enum.RenderMode.html\" title=\"enum clovers_runtime::render::RenderMode\">RenderMode</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.92.0/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"clovers_runtime/sampler/enum.Sampler.html\" title=\"enum clovers_runtime::sampler::Sampler\">Sampler</a>"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[280,1141]}

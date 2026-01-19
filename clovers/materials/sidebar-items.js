@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Kind","MaterialInit","MaterialType"],"mod":["cone_light","dielectric","diffuse_light","dispersive","gltf","isotropic","lambertian","metal","thin_film"],"struct":["Material","ScatterRecord","SharedMaterial"],"trait":["MaterialTrait"]};

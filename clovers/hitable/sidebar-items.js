@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Hitable"],"fn":["get_orientation"],"struct":["Empty","HitableList"],"trait":["HitableTrait"]};

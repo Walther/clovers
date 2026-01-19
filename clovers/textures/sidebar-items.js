@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Texture"],"mod":["solid_color","spatial_checker","surface_checker"],"trait":["TextureTrait"]};

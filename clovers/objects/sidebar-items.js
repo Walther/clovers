@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Object"],"fn":["object_to_hitable"],"mod":["boxy","constant_medium","gltf","moving_sphere","ply","quad","rotate","sphere","stl","translate","triangle"],"struct":["ObjectList"]};
