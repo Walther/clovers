@@ -85,6 +85,7 @@ pub mod materials;
 pub mod objects;
 pub mod onb;
 pub mod pdf;
+pub mod polarization;
 pub mod random;
 pub mod ray;
 pub mod scenes;
